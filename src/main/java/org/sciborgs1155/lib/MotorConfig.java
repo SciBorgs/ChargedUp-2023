@@ -1,4 +1,4 @@
-package frc.lib;
+package org.sciborgs1155.lib;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
