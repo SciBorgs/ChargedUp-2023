@@ -14,6 +14,7 @@ import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
 import org.sciborgs1155.robot.Constants.DriveConstants;
 import org.sciborgs1155.robot.Ports;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 public class DriveSubsystem extends SubsystemBase implements Loggable {
   // Robot swerve modules
@@ -55,18 +56,15 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
   private final Gyro m_gyro = new ADXRS450_Gyro();
 
   // Odometry class for tracking robot pose
-  SwerveDriveOdometry m_odometry =
+  private SwerveDriveOdometry m_odometry =
       new SwerveDriveOdometry(
           DriveConstants.kDriveKinematics, m_gyro.getRotation2d(), getModulePositions());
 
+  // Smartdashboard Field
+  private Field2d field2d = new Field2d();
+
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {}
-
-  @Override
-  public void periodic() {
-    // Update the odometry in the periodic block
-    m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
-  }
 
   /**
    * Returns the currently-estimated pose of the robot.
@@ -142,6 +140,12 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
     return m_gyro.getRotation2d().getDegrees();
   }
 
+  private SwerveModuleState[] getModuleStates() {
+    return Arrays.stream(modules)
+      .map(module -> module.getState())
+      .toArray(SwerveModuleState[]::new);
+  }
+
   private SwerveModulePosition[] getModulePositions() {
     return Arrays.stream(modules)
         .map(module -> module.getPosition())
@@ -156,4 +160,11 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
   public double getTurnRate() {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   } // SpeedLimit is just to make sure I dont burn down the school
+
+  @Override
+  public void periodic() {
+    // Update the odometry in the periodic block
+    m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
+    field2d.setRobotPose(getPose());
+  }
 }
