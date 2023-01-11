@@ -11,6 +11,7 @@ import io.github.oblarg.oblog.Logger;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.ExampleCommand;
 import org.sciborgs1155.robot.subsystems.ExampleSubsystem;
+import org.sciborgs1155.robot.Ports.Inputs;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -23,7 +24,7 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController = new CommandXboxController(Ports.xbox);
+  private final CommandXboxController m_driverController = new CommandXboxController(Inputs.xbox);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

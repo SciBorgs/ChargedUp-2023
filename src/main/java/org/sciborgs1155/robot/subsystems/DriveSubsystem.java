@@ -13,7 +13,10 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
 import org.sciborgs1155.robot.Constants.DriveConstants;
-import org.sciborgs1155.robot.Ports;
+
+import com.ctre.phoenix.sensors.WPI_PigeonIMU;
+
+import org.sciborgs1155.robot.Ports.Drivetrain;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 public class DriveSubsystem extends SubsystemBase implements Loggable {
@@ -21,39 +24,39 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
   @Log
   private final SwerveModule frontLeft =
       new SwerveModule(
-          Ports.frontLeftDriveMotorPort,
-          Ports.frontLeftTurningMotorPort,
+          Drivetrain.frontLeftDriveMotorPort,
+          Drivetrain.frontLeftTurningMotorPort,
           DriveConstants.frontDriveConfig,
           DriveConstants.frontTurnConfig);
 
   @Log
   private final SwerveModule rearLeft =
       new SwerveModule(
-          Ports.rearLeftDriveMotorPort,
-          Ports.rearLeftTurningMotorPort,
+          Drivetrain.rearLeftDriveMotorPort,
+          Drivetrain.rearLeftTurningMotorPort,
           DriveConstants.rearDriveConfig,
           DriveConstants.rearTurnConfig);
 
   @Log
   private final SwerveModule frontRight =
       new SwerveModule(
-          Ports.frontRightDriveMotorPort,
-          Ports.frontRightTurningMotorPort,
+          Drivetrain.frontRightDriveMotorPort,
+          Drivetrain.frontRightTurningMotorPort,
           DriveConstants.frontDriveConfig,
           DriveConstants.frontTurnConfig);
 
   @Log
   private final SwerveModule rearRight =
       new SwerveModule(
-          Ports.rearRightDriveMotorPort,
-          Ports.rearRightTurningMotorPort,
+          Drivetrain.rearRightDriveMotorPort,
+          Drivetrain.rearRightTurningMotorPort,
           DriveConstants.rearDriveConfig,
           DriveConstants.rearTurnConfig);
 
   private final SwerveModule[] modules = {frontLeft, rearLeft, frontRight, rearRight};
 
   // The gyro sensor
-  private final Gyro m_gyro = new ADXRS450_Gyro();
+  private final WPI_PigeonIMU m_gyro = new WPI_PigeonIMU(2);
 
   // Odometry class for tracking robot pose
   private SwerveDriveOdometry m_odometry =
