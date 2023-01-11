@@ -1,6 +1,8 @@
 package org.sciborgs1155.robot;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
@@ -23,6 +25,8 @@ public class RobotContainer {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController xbox = new CommandXboxController(Inputs.xbox);
+  private final Joystick leftJoystick = new Joystick(0);
+  private final Joystick rightJoystick = new Joystick(10);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -32,6 +36,14 @@ public class RobotContainer {
     configureBindings();
   }
 
+  private void configureSubsystemDefaults() {
+    drive.setDefaultCommand(
+        new RunCommand(
+            () -> {
+              drive.drive(leftJoystick.getX(), leftJoystick.getY(), rightJoystick.getX(), false);
+            },
+            drive));
+  }
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
    * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
