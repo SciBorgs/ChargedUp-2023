@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
+import org.sciborgs1155.robot.Ports.Inputs;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.ExampleCommand;
 import org.sciborgs1155.robot.subsystems.DriveSubsystem;
@@ -25,7 +26,7 @@ public class RobotContainer {
   private final DriveSubsystem drive = new DriveSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController = new CommandXboxController(Ports.xbox);
+  private final CommandXboxController m_driverController = new CommandXboxController(Inputs.xbox);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

@@ -1,72 +1,69 @@
 package org.sciborgs1155.robot.subsystems;
 
+import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
 import org.sciborgs1155.robot.Constants.DriveConstants;
-import org.sciborgs1155.robot.Ports;
+import org.sciborgs1155.robot.Ports.Drivetrain;
 
 public class DriveSubsystem extends SubsystemBase implements Loggable {
   // Robot swerve modules
   @Log
   private final SwerveModule frontLeft =
       new SwerveModule(
-          Ports.frontLeftDriveMotorPort,
-          Ports.frontLeftTurningMotorPort,
+          Drivetrain.frontLeftDriveMotorPort,
+          Drivetrain.frontLeftTurningMotorPort,
           DriveConstants.frontDriveConfig,
           DriveConstants.frontTurnConfig);
 
   @Log
   private final SwerveModule rearLeft =
       new SwerveModule(
-          Ports.rearLeftDriveMotorPort,
-          Ports.rearLeftTurningMotorPort,
+          Drivetrain.rearLeftDriveMotorPort,
+          Drivetrain.rearLeftTurningMotorPort,
           DriveConstants.rearDriveConfig,
           DriveConstants.rearTurnConfig);
 
   @Log
   private final SwerveModule frontRight =
       new SwerveModule(
-          Ports.frontRightDriveMotorPort,
-          Ports.frontRightTurningMotorPort,
+          Drivetrain.frontRightDriveMotorPort,
+          Drivetrain.frontRightTurningMotorPort,
           DriveConstants.frontDriveConfig,
           DriveConstants.frontTurnConfig);
 
   @Log
   private final SwerveModule rearRight =
       new SwerveModule(
-          Ports.rearRightDriveMotorPort,
-          Ports.rearRightTurningMotorPort,
+          Drivetrain.rearRightDriveMotorPort,
+          Drivetrain.rearRightTurningMotorPort,
           DriveConstants.rearDriveConfig,
           DriveConstants.rearTurnConfig);
 
   private final SwerveModule[] modules = {frontLeft, rearLeft, frontRight, rearRight};
 
   // The gyro sensor
-  private final Gyro m_gyro = new ADXRS450_Gyro();
+  private final WPI_PigeonIMU m_gyro = new WPI_PigeonIMU(2);
 
   // Odometry class for tracking robot pose
-  SwerveDriveOdometry m_odometry =
+  private SwerveDriveOdometry m_odometry =
       new SwerveDriveOdometry(
           DriveConstants.kDriveKinematics, m_gyro.getRotation2d(), getModulePositions());
 
+  // Smartdashboard Field
+  private Field2d field2d = new Field2d();
+
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {}
-
-  @Override
-  public void periodic() {
-    // Update the odometry in the periodic block
-    m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
-  }
 
   /**
    * Returns the currently-estimated pose of the robot.
@@ -135,6 +132,18 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
     return m_gyro.getRotation2d().getDegrees();
   }
 
+  private SwerveModuleState[] getModuleStates() {
+    return Arrays.stream(modules)
+        .map(module -> module.getState())
+        .toArray(SwerveModuleState[]::new);
+  }
+
+  private SwerveModulePosition[] getModulePositions() {
+    return Arrays.stream(modules)
+        .map(module -> module.getPosition())
+        .toArray(SwerveModulePosition[]::new);
+  }
+
   /**
    * Returns the turn rate of the robot.
    *
@@ -144,14 +153,10 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   } // SpeedLimit is just to make sure I dont burn down the school
 
-  /**
-   * Returns the swerve module positions of the robot.
-   *
-   * @return The swerve module positions
-   */
-  private SwerveModulePosition[] getModulePositions() {
-    return Arrays.stream(modules)
-        .map(module -> module.getPosition())
-        .toArray(SwerveModulePosition[]::new);
+  @Override
+  public void periodic() {
+    // Update the odometry in the periodic block
+    m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
+    field2d.setRobotPose(getPose());
   }
 }
