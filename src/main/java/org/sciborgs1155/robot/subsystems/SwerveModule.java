@@ -31,6 +31,8 @@ public class SwerveModule implements Sendable {
 
   private final SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(0, 0);
 
+  private final double angularOffset;
+
   /**
    * Constructs a SwerveModule for rev's product.
    *
@@ -78,6 +80,8 @@ public class SwerveModule implements Sendable {
       REVPhysicsSim.getInstance().addSparkMax(driveMotor, DCMotor.getNEO(1));
       REVPhysicsSim.getInstance().addSparkMax(turnMotor, DCMotor.getNeo550(1));
     }
+
+    this.angularOffset = angularOffset;
   }
 
   /**
@@ -88,13 +92,13 @@ public class SwerveModule implements Sendable {
   public SwerveModuleState getState() {
     // won't work until units are correct
     return new SwerveModuleState(
-        driveEncoder.getVelocity(), new Rotation2d(turningEncoder.getPosition()));
+        driveEncoder.getVelocity(), new Rotation2d(turningEncoder.getPosition() - angularOffset));
   }
 
   public SwerveModulePosition getPosition() {
     // won't work until units are correct
     return new SwerveModulePosition(
-        driveEncoder.getPosition(), new Rotation2d(turningEncoder.getPosition()));
+        driveEncoder.getPosition(), new Rotation2d(turningEncoder.getPosition() - angularOffset));
   }
 
   /**
@@ -103,9 +107,12 @@ public class SwerveModule implements Sendable {
    * @param desiredState Desired state with speed and angle.
    */
   public void setDesiredState(SwerveModuleState desiredState) {
+    SwerveModuleState correctedDesiredState = new SwerveModuleState();
+    correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
+    correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(angularOffset));
     // Optimize the reference state to avoid spinning further than 90 degrees
     SwerveModuleState state =
-        SwerveModuleState.optimize(desiredState, new Rotation2d(turningEncoder.getPosition()));
+        SwerveModuleState.optimize(correctedDesiredState, new Rotation2d(turningEncoder.getPosition()));
 
     // Calculate the drive output from the drive PID controller.
     driveFeedback.setReference(
