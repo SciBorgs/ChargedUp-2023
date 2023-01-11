@@ -94,19 +94,12 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
    * @param rot Angular rate of the robot.
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
-  @SuppressWarnings("ParameterName")
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    var swerveModuleStates =
+    setModuleStates(
         DriveConstants.kDriveKinematics.toSwerveModuleStates(
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
-                : new ChassisSpeeds(xSpeed, ySpeed, rot));
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    frontLeft.setDesiredState(swerveModuleStates[0]);
-    frontRight.setDesiredState(swerveModuleStates[1]);
-    rearLeft.setDesiredState(swerveModuleStates[2]);
-    rearRight.setDesiredState(swerveModuleStates[3]);
+                : new ChassisSpeeds(xSpeed, ySpeed, rot)));
   }
 
   /**
@@ -142,12 +135,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
     return m_gyro.getRotation2d().getDegrees();
   }
 
-  private SwerveModulePosition[] getModulePositions() {
-    return Arrays.stream(modules)
-        .map(module -> module.getPosition())
-        .toArray(SwerveModulePosition[]::new);
-  }
-
   /**
    * Returns the turn rate of the robot.
    *
@@ -156,4 +143,15 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
   public double getTurnRate() {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   } // SpeedLimit is just to make sure I dont burn down the school
+
+  /**
+   * Returns the swerve module positions of the robot.
+   *
+   * @return The swerve module positions
+   */
+  private SwerveModulePosition[] getModulePositions() {
+    return Arrays.stream(modules)
+        .map(module -> module.getPosition())
+        .toArray(SwerveModulePosition[]::new);
+  }
 }

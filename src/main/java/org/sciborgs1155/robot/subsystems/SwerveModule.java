@@ -6,6 +6,7 @@ import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -24,11 +25,11 @@ public class SwerveModule implements Sendable {
   private final RelativeEncoder driveEncoder;
   private final RelativeEncoder turningEncoder;
 
-  private final PIDController m_drivePIDController =
+  private final PIDController driveFeedback =
       new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
 
   // Using a TrapezoidProfile PIDController to allow for smooth turning
-  private final ProfiledPIDController m_turningPIDController =
+  private final ProfiledPIDController turnFeedback =
       new ProfiledPIDController(
           ModuleConstants.kPModuleTurningController,
           0,
@@ -36,6 +37,9 @@ public class SwerveModule implements Sendable {
           new TrapezoidProfile.Constraints(
               ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
               ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
+
+  private final SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(0, 0);
+  private final SimpleMotorFeedforward turnFeedforward = new SimpleMotorFeedforward(0, 0);
 
   /**
    * Constructs a SwerveModule.
@@ -59,16 +63,16 @@ public class SwerveModule implements Sendable {
     // Set the distance per pulse for the drive encoder. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    // driveEncoder.setDistancePerPulse(ModuleConstants.kDriveEncoderDistancePerPulse);
+    driveEncoder.setVelocityConversionFactor(ModuleConstants.kDriveEncoderDistancePerPulse);
 
     // Set the distance (in this case, angle) per pulse for the turning encoder.
     // This is the the angle through an entire rotation (2 * pi) divided by the
     // encoder resolution.
-    // turningEncoder.setDistancePerPulse(ModuleConstants.kTurningEncoderDistancePerPulse);
+    turningEncoder.setPositionConversionFactor(ModuleConstants.kTurningEncoderDistancePerPulse);
 
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
-    m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
+    turnFeedback.enableContinuousInput(-Math.PI, Math.PI);
 
     // add motors to rev physics sim
     if (Robot.isSimulation()) {
@@ -106,15 +110,17 @@ public class SwerveModule implements Sendable {
 
     // Calculate the drive output from the drive PID controller.
     final double driveOutput =
-        m_drivePIDController.calculate(driveEncoder.getVelocity(), state.speedMetersPerSecond);
+        driveFeedback.calculate(driveEncoder.getVelocity(), state.speedMetersPerSecond)
+            + driveFeedforward.calculate(state.speedMetersPerSecond);
 
     // Calculate the turning motor output from the turning PID controller.
     final double turnOutput =
-        m_turningPIDController.calculate(turningEncoder.getPosition(), state.angle.getRadians());
+        turnFeedback.calculate(turningEncoder.getPosition(), state.angle.getRadians())
+            + turnFeedforward.calculate(turnFeedback.getSetpoint().velocity);
 
     // Calculate the turning motor output from the turning PID controller.
-    driveMotor.set(driveOutput);
-    turnMotor.set(turnOutput);
+    driveMotor.setVoltage(driveOutput);
+    turnMotor.setVoltage(turnOutput);
   }
 
   /** Zeroes all the SwerveModule encoders. */
@@ -127,7 +133,7 @@ public class SwerveModule implements Sendable {
   public void initSendable(SendableBuilder builder) {
     builder.addDoubleProperty("velocity", driveEncoder::getVelocity, null);
     builder.addDoubleProperty("angle", turningEncoder::getPosition, null);
-    m_drivePIDController.initSendable(builder);
-    m_turningPIDController.initSendable(builder);
+    driveFeedback.initSendable(builder);
+    turnFeedback.initSendable(builder);
   }
 }

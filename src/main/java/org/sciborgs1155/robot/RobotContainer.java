@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.ExampleCommand;
+import org.sciborgs1155.robot.subsystems.DriveSubsystem;
 import org.sciborgs1155.robot.subsystems.ExampleSubsystem;
 
 /**
@@ -21,6 +22,7 @@ import org.sciborgs1155.robot.subsystems.ExampleSubsystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  private final DriveSubsystem drive = new DriveSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController = new CommandXboxController(Ports.xbox);

@@ -1,0 +1,23 @@
+{
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo"
+    }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "Shuffleboard": {
+        "DriveSubsystem": {
+          "frontLeft": {
+            "open": true
+          },
+          "open": true
+        },
+        "RobotContainer": {
+          "open": true
+        },
+        "open": true
+      }
+    }
+  }
+}
