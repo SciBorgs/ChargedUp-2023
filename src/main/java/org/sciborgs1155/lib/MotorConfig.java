@@ -54,6 +54,10 @@ public final class MotorConfig {
     setCurrentLimit(80);
   }
 
+  public static MotorConfig base() {
+    return new MotorConfig();
+  }
+
   /**
    * Creates a CANSparkMax based on configured values
    *

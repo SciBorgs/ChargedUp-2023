@@ -14,44 +14,37 @@ import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.sciborgs1155.robot.Constants.DriveConstants;
+import org.sciborgs1155.robot.Ports;
 
 public class DriveSubsystem extends SubsystemBase {
   // Robot swerve modules
   private final SwerveModule m_frontLeft =
       new SwerveModule(
-          DriveConstants.kFrontLeftDriveMotorPort,
-          DriveConstants.kFrontLeftTurningMotorPort,
-          DriveConstants.kFrontLeftDriveEncoderPorts,
-          DriveConstants.kFrontLeftTurningEncoderPorts,
-          DriveConstants.kFrontLeftDriveEncoderReversed,
-          DriveConstants.kFrontLeftTurningEncoderReversed);
+          Ports.frontLeftDriveMotorPort,
+          Ports.frontLeftTurningMotorPort,
+          DriveConstants.frontDriveConfig,
+          DriveConstants.frontTurnConfig);
 
   private final SwerveModule m_rearLeft =
       new SwerveModule(
-          DriveConstants.kRearLeftDriveMotorPort,
-          DriveConstants.kRearLeftTurningMotorPort,
-          DriveConstants.kRearLeftDriveEncoderPorts,
-          DriveConstants.kRearLeftTurningEncoderPorts,
-          DriveConstants.kRearLeftDriveEncoderReversed,
-          DriveConstants.kRearLeftTurningEncoderReversed);
+          Ports.rearLeftDriveMotorPort,
+          Ports.rearLeftTurningMotorPort,
+          DriveConstants.rearDriveConfig,
+          DriveConstants.rearTurnConfig);
 
   private final SwerveModule m_frontRight =
       new SwerveModule(
-          DriveConstants.kFrontRightDriveMotorPort,
-          DriveConstants.kFrontRightTurningMotorPort,
-          DriveConstants.kFrontRightDriveEncoderPorts,
-          DriveConstants.kFrontRightTurningEncoderPorts,
-          DriveConstants.kFrontRightDriveEncoderReversed,
-          DriveConstants.kFrontRightTurningEncoderReversed);
+          Ports.frontRightDriveMotorPort,
+          Ports.frontRightTurningMotorPort,
+          DriveConstants.frontDriveConfig,
+          DriveConstants.frontTurnConfig);
 
   private final SwerveModule m_rearRight =
       new SwerveModule(
-          DriveConstants.kRearRightDriveMotorPort,
-          DriveConstants.kRearRightTurningMotorPort,
-          DriveConstants.kRearRightDriveEncoderPorts,
-          DriveConstants.kRearRightTurningEncoderPorts,
-          DriveConstants.kRearRightDriveEncoderReversed,
-          DriveConstants.kRearRightTurningEncoderReversed);
+          Ports.rearRightDriveMotorPort,
+          Ports.rearRightTurningMotorPort,
+          DriveConstants.rearDriveConfig,
+          DriveConstants.rearTurnConfig);
 
   // The gyro sensor
   private final Gyro m_gyro = new ADXRS450_Gyro();

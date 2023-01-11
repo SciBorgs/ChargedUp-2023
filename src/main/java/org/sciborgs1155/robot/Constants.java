@@ -7,6 +7,8 @@ package org.sciborgs1155.robot;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import org.sciborgs1155.lib.MotorConfig;
+import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -14,39 +16,23 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
  * globally (i.e. public static). Do not put anything functional in this class.
  *
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
- * constants are needed, to reduce verbosity.
+ * constants are needed, to reduce verbosity. <b>Units</b>
+ *
+ * <ul>
+ *   <li>length: meters
+ *   <li>time: seconds
+ *   <li>angle: radians
+ * </ul>
  */
 public final class Constants {
   public static final class DriveConstants {
-    public static final int kFrontLeftDriveMotorPort = 0;
-    public static final int kRearLeftDriveMotorPort = 2;
-    public static final int kFrontRightDriveMotorPort = 4;
-    public static final int kRearRightDriveMotorPort = 6;
+    public static final MotorConfig frontDriveConfig =
+        MotorConfig.base().setNeutralBehavior(NeutralBehavior.BRAKE);
+    public static final MotorConfig rearDriveConfig = frontDriveConfig.clone().setInverted(true);
 
-    public static final int kFrontLeftTurningMotorPort = 1;
-    public static final int kRearLeftTurningMotorPort = 3;
-    public static final int kFrontRightTurningMotorPort = 5;
-    public static final int kRearRightTurningMotorPort = 7;
-
-    public static final int[] kFrontLeftTurningEncoderPorts = new int[] {0, 1};
-    public static final int[] kRearLeftTurningEncoderPorts = new int[] {2, 3};
-    public static final int[] kFrontRightTurningEncoderPorts = new int[] {4, 5};
-    public static final int[] kRearRightTurningEncoderPorts = new int[] {6, 7};
-
-    public static final boolean kFrontLeftTurningEncoderReversed = false;
-    public static final boolean kRearLeftTurningEncoderReversed = true;
-    public static final boolean kFrontRightTurningEncoderReversed = false;
-    public static final boolean kRearRightTurningEncoderReversed = true;
-
-    public static final int[] kFrontLeftDriveEncoderPorts = new int[] {8, 9};
-    public static final int[] kRearLeftDriveEncoderPorts = new int[] {10, 11};
-    public static final int[] kFrontRightDriveEncoderPorts = new int[] {12, 13};
-    public static final int[] kRearRightDriveEncoderPorts = new int[] {14, 15};
-
-    public static final boolean kFrontLeftDriveEncoderReversed = false;
-    public static final boolean kRearLeftDriveEncoderReversed = true;
-    public static final boolean kFrontRightDriveEncoderReversed = false;
-    public static final boolean kRearRightDriveEncoderReversed = true;
+    public static final MotorConfig frontTurnConfig =
+        MotorConfig.base().setNeutralBehavior(NeutralBehavior.BRAKE);
+    public static final MotorConfig rearTurnConfig = rearDriveConfig.clone();
 
     public static final double kTrackWidth = 0.5;
     // Distance between centers of right and left wheels on robot
@@ -89,10 +75,6 @@ public final class Constants {
     public static final double kPModuleTurningController = 1;
 
     public static final double kPModuleDriveController = 1;
-  }
-
-  public static final class OIConstants {
-    public static final int kDriverControllerPort = 0;
   }
 
   public static final class AutoConstants {
