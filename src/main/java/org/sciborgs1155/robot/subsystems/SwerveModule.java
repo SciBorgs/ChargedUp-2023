@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package org.sciborgs1155.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
@@ -15,11 +11,13 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import org.sciborgs1155.lib.MotorConfig;
 import org.sciborgs1155.robot.Constants.ModuleConstants;
 import org.sciborgs1155.robot.Robot;
 
-public class SwerveModule {
+public class SwerveModule implements Sendable {
   private final CANSparkMax driveMotor; // Regular Neo
   private final CANSparkMax turnMotor; // Neo 550
 
@@ -91,6 +89,7 @@ public class SwerveModule {
   }
 
   public SwerveModulePosition getPosition() {
+    // won't work until units are correct
     return new SwerveModulePosition(
         driveEncoder.getPosition(), new Rotation2d(turningEncoder.getPosition()));
   }
@@ -122,5 +121,13 @@ public class SwerveModule {
   public void resetEncoders() {
     driveEncoder.setPosition(0);
     turningEncoder.setPosition(0);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.addDoubleProperty("velocity", driveEncoder::getVelocity, null);
+    builder.addDoubleProperty("angle", turningEncoder::getPosition, null);
+    m_drivePIDController.initSendable(builder);
+    m_turningPIDController.initSendable(builder);
   }
 }
