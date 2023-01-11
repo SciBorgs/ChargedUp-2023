@@ -21,42 +21,38 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
       new SwerveModule(
           Drivetrain.frontLeftDriveMotorPort,
           Drivetrain.frontLeftTurningMotorPort,
-          DriveConstants.frontDriveConfig,
-          DriveConstants.frontTurnConfig);
-
-  @Log
-  private final SwerveModule rearLeft =
-      new SwerveModule(
-          Drivetrain.rearLeftDriveMotorPort,
-          Drivetrain.rearLeftTurningMotorPort,
-          DriveConstants.rearDriveConfig,
-          DriveConstants.rearTurnConfig);
+          DriveConstants.kFrontLeftChassisAngularOffset);
 
   @Log
   private final SwerveModule frontRight =
       new SwerveModule(
           Drivetrain.frontRightDriveMotorPort,
           Drivetrain.frontRightTurningMotorPort,
-          DriveConstants.frontDriveConfig,
-          DriveConstants.frontTurnConfig);
+          DriveConstants.kFrontRightChassisAngularOffset);
+
+  @Log
+  private final SwerveModule rearLeft =
+      new SwerveModule(
+          Drivetrain.rearLeftDriveMotorPort,
+          Drivetrain.rearLeftTurningMotorPort,
+          DriveConstants.kBackLeftChassisAngularOffset);
 
   @Log
   private final SwerveModule rearRight =
       new SwerveModule(
           Drivetrain.rearRightDriveMotorPort,
           Drivetrain.rearRightTurningMotorPort,
-          DriveConstants.rearDriveConfig,
-          DriveConstants.rearTurnConfig);
+          DriveConstants.kBackRightChassisAngularOffset);
 
-  private final SwerveModule[] modules = {frontLeft, rearLeft, frontRight, rearRight};
+  private final SwerveModule[] modules = {frontLeft, frontRight, rearLeft, rearRight};
 
   // The gyro sensor
-  private final WPI_PigeonIMU m_gyro = new WPI_PigeonIMU(2);
+  private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(2);
 
   // Odometry class for tracking robot pose
-  private SwerveDriveOdometry m_odometry =
+  private SwerveDriveOdometry odometry =
       new SwerveDriveOdometry(
-          DriveConstants.kDriveKinematics, m_gyro.getRotation2d(), getModulePositions());
+          DriveConstants.kDriveKinematics, gyro.getRotation2d(), getModulePositions());
 
   @Log private Field2d field2d = new Field2d();
 
@@ -69,7 +65,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
    * @return The pose.
    */
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    return odometry.getPoseMeters();
   }
 
   /**
@@ -78,7 +74,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(m_gyro.getRotation2d(), getModulePositions(), pose);
+    odometry.resetPosition(gyro.getRotation2d(), getModulePositions(), pose);
   }
 
   /**
@@ -93,7 +89,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
     setModuleStates(
         DriveConstants.kDriveKinematics.toSwerveModuleStates(
             fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
+                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, gyro.getRotation2d())
                 : new ChassisSpeeds(xSpeed, ySpeed, rot)));
   }
 
@@ -118,7 +114,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    m_gyro.reset();
+    gyro.reset();
   }
 
   /**
@@ -126,8 +122,9 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
    *
    * @return the robot's heading in degrees, from -180 to 180
    */
+  @Log
   public double getHeading() {
-    return m_gyro.getRotation2d().getDegrees();
+    return gyro.getRotation2d().getDegrees();
   }
 
   private SwerveModuleState[] getModuleStates() {
@@ -147,14 +144,15 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
    *
    * @return The turn rate of the robot, in degrees per second
    */
+  @Log
   public double getTurnRate() {
-    return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+    return gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   } // SpeedLimit is just to make sure I dont burn down the school
 
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
+    odometry.update(gyro.getRotation2d(), getModulePositions());
     field2d.setRobotPose(getPose());
   }
 }

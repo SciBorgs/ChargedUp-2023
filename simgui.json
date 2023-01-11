@@ -25,7 +25,7 @@
     "transitory": {
       "Shuffleboard": {
         "DriveSubsystem": {
-          "frontLeft": {
+          "field2d": {
             "open": true
           },
           "open": true

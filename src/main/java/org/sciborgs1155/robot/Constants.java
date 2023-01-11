@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package org.sciborgs1155.robot;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -25,14 +21,18 @@ import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
  * </ul>
  */
 public final class Constants {
-  public static final class DriveConstants {
-    public static final MotorConfig frontDriveConfig =
-        MotorConfig.base().setNeutralBehavior(NeutralBehavior.BRAKE);
-    public static final MotorConfig rearDriveConfig = frontDriveConfig.clone().setInverted(true);
+  public static final class Motors {
+    public static final MotorConfig moduleDriveConfig =
+        MotorConfig.base().setNeutralBehavior(NeutralBehavior.BRAKE).setCurrentLimit(50);
 
-    public static final MotorConfig frontTurnConfig =
-        MotorConfig.base().setNeutralBehavior(NeutralBehavior.BRAKE);
-    public static final MotorConfig rearTurnConfig = rearDriveConfig.clone();
+    public static final MotorConfig moduleTurnConfig =
+        MotorConfig.base()
+            .setInverted(true)
+            .setNeutralBehavior(NeutralBehavior.BRAKE)
+            .setCurrentLimit(20);
+  }
+
+  public static final class DriveConstants {
 
     public static final double kTrackWidth = 0.5;
     // Distance between centers of right and left wheels on robot
@@ -46,6 +46,11 @@ public final class Constants {
             new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     public static final boolean kGyroReversed = false;
+
+    public static final double kFrontLeftChassisAngularOffset = -Math.PI / 2;
+    public static final double kFrontRightChassisAngularOffset = 0;
+    public static final double kBackLeftChassisAngularOffset = Math.PI;
+    public static final double kBackRightChassisAngularOffset = Math.PI / 2;
 
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
     // These characterization values MUST be determined either experimentally or theoretically
