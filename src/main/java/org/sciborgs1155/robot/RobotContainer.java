@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package org.sciborgs1155.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,7 +22,7 @@ public class RobotContainer {
   private final DriveSubsystem drive = new DriveSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController = new CommandXboxController(Inputs.xbox);
+  private final CommandXboxController xbox = new CommandXboxController(Inputs.xbox);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -52,7 +48,7 @@ public class RobotContainer {
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
-    m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+    xbox.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
   }
 
   /**

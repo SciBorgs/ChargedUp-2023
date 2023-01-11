@@ -1,7 +1,24 @@
 {
+  "HALProvider": {
+    "Other Devices": {
+      "SPARK MAX [0]": {
+        "header": {
+          "open": true
+        }
+      }
+    }
+  },
   "NTProvider": {
     "types": {
-      "/FMSInfo": "FMSInfo"
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/DriveSubsystem/field2d": "Field2d"
+    },
+    "windows": {
+      "/Shuffleboard/DriveSubsystem/field2d": {
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "NetworkTables": {

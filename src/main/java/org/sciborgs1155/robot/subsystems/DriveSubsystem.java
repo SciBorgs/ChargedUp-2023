@@ -16,7 +16,6 @@ import org.sciborgs1155.robot.Constants.DriveConstants;
 import org.sciborgs1155.robot.Ports.Drivetrain;
 
 public class DriveSubsystem extends SubsystemBase implements Loggable {
-  // Robot swerve modules
   @Log
   private final SwerveModule frontLeft =
       new SwerveModule(
@@ -59,8 +58,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
       new SwerveDriveOdometry(
           DriveConstants.kDriveKinematics, m_gyro.getRotation2d(), getModulePositions());
 
-  // Smartdashboard Field
-  private Field2d field2d = new Field2d();
+  @Log private Field2d field2d = new Field2d();
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {}

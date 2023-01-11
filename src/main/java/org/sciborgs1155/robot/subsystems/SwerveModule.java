@@ -1,9 +1,11 @@
 package org.sciborgs1155.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -23,7 +25,7 @@ public class SwerveModule implements Sendable {
   private final CANSparkMax turnMotor; // Neo 550
 
   private final RelativeEncoder driveEncoder;
-  private final RelativeEncoder turningEncoder;
+  private final AbsoluteEncoder turningEncoder;
 
   private final PIDController driveFeedback =
       new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
@@ -56,7 +58,7 @@ public class SwerveModule implements Sendable {
 
     driveEncoder = driveMotor.getEncoder();
 
-    turningEncoder = turnMotor.getEncoder();
+    turningEncoder = turnMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
     // TODO proper conversion
 
@@ -126,7 +128,6 @@ public class SwerveModule implements Sendable {
   /** Zeroes all the SwerveModule encoders. */
   public void resetEncoders() {
     driveEncoder.setPosition(0);
-    turningEncoder.setPosition(0);
   }
 
   @Override
