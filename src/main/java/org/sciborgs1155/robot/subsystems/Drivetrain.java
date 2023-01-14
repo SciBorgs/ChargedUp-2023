@@ -7,7 +7,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -64,12 +63,13 @@ public class Drivetrain extends SubsystemBase implements Loggable {
           .map(module -> field2d.getObject(module.getClass().getSimpleName()))
           .toArray(FieldObject2d[]::new);
 
+  
   /**
    * Returns the currently-estimated pose of the robot.
    *
    * @return The pose.
    */
-  public Pose2d getPose() {
+  private final Pose2d getPose() {
     return odometry.getPoseMeters();
   }
 
@@ -178,7 +178,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   public void simulationPeriodic() {
     gyro.getSimCollection()
         .addHeading(
-            Units.radiansToDegrees(
+            Math.toDegrees(
                 DriveConstants.kinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
                     * 0.02));
   }

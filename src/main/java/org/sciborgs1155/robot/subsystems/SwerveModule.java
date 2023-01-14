@@ -3,7 +3,6 @@ package org.sciborgs1155.robot.subsystems;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.PIDController;
@@ -12,8 +11,10 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import org.sciborgs1155.robot.Constants.ModuleConstants;
 import org.sciborgs1155.robot.Constants.ModuleConstants.Driving;
 import org.sciborgs1155.robot.Constants.ModuleConstants.Turning;
@@ -25,6 +26,8 @@ public class SwerveModule implements Sendable {
   private final CANSparkMax driveMotor; // Regular Neo
   private final CANSparkMax turnMotor; // Neo 550
 
+  private final FlywheelSim driveSim;
+  private final FlywheelSim turnSim;
   private final RelativeEncoder driveEncoder;
   private final AbsoluteEncoder turningEncoder;
 
@@ -74,10 +77,13 @@ public class SwerveModule implements Sendable {
     driveMotor.burnFlash();
     turnMotor.burnFlash();
 
+    driveSim = new FlywheelSim(DCMotor.getNEO(1), 1, 10);
+    turnSim = new FlywheelSim(DCMotor.getNeo550(1), 1, 10);
+
     // add motors to rev physics sim
     if (Robot.isSimulation()) {
-      REVPhysicsSim.getInstance().addSparkMax(driveMotor, 1, 500);
-      REVPhysicsSim.getInstance().addSparkMax(turnMotor, 1, 20);
+      // REVPhysicsSim.getInstance().addSparkMax(driveMotor, 1, 500);
+      // REVPhysicsSim.getInstance().addSparkMax(turnMotor, 1, 20);
       this.angularOffset = 0;
     } else {
       this.angularOffset = angularOffset;
