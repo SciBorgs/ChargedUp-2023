@@ -16,7 +16,7 @@ import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
  *
  * <ul>
  *   <li>length: meters
- *   <li>time: seconds
+ *   <li>time: seconds, minutes
  *   <li>angle: radians
  * </ul>
  */
@@ -78,30 +78,45 @@ public final class Constants {
         (kDrivingMotorFreeSpeedRps * kWheelCircumferenceMeters) / kDrivingMotorReduction;
 
     public final class Driving {
-      public static final double encoderPositionFactor =
+      public static final double ENCODER_POSITION_FACTOR =
           (kWheelDiameterMeters * Math.PI) / kDrivingMotorReduction;
-      public static final double encoderVelocityFactor = encoderPositionFactor / 60.0;
+      public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0;
 
-      public static final double kP = 0.04;
-      public static final double kI = 0;
-      public static final double kD = 0;
-      public static final double kV = 1 / kDriveWheelFreeSpeedRps; // ??
+      public static final double P = 0.04;
+      public static final double I = 0;
+      public static final double D = 0;
+
+      public static final double S = 0;
+      public static final double V = 0; // 1 / kDriveWheelFreeSpeedRps; // ??
+      public static final double A = 0;
 
       public static final double minOutput = -1;
       public static final double maxOutput = 1;
     }
 
-    public final class Turning {
-      public static final double encoderPositionFactor = (2 * Math.PI);
-      public static final double encoderVelocityFactor = encoderPositionFactor / 60.0;
+    public static final class Turning {
+      public static final double ENCODER_POSITION_FACTOR = (2 * Math.PI);
+      public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0;
 
-      public static final double kP = 1;
-      public static final double kI = 0;
-      public static final double kD = 0;
-      public static final double kV = 0;
+      // TODO tune
+      public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad /
+      public static final double MAX_ANGULAR_ACCELERATION = 2 * Math.PI;
 
-      public static final double minInput = 0;
-      public static final double maxInput = encoderPositionFactor;
+      public static final double P = 0.1;
+      public static final double I = 0;
+      public static final double D = 0;
+
+      public static final double S = 0;
+      public static final double V = 0;
+      public static final double A = 0;
+
+      public static final TrapezoidProfile.Constraints CONSTRAINTS =
+          new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCELERATION);
+
+      // pid wrapping
+      public static final double MIN_INPUT = 0;
+      public static final double MAX_INPUT = ENCODER_POSITION_FACTOR;
+
       public static final double minOutput = -1;
       public static final double maxOutput = 1;
     }

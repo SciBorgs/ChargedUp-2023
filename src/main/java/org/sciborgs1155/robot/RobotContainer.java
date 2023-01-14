@@ -6,10 +6,10 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
-import org.sciborgs1155.robot.Ports.Inputs;
+import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.ExampleCommand;
-import org.sciborgs1155.robot.subsystems.DriveSubsystem;
+import org.sciborgs1155.robot.subsystems.Drivetrain;
 import org.sciborgs1155.robot.subsystems.ExampleSubsystem;
 
 /**
@@ -21,12 +21,12 @@ import org.sciborgs1155.robot.subsystems.ExampleSubsystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-  private final DriveSubsystem drive = new DriveSubsystem();
+  private final Drivetrain drive = new Drivetrain();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController xbox = new CommandXboxController(Inputs.xbox);
-  private final Joystick leftJoystick = new Joystick(Inputs.leftStick);
-  private final Joystick rightJoystick = new Joystick(Inputs.rightStick);
+  private final CommandXboxController xbox = new CommandXboxController(OI.xbox);
+  private final Joystick leftJoystick = new Joystick(OI.leftStick);
+  private final Joystick rightJoystick = new Joystick(OI.rightStick);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

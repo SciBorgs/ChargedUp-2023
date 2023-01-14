@@ -2,19 +2,21 @@ package org.sciborgs1155.robot.subsystems;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
-import com.revrobotics.SparkMaxPIDController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import org.sciborgs1155.robot.Constants.ModuleConstants;
+import org.sciborgs1155.robot.Constants.ModuleConstants.Driving;
+import org.sciborgs1155.robot.Constants.ModuleConstants.Turning;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Robot;
 
@@ -26,8 +28,18 @@ public class SwerveModule implements Sendable {
   private final RelativeEncoder driveEncoder;
   private final AbsoluteEncoder turningEncoder;
 
-  private final SparkMaxPIDController driveFeedback;
-  private final SparkMaxPIDController turnFeedback;
+  private final PIDController driveFeedback = new PIDController(Driving.P, Driving.I, Driving.D);
+  private final ProfiledPIDController turnFeedback =
+      new ProfiledPIDController(
+          ModuleConstants.Turning.P,
+          ModuleConstants.Turning.I,
+          ModuleConstants.Turning.D,
+          ModuleConstants.Turning.CONSTRAINTS);
+
+  private final SimpleMotorFeedforward driveFeedforward =
+      new SimpleMotorFeedforward(Driving.S, Driving.V, Driving.A);
+  private final SimpleMotorFeedforward turnFeedforward =
+      new SimpleMotorFeedforward(Turning.S, Turning.V, Turning.A);
 
   private final double angularOffset;
 
@@ -44,39 +56,17 @@ public class SwerveModule implements Sendable {
 
     driveEncoder = driveMotor.getEncoder();
     turningEncoder = turnMotor.getAbsoluteEncoder(Type.kDutyCycle);
-    driveFeedback = driveMotor.getPIDController();
-    turnFeedback = turnMotor.getPIDController();
-    driveFeedback.setFeedbackDevice(driveEncoder);
-    turnFeedback.setFeedbackDevice(turningEncoder);
 
     turningEncoder.setInverted(ModuleConstants.kTurningEncoderInverted);
 
     // encoder ratios
-    driveEncoder.setPositionConversionFactor(ModuleConstants.Driving.encoderPositionFactor);
-    driveEncoder.setVelocityConversionFactor(ModuleConstants.Driving.encoderVelocityFactor);
-    turningEncoder.setPositionConversionFactor(ModuleConstants.Turning.encoderPositionFactor);
-    turningEncoder.setVelocityConversionFactor(ModuleConstants.Turning.encoderVelocityFactor);
+    driveEncoder.setPositionConversionFactor(Driving.ENCODER_POSITION_FACTOR);
+    driveEncoder.setVelocityConversionFactor(Driving.ENCODER_VELOCITY_FACTOR);
+    turningEncoder.setPositionConversionFactor(ModuleConstants.Turning.ENCODER_POSITION_FACTOR);
+    turningEncoder.setVelocityConversionFactor(ModuleConstants.Turning.ENCODER_VELOCITY_FACTOR);
 
     // set up continuous input for turning
-    turnFeedback.setPositionPIDWrappingEnabled(true);
-    turnFeedback.setPositionPIDWrappingMinInput(ModuleConstants.Turning.minInput);
-    turnFeedback.setPositionPIDWrappingMaxInput(ModuleConstants.Turning.maxInput);
-
-    // configure constants
-    // this is disgusting, i immensely dislike revlib
-    driveFeedback.setP(ModuleConstants.Driving.kP);
-    driveFeedback.setI(ModuleConstants.Driving.kI);
-    driveFeedback.setD(ModuleConstants.Driving.kD);
-    driveFeedback.setFF(ModuleConstants.Driving.kV);
-    driveFeedback.setOutputRange(
-        ModuleConstants.Driving.minOutput, ModuleConstants.Driving.maxOutput);
-
-    turnFeedback.setP(ModuleConstants.Turning.kP);
-    turnFeedback.setI(ModuleConstants.Turning.kI);
-    turnFeedback.setD(ModuleConstants.Turning.kD);
-    turnFeedback.setFF(ModuleConstants.Turning.kV);
-    turnFeedback.setOutputRange(
-        ModuleConstants.Turning.minOutput, ModuleConstants.Turning.maxOutput);
+    turnFeedback.enableContinuousInput(Turning.MIN_INPUT, Turning.MAX_INPUT);
 
     driveEncoder.setPosition(0);
 
@@ -86,11 +76,12 @@ public class SwerveModule implements Sendable {
 
     // add motors to rev physics sim
     if (Robot.isSimulation()) {
-      REVPhysicsSim.getInstance().addSparkMax(driveMotor, DCMotor.getNEO(1));
-      REVPhysicsSim.getInstance().addSparkMax(turnMotor, DCMotor.getNeo550(1));
+      REVPhysicsSim.getInstance().addSparkMax(driveMotor, 1, 500);
+      REVPhysicsSim.getInstance().addSparkMax(turnMotor, 1, 20);
+      this.angularOffset = 0;
+    } else {
+      this.angularOffset = angularOffset;
     }
-
-    this.angularOffset = angularOffset;
   }
 
   /**
@@ -124,9 +115,17 @@ public class SwerveModule implements Sendable {
         SwerveModuleState.optimize(
             correctedDesiredState, new Rotation2d(turningEncoder.getPosition()));
 
+    final double driveFB =
+        driveFeedback.calculate(driveEncoder.getVelocity(), state.speedMetersPerSecond);
+    final double driveFF = driveFeedforward.calculate(state.speedMetersPerSecond);
+
+    final double turnFB =
+        turnFeedback.calculate(turningEncoder.getPosition(), state.angle.getRadians());
+    final double turnFF = turnFeedforward.calculate(turnFeedback.getSetpoint().velocity);
+
     // Calculate the drive output from the drive PID controller.
-    driveFeedback.setReference(state.speedMetersPerSecond, ControlType.kVelocity);
-    turnFeedback.setReference(state.angle.getRadians(), ControlType.kPosition);
+    driveMotor.setVoltage(driveFB + driveFF);
+    turnMotor.setVoltage(turnFB + turnFF);
   }
 
   /** Zeroes all the SwerveModule encoders. */

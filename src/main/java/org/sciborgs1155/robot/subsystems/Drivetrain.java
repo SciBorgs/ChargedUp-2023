@@ -15,41 +15,42 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
 import org.sciborgs1155.robot.Constants.DriveConstants;
-import org.sciborgs1155.robot.Ports.Drivetrain;
+import org.sciborgs1155.robot.Ports.DrivePorts;
+import org.sciborgs1155.robot.Ports.Sensors;
 
-public class DriveSubsystem extends SubsystemBase implements Loggable {
+public class Drivetrain extends SubsystemBase implements Loggable {
   @Log
   private final SwerveModule frontLeft =
       new SwerveModule(
-          Drivetrain.frontLeftDriveMotorPort,
-          Drivetrain.frontLeftTurningMotorPort,
+          DrivePorts.frontLeftDriveMotorPort,
+          DrivePorts.frontLeftTurningMotorPort,
           DriveConstants.frontLeftAngularOffset);
 
   @Log
   private final SwerveModule frontRight =
       new SwerveModule(
-          Drivetrain.frontRightDriveMotorPort,
-          Drivetrain.frontRightTurningMotorPort,
+          DrivePorts.frontRightDriveMotorPort,
+          DrivePorts.frontRightTurningMotorPort,
           DriveConstants.frontRightAngularOffset);
 
   @Log
   private final SwerveModule rearLeft =
       new SwerveModule(
-          Drivetrain.rearLeftDriveMotorPort,
-          Drivetrain.rearLeftTurningMotorPort,
+          DrivePorts.rearLeftDriveMotorPort,
+          DrivePorts.rearLeftTurningMotorPort,
           DriveConstants.backLeftAngularOffset);
 
   @Log
   private final SwerveModule rearRight =
       new SwerveModule(
-          Drivetrain.rearRightDriveMotorPort,
-          Drivetrain.rearRightTurningMotorPort,
+          DrivePorts.rearRightDriveMotorPort,
+          DrivePorts.rearRightTurningMotorPort,
           DriveConstants.backRightAngularOffset);
 
   private final SwerveModule[] modules = {frontLeft, frontRight, rearLeft, rearRight};
 
   // The gyro sensor
-  private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(2);
+  private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Sensors.PIGEON);
 
   // Odometry class for tracking robot pose
   private final SwerveDriveOdometry odometry =

@@ -11,10 +11,11 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/Shuffleboard/DriveSubsystem/field2d": "Field2d"
+      "/Shuffleboard/DriveSubsystem/field2d": "Field2d",
+      "/Shuffleboard/Drivetrain/field2d": "Field2d"
     },
     "windows": {
-      "/Shuffleboard/DriveSubsystem/field2d": {
+      "/Shuffleboard/Drivetrain/field2d": {
         "window": {
           "visible": true
         }
@@ -25,6 +26,12 @@
     "transitory": {
       "Shuffleboard": {
         "DriveSubsystem": {
+          "field2d": {
+            "open": true
+          },
+          "open": true
+        },
+        "Drivetrain": {
           "field2d": {
             "open": true
           },
