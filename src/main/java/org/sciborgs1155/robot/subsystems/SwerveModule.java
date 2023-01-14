@@ -71,6 +71,8 @@ public class SwerveModule implements Sendable {
     driveEncoder.setVelocityConversionFactor(ModuleConstants.kDriveEncoderDistancePerPulse);
     turningEncoder.setPositionConversionFactor(ModuleConstants.kTurningEncoderDistancePerPulse);
 
+    driveEncoder.setPosition(0);
+
     // burning to flash again (already done in motor config, there's probably a nicer way)
     driveMotor.burnFlash();
     turnMotor.burnFlash();
@@ -122,7 +124,7 @@ public class SwerveModule implements Sendable {
         driveFeedforward.calculate(state.speedMetersPerSecond));
     turnFeedback.setReference(
         state.angle.getRadians(),
-        ControlType.kSmartMotion); // change to kPosition if things get weird
+        ControlType.kPosition); // change to kPosition if things get weird
   }
 
   /** Zeroes all the SwerveModule encoders. */

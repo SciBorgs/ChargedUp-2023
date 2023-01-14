@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -52,7 +53,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
   // Odometry class for tracking robot pose
   private SwerveDriveOdometry odometry =
       new SwerveDriveOdometry(
-          DriveConstants.kDriveKinematics, gyro.getRotation2d(), getModulePositions());
+          DriveConstants.driveKinematics, gyro.getRotation2d(), getModulePositions());
 
   @Log private Field2d field2d = new Field2d();
 
@@ -87,7 +88,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     setModuleStates(
-        DriveConstants.kDriveKinematics.toSwerveModuleStates(
+        DriveConstants.driveKinematics.toSwerveModuleStates(
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, gyro.getRotation2d())
                 : new ChassisSpeeds(xSpeed, ySpeed, rot)));
@@ -154,5 +155,10 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
     // Update the odometry in the periodic block
     odometry.update(gyro.getRotation2d(), getModulePositions());
     field2d.setRobotPose(getPose());
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    gyro.getSimCollection().addHeading(Math.toDegrees(DriveConstants.driveKinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond * 0.02));
   }
 }

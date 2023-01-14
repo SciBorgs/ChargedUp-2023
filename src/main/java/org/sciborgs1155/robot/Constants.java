@@ -38,7 +38,7 @@ public final class Constants {
     // Distance between centers of right and left wheels on robot
     public static final double kWheelBase = 0.7;
     // Distance between front and back wheels on robot
-    public static final SwerveDriveKinematics kDriveKinematics =
+    public static final SwerveDriveKinematics driveKinematics =
         new SwerveDriveKinematics(
             new Translation2d(kWheelBase / 2, kTrackWidth / 2),
             new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
