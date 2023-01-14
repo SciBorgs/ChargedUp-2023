@@ -2,13 +2,14 @@ package org.sciborgs1155.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
@@ -22,28 +23,28 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
       new SwerveModule(
           Drivetrain.frontLeftDriveMotorPort,
           Drivetrain.frontLeftTurningMotorPort,
-          DriveConstants.kFrontLeftChassisAngularOffset);
+          DriveConstants.frontLeftAngularOffset);
 
   @Log
   private final SwerveModule frontRight =
       new SwerveModule(
           Drivetrain.frontRightDriveMotorPort,
           Drivetrain.frontRightTurningMotorPort,
-          DriveConstants.kFrontRightChassisAngularOffset);
+          DriveConstants.frontRightAngularOffset);
 
   @Log
   private final SwerveModule rearLeft =
       new SwerveModule(
           Drivetrain.rearLeftDriveMotorPort,
           Drivetrain.rearLeftTurningMotorPort,
-          DriveConstants.kBackLeftChassisAngularOffset);
+          DriveConstants.backLeftAngularOffset);
 
   @Log
   private final SwerveModule rearRight =
       new SwerveModule(
           Drivetrain.rearRightDriveMotorPort,
           Drivetrain.rearRightTurningMotorPort,
-          DriveConstants.kBackRightChassisAngularOffset);
+          DriveConstants.backRightAngularOffset);
 
   private final SwerveModule[] modules = {frontLeft, frontRight, rearLeft, rearRight};
 
@@ -51,14 +52,16 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
   private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(2);
 
   // Odometry class for tracking robot pose
-  private SwerveDriveOdometry odometry =
+  private final SwerveDriveOdometry odometry =
       new SwerveDriveOdometry(
-          DriveConstants.driveKinematics, gyro.getRotation2d(), getModulePositions());
+          DriveConstants.kinematics, gyro.getRotation2d(), getModulePositions());
 
-  @Log private Field2d field2d = new Field2d();
+  @Log private final Field2d field2d = new Field2d();
 
-  /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {}
+  private final FieldObject2d[] modules2d =
+      Arrays.stream(modules)
+          .map(module -> field2d.getObject(module.getClass().getSimpleName()))
+          .toArray(FieldObject2d[]::new);
 
   /**
    * Returns the currently-estimated pose of the robot.
@@ -87,11 +90,18 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    setModuleStates(
-        DriveConstants.driveKinematics.toSwerveModuleStates(
+    // scale inputs based on maximum values
+    xSpeed *= DriveConstants.maxSpeed;
+    ySpeed *= DriveConstants.maxSpeed;
+    rot *= DriveConstants.maxAngularSpeed;
+
+    var states =
+        DriveConstants.kinematics.toSwerveModuleStates(
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, gyro.getRotation2d())
-                : new ChassisSpeeds(xSpeed, ySpeed, rot)));
+                : new ChassisSpeeds(xSpeed, ySpeed, rot));
+
+    setModuleStates(states);
   }
 
   /**
@@ -100,12 +110,12 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
    * @param desiredStates The desired SwerveModule states.
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    frontLeft.setDesiredState(desiredStates[0]);
-    frontRight.setDesiredState(desiredStates[1]);
-    rearLeft.setDesiredState(desiredStates[2]);
-    rearRight.setDesiredState(desiredStates[3]);
+    if (desiredStates.length != modules.length) {
+      throw new IllegalArgumentException("desiredStates must have the same length as modules");
+    }
+
+    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.maxSpeed);
+    for (int i = 0; i < modules.length; i++) modules[i].setDesiredState(desiredStates[i]);
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
@@ -120,6 +130,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
 
   /**
    * Returns the heading of the robot.
+   *
+   * <p>This not for internal use, as all internal angle values should be in radians.
    *
    * @return the robot's heading in degrees, from -180 to 180
    */
@@ -147,18 +159,26 @@ public class DriveSubsystem extends SubsystemBase implements Loggable {
    */
   @Log
   public double getTurnRate() {
-    return gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
-  } // SpeedLimit is just to make sure I dont burn down the school
+    return gyro.getRate() * (DriveConstants.gyroReversed ? -1.0 : 1.0);
+  }
 
   @Override
   public void periodic() {
-    // Update the odometry in the periodic block
     odometry.update(gyro.getRotation2d(), getModulePositions());
     field2d.setRobotPose(getPose());
   }
 
+  // modules2d[i].setPose(getPose());
+  // modules2d[i].setPose(
+  //     new Pose2d(
+  //         getPose().getTranslation().rotateBy(gyro.getRotation2d()),
+  //         modules[i].getState().angle.plus(gyro.getRotation2d())));
   @Override
   public void simulationPeriodic() {
-    gyro.getSimCollection().addHeading(Math.toDegrees(DriveConstants.driveKinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond * 0.02));
+    gyro.getSimCollection()
+        .addHeading(
+            Units.radiansToDegrees(
+                DriveConstants.kinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
+                    * 0.02));
   }
 }

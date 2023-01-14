@@ -25,8 +25,8 @@ public class RobotContainer {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController xbox = new CommandXboxController(Inputs.xbox);
-  private final Joystick leftJoystick = new Joystick(1);
-  private final Joystick rightJoystick = new Joystick(2);
+  private final Joystick leftJoystick = new Joystick(Inputs.leftStick);
+  private final Joystick rightJoystick = new Joystick(Inputs.rightStick);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

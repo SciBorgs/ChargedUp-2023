@@ -8,7 +8,6 @@ import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -19,6 +18,7 @@ import org.sciborgs1155.robot.Constants.ModuleConstants;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Robot;
 
+/** Class to encapsulate a rev max swerve module */
 public class SwerveModule implements Sendable {
   private final CANSparkMax driveMotor; // Regular Neo
   private final CANSparkMax turnMotor; // Neo 550
@@ -28,8 +28,6 @@ public class SwerveModule implements Sendable {
 
   private final SparkMaxPIDController driveFeedback;
   private final SparkMaxPIDController turnFeedback;
-
-  private final SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(0, 0);
 
   private final double angularOffset;
 
@@ -51,25 +49,34 @@ public class SwerveModule implements Sendable {
     driveFeedback.setFeedbackDevice(driveEncoder);
     turnFeedback.setFeedbackDevice(turningEncoder);
 
+    turningEncoder.setInverted(ModuleConstants.kTurningEncoderInverted);
+
+    // encoder ratios
+    driveEncoder.setPositionConversionFactor(ModuleConstants.Driving.encoderPositionFactor);
+    driveEncoder.setVelocityConversionFactor(ModuleConstants.Driving.encoderVelocityFactor);
+    turningEncoder.setPositionConversionFactor(ModuleConstants.Turning.encoderPositionFactor);
+    turningEncoder.setVelocityConversionFactor(ModuleConstants.Turning.encoderVelocityFactor);
+
     // set up continuous input for turning
     turnFeedback.setPositionPIDWrappingEnabled(true);
     turnFeedback.setPositionPIDWrappingMinInput(-Math.PI);
     turnFeedback.setPositionPIDWrappingMaxInput(Math.PI);
 
-    // set up smart motion constants?
-    turnFeedback.setSmartMotionMaxAccel(
-        ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared, 0);
-    turnFeedback.setSmartMotionMaxVelocity(
-        ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond, 0);
-
     // configure constants
-    driveFeedback.setP(ModuleConstants.kPModuleDriveController);
-    turnFeedback.setP(ModuleConstants.kPModuleTurningController);
+    // this is disgusting, i immensely dislike revlib
+    driveFeedback.setP(ModuleConstants.Driving.kP);
+    driveFeedback.setI(ModuleConstants.Driving.kI);
+    driveFeedback.setD(ModuleConstants.Driving.kD);
+    driveFeedback.setFF(ModuleConstants.Driving.kV);
+    driveFeedback.setOutputRange(
+        ModuleConstants.Driving.minOutput, ModuleConstants.Driving.maxOutput);
 
-    // TODO proper conversion
-
-    driveEncoder.setVelocityConversionFactor(ModuleConstants.kDriveEncoderDistancePerPulse);
-    turningEncoder.setPositionConversionFactor(ModuleConstants.kTurningEncoderDistancePerPulse);
+    turnFeedback.setP(ModuleConstants.Turning.kP);
+    turnFeedback.setI(ModuleConstants.Turning.kI);
+    turnFeedback.setD(ModuleConstants.Turning.kD);
+    turnFeedback.setFF(ModuleConstants.Turning.kV);
+    turnFeedback.setOutputRange(
+        ModuleConstants.Turning.minOutput, ModuleConstants.Turning.maxOutput);
 
     driveEncoder.setPosition(0);
 
@@ -114,17 +121,12 @@ public class SwerveModule implements Sendable {
     correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(angularOffset));
     // Optimize the reference state to avoid spinning further than 90 degrees
     SwerveModuleState state =
-        SwerveModuleState.optimize(correctedDesiredState, new Rotation2d(turningEncoder.getPosition()));
+        SwerveModuleState.optimize(
+            correctedDesiredState, new Rotation2d(turningEncoder.getPosition()));
 
     // Calculate the drive output from the drive PID controller.
-    driveFeedback.setReference(
-        state.speedMetersPerSecond,
-        ControlType.kVelocity,
-        0,
-        driveFeedforward.calculate(state.speedMetersPerSecond));
-    turnFeedback.setReference(
-        state.angle.getRadians(),
-        ControlType.kPosition); // change to kPosition if things get weird
+    driveFeedback.setReference(state.speedMetersPerSecond, ControlType.kVelocity);
+    turnFeedback.setReference(state.angle.getRadians(), ControlType.kPosition);
   }
 
   /** Zeroes all the SwerveModule encoders. */
