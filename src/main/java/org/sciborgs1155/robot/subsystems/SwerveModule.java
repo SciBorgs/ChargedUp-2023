@@ -59,8 +59,8 @@ public class SwerveModule implements Sendable {
 
     // set up continuous input for turning
     turnFeedback.setPositionPIDWrappingEnabled(true);
-    turnFeedback.setPositionPIDWrappingMinInput(-Math.PI);
-    turnFeedback.setPositionPIDWrappingMaxInput(Math.PI);
+    turnFeedback.setPositionPIDWrappingMinInput(ModuleConstants.Turning.minInput);
+    turnFeedback.setPositionPIDWrappingMaxInput(ModuleConstants.Turning.maxInput);
 
     // configure constants
     // this is disgusting, i immensely dislike revlib
