@@ -4,17 +4,21 @@
 
 package org.sciborgs1155.robot.commands;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.sciborgs1155.robot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import org.sciborgs1155.robot.Constants.DriveConstants;
+import org.sciborgs1155.robot.Constants.AutoConstants;
 
 public final class Autos {
   /** Example static factory for an autonomous command. */
   // public static CommandBase exampleAuto(ExampleSubsystem subsystem) {
-  //   return Commands.sequence(subsystem.exampleMethodCommand(), new ExampleCommand(subsystem));
+  // return Commands.sequence(subsystem.exampleMethodCommand(), new
+  // ExampleCommand(subsystem));
   // }
 
   public static CommandBase mobility(Drivetrain drive) {
@@ -22,7 +26,14 @@ public final class Autos {
   }
 
   public static CommandBase followPath(Drivetrain drive, Trajectory path) {
-    return new SwerveControllerCommand(path, drive::getPose, DriveConstants.kinematics, null, null, null);
+    PIDController x = new PIDController(AutoConstants.P_X_CONTROLLER, 0, 0);
+    PIDController y = new PIDController(AutoConstants.P_Y_CONTROLLER, 0, 0);
+    ProfiledPIDController theta = new ProfiledPIDController(
+        AutoConstants.P_THETA_CONTROLLER,
+        AutoConstants.MAX_SPEED, AutoConstants.MAX_ACCEL, AutoConstants.THETA_CONTROLLER_CONSTRAINTS);
+
+    return new SwerveControllerCommand(path, drive::getPose, DriveConstants.kinematics, x, y, theta,
+        drive::setModuleStates, drive);
   }
 
   private Autos() {

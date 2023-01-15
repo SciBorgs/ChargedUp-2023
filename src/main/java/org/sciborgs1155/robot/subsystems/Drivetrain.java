@@ -15,12 +15,9 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
 import org.sciborgs1155.robot.Constants.DriveConstants;
-import org.sciborgs1155.robot.Constants.AutoConstants;
 import org.sciborgs1155.robot.Ports.DrivePorts;
 import org.sciborgs1155.robot.Ports.Sensors;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+
 
 public class Drivetrain extends SubsystemBase implements Loggable {
   @Log
@@ -48,13 +45,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
       DriveConstants.backRightAngularOffset);
 
   private final SwerveModule[] modules = { frontLeft, frontRight, rearLeft, rearRight };
-
-  // Controllers
-  public static final PIDController xController = new PIDController(AutoConstants.P_X_CONTROLLER, 0, 0);
-  public static final PIDController yController = new PIDController(AutoConstants.P_Y_CONTROLLER, 0, 0);
-  public static final ProfiledPIDController thetaController = new ProfiledPIDController(
-      AutoConstants.P_THETA_CONTROLLER,
-      AutoConstants.MAX_SPEED, AutoConstants.MAX_ACCEL, AutoConstants.THETA_CONTROLLER_CONSTRAINTS);
 
   // gyro sensor
   private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Sensors.PIGEON);
