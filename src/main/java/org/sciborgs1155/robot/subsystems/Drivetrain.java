@@ -182,9 +182,9 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   // modules2d[i].setPose(getPose());
   // modules2d[i].setPose(
-  //     new Pose2d(
-  //         getPose().getTranslation().rotateBy(gyro.getRotation2d()),
-  //         modules[i].getState().angle.plus(gyro.getRotation2d())));
+  // new Pose2d(
+  // getPose().getTranslation().rotateBy(gyro.getRotation2d()),
+  // modules[i].getState().angle.plus(gyro.getRotation2d())));
   @Override
   public void simulationPeriodic() {
     gyro.getSimCollection()
