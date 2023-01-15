@@ -8,9 +8,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
-import org.sciborgs1155.robot.commands.ExampleCommand;
 import org.sciborgs1155.robot.subsystems.Drivetrain;
-import org.sciborgs1155.robot.subsystems.ExampleSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -20,7 +18,6 @@ import org.sciborgs1155.robot.subsystems.ExampleSubsystem;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final Drivetrain drive = new Drivetrain();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -58,12 +55,12 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    new Trigger(m_exampleSubsystem::exampleCondition)
-        .onTrue(new ExampleCommand(m_exampleSubsystem));
+    // new Trigger(m_exampleSubsystem::exampleCondition)
+    //     .onTrue(new ExampleCommand(m_exampleSubsystem));
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
-    xbox.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+    // xbox.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
   }
 
   /**

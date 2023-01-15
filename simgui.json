@@ -12,7 +12,10 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/Shuffleboard/DriveSubsystem/field2d": "Field2d",
-      "/Shuffleboard/Drivetrain/field2d": "Field2d"
+      "/Shuffleboard/Drivetrain/field2d": "Field2d",
+      "/Shuffleboard/Drivetrain/frontLeft": "PIDController",
+      "/Shuffleboard/Drivetrain/frontRight": "PIDController",
+      "/Shuffleboard/Drivetrain/rearRight": "PIDController"
     },
     "windows": {
       "/Shuffleboard/Drivetrain/field2d": {
@@ -35,7 +38,19 @@
           "field2d": {
             "open": true
           },
-          "open": true
+          "frontLeft": {
+            "open": true
+          },
+          "frontRight": {
+            "open": true
+          },
+          "open": true,
+          "rearLeft": {
+            "open": true
+          },
+          "rearRight": {
+            "open": true
+          }
         },
         "RobotContainer": {
           "open": true

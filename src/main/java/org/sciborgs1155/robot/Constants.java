@@ -26,10 +26,7 @@ public final class Constants {
         MotorConfig.base().setNeutralBehavior(NeutralBehavior.BRAKE).setCurrentLimit(50);
 
     public static final MotorConfig moduleTurnConfig =
-        MotorConfig.base()
-            .setInverted(true)
-            .setNeutralBehavior(NeutralBehavior.BRAKE)
-            .setCurrentLimit(20);
+        MotorConfig.base().setNeutralBehavior(NeutralBehavior.BRAKE).setCurrentLimit(20);
   }
 
   public static final class DriveConstants {
@@ -43,14 +40,15 @@ public final class Constants {
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kinematics =
         new SwerveDriveKinematics(
-            new Translation2d(wheelBase / 2, trackWidth / 2),
-            new Translation2d(wheelBase / 2, -trackWidth / 2),
-            new Translation2d(-wheelBase / 2, trackWidth / 2),
-            new Translation2d(-wheelBase / 2, -trackWidth / 2));
+            new Translation2d(wheelBase / 2, trackWidth / 2), // front left
+            new Translation2d(wheelBase / 2, -trackWidth / 2), // front right
+            new Translation2d(-wheelBase / 2, trackWidth / 2), // rear left
+            new Translation2d(-wheelBase / 2, -trackWidth / 2)); // rear right
 
     public static final boolean gyroReversed = false;
 
     // angular offsets of the modules, since we use absolute encoders
+    // ignored (used as 0) in simulation because that's how sim works
     public static final double frontLeftAngularOffset = -Math.PI / 2;
     public static final double frontRightAngularOffset = 0;
     public static final double backLeftAngularOffset = Math.PI;
@@ -102,7 +100,7 @@ public final class Constants {
       public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad /
       public static final double MAX_ANGULAR_ACCELERATION = 2 * Math.PI;
 
-      public static final double P = 0.1;
+      public static final double P = 0.001;
       public static final double I = 0;
       public static final double D = 0;
 

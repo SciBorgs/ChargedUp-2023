@@ -7,6 +7,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -63,13 +64,12 @@ public class Drivetrain extends SubsystemBase implements Loggable {
           .map(module -> field2d.getObject(module.getClass().getSimpleName()))
           .toArray(FieldObject2d[]::new);
 
-  
   /**
    * Returns the currently-estimated pose of the robot.
    *
    * @return The pose.
    */
-  private final Pose2d getPose() {
+  public Pose2d getPose() {
     return odometry.getPoseMeters();
   }
 
@@ -92,9 +92,9 @@ public class Drivetrain extends SubsystemBase implements Loggable {
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     // scale inputs based on maximum values
-    xSpeed *= DriveConstants.maxSpeed;
-    ySpeed *= DriveConstants.maxSpeed;
-    rot *= DriveConstants.maxAngularSpeed;
+    // xSpeed *= DriveConstants.maxSpeed;
+    // ySpeed *= DriveConstants.maxSpeed;
+    // rot *= DriveConstants.maxAngularSpeed;
 
     var states =
         DriveConstants.kinematics.toSwerveModuleStates(
@@ -102,6 +102,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, gyro.getRotation2d())
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
 
+    System.out.println(states[2].speedMetersPerSecond);
     setModuleStates(states);
   }
 
@@ -178,8 +179,9 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   public void simulationPeriodic() {
     gyro.getSimCollection()
         .addHeading(
-            Math.toDegrees(
+            Units.radiansToDegrees(
                 DriveConstants.kinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
                     * 0.02));
+    // gyro.getSimCollection().addHeading(0);
   }
 }
