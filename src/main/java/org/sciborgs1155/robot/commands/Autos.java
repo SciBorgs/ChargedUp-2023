@@ -4,9 +4,12 @@
 
 package org.sciborgs1155.robot.commands;
 
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.sciborgs1155.robot.subsystems.Drivetrain;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import org.sciborgs1155.robot.Constants.DriveConstants;
 
 public final class Autos {
   /** Example static factory for an autonomous command. */
@@ -16,6 +19,10 @@ public final class Autos {
 
   public static CommandBase mobility(Drivetrain drive) {
     return Commands.run(() -> drive.drive(0.5, 0, 0, false), drive).withTimeout(5);
+  }
+
+  public static CommandBase followPath(Drivetrain drive, Trajectory path) {
+    return new SwerveControllerCommand(path, drive::getPose, DriveConstants.kinematics, null, null, null);
   }
 
   private Autos() {

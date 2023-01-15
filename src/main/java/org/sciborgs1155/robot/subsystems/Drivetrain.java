@@ -15,54 +15,60 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
 import org.sciborgs1155.robot.Constants.DriveConstants;
+import org.sciborgs1155.robot.Constants.AutoConstants;
 import org.sciborgs1155.robot.Ports.DrivePorts;
 import org.sciborgs1155.robot.Ports.Sensors;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 
 public class Drivetrain extends SubsystemBase implements Loggable {
   @Log
-  private final SwerveModule frontLeft =
-      new SwerveModule(
-          DrivePorts.frontLeftDriveMotorPort,
-          DrivePorts.frontLeftTurningMotorPort,
-          DriveConstants.frontLeftAngularOffset);
+  private final SwerveModule frontLeft = new SwerveModule(
+      DrivePorts.frontLeftDriveMotorPort,
+      DrivePorts.frontLeftTurningMotorPort,
+      DriveConstants.frontLeftAngularOffset);
 
   @Log
-  private final SwerveModule frontRight =
-      new SwerveModule(
-          DrivePorts.frontRightDriveMotorPort,
-          DrivePorts.frontRightTurningMotorPort,
-          DriveConstants.frontRightAngularOffset);
+  private final SwerveModule frontRight = new SwerveModule(
+      DrivePorts.frontRightDriveMotorPort,
+      DrivePorts.frontRightTurningMotorPort,
+      DriveConstants.frontRightAngularOffset);
 
   @Log
-  private final SwerveModule rearLeft =
-      new SwerveModule(
-          DrivePorts.rearLeftDriveMotorPort,
-          DrivePorts.rearLeftTurningMotorPort,
-          DriveConstants.backLeftAngularOffset);
+  private final SwerveModule rearLeft = new SwerveModule(
+      DrivePorts.rearLeftDriveMotorPort,
+      DrivePorts.rearLeftTurningMotorPort,
+      DriveConstants.backLeftAngularOffset);
 
   @Log
-  private final SwerveModule rearRight =
-      new SwerveModule(
-          DrivePorts.rearRightDriveMotorPort,
-          DrivePorts.rearRightTurningMotorPort,
-          DriveConstants.backRightAngularOffset);
+  private final SwerveModule rearRight = new SwerveModule(
+      DrivePorts.rearRightDriveMotorPort,
+      DrivePorts.rearRightTurningMotorPort,
+      DriveConstants.backRightAngularOffset);
 
-  private final SwerveModule[] modules = {frontLeft, frontRight, rearLeft, rearRight};
+  private final SwerveModule[] modules = { frontLeft, frontRight, rearLeft, rearRight };
 
-  // The gyro sensor
+  // Controllers
+  public static final PIDController xController = new PIDController(AutoConstants.P_X_CONTROLLER, 0, 0);
+  public static final PIDController yController = new PIDController(AutoConstants.P_Y_CONTROLLER, 0, 0);
+  public static final ProfiledPIDController thetaController = new ProfiledPIDController(
+      AutoConstants.P_THETA_CONTROLLER,
+      AutoConstants.MAX_SPEED, AutoConstants.MAX_ACCEL, AutoConstants.THETA_CONTROLLER_CONSTRAINTS);
+
+  // gyro sensor
   private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Sensors.PIGEON);
 
   // Odometry class for tracking robot pose
-  private final SwerveDriveOdometry odometry =
-      new SwerveDriveOdometry(
-          DriveConstants.kinematics, gyro.getRotation2d(), getModulePositions());
+  private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(
+      DriveConstants.kinematics, gyro.getRotation2d(), getModulePositions());
 
-  @Log private final Field2d field2d = new Field2d();
+  @Log
+  private final Field2d field2d = new Field2d();
 
-  private final FieldObject2d[] modules2d =
-      Arrays.stream(modules)
-          .map(module -> field2d.getObject(module.getClass().getSimpleName()))
-          .toArray(FieldObject2d[]::new);
+  private final FieldObject2d[] modules2d = Arrays.stream(modules)
+      .map(module -> field2d.getObject(module.getClass().getSimpleName()))
+      .toArray(FieldObject2d[]::new);
 
   /**
    * Returns the currently-estimated pose of the robot.
@@ -85,10 +91,11 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   /**
    * Method to drive the robot using joystick info.
    *
-   * @param xSpeed Speed of the robot in the x direction (forward).
-   * @param ySpeed Speed of the robot in the y direction (sideways).
-   * @param rot Angular rate of the robot.
-   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
+   * @param xSpeed        Speed of the robot in the x direction (forward).
+   * @param ySpeed        Speed of the robot in the y direction (sideways).
+   * @param rot           Angular rate of the robot.
+   * @param fieldRelative Whether the provided x and y speeds are relative to the
+   *                      field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     // scale inputs based on maximum values
@@ -96,11 +103,10 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     // ySpeed *= DriveConstants.maxSpeed;
     // rot *= DriveConstants.maxAngularSpeed;
 
-    var states =
-        DriveConstants.kinematics.toSwerveModuleStates(
-            fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, gyro.getRotation2d())
-                : new ChassisSpeeds(xSpeed, ySpeed, rot));
+    var states = DriveConstants.kinematics.toSwerveModuleStates(
+        fieldRelative
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, gyro.getRotation2d())
+            : new ChassisSpeeds(xSpeed, ySpeed, rot));
 
     System.out.println(states[2].speedMetersPerSecond);
     setModuleStates(states);
@@ -117,7 +123,8 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     }
 
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.maxSpeed);
-    for (int i = 0; i < modules.length; i++) modules[i].setDesiredState(desiredStates[i]);
+    for (int i = 0; i < modules.length; i++)
+      modules[i].setDesiredState(desiredStates[i]);
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
@@ -133,7 +140,8 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   /**
    * Returns the heading of the robot.
    *
-   * <p>This not for internal use, as all internal angle values should be in radians.
+   * <p>
+   * This not for internal use, as all internal angle values should be in radians.
    *
    * @return the robot's heading in degrees, from -180 to 180
    */
@@ -172,9 +180,9 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   // modules2d[i].setPose(getPose());
   // modules2d[i].setPose(
-  //     new Pose2d(
-  //         getPose().getTranslation().rotateBy(gyro.getRotation2d()),
-  //         modules[i].getState().angle.plus(gyro.getRotation2d())));
+  // new Pose2d(
+  // getPose().getTranslation().rotateBy(gyro.getRotation2d()),
+  // modules[i].getState().angle.plus(gyro.getRotation2d())));
   @Override
   public void simulationPeriodic() {
     gyro.getSimCollection()
