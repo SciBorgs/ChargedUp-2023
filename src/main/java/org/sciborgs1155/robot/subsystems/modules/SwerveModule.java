@@ -1,9 +1,8 @@
-package org.sciborgs1155.robot.subsystems;
+package org.sciborgs1155.robot.subsystems.modules;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.PIDController;
@@ -12,23 +11,18 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import org.sciborgs1155.robot.Constants.ModuleConstants;
 import org.sciborgs1155.robot.Constants.ModuleConstants.Driving;
 import org.sciborgs1155.robot.Constants.ModuleConstants.Turning;
 import org.sciborgs1155.robot.Constants.Motors;
-import org.sciborgs1155.robot.Robot;
 
 /** Class to encapsulate a rev max swerve module */
 public class SwerveModule implements Sendable {
   private final CANSparkMax driveMotor; // Regular Neo
   private final CANSparkMax turnMotor; // Neo 550
 
-  private final FlywheelSim driveSim;
-  private final FlywheelSim turnSim;
   private final RelativeEncoder driveEncoder;
   private final AbsoluteEncoder turningEncoder;
 
@@ -70,22 +64,9 @@ public class SwerveModule implements Sendable {
 
     driveEncoder.setPosition(0);
 
+    this.angularOffset = angularOffset;
+
     // burning to flash again (already done in motor config, there's probably a nicer way)
-
-    driveSim = new FlywheelSim(DCMotor.getNEO(1), 1, 10);
-    turnSim = new FlywheelSim(DCMotor.getNeo550(1), 1, 10);
-
-    // add motors to rev physics sim
-    if (Robot.isSimulation()) {
-      driveMotor.setInverted(true);
-      REVPhysicsSim.getInstance().addSparkMax(driveMotor, (float) 2.6, 900);
-      REVPhysicsSim.getInstance().addSparkMax(turnMotor, (float) 0.97, 1050);
-      this.angularOffset = 0;
-      // turningEncoder.setZeroOffset(angularOffset);
-    } else {
-      this.angularOffset = angularOffset;
-    }
-
     driveMotor.burnFlash();
     turnMotor.burnFlash();
   }
@@ -124,10 +105,6 @@ public class SwerveModule implements Sendable {
     final double driveFB =
         driveFeedback.calculate(driveEncoder.getVelocity(), state.speedMetersPerSecond);
     final double driveFF = driveFeedforward.calculate(state.speedMetersPerSecond);
-
-    System.out.println(String.format("velocity: %.2f", driveEncoder.getVelocity()));
-    System.out.println(String.format("position: %.2f", driveEncoder.getPosition()));
-    System.out.println(String.format("rotation: %.2f", turningEncoder.getPosition()));
 
     final double turnFB =
         turnFeedback.calculate(turningEncoder.getPosition(), state.angle.getRadians());
