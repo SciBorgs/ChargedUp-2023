@@ -1,13 +1,19 @@
 package org.sciborgs1155.lib;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Set;
 
-public final class FunctionRegistry implements Runnable {
+public final class FunctionRegistry {
   private static FunctionRegistry instance = null;
 
-  private ArrayList<Runnable> runnables;
+  public static double DEFAULT_RATE = 0.01;
 
-  private FunctionRegistry() {}
+  private HashMap<Runnable, Double> runnables;
+
+  private FunctionRegistry() {
+    runnables = new HashMap<>();
+  }
 
   public static FunctionRegistry getInstance() {
     if (instance == null) {
@@ -16,12 +22,15 @@ public final class FunctionRegistry implements Runnable {
     return instance;
   }
 
-  public void add(Runnable runnable) {
-    runnables.add(runnable);
+  public void add(Runnable runnable, double rate) {
+    runnables.put(runnable, rate);
   }
 
-  @Override
-  public void run() {
-    for (Runnable runnable : runnables) runnable.run();
+  public void add(Runnable runnable) {
+    add(runnable, DEFAULT_RATE);
+  }
+
+  public Set<Entry<Runnable, Double>> getEntries() {
+    return runnables.entrySet();
   }
 }

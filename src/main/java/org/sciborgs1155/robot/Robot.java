@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package org.sciborgs1155.robot;
 
 import com.revrobotics.REVPhysicsSim;
@@ -39,7 +35,9 @@ public class Robot extends TimedRobot {
     // Start networktables logger
     DataLogManager.start();
     // binds FunctionRegistry to be ran at 0.01 hertz
-    addPeriodic(FunctionRegistry.getInstance(), Constants.CONTROLLER_RATE);
+    for (var entry : FunctionRegistry.getInstance().getEntries()) {
+      addPeriodic(entry.getKey(), entry.getValue());
+    }
   }
 
   /**
