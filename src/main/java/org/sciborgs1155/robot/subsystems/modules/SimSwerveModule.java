@@ -13,7 +13,7 @@ import org.sciborgs1155.robot.Constants.ModuleConstants.Driving;
 import org.sciborgs1155.robot.Constants.ModuleConstants.Turning;
 
 /** Class to encapsulate a rev max swerve module */
-public class SimSwerveModule implements Sendable {
+public class SimSwerveModule implements SwerveModule, Sendable {
 
   private final WheelSim drive = new WheelSim(Driving.V, Driving.A);
   private final WheelSim turn = new WheelSim(Turning.V, Turning.A);
@@ -62,6 +62,8 @@ public class SimSwerveModule implements Sendable {
     SwerveModuleState state =
         SwerveModuleState.optimize(desiredState, new Rotation2d(turn.getPosition()));
 
+    // System.out.println(desiredState.speedMetersPerSecond);
+    // System.out.println(state.speedMetersPerSecond);
     final double driveFB = driveFeedback.calculate(drive.getVelocity(), state.speedMetersPerSecond);
     final double driveFF = driveFeedforward.calculate(state.speedMetersPerSecond);
 
@@ -69,6 +71,7 @@ public class SimSwerveModule implements Sendable {
     final double turnFF = turnFeedforward.calculate(turnFeedback.getSetpoint().velocity);
 
     // Calculate the drive output from the drive PID controller.
+    // System.out.println(driveFB + driveFF);
     drive.setInput(driveFB + driveFF);
     drive.update(0.02);
     turn.setInput(turnFB + turnFF);
