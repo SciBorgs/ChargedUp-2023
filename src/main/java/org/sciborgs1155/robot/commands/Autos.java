@@ -41,6 +41,8 @@ public final class Autos {
             AutoConstants.MAX_ACCEL,
             AutoConstants.THETA_CONTROLLER_CONSTRAINTS);
 
+    drive.resetOdometry(path.getInitialPose());
+
     return new SwerveControllerCommand(
         path,
         drive::getPose,
