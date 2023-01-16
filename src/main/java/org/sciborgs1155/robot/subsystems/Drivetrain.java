@@ -166,6 +166,16 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     return gyro.getRate() * (DriveConstants.gyroReversed ? -1.0 : 1.0);
   }
 
+  /**
+   * Returns the pitch value recorded by the pigeon.
+   *
+   * @return The pitch value of the pigeon.
+   */
+  @Log
+  public double getPitch() {
+    return gyro.getPitch();
+  }
+
   @Override
   public void periodic() {
     // for (int i = 0; i < modules.length; i++) modules[i].setDesiredState(setpoint[i]);

@@ -10,6 +10,8 @@ import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.subsystems.Drivetrain;
 
+import com.pathplanner.lib.PathPlanner;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -70,6 +72,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return Autos.mobility(drive);
+    return Autos.followPath(drive, "New Path");
   }
 }

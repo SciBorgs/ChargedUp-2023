@@ -14,6 +14,8 @@ import org.sciborgs1155.robot.Constants.AutoConstants;
 import org.sciborgs1155.robot.Constants.DriveConstants;
 import org.sciborgs1155.robot.subsystems.Drivetrain;
 
+import com.pathplanner.lib.PathPlanner;
+
 public final class Autos {
   /** Example static factory for an autonomous command. */
   // public static CommandBase exampleAuto(ExampleSubsystem subsystem) {
@@ -25,7 +27,11 @@ public final class Autos {
     return Commands.run(() -> drive.drive(0.5, 0, 0, false), drive).withTimeout(5);
   }
 
-  public static CommandBase followPath(Drivetrain drive, Trajectory path) {
+  public static CommandBase followPath(Drivetrain drive, String pathName) {
+    return followTrajectory(drive, PathPlanner.loadPath(pathName, AutoConstants.MAX_SPEED, AutoConstants.MAX_ACCEL));
+  }
+
+  public static CommandBase followTrajectory(Drivetrain drive, Trajectory path) {
     PIDController x = new PIDController(AutoConstants.P_X_CONTROLLER, 0, 0);
     PIDController y = new PIDController(AutoConstants.P_Y_CONTROLLER, 0, 0);
     ProfiledPIDController theta =
