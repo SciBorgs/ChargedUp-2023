@@ -15,7 +15,6 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import org.sciborgs1155.lib.FunctionRegistry;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Constants.ModuleConstants;
 import org.sciborgs1155.robot.Constants.ModuleConstants.Driving;
 import org.sciborgs1155.robot.Constants.ModuleConstants.Turning;
 import org.sciborgs1155.robot.Constants.Motors;
@@ -51,13 +50,13 @@ public class RevModule implements SwerveModule, Sendable {
    * @param angularOffset offset from drivetrain
    */
   public RevModule(int drivePort, int turnPort, double angularOffset) {
-    driveMotor = Motors.moduleDriveConfig.buildCanSparkMax(MotorType.kBrushless, drivePort);
-    turnMotor = Motors.moduleTurnConfig.buildCanSparkMax(MotorType.kBrushless, turnPort);
+    driveMotor = Motors.DRIVE.buildCanSparkMax(MotorType.kBrushless, drivePort);
+    turnMotor = Motors.TURN.buildCanSparkMax(MotorType.kBrushless, turnPort);
 
     driveEncoder = driveMotor.getEncoder();
     turningEncoder = turnMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
-    turningEncoder.setInverted(ModuleConstants.kTurningEncoderInverted);
+    turningEncoder.setInverted(Turning.ENCODER_INVERTED);
 
     // encoder ratios
     driveEncoder.setPositionConversionFactor(Driving.ENCODER_POSITION_FACTOR);

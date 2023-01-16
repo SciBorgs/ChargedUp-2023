@@ -26,28 +26,28 @@ public class Drivetrain extends SubsystemBase implements Loggable {
       SwerveModule.create(
           DrivePorts.frontLeftDriveMotorPort,
           DrivePorts.frontLeftTurningMotorPort,
-          DriveConstants.frontLeftAngularOffset);
+          DriveConstants.ANGULAR_OFFSETS[0]);
 
   @Log
   private final SwerveModule frontRight =
       SwerveModule.create(
           DrivePorts.frontRightDriveMotorPort,
           DrivePorts.frontRightTurningMotorPort,
-          DriveConstants.frontRightAngularOffset);
+          DriveConstants.ANGULAR_OFFSETS[1]);
 
   @Log
   private final SwerveModule rearLeft =
       SwerveModule.create(
           DrivePorts.rearLeftDriveMotorPort,
           DrivePorts.rearLeftTurningMotorPort,
-          DriveConstants.backLeftAngularOffset);
+          DriveConstants.ANGULAR_OFFSETS[2]);
 
   @Log
   private final SwerveModule rearRight =
       SwerveModule.create(
           DrivePorts.rearRightDriveMotorPort,
           DrivePorts.rearRightTurningMotorPort,
-          DriveConstants.backRightAngularOffset);
+          DriveConstants.ANGULAR_OFFSETS[3]);
 
   private final SwerveModule[] modules = {frontLeft, frontRight, rearLeft, rearRight};
 
@@ -61,11 +61,13 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   @Log private final Field2d field2d = new Field2d();
 
-  private final FieldObject2d[] modules2d =
-      Arrays.stream(modules)
-          .map(module -> field2d.getObject(module.toString()))
-          .toArray(FieldObject2d[]::new);
+  private final FieldObject2d[] modules2d = new FieldObject2d[modules.length];
 
+  public Drivetrain() {
+    for (int i = 0; i < modules2d.length; i++) {
+      modules2d[i] = field2d.getObject("module-" + i);
+    }
+  }
   /**
    * Returns the currently-estimated pose of the robot.
    *
@@ -94,9 +96,9 @@ public class Drivetrain extends SubsystemBase implements Loggable {
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     // scale inputs based on maximum values
-    // xSpeed *= DriveConstants.maxSpeed;
-    // ySpeed *= DriveConstants.maxSpeed;
-    // rot *= DriveConstants.maxAngularSpeed;
+    xSpeed *= DriveConstants.MAX_SPEED;
+    ySpeed *= DriveConstants.MAX_SPEED;
+    rot *= DriveConstants.MAX_ANGULAR_SPEED;
 
     var states =
         DriveConstants.KINEMATICS.toSwerveModuleStates(
@@ -118,7 +120,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
       throw new IllegalArgumentException("desiredStates must have the same length as modules");
     }
 
-    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.maxSpeed);
+    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.MAX_SPEED);
     for (int i = 0; i < modules.length; i++) modules[i].setDesiredState(desiredStates[i]);
   }
 
@@ -163,7 +165,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
    */
   @Log
   public double getTurnRate() {
-    return gyro.getRate() * (DriveConstants.gyroReversed ? -1.0 : 1.0);
+    return gyro.getRate() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
   }
 
   /**
@@ -183,7 +185,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     field2d.setRobotPose(getPose());
     for (int i = 0; i < modules2d.length; i++) {
       var transform =
-          new Transform2d(DriveConstants.moduleOffsets[i], modules[i].getPosition().angle);
+          new Transform2d(DriveConstants.MODULE_OFFSET[i], modules[i].getPosition().angle);
       modules2d[i].setPose(getPose().transformBy(transform));
     }
   }
@@ -195,7 +197,5 @@ public class Drivetrain extends SubsystemBase implements Loggable {
             Units.radiansToDegrees(
                 DriveConstants.KINEMATICS.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
                     * 0.02));
-
-    // for (int i = 0; i < simModules.length; i++) simModules[i].setDesiredState(setpoint[i]);
   }
 }

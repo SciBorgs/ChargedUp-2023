@@ -30,6 +30,11 @@
     },
     "windows": {
       "/Shuffleboard/Drivetrain/field2d": {
+        "Robot": {
+          "arrows": false,
+          "length": 0.2800000011920929,
+          "width": 0.2800000011920929
+        },
         "SimSwerveModule": {
           "arrowSize": 0,
           "arrowWeight": 1.0,
@@ -42,6 +47,26 @@
           "length": 0.10000000149011612,
           "style": "Box/Image",
           "width": 0.20000000298023224
+        },
+        "module-0": {
+          "arrowSize": 33,
+          "arrowWeight": 3.0,
+          "style": "Hidden"
+        },
+        "module-1": {
+          "arrowSize": 33,
+          "arrowWeight": 3.0,
+          "style": "Hidden"
+        },
+        "module-2": {
+          "arrowSize": 33,
+          "arrowWeight": 3.0,
+          "style": "Hidden"
+        },
+        "module-3": {
+          "arrowSize": 33,
+          "arrowWeight": 3.0,
+          "style": "Hidden"
         },
         "org.sciborgs1155.robot.subsystems.modules.SimSwerveModule@27f843b": {
           "arrowColor": [

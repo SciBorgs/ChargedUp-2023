@@ -4,6 +4,7 @@
 
 package org.sciborgs1155.robot.commands;
 
+import com.pathplanner.lib.PathPlanner;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -13,8 +14,6 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import org.sciborgs1155.robot.Constants.AutoConstants;
 import org.sciborgs1155.robot.Constants.DriveConstants;
 import org.sciborgs1155.robot.subsystems.Drivetrain;
-
-import com.pathplanner.lib.PathPlanner;
 
 public final class Autos {
   /** Example static factory for an autonomous command. */
@@ -28,7 +27,8 @@ public final class Autos {
   }
 
   public static CommandBase followPath(Drivetrain drive, String pathName) {
-    return followTrajectory(drive, PathPlanner.loadPath(pathName, AutoConstants.MAX_SPEED, AutoConstants.MAX_ACCEL));
+    return followTrajectory(
+        drive, PathPlanner.loadPath(pathName, AutoConstants.MAX_SPEED, AutoConstants.MAX_ACCEL));
   }
 
   public static CommandBase followTrajectory(Drivetrain drive, Trajectory path) {
