@@ -12,5 +12,5 @@ public abstract class PacedSubsystem extends SubsystemBase {
     this(FunctionRegistry.DEFAULT_RATE);
   }
 
-  public abstract void pacedPeriodic();
+  public void pacedPeriodic() {}
 }

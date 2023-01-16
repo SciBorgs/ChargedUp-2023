@@ -17,45 +17,38 @@ import java.util.Arrays;
 import org.sciborgs1155.robot.Constants.DriveConstants;
 import org.sciborgs1155.robot.Ports.DrivePorts;
 import org.sciborgs1155.robot.Ports.Sensors;
-import org.sciborgs1155.robot.subsystems.modules.SimSwerveModule;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 
 public class Drivetrain extends SubsystemBase implements Loggable {
   @Log
   private final SwerveModule frontLeft =
-      new SwerveModule(
+      SwerveModule.create(
           DrivePorts.frontLeftDriveMotorPort,
           DrivePorts.frontLeftTurningMotorPort,
           DriveConstants.frontLeftAngularOffset);
 
   @Log
   private final SwerveModule frontRight =
-      new SwerveModule(
+      SwerveModule.create(
           DrivePorts.frontRightDriveMotorPort,
           DrivePorts.frontRightTurningMotorPort,
           DriveConstants.frontRightAngularOffset);
 
   @Log
   private final SwerveModule rearLeft =
-      new SwerveModule(
+      SwerveModule.create(
           DrivePorts.rearLeftDriveMotorPort,
           DrivePorts.rearLeftTurningMotorPort,
           DriveConstants.backLeftAngularOffset);
 
   @Log
   private final SwerveModule rearRight =
-      new SwerveModule(
+      SwerveModule.create(
           DrivePorts.rearRightDriveMotorPort,
           DrivePorts.rearRightTurningMotorPort,
           DriveConstants.backRightAngularOffset);
 
-  private final SimSwerveModule[] simModules = {
-    new SimSwerveModule(), new SimSwerveModule(), new SimSwerveModule(), new SimSwerveModule()
-  };
-
   private final SwerveModule[] modules = {frontLeft, frontRight, rearLeft, rearRight};
-
-  private SwerveModuleState[] setpoint = getModuleStates();
 
   // The gyro sensor
   private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Sensors.PIGEON);
@@ -100,18 +93,18 @@ public class Drivetrain extends SubsystemBase implements Loggable {
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     // scale inputs based on maximum values
-    xSpeed *= DriveConstants.maxSpeed;
-    ySpeed *= DriveConstants.maxSpeed;
-    rot *= DriveConstants.maxAngularSpeed;
+    // xSpeed *= DriveConstants.maxSpeed;
+    // ySpeed *= DriveConstants.maxSpeed;
+    // rot *= DriveConstants.maxAngularSpeed;
 
-    setpoint =
+    var states =
         DriveConstants.kinematics.toSwerveModuleStates(
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, gyro.getRotation2d())
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
 
     // System.out.println(states[2].speedMetersPerSecond);
-    // setModuleStates(states);
+    setModuleStates(states);
   }
 
   /**
@@ -125,8 +118,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     }
 
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.maxSpeed);
-    setpoint = desiredStates;
-    // for (int i = 0; i < modules.length; i++) modules[i].setDesiredState(desiredStates[i]);
+    for (int i = 0; i < modules.length; i++) modules[i].setDesiredState(desiredStates[i]);
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
@@ -175,7 +167,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   @Override
   public void periodic() {
-    for (int i = 0; i < modules.length; i++) modules[i].setDesiredState(setpoint[i]);
+    // for (int i = 0; i < modules.length; i++) modules[i].setDesiredState(setpoint[i]);
     odometry.update(gyro.getRotation2d(), getModulePositions());
     field2d.setRobotPose(getPose());
   }
@@ -188,6 +180,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
                 DriveConstants.kinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
                     * 0.02));
 
-    for (int i = 0; i < simModules.length; i++) simModules[i].setDesiredState(setpoint[i]);
+    // for (int i = 0; i < simModules.length; i++) simModules[i].setDesiredState(setpoint[i]);
   }
 }

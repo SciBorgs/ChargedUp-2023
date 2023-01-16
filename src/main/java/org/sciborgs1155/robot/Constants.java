@@ -92,8 +92,8 @@ public final class Constants {
       public static final double D = 0;
 
       public static final double S = 0;
-      public static final double V = 1 / kDriveWheelFreeSpeedRps; // ??
-      public static final double A = 0.2;
+      public static final double V = 1; // 1 / kDriveWheelFreeSpeedRps; // ??
+      public static final double A = 1;
 
       public static final double minOutput = -1;
       public static final double maxOutput = 1;
@@ -112,8 +112,8 @@ public final class Constants {
       public static final double D = 0;
 
       public static final double S = 0;
-      public static final double V = 0.3;
-      public static final double A = 0.1;
+      public static final double V = 1;
+      public static final double A = 1;
 
       public static final TrapezoidProfile.Constraints CONSTRAINTS =
           new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCELERATION);
