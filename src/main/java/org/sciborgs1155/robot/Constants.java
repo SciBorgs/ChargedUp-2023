@@ -42,12 +42,14 @@ public final class Constants {
     // Distance between centers of right and left wheels on robot
     public static final double wheelBase = 0.7;
     // Distance between front and back wheels on robot
-    public static final SwerveDriveKinematics kinematics =
-        new SwerveDriveKinematics(
-            new Translation2d(wheelBase / 2, trackWidth / 2), // front left
-            new Translation2d(wheelBase / 2, -trackWidth / 2), // front right
-            new Translation2d(-wheelBase / 2, trackWidth / 2), // rear left
-            new Translation2d(-wheelBase / 2, -trackWidth / 2)); // rear right
+    public static final Translation2d[] moduleOffsets = {
+      new Translation2d(wheelBase / 2, trackWidth / 2), // front left
+      new Translation2d(wheelBase / 2, -trackWidth / 2), // front right
+      new Translation2d(-wheelBase / 2, trackWidth / 2), // rear left
+      new Translation2d(-wheelBase / 2, -trackWidth / 2) // rear right
+    };
+
+    public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(moduleOffsets);
 
     public static final boolean gyroReversed = false;
 

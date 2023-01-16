@@ -38,7 +38,7 @@ public final class Autos {
     return new SwerveControllerCommand(
         path,
         drive::getPose,
-        DriveConstants.kinematics,
+        DriveConstants.KINEMATICS,
         x,
         y,
         theta,

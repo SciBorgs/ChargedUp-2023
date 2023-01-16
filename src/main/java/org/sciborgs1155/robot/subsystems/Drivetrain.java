@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -56,13 +57,13 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   // Odometry class for tracking robot pose
   private final SwerveDriveOdometry odometry =
       new SwerveDriveOdometry(
-          DriveConstants.kinematics, gyro.getRotation2d(), getModulePositions());
+          DriveConstants.KINEMATICS, gyro.getRotation2d(), getModulePositions());
 
   @Log private final Field2d field2d = new Field2d();
 
   private final FieldObject2d[] modules2d =
       Arrays.stream(modules)
-          .map(module -> field2d.getObject(module.getClass().getSimpleName()))
+          .map(module -> field2d.getObject(module.toString()))
           .toArray(FieldObject2d[]::new);
 
   /**
@@ -98,7 +99,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     // rot *= DriveConstants.maxAngularSpeed;
 
     var states =
-        DriveConstants.kinematics.toSwerveModuleStates(
+        DriveConstants.KINEMATICS.toSwerveModuleStates(
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, gyro.getRotation2d())
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
@@ -170,6 +171,11 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     // for (int i = 0; i < modules.length; i++) modules[i].setDesiredState(setpoint[i]);
     odometry.update(gyro.getRotation2d(), getModulePositions());
     field2d.setRobotPose(getPose());
+    for (int i = 0; i < modules2d.length; i++) {
+      var transform =
+          new Transform2d(DriveConstants.moduleOffsets[i], modules[i].getPosition().angle);
+      modules2d[i].setPose(getPose().transformBy(transform));
+    }
   }
 
   @Override
@@ -177,7 +183,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     gyro.getSimCollection()
         .addHeading(
             Units.radiansToDegrees(
-                DriveConstants.kinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
+                DriveConstants.KINEMATICS.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
                     * 0.02));
 
     // for (int i = 0; i < simModules.length; i++) simModules[i].setDesiredState(setpoint[i]);

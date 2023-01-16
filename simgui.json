@@ -11,6 +11,16 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[5]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[6]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[7]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
+      "/LiveWindow/Ungrouped/Pigeon IMU [2]": "Gyro",
+      "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/Shuffleboard/DriveSubsystem/field2d": "Field2d",
       "/Shuffleboard/Drivetrain/field2d": "Field2d",
       "/Shuffleboard/Drivetrain/frontLeft": "PIDController",
@@ -20,7 +30,75 @@
     },
     "windows": {
       "/Shuffleboard/Drivetrain/field2d": {
+        "SimSwerveModule": {
+          "arrowSize": 0,
+          "arrowWeight": 1.0,
+          "color": [
+            0.0,
+            82.50001525878906,
+            255.0,
+            255.0
+          ],
+          "length": 0.10000000149011612,
+          "style": "Box/Image",
+          "width": 0.20000000298023224
+        },
+        "org.sciborgs1155.robot.subsystems.modules.SimSwerveModule@27f843b": {
+          "arrowColor": [
+            0.0,
+            1.0,
+            1.0,
+            255.0
+          ],
+          "arrowWeight": 2.0,
+          "color": [
+            0.0,
+            119.99999237060547,
+            255.0,
+            255.0
+          ],
+          "selectable": false,
+          "style": "Line",
+          "weight": 2.0
+        },
+        "org.sciborgs1155.robot.subsystems.modules.SimSwerveModule@4354e572": {
+          "arrowColor": [
+            0.0,
+            1.0,
+            1.0,
+            255.0
+          ],
+          "arrowWeight": 2.0,
+          "selectable": false,
+          "style": "Line",
+          "weight": 2.0
+        },
+        "org.sciborgs1155.robot.subsystems.modules.SimSwerveModule@59bbac13": {
+          "arrowColor": [
+            0.0,
+            1.0,
+            1.0,
+            255.0
+          ],
+          "arrowWeight": 2.0,
+          "selectable": false,
+          "style": "Line",
+          "weight": 2.0
+        },
+        "org.sciborgs1155.robot.subsystems.modules.SimSwerveModule@ee7bcb8": {
+          "arrowColor": [
+            0.0,
+            1.0,
+            1.0,
+            255.0
+          ],
+          "arrowWeight": 2.0,
+          "selectable": false,
+          "style": "Line",
+          "weight": 2.0
+        },
         "window": {
+          "name": "todo: add among us",
           "visible": true
         }
       }
