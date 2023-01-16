@@ -89,7 +89,7 @@ public final class Constants {
           (kWheelDiameterMeters * Math.PI) / kDrivingMotorReduction;
       public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0;
 
-      public static final double P = 0.04;
+      public static final double P = 0.1;
       public static final double I = 0;
       public static final double D = 0;
 
@@ -109,7 +109,7 @@ public final class Constants {
       public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad /
       public static final double MAX_ANGULAR_ACCELERATION = 2 * Math.PI;
 
-      public static final double P = 0.001;
+      public static final double P = 0.1;
       public static final double I = 0;
       public static final double D = 0;
 
