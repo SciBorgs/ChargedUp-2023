@@ -13,6 +13,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import org.sciborgs1155.lib.FunctionRegistry;
+import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.ModuleConstants;
 import org.sciborgs1155.robot.Constants.ModuleConstants.Driving;
 import org.sciborgs1155.robot.Constants.ModuleConstants.Turning;
@@ -26,9 +28,11 @@ public class SwerveModule implements Sendable {
   private final RelativeEncoder driveEncoder;
   private final AbsoluteEncoder turningEncoder;
 
-  private final PIDController driveFeedback = new PIDController(Driving.P, Driving.I, Driving.D);
+  private final PIDController driveFeedback =
+      new PIDController(Driving.P, Driving.I, Driving.D, Constants.CONTROLLER_RATE);
   private final ProfiledPIDController turnFeedback =
-      new ProfiledPIDController(Turning.P, Turning.I, Turning.D, Turning.CONSTRAINTS);
+      new ProfiledPIDController(
+          Turning.P, Turning.I, Turning.D, Turning.CONSTRAINTS, Constants.CONTROLLER_RATE);
 
   private final SimpleMotorFeedforward driveFeedforward =
       new SimpleMotorFeedforward(Driving.S, Driving.V, Driving.A);
@@ -36,6 +40,8 @@ public class SwerveModule implements Sendable {
       new SimpleMotorFeedforward(Turning.S, Turning.V, Turning.A);
 
   private final double angularOffset;
+
+  private SwerveModuleState setpoint = new SwerveModuleState();
 
   /**
    * Constructs a SwerveModule for rev's product.
@@ -69,6 +75,9 @@ public class SwerveModule implements Sendable {
     // burning to flash again (already done in motor config, there's probably a nicer way)
     driveMotor.burnFlash();
     turnMotor.burnFlash();
+
+    // add update method to periodic
+    FunctionRegistry.getInstance().add(this::update);
   }
 
   /**
@@ -88,6 +97,21 @@ public class SwerveModule implements Sendable {
         driveEncoder.getPosition(), new Rotation2d(turningEncoder.getPosition() - angularOffset));
   }
 
+  /** run controllers, set motors */
+  private void update() {
+    final double driveFB =
+        driveFeedback.calculate(driveEncoder.getVelocity(), setpoint.speedMetersPerSecond);
+    final double driveFF = driveFeedforward.calculate(setpoint.speedMetersPerSecond);
+
+    final double turnFB =
+        turnFeedback.calculate(turningEncoder.getPosition(), setpoint.angle.getRadians());
+    final double turnFF = turnFeedforward.calculate(turnFeedback.getSetpoint().velocity);
+
+    // Calculate the drive output from the drive PID controller.
+    driveMotor.setVoltage(driveFB + driveFF);
+    turnMotor.setVoltage(turnFB + turnFF);
+  }
+
   /**
    * Sets the desired state for the module.
    *
@@ -98,21 +122,9 @@ public class SwerveModule implements Sendable {
     correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
     correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(angularOffset));
     // Optimize the reference state to avoid spinning further than 90 degrees
-    SwerveModuleState state =
+    setpoint =
         SwerveModuleState.optimize(
             correctedDesiredState, new Rotation2d(turningEncoder.getPosition()));
-
-    final double driveFB =
-        driveFeedback.calculate(driveEncoder.getVelocity(), state.speedMetersPerSecond);
-    final double driveFF = driveFeedforward.calculate(state.speedMetersPerSecond);
-
-    final double turnFB =
-        turnFeedback.calculate(turningEncoder.getPosition(), state.angle.getRadians());
-    final double turnFF = turnFeedforward.calculate(turnFeedback.getSetpoint().velocity);
-
-    // Calculate the drive output from the drive PID controller.
-    driveMotor.setVoltage(driveFB + driveFF);
-    turnMotor.setVoltage(turnFB + turnFF);
   }
 
   /** Zeroes all the SwerveModule encoders. */

@@ -21,6 +21,10 @@ import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
  * </ul>
  */
 public final class Constants {
+
+  public static final double RATE = 0.02; // roborio tickrate
+  public static final double CONTROLLER_RATE = 0.01; // controller tickrate
+
   public static final class Motors {
     public static final MotorConfig moduleDriveConfig =
         MotorConfig.base().setNeutralBehavior(NeutralBehavior.BRAKE).setCurrentLimit(50);

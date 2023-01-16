@@ -180,11 +180,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     field2d.setRobotPose(getPose());
   }
 
-  // modules2d[i].setPose(getPose());
-  // modules2d[i].setPose(
-  // new Pose2d(
-  // getPose().getTranslation().rotateBy(gyro.getRotation2d()),
-  // modules[i].getState().angle.plus(gyro.getRotation2d())));
   @Override
   public void simulationPeriodic() {
     gyro.getSimCollection()
@@ -194,6 +189,5 @@ public class Drivetrain extends SubsystemBase implements Loggable {
                     * 0.02));
 
     for (int i = 0; i < simModules.length; i++) simModules[i].setDesiredState(setpoint[i]);
-    // gyro.getSimCollection().addHeading(0);
   }
 }

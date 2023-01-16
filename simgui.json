@@ -15,6 +15,7 @@
       "/Shuffleboard/Drivetrain/field2d": "Field2d",
       "/Shuffleboard/Drivetrain/frontLeft": "PIDController",
       "/Shuffleboard/Drivetrain/frontRight": "PIDController",
+      "/Shuffleboard/Drivetrain/rearLeft": "PIDController",
       "/Shuffleboard/Drivetrain/rearRight": "PIDController"
     },
     "windows": {

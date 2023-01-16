@@ -16,7 +16,7 @@ import org.sciborgs1155.robot.Constants.ModuleConstants.Turning;
 public class SimSwerveModule implements Sendable {
 
   private final WheelSim drive = new WheelSim(Driving.V, Driving.A);
-  private final WheelSim turn = new WheelSim(Driving.V, Driving.A);
+  private final WheelSim turn = new WheelSim(Turning.V, Turning.A);
 
   private final PIDController driveFeedback = new PIDController(Driving.P, Driving.I, Driving.D);
   private final ProfiledPIDController turnFeedback =
