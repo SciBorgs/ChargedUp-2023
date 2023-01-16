@@ -1,7 +1,8 @@
+package org.sciborgs1155.lib;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-import org.sciborgs1155.lib.WheelSim;
 
 public class WheelSimTest {
   @Test
