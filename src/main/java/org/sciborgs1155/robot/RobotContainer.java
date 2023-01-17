@@ -39,7 +39,7 @@ public class RobotContainer {
     drive.setDefaultCommand(
         new RunCommand(
             () -> {
-              drive.drive(leftJoystick.getX(), leftJoystick.getY(), rightJoystick.getX(), true);
+              drive.drive(xbox.getLeftX(), xbox.getLeftY(), xbox.getRightX(), false);
             },
             drive));
   }

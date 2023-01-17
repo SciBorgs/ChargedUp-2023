@@ -1,14 +1,13 @@
 package org.sciborgs1155.robot.subsystems;
 
-import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -17,7 +16,6 @@ import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
 import org.sciborgs1155.robot.Constants.DriveConstants;
 import org.sciborgs1155.robot.Ports.DrivePorts;
-import org.sciborgs1155.robot.Ports.Sensors;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 
 public class Drivetrain extends SubsystemBase implements Loggable {
@@ -52,12 +50,13 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   private final SwerveModule[] modules = {frontLeft, frontRight, rearLeft, rearRight};
 
   // The gyro sensor
-  private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Sensors.PIGEON);
+  // private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Sensors.PIGEON);
 
   // Odometry class for tracking robot pose
   private final SwerveDriveOdometry odometry =
       new SwerveDriveOdometry(
-          DriveConstants.KINEMATICS, gyro.getRotation2d(), getModulePositions());
+          // DriveConstants.KINEMATICS, gyro.getRotation2d(), getModulePositions());
+          DriveConstants.KINEMATICS, new Rotation2d(), getModulePositions());
 
   @Log private final Field2d field2d = new Field2d();
 
@@ -83,7 +82,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    odometry.resetPosition(gyro.getRotation2d(), getModulePositions(), pose);
+    // odometry.resetPosition(gyro.getRotation2d(), getModulePositions(), pose);
   }
 
   /**
@@ -103,7 +102,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     var states =
         DriveConstants.KINEMATICS.toSwerveModuleStates(
             fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, gyro.getRotation2d())
+                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, new Rotation2d())
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
 
     // System.out.println(states[2].speedMetersPerSecond);
@@ -131,7 +130,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    gyro.reset();
+    // gyro.reset();
   }
 
   /**
@@ -143,7 +142,8 @@ public class Drivetrain extends SubsystemBase implements Loggable {
    */
   @Log
   public double getHeading() {
-    return gyro.getRotation2d().getDegrees();
+    // return gyro.getRotation2d().getDegrees();
+    return 0;
   }
 
   private SwerveModuleState[] getModuleStates() {
@@ -165,7 +165,8 @@ public class Drivetrain extends SubsystemBase implements Loggable {
    */
   @Log
   public double getTurnRate() {
-    return gyro.getRate() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
+    // return gyro.getRate() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
+    return 0;
   }
 
   /**
@@ -175,13 +176,14 @@ public class Drivetrain extends SubsystemBase implements Loggable {
    */
   @Log
   public double getPitch() {
-    return gyro.getPitch();
+    // return gyro.getPitch();
+    return 0;
   }
 
   @Override
   public void periodic() {
     // for (int i = 0; i < modules.length; i++) modules[i].setDesiredState(setpoint[i]);
-    odometry.update(gyro.getRotation2d(), getModulePositions());
+    odometry.update(new Rotation2d(), getModulePositions());
     field2d.setRobotPose(getPose());
     for (int i = 0; i < modules2d.length; i++) {
       var transform =
@@ -192,10 +194,11 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   @Override
   public void simulationPeriodic() {
-    gyro.getSimCollection()
-        .addHeading(
-            Units.radiansToDegrees(
-                DriveConstants.KINEMATICS.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
-                    * 0.02));
+    // gyro.getSimCollection()
+    //     .addHeading(
+    //         Units.radiansToDegrees(
+    //
+    // DriveConstants.KINEMATICS.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
+    //                 * 0.02));
   }
 }
