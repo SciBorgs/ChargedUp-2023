@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import org.sciborgs1155.lib.WheelSim;
+import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.ModuleConstants.Driving;
 import org.sciborgs1155.robot.Constants.ModuleConstants.Turning;
 
@@ -73,9 +74,9 @@ public class SimSwerveModule implements SwerveModule, Sendable {
     // Calculate the drive output from the drive PID controller.
     // System.out.println(driveFB + driveFF);
     drive.setInput(driveFB + driveFF);
-    drive.update(0.02);
+    drive.update(Constants.RATE);
     turn.setInput(turnFB + turnFF);
-    turn.update(0.02);
+    turn.update(Constants.RATE);
   }
 
   /** Zeroes all the SwerveModule encoders. */

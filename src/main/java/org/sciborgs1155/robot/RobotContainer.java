@@ -21,9 +21,9 @@ public class RobotContainer {
   private final Drivetrain drive = new Drivetrain();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController xbox = new CommandXboxController(OI.xbox);
-  private final Joystick leftJoystick = new Joystick(OI.leftStick);
-  private final Joystick rightJoystick = new Joystick(OI.rightStick);
+  private final CommandXboxController xbox = new CommandXboxController(OI.XBOX);
+  private final Joystick leftJoystick = new Joystick(OI.LEFT_STICK);
+  private final Joystick rightJoystick = new Joystick(OI.RIGHT_STICK);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

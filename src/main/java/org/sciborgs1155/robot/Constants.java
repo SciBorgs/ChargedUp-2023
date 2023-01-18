@@ -3,6 +3,7 @@ package org.sciborgs1155.robot;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import org.sciborgs1155.lib.MotorConfig;
 import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
 
@@ -38,9 +39,11 @@ public final class Constants {
     public static final double MAX_SPEED = 4.8; // m / s
     public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
 
-    public static final double TRACK_WIDTH = 0.28;
+    // public static final double TRACK_WIDTH = 0.28;
+    public static final double TRACK_WIDTH = Units.inchesToMeters(17);
     // Distance between centers of right and left wheels on robot
-    public static final double WHEEL_BASE = 0.28;
+    // public static final double WHEEL_BASE = 0.28;
+    public static final double WHEEL_BASE = Units.inchesToMeters(17);
     // Distance between front and back wheels on robot
 
     public static final Translation2d[] MODULE_OFFSET = {
@@ -90,8 +93,8 @@ public final class Constants {
       public static final double D = 0;
 
       public static final double S = 0;
-      public static final double V = 1; // 1 / kDriveWheelFreeSpeedRps; // ??
-      public static final double A = 1;
+      public static final double V = 0; // 1 / kDriveWheelFreeSpeedRps; // ??
+      public static final double A = 0;
     }
 
     public static final class Turning {
@@ -108,8 +111,8 @@ public final class Constants {
       public static final double D = 0;
 
       public static final double S = 0;
-      public static final double V = 1;
-      public static final double A = 1;
+      public static final double V = 0;
+      public static final double A = 0;
 
       public static final TrapezoidProfile.Constraints CONSTRAINTS =
           new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCELERATION);

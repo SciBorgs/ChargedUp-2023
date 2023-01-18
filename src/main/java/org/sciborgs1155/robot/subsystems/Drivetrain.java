@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
+import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.DriveConstants;
 import org.sciborgs1155.robot.Ports.DrivePorts;
 import org.sciborgs1155.robot.Ports.Sensors;
@@ -24,35 +25,35 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   @Log
   private final SwerveModule frontLeft =
       SwerveModule.create(
-          DrivePorts.frontLeftDriveMotorPort,
-          DrivePorts.frontLeftTurningMotorPort,
+          DrivePorts.FRONT_LEFT_DRIVE,
+          DrivePorts.FRONT_LEFT_TURNING,
           DriveConstants.ANGULAR_OFFSETS[0]);
 
   @Log
   private final SwerveModule frontRight =
       SwerveModule.create(
-          DrivePorts.frontRightDriveMotorPort,
-          DrivePorts.frontRightTurningMotorPort,
+          DrivePorts.FRONT_RIGHT_DRIVE,
+          DrivePorts.FRONT_RIGHT_TURNING,
           DriveConstants.ANGULAR_OFFSETS[1]);
 
   @Log
   private final SwerveModule rearLeft =
       SwerveModule.create(
-          DrivePorts.rearLeftDriveMotorPort,
-          DrivePorts.rearLeftTurningMotorPort,
+          DrivePorts.REAR_LEFT_DRIVE,
+          DrivePorts.REAR_LEFT_TURNING,
           DriveConstants.ANGULAR_OFFSETS[2]);
 
   @Log
   private final SwerveModule rearRight =
       SwerveModule.create(
-          DrivePorts.rearRightDriveMotorPort,
-          DrivePorts.rearRightTurningMotorPort,
+          DrivePorts.REAR_RIGHT_DRIVE,
+          DrivePorts.REAR_RIGHT_TURNING,
           DriveConstants.ANGULAR_OFFSETS[3]);
 
   private final SwerveModule[] modules = {frontLeft, frontRight, rearLeft, rearRight};
 
   // The gyro sensor
-  private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Sensors.PIGEON);
+  @Log private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Sensors.PIGEON);
 
   // Odometry class for tracking robot pose
   private final SwerveDriveOdometry odometry =
@@ -183,6 +184,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     // for (int i = 0; i < modules.length; i++) modules[i].setDesiredState(setpoint[i]);
     odometry.update(gyro.getRotation2d(), getModulePositions());
     field2d.setRobotPose(getPose());
+
     for (int i = 0; i < modules2d.length; i++) {
       var transform =
           new Transform2d(DriveConstants.MODULE_OFFSET[i], modules[i].getPosition().angle);
@@ -196,6 +198,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
         .addHeading(
             Units.radiansToDegrees(
                 DriveConstants.KINEMATICS.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
-                    * 0.02));
+                    * Constants.RATE));
   }
 }

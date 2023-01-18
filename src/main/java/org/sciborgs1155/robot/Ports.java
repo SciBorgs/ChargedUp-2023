@@ -3,21 +3,21 @@ package org.sciborgs1155.robot;
 public final class Ports {
 
   public static final class OI {
-    public static final int xbox = 0;
-    public static final int leftStick = 1;
-    public static final int rightStick = 2;
+    public static final int XBOX = 0;
+    public static final int LEFT_STICK = 1;
+    public static final int RIGHT_STICK = 2;
   }
 
   public static final class DrivePorts {
-    public static final int frontLeftDriveMotorPort = 0;
-    public static final int rearLeftDriveMotorPort = 2;
-    public static final int frontRightDriveMotorPort = 4;
-    public static final int rearRightDriveMotorPort = 6;
+    public static final int FRONT_LEFT_DRIVE = 11;
+    public static final int REAR_LEFT_DRIVE = 1;
+    public static final int FRONT_RIGHT_DRIVE = 13;
+    public static final int REAR_RIGHT_DRIVE = 5;
 
-    public static final int frontLeftTurningMotorPort = 1;
-    public static final int rearLeftTurningMotorPort = 3;
-    public static final int frontRightTurningMotorPort = 5;
-    public static final int rearRightTurningMotorPort = 7;
+    public static final int FRONT_LEFT_TURNING = 4;
+    public static final int REAR_LEFT_TURNING = 31;
+    public static final int FRONT_RIGHT_TURNING = 32;
+    public static final int REAR_RIGHT_TURNING = 3;
   }
 
   public static final class Sensors {
