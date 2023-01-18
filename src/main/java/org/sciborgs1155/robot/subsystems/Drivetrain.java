@@ -1,7 +1,7 @@
 package org.sciborgs1155.robot.subsystems;
 
-import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -20,6 +20,8 @@ import org.sciborgs1155.robot.Constants.DriveConstants;
 import org.sciborgs1155.robot.Ports.DrivePorts;
 import org.sciborgs1155.robot.Ports.Sensors;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
+
+import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 
 public class Drivetrain extends SubsystemBase implements Loggable {
   @Log
@@ -107,7 +109,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, gyro.getRotation2d())
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
 
-    // System.out.println(states[2].speedMetersPerSecond);
     setModuleStates(states);
   }
 
@@ -133,18 +134,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     gyro.reset();
-  }
-
-  /**
-   * Returns the heading of the robot.
-   *
-   * <p>This not for internal use, as all internal angle values should be in radians.
-   *
-   * @return the robot's heading in degrees, from -180 to 180
-   */
-  @Log
-  public double getHeading() {
-    return gyro.getRotation2d().getDegrees();
   }
 
   private SwerveModuleState[] getModuleStates() {
