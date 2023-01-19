@@ -20,6 +20,11 @@ public final class Ports {
     public static final int rearRightTurningMotorPort = 7;
   }
 
+  public static final class ElevatorPorts {
+    public static final int leftElevatorMotor = 8;
+    public static final int rightElevatorMotor = 9;
+  }
+
   public static final class Sensors {
     public static final int PIGEON = 2;
   }
