@@ -13,7 +13,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import org.sciborgs1155.lib.FunctionRegistry;
+import org.sciborgs1155.lib.CustomPeriodRunnables;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.ModuleConstants.Driving;
 import org.sciborgs1155.robot.Constants.ModuleConstants.Turning;
@@ -76,7 +76,7 @@ public class RevModule implements SwerveModule, Sendable {
     turnMotor.burnFlash();
 
     // add update method to periodic
-    FunctionRegistry.getInstance().add(this::update);
+    CustomPeriodRunnables.add(this::update);
   }
 
   /**

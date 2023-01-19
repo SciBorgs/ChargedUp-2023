@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import io.github.oblarg.oblog.Logger;
-import org.sciborgs1155.lib.FunctionRegistry;
+import org.sciborgs1155.lib.CustomPeriodRunnables;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -35,9 +35,7 @@ public class Robot extends TimedRobot {
     // Start networktables logger
     DataLogManager.start();
     // binds FunctionRegistry to be ran at 0.01 hertz
-    for (var entry : FunctionRegistry.getInstance().getEntries()) {
-      addPeriodic(entry.getKey(), entry.getValue());
-    }
+    CustomPeriodRunnables.forEachRunnable(this::addPeriodic);
   }
 
   /**

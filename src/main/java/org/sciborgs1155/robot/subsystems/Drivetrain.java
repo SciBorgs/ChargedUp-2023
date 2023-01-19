@@ -1,7 +1,7 @@
 package org.sciborgs1155.robot.subsystems;
 
+import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -20,8 +20,6 @@ import org.sciborgs1155.robot.Constants.DriveConstants;
 import org.sciborgs1155.robot.Ports.DrivePorts;
 import org.sciborgs1155.robot.Ports.Sensors;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
-
-import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 
 public class Drivetrain extends SubsystemBase implements Loggable {
   @Log
@@ -123,12 +121,14 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     }
 
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.MAX_SPEED);
-    for (int i = 0; i < modules.length; i++) modules[i].setDesiredState(desiredStates[i]);
+    for (int i = 0; i < modules.length; i++) {
+      modules[i].setDesiredState(desiredStates[i]);
+    }
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
   public void resetEncoders() {
-    Arrays.stream(modules).forEach(module -> module.resetEncoders());
+    Arrays.stream(modules).forEach(SwerveModule::resetEncoders);
   }
 
   /** Zeroes the heading of the robot. */
@@ -138,13 +138,13 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   private SwerveModuleState[] getModuleStates() {
     return Arrays.stream(modules)
-        .map(module -> module.getState())
+        .map(SwerveModule::getState)
         .toArray(SwerveModuleState[]::new);
   }
 
   private SwerveModulePosition[] getModulePositions() {
     return Arrays.stream(modules)
-        .map(module -> module.getPosition())
+        .map(SwerveModule::getPosition)
         .toArray(SwerveModulePosition[]::new);
   }
 
