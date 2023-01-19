@@ -137,9 +137,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   }
 
   private SwerveModuleState[] getModuleStates() {
-    return Arrays.stream(modules)
-        .map(SwerveModule::getState)
-        .toArray(SwerveModuleState[]::new);
+    return Arrays.stream(modules).map(SwerveModule::getState).toArray(SwerveModuleState[]::new);
   }
 
   private SwerveModulePosition[] getModulePositions() {
