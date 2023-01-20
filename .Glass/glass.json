@@ -1,0 +1,39 @@
+{
+  "NetworkTables": {
+    "transitory": {
+      "Shuffleboard": {
+        "Drivetrain": {
+          "frontLeft": {
+            "open": true
+          },
+          "frontRight": {
+            "open": true
+          },
+          "open": true,
+          "rearLeft": {
+            "open": true
+          },
+          "rearRight": {
+            "open": true
+          }
+        },
+        "RobotContainer": {
+          "open": true
+        },
+        "open": true
+      },
+      "SmartDashboard": {
+        "open": true
+      }
+    },
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Drivetrain/field2d": "Field2d",
+      "/Shuffleboard/Drivetrain/gyro": "Gyro"
+    }
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)",
+    "serverTeam": "1155"
+  }
+}

@@ -27,6 +27,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
       SwerveModule.create(
           DrivePorts.FRONT_LEFT_DRIVE,
           DrivePorts.FRONT_LEFT_TURNING,
+          DrivePorts.FRONT_LEFT_DUTY_CYCLE,
           DriveConstants.ANGULAR_OFFSETS[0]);
 
   @Log
@@ -34,6 +35,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
       SwerveModule.create(
           DrivePorts.FRONT_RIGHT_DRIVE,
           DrivePorts.FRONT_RIGHT_TURNING,
+          DrivePorts.FRONT_RIGHT_DUTY_CYCLE,
           DriveConstants.ANGULAR_OFFSETS[1]);
 
   @Log
@@ -41,6 +43,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
       SwerveModule.create(
           DrivePorts.REAR_LEFT_DRIVE,
           DrivePorts.REAR_LEFT_TURNING,
+          DrivePorts.BACK_LEFT_DUTY_CYCLE,
           DriveConstants.ANGULAR_OFFSETS[2]);
 
   @Log
@@ -48,6 +51,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
       SwerveModule.create(
           DrivePorts.REAR_RIGHT_DRIVE,
           DrivePorts.REAR_RIGHT_TURNING,
+          DrivePorts.BACK_RIGHT_DUTY_CYCLE,
           DriveConstants.ANGULAR_OFFSETS[3]);
 
   private final SwerveModule[] modules = {frontLeft, frontRight, rearLeft, rearRight};
@@ -96,6 +100,12 @@ public class Drivetrain extends SubsystemBase implements Loggable {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+    // deadband
+    if (Math.abs(xSpeed) < 0.05) xSpeed = 0;
+    if (Math.abs(ySpeed) < 0.05) ySpeed = 0;
+    if (Math.abs(rot) < 0.005) rot = 0;
+
+    // System.out.println(ySpeed);
     // scale inputs based on maximum values
     xSpeed *= DriveConstants.MAX_SPEED;
     ySpeed *= DriveConstants.MAX_SPEED;

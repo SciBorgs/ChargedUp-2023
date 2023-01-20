@@ -69,6 +69,7 @@ public final class MotorConfig {
     var motor = new CANSparkMax(id, motorType);
     motor.restoreFactoryDefaults();
     motor.setInverted(inverted);
+    motor.setIdleMode(neutralBehavior.getREV());
     motor.setOpenLoopRampRate(openLoopRampRate);
     motor.setSmartCurrentLimit(currentLimit);
     motor.burnFlash();

@@ -93,8 +93,8 @@ public final class Constants {
       public static final double D = 0;
 
       public static final double S = 0;
-      public static final double V = 0; // 1 / kDriveWheelFreeSpeedRps; // ??
-      public static final double A = 0;
+      public static final double V = 0.01; // 1 / kDriveWheelFreeSpeedRps; // ??
+      public static final double A = 0.01;
     }
 
     public static final class Turning {
@@ -106,13 +106,13 @@ public final class Constants {
       public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad /
       public static final double MAX_ANGULAR_ACCELERATION = 2 * Math.PI;
 
-      public static final double P = 0.1;
+      public static final double P = 1;
       public static final double I = 0;
       public static final double D = 0;
 
-      public static final double S = 0;
-      public static final double V = 0;
-      public static final double A = 0;
+      public static final double S = 0.1;
+      public static final double V = 0.1;
+      public static final double A = 0.1;
 
       public static final TrapezoidProfile.Constraints CONSTRAINTS =
           new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCELERATION);
