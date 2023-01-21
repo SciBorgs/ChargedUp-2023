@@ -28,10 +28,10 @@ public final class Constants {
 
   public static final class Motors {
     public static final MotorConfig DRIVE =
-        MotorConfig.base().setNeutralBehavior(NeutralBehavior.BRAKE).setCurrentLimit(50);
+        MotorConfig.base().neutralBehavior(NeutralBehavior.BRAKE).currentLimit(50);
 
     public static final MotorConfig TURN =
-        MotorConfig.base().setNeutralBehavior(NeutralBehavior.BRAKE).setCurrentLimit(20);
+        MotorConfig.base().neutralBehavior(NeutralBehavior.BRAKE).currentLimit(20);
   }
 
   public static final class DriveConstants {
@@ -65,6 +65,13 @@ public final class Constants {
       Math.PI, // rear left
       Math.PI / 2 // rear right
     };
+    // public static final double[] ANGULAR_OFFSETS = {
+    //   0, // front left
+    //   Math.PI / 2, // front right
+    //   2 * Math.PI / 3, // rear left
+    //   Math.PI // rear right
+    // };
+
   }
 
   public static final class ModuleConstants {
@@ -85,7 +92,7 @@ public final class Constants {
       public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0; // m / s
       // public static final double ENCODER_VELOCITY_FACTOR = 1;
 
-      public static final double P = 0.01;
+      public static final double P = 0.06;
       public static final double I = 0;
       public static final double D = 0;
 
@@ -102,9 +109,9 @@ public final class Constants {
       public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
       public static final double MAX_ANGULAR_ACCELERATION = 2 * Math.PI; // rad / s^2
 
-      public static final double P = 0.5;
-      public static final double I = 0;
-      public static final double D = 0.01;
+      public static final double P = 1.5;
+      public static final double I = 0.01;
+      public static final double D = 0.02;
 
       // feedforward constants for simulation
       public static final double S = 0.1;

@@ -1,9 +1,11 @@
 package org.sciborgs1155.robot.subsystems.modules;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,9 +23,7 @@ public class RevModule implements SwerveModule, Sendable {
   private final CANSparkMax turnMotor; // Neo 550
 
   private final RelativeEncoder driveEncoder;
-  // private final AbsoluteEncoder turningEncoder;
-  // relative encoder is temporary, until we rewire drive
-  private final RelativeEncoder turningEncoder;
+  private final AbsoluteEncoder turningEncoder;
 
   private final SparkMaxPIDController driveFeedback;
   private final SparkMaxPIDController turnFeedback;
@@ -47,12 +47,11 @@ public class RevModule implements SwerveModule, Sendable {
     turnMotor = Motors.TURN.buildCanSparkMax(MotorType.kBrushless, turnPort);
 
     driveEncoder = driveMotor.getEncoder();
-    turningEncoder = driveMotor.getEncoder();
+    turningEncoder = turnMotor.getAbsoluteEncoder(Type.kDutyCycle);
     driveFeedback = driveMotor.getPIDController();
     turnFeedback = turnMotor.getPIDController();
     driveFeedback.setFeedbackDevice(driveEncoder);
     turnFeedback.setFeedbackDevice(turningEncoder);
-    // turningEncoder = turnMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
     turningEncoder.setInverted(Turning.ENCODER_INVERTED);
 
@@ -63,7 +62,6 @@ public class RevModule implements SwerveModule, Sendable {
     driveFeedback.setP(Driving.P);
     driveFeedback.setI(Driving.I);
     driveFeedback.setD(Driving.D);
-    // driveEncoder.setInverted(true);
 
     turningEncoder.setPositionConversionFactor(Turning.ENCODER_POSITION_FACTOR);
     turningEncoder.setVelocityConversionFactor(Turning.ENCODER_VELOCITY_FACTOR);
@@ -77,13 +75,13 @@ public class RevModule implements SwerveModule, Sendable {
     turnFeedback.setI(Turning.I);
     turnFeedback.setD(Turning.D);
 
-    driveEncoder.setPosition(0);
-
     this.angularOffset = angularOffset;
-
+    
     // burning to flash again (already done in motor config, there's probably a nicer way)
     driveMotor.burnFlash();
     turnMotor.burnFlash();
+
+    driveEncoder.setPosition(0);
   }
 
   /**
@@ -117,6 +115,7 @@ public class RevModule implements SwerveModule, Sendable {
         SwerveModuleState.optimize(
             correctedDesiredState, Rotation2d.fromRadians(turningEncoder.getPosition()));
 
+    // setpoint = desiredState;
     double driveFF = driveFeedforward.calculate(setpoint.speedMetersPerSecond);
     driveFeedback.setReference(setpoint.speedMetersPerSecond, ControlType.kVelocity, 0, driveFF);
     turnFeedback.setReference(setpoint.angle.getRadians(), ControlType.kPosition);
@@ -130,8 +129,9 @@ public class RevModule implements SwerveModule, Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.addDoubleProperty("current velocity", driveEncoder::getVelocity, null);
+    // builder.addDoubleProperty("current angle", () -> this.getPosition().angle.getRadians(), null);
     builder.addDoubleProperty("current angle", turningEncoder::getPosition, null);
+    builder.addDoubleProperty("target angle", () -> setpoint.angle.getRadians(), null);
     builder.addDoubleProperty("target velocity", () -> setpoint.speedMetersPerSecond, null);
-    builder.addDoubleProperty("target angle", setpoint.angle::getRadians, null);
   }
 }

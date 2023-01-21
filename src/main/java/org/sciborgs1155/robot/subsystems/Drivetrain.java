@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
-import java.util.function.DoubleSupplier;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.DriveConstants;
 import org.sciborgs1155.robot.Ports.DrivePorts;
@@ -100,9 +99,9 @@ public class Drivetrain extends SubsystemBase implements Loggable {
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     // deadband
-    if (Math.abs(xSpeed) < 0.05) xSpeed = 0;
-    if (Math.abs(ySpeed) < 0.05) ySpeed = 0;
-    if (Math.abs(rot) < 0.005) rot = 0;
+    if (Math.abs(xSpeed) < 0.01) xSpeed = 0;
+    if (Math.abs(ySpeed) < 0.01) ySpeed = 0;
+    if (Math.abs(rot) < 0.01) rot = 0;
 
     // System.out.println(ySpeed);
     // scale inputs based on maximum values
@@ -131,7 +130,8 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.MAX_SPEED);
     for (int i = 0; i < modules.length; i++) {
-      modules[i].setDesiredState(desiredStates[i]);
+      // modules[i].setDesiredState(desiredStates[i]);
+      modules[i].setDesiredState(new SwerveModuleState());
     }
   }
 
@@ -195,12 +195,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
             Units.radiansToDegrees(
                 DriveConstants.KINEMATICS.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
                     * Constants.RATE));
-  }
-
-  public Command drive(
-      DoubleSupplier xSpeed, DoubleSupplier ySpeed, DoubleSupplier rot, boolean fieldRelative) {
-    return this.run(
-        () -> drive(xSpeed.getAsDouble(), ySpeed.getAsDouble(), rot.getAsDouble(), fieldRelative));
   }
 
   /** Sets the drivetrain to an "X" configuration, preventing movement */

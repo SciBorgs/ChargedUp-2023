@@ -9,14 +9,14 @@ public final class Ports {
   }
 
   public static final class DrivePorts {
-    public static final int FRONT_LEFT_DRIVE = 7;
+    public static final int FRONT_LEFT_DRIVE = 38;
     public static final int REAR_LEFT_DRIVE = 1;
-    public static final int FRONT_RIGHT_DRIVE = 40;
-    public static final int REAR_RIGHT_DRIVE = 5;
+    public static final int FRONT_RIGHT_DRIVE = 5;
+    public static final int REAR_RIGHT_DRIVE = 32;
 
-    public static final int FRONT_LEFT_TURNING = 4;
+    public static final int FRONT_LEFT_TURNING = 36;
     public static final int REAR_LEFT_TURNING = 31;
-    public static final int FRONT_RIGHT_TURNING = 32;
+    public static final int FRONT_RIGHT_TURNING = 40;
     public static final int REAR_RIGHT_TURNING = 3;
   }
 
