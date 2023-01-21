@@ -72,50 +72,47 @@ public final class Constants {
     // we use a 14T pinion
     public static final int PINION_TEETH = 14;
 
-    // Calculations required for driving motor conversion factors and feed forward
-    public static final double DRIVING_FREE_SPEED = 5676.0 / 60.0; // rot / s
     public static final double WHEEL_DIAMETER = 0.0762;
-    public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
-    // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15
-    // teeth on the
-    // bevel pinion
+
+    // 45 teeth on the wheel's bevel gear
+    // 22 teeth on the first-stage spur gear
+    // 15 teeth on the bevel pinion
     public static final double DRIVING_MOTOR_REDUCTION = (45.0 * 22) / (PINION_TEETH * 15);
-    public static final double kDriveWheelFreeSpeedRps =
-        (DRIVING_FREE_SPEED * WHEEL_CIRCUMFERENCE) / DRIVING_MOTOR_REDUCTION;
 
     public static final class Driving {
       public static final double ENCODER_POSITION_FACTOR =
-          (WHEEL_DIAMETER * Math.PI) / DRIVING_MOTOR_REDUCTION;
-      public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0;
+          (WHEEL_DIAMETER * Math.PI) / DRIVING_MOTOR_REDUCTION; // m
+      public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0; // m / s
+      // public static final double ENCODER_VELOCITY_FACTOR = 1;
 
-      public static final double P = 0.1;
+      public static final double P = 0.01;
       public static final double I = 0;
       public static final double D = 0;
 
-      public static final double S = 0;
-      public static final double V = 0.01; // 1 / kDriveWheelFreeSpeedRps; // ??
+      public static final double S = 0.01;
+      public static final double V = 0.01;
       public static final double A = 0.01;
     }
 
     public static final class Turning {
-      public static final double ENCODER_POSITION_FACTOR = (2 * Math.PI);
-      public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0;
+      public static final double ENCODER_POSITION_FACTOR = (2 * Math.PI); // m
+      public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0; // m / s
       public static final boolean ENCODER_INVERTED = true;
 
-      // TODO tune
-      public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad /
-      public static final double MAX_ANGULAR_ACCELERATION = 2 * Math.PI;
+      public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
+      public static final double MAX_ANGULAR_ACCELERATION = 2 * Math.PI; // rad / s^2
 
-      public static final double P = 1;
+      public static final double P = 0.5;
       public static final double I = 0;
-      public static final double D = 0;
+      public static final double D = 0.01;
 
+      // feedforward constants for simulation
       public static final double S = 0.1;
       public static final double V = 0.1;
       public static final double A = 0.1;
 
-      public static final TrapezoidProfile.Constraints CONSTRAINTS =
-          new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCELERATION);
+      // public static final TrapezoidProfile.Constraints CONSTRAINTS =
+      //     new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCELERATION);
 
       // pid wrapping
       public static final double MIN_INPUT = 0;

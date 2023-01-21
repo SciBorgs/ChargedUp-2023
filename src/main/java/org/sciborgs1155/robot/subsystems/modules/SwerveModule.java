@@ -6,10 +6,9 @@ import org.sciborgs1155.robot.Robot;
 
 public interface SwerveModule {
 
-  public static SwerveModule create(
-      int drivePort, int turnPort, int turnEncoderPort, double angularOffset) {
+  public static SwerveModule create(int drivePort, int turnPort, double angularOffset) {
     return Robot.isReal()
-        ? new RevModule(drivePort, turnPort, turnEncoderPort, angularOffset)
+        ? new RevModule(drivePort, turnPort, angularOffset)
         : new SimSwerveModule();
   }
 

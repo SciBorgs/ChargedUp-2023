@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -11,10 +12,12 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
+import java.util.function.DoubleSupplier;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.DriveConstants;
 import org.sciborgs1155.robot.Ports.DrivePorts;
@@ -27,7 +30,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
       SwerveModule.create(
           DrivePorts.FRONT_LEFT_DRIVE,
           DrivePorts.FRONT_LEFT_TURNING,
-          DrivePorts.FRONT_LEFT_DUTY_CYCLE,
           DriveConstants.ANGULAR_OFFSETS[0]);
 
   @Log
@@ -35,7 +37,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
       SwerveModule.create(
           DrivePorts.FRONT_RIGHT_DRIVE,
           DrivePorts.FRONT_RIGHT_TURNING,
-          DrivePorts.FRONT_RIGHT_DUTY_CYCLE,
           DriveConstants.ANGULAR_OFFSETS[1]);
 
   @Log
@@ -43,7 +44,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
       SwerveModule.create(
           DrivePorts.REAR_LEFT_DRIVE,
           DrivePorts.REAR_LEFT_TURNING,
-          DrivePorts.BACK_LEFT_DUTY_CYCLE,
           DriveConstants.ANGULAR_OFFSETS[2]);
 
   @Log
@@ -51,7 +51,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
       SwerveModule.create(
           DrivePorts.REAR_RIGHT_DRIVE,
           DrivePorts.REAR_RIGHT_TURNING,
-          DrivePorts.BACK_RIGHT_DUTY_CYCLE,
           DriveConstants.ANGULAR_OFFSETS[3]);
 
   private final SwerveModule[] modules = {frontLeft, frontRight, rearLeft, rearRight};
@@ -196,5 +195,23 @@ public class Drivetrain extends SubsystemBase implements Loggable {
             Units.radiansToDegrees(
                 DriveConstants.KINEMATICS.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
                     * Constants.RATE));
+  }
+
+  public Command drive(
+      DoubleSupplier xSpeed, DoubleSupplier ySpeed, DoubleSupplier rot, boolean fieldRelative) {
+    return this.run(
+        () -> drive(xSpeed.getAsDouble(), ySpeed.getAsDouble(), rot.getAsDouble(), fieldRelative));
+  }
+
+  /** Sets the drivetrain to an "X" configuration, preventing movement */
+  public Command lock() {
+    var states =
+        new SwerveModuleState[] {
+          new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(45))
+        };
+    return this.runOnce(() -> setModuleStates(states));
   }
 }

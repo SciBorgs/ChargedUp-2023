@@ -1,7 +1,6 @@
 package org.sciborgs1155.robot.subsystems.modules;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -20,13 +19,10 @@ public class SimSwerveModule implements SwerveModule, Sendable {
   private final WheelSim turn = new WheelSim(Turning.V, Turning.A);
 
   private final PIDController driveFeedback = new PIDController(Driving.P, Driving.I, Driving.D);
-  private final ProfiledPIDController turnFeedback =
-      new ProfiledPIDController(Turning.P, Turning.I, Turning.D, Turning.CONSTRAINTS);
+  private final PIDController turnFeedback = new PIDController(Turning.P, Turning.I, Turning.D);
 
   private final SimpleMotorFeedforward driveFeedforward =
       new SimpleMotorFeedforward(Driving.S, Driving.V, Driving.A);
-  private final SimpleMotorFeedforward turnFeedforward =
-      new SimpleMotorFeedforward(Turning.S, Turning.V, Turning.A);
 
   /**
    * Constructs a SwerveModule for rev's product.
@@ -46,11 +42,12 @@ public class SimSwerveModule implements SwerveModule, Sendable {
    * @return The current state of the module.
    */
   public SwerveModuleState getState() {
-    return new SwerveModuleState(drive.getVelocity(), new Rotation2d(turn.getPosition()));
+    return new SwerveModuleState(drive.getVelocity(), Rotation2d.fromRadians(turn.getPosition()));
   }
 
   public SwerveModulePosition getPosition() {
-    return new SwerveModulePosition(drive.getPosition(), new Rotation2d(turn.getPosition()));
+    return new SwerveModulePosition(
+        drive.getPosition(), Rotation2d.fromRadians(turn.getPosition()));
   }
 
   /**
@@ -61,21 +58,16 @@ public class SimSwerveModule implements SwerveModule, Sendable {
   public void setDesiredState(SwerveModuleState desiredState) {
     // Optimize the reference state to avoid spinning further than 90 degrees
     SwerveModuleState state =
-        SwerveModuleState.optimize(desiredState, new Rotation2d(turn.getPosition()));
+        SwerveModuleState.optimize(desiredState, Rotation2d.fromRadians(turn.getPosition()));
 
-    // System.out.println(desiredState.speedMetersPerSecond);
-    // System.out.println(state.speedMetersPerSecond);
     final double driveFB = driveFeedback.calculate(drive.getVelocity(), state.speedMetersPerSecond);
     final double driveFF = driveFeedforward.calculate(state.speedMetersPerSecond);
 
     final double turnFB = turnFeedback.calculate(turn.getPosition(), state.angle.getRadians());
-    final double turnFF = turnFeedforward.calculate(turnFeedback.getSetpoint().velocity);
 
-    // Calculate the drive output from the drive PID controller.
-    // System.out.println(driveFB + driveFF);
     drive.setInput(driveFB + driveFF);
     drive.update(Constants.RATE);
-    turn.setInput(turnFB + turnFF);
+    turn.setInput(turnFB);
     turn.update(Constants.RATE);
   }
 
@@ -89,7 +81,5 @@ public class SimSwerveModule implements SwerveModule, Sendable {
   public void initSendable(SendableBuilder builder) {
     builder.addDoubleProperty("velocity", drive::getVelocity, null);
     builder.addDoubleProperty("angle", turn::getPosition, null);
-    driveFeedback.initSendable(builder);
-    turnFeedback.initSendable(builder);
   }
 }

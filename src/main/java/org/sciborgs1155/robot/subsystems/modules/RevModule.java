@@ -1,21 +1,16 @@
 package org.sciborgs1155.robot.subsystems.modules;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import org.sciborgs1155.lib.CustomPeriodRunnables;
-import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.ModuleConstants.Driving;
 import org.sciborgs1155.robot.Constants.ModuleConstants.Turning;
 import org.sciborgs1155.robot.Constants.Motors;
@@ -27,18 +22,14 @@ public class RevModule implements SwerveModule, Sendable {
 
   private final RelativeEncoder driveEncoder;
   // private final AbsoluteEncoder turningEncoder;
-  private final DutyCycleEncoder turningEncoder;
+  // relative encoder is temporary, until we rewire drive
+  private final RelativeEncoder turningEncoder;
 
-  private final PIDController driveFeedback =
-      new PIDController(Driving.P, Driving.I, Driving.D, Constants.CONTROLLER_RATE);
-  private final ProfiledPIDController turnFeedback =
-      new ProfiledPIDController(
-          Turning.P, Turning.I, Turning.D, Turning.CONSTRAINTS, Constants.CONTROLLER_RATE);
+  private final SparkMaxPIDController driveFeedback;
+  private final SparkMaxPIDController turnFeedback;
 
   private final SimpleMotorFeedforward driveFeedforward =
       new SimpleMotorFeedforward(Driving.S, Driving.V, Driving.A);
-  private final SimpleMotorFeedforward turnFeedforward =
-      new SimpleMotorFeedforward(Turning.S, Turning.V, Turning.A);
 
   private final double angularOffset;
 
@@ -51,40 +42,48 @@ public class RevModule implements SwerveModule, Sendable {
    * @param turnPort turning motor port
    * @param angularOffset offset from drivetrain
    */
-  public RevModule(int drivePort, int turnPort, int turnEncoderPort, double angularOffset) {
+  public RevModule(int drivePort, int turnPort, double angularOffset) {
     driveMotor = Motors.DRIVE.buildCanSparkMax(MotorType.kBrushless, drivePort);
     turnMotor = Motors.TURN.buildCanSparkMax(MotorType.kBrushless, turnPort);
 
     driveEncoder = driveMotor.getEncoder();
+    turningEncoder = driveMotor.getEncoder();
+    driveFeedback = driveMotor.getPIDController();
+    turnFeedback = turnMotor.getPIDController();
+    driveFeedback.setFeedbackDevice(driveEncoder);
+    turnFeedback.setFeedbackDevice(turningEncoder);
     // turningEncoder = turnMotor.getAbsoluteEncoder(Type.kDutyCycle);
-    turningEncoder = new DutyCycleEncoder(turnEncoderPort);
 
-    turningEncoder.setDistancePerRotation(-1 * Turning.ENCODER_POSITION_FACTOR);
-
-    // turningEncoder.setInverted(Turning.ENCODER_INVERTED);
+    turningEncoder.setInverted(Turning.ENCODER_INVERTED);
 
     // encoder ratios
     driveEncoder.setPositionConversionFactor(Driving.ENCODER_POSITION_FACTOR);
     driveEncoder.setVelocityConversionFactor(Driving.ENCODER_VELOCITY_FACTOR);
-    // turningEncoder.setPositionConversionFactor(Turning.ENCODER_POSITION_FACTOR);
-    // turningEncoder.setVelocityConversionFactor(Turning.ENCODER_VELOCITY_FACTOR);
+
+    driveFeedback.setP(Driving.P);
+    driveFeedback.setI(Driving.I);
+    driveFeedback.setD(Driving.D);
+    // driveEncoder.setInverted(true);
+
+    turningEncoder.setPositionConversionFactor(Turning.ENCODER_POSITION_FACTOR);
+    turningEncoder.setVelocityConversionFactor(Turning.ENCODER_VELOCITY_FACTOR);
 
     // set up continuous input for turning
-    turnFeedback.enableContinuousInput(Turning.MIN_INPUT, Turning.MAX_INPUT);
+    turnFeedback.setPositionPIDWrappingEnabled(true);
+    turnFeedback.setPositionPIDWrappingMinInput(Turning.MIN_INPUT);
+    turnFeedback.setPositionPIDWrappingMaxInput(Turning.MAX_INPUT);
+
+    turnFeedback.setP(Turning.P);
+    turnFeedback.setI(Turning.I);
+    turnFeedback.setD(Turning.D);
 
     driveEncoder.setPosition(0);
 
     this.angularOffset = angularOffset;
-    
-    // TODO fix modules...
-    turningEncoder.reset();
 
     // burning to flash again (already done in motor config, there's probably a nicer way)
     driveMotor.burnFlash();
     turnMotor.burnFlash();
-
-    // add update method to periodic
-    CustomPeriodRunnables.add(this::update);
   }
 
   /**
@@ -93,32 +92,15 @@ public class RevModule implements SwerveModule, Sendable {
    * @return The current state of the module.
    */
   public SwerveModuleState getState() {
-    // won't work until units are correct
     return new SwerveModuleState(
-        driveEncoder.getVelocity(), new Rotation2d(turningEncoder.getDistance() - angularOffset));
+        driveEncoder.getVelocity(),
+        Rotation2d.fromRadians(turningEncoder.getPosition() - angularOffset));
   }
 
   public SwerveModulePosition getPosition() {
-    // won't work until units are correct
     return new SwerveModulePosition(
-        driveEncoder.getPosition(), new Rotation2d(turningEncoder.getDistance() - angularOffset));
-  }
-
-  /** run controllers, set motors */
-  private void update() {
-    final double driveFB =
-        driveFeedback.calculate(driveEncoder.getVelocity(), setpoint.speedMetersPerSecond);
-    final double driveFF = driveFeedforward.calculate(setpoint.speedMetersPerSecond);
-
-    SmartDashboard.putNumber("turn distance", turningEncoder.getDistance());
-    SmartDashboard.putNumber("setpoint angle", setpoint.angle.getRadians());
-    final double turnFB =
-        turnFeedback.calculate(turningEncoder.getDistance(), setpoint.angle.getRadians());
-    final double turnFF = turnFeedforward.calculate(turnFeedback.getSetpoint().velocity);
-
-    // Calculate the drive output from the drive PID controller.
-    driveMotor.setVoltage(driveFB + driveFF);
-    turnMotor.setVoltage(turnFB + turnFF);
+        driveEncoder.getPosition(),
+        Rotation2d.fromRadians(turningEncoder.getPosition() - angularOffset));
   }
 
   /**
@@ -133,7 +115,11 @@ public class RevModule implements SwerveModule, Sendable {
     // Optimize the reference state to avoid spinning further than 90 degrees
     setpoint =
         SwerveModuleState.optimize(
-            correctedDesiredState, new Rotation2d(turningEncoder.getDistance()));
+            correctedDesiredState, Rotation2d.fromRadians(turningEncoder.getPosition()));
+
+    double driveFF = driveFeedforward.calculate(setpoint.speedMetersPerSecond);
+    driveFeedback.setReference(setpoint.speedMetersPerSecond, ControlType.kVelocity, 0, driveFF);
+    turnFeedback.setReference(setpoint.angle.getRadians(), ControlType.kPosition);
   }
 
   /** Zeroes all the SwerveModule encoders. */
@@ -143,9 +129,9 @@ public class RevModule implements SwerveModule, Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.addDoubleProperty("velocity", driveEncoder::getVelocity, null);
-    builder.addDoubleProperty("angle", turningEncoder::getDistance, null);
-    // driveFeedback.initSendable(builder);
-    turnFeedback.initSendable(builder);
+    builder.addDoubleProperty("current velocity", driveEncoder::getVelocity, null);
+    builder.addDoubleProperty("current angle", turningEncoder::getPosition, null);
+    builder.addDoubleProperty("target velocity", () -> setpoint.speedMetersPerSecond, null);
+    builder.addDoubleProperty("target angle", setpoint.angle::getRadians, null);
   }
 }
