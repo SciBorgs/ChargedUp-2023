@@ -74,7 +74,7 @@ public class RevModule implements SwerveModule, Sendable {
     turnFeedback.setP(Turning.P);
     turnFeedback.setI(Turning.I);
     turnFeedback.setD(Turning.D);
-
+    
     // burning to flash again (already done in motor config, there's probably a nicer way)
     driveMotor.burnFlash();
     turnMotor.burnFlash();
