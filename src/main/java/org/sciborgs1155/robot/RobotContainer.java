@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -43,7 +44,11 @@ public class RobotContainer {
     drive.setDefaultCommand(
         new RunCommand(
             () -> {
-              drive.drive(xbox.getLeftX(), xbox.getLeftY(), xbox.getRightX(), false);
+              drive.drive(
+                  MathUtil.applyDeadband(-xbox.getLeftY(), Constants.DEADBAND),
+                  MathUtil.applyDeadband(-xbox.getLeftX(), Constants.DEADBAND),
+                  MathUtil.applyDeadband(-xbox.getRightX(), Constants.DEADBAND),
+                  false);
             },
             drive));
   }

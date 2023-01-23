@@ -75,13 +75,13 @@ public class RevModule implements SwerveModule, Sendable {
     turnFeedback.setI(Turning.I);
     turnFeedback.setD(Turning.D);
 
-    this.angularOffset = angularOffset;
-    
     // burning to flash again (already done in motor config, there's probably a nicer way)
     driveMotor.burnFlash();
     turnMotor.burnFlash();
 
     driveEncoder.setPosition(0);
+    this.angularOffset = angularOffset;
+    setpoint.angle = Rotation2d.fromRadians(turningEncoder.getPosition());
   }
 
   /**
@@ -129,7 +129,8 @@ public class RevModule implements SwerveModule, Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.addDoubleProperty("current velocity", driveEncoder::getVelocity, null);
-    // builder.addDoubleProperty("current angle", () -> this.getPosition().angle.getRadians(), null);
+    // builder.addDoubleProperty("current angle", () -> this.getPosition().angle.getRadians(),
+    // null);
     builder.addDoubleProperty("current angle", turningEncoder::getPosition, null);
     builder.addDoubleProperty("target angle", () -> setpoint.angle.getRadians(), null);
     builder.addDoubleProperty("target velocity", () -> setpoint.speedMetersPerSecond, null);

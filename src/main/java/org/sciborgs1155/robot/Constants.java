@@ -25,13 +25,20 @@ public final class Constants {
 
   public static final double RATE = 0.02; // roborio tickrate
   public static final double CONTROLLER_RATE = 0.015; // controller tickrate
+  public static final double DEADBAND = 0.06;
 
   public static final class Motors {
     public static final MotorConfig DRIVE =
-        MotorConfig.base().neutralBehavior(NeutralBehavior.BRAKE).currentLimit(50);
+        MotorConfig.base()
+            .setBurnFlash(false)
+            .setNeutralBehavior(NeutralBehavior.BRAKE)
+            .setCurrentLimit(50);
 
     public static final MotorConfig TURN =
-        MotorConfig.base().neutralBehavior(NeutralBehavior.BRAKE).currentLimit(20);
+        MotorConfig.base()
+            .setBurnFlash(false)
+            .setNeutralBehavior(NeutralBehavior.BRAKE)
+            .setCurrentLimit(20);
   }
 
   public static final class DriveConstants {
@@ -102,8 +109,9 @@ public final class Constants {
     }
 
     public static final class Turning {
-      public static final double ENCODER_POSITION_FACTOR = (2 * Math.PI); // m
-      public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0; // m / s
+      public static final double ENCODER_POSITION_FACTOR = (2 * Math.PI); // rad
+      public static final double ENCODER_VELOCITY_FACTOR =
+          ENCODER_POSITION_FACTOR / 60.0; // rad / s
       public static final boolean ENCODER_INVERTED = true;
 
       public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
@@ -117,9 +125,6 @@ public final class Constants {
       public static final double S = 0.1;
       public static final double V = 0.1;
       public static final double A = 0.1;
-
-      // public static final TrapezoidProfile.Constraints CONSTRAINTS =
-      //     new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCELERATION);
 
       // pid wrapping
       public static final double MIN_INPUT = 0;

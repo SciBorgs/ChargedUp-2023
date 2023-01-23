@@ -98,12 +98,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    // deadband
-    if (Math.abs(xSpeed) < 0.01) xSpeed = 0;
-    if (Math.abs(ySpeed) < 0.01) ySpeed = 0;
-    if (Math.abs(rot) < 0.01) rot = 0;
-
-    // System.out.println(ySpeed);
     // scale inputs based on maximum values
     xSpeed *= DriveConstants.MAX_SPEED;
     ySpeed *= DriveConstants.MAX_SPEED;
@@ -130,8 +124,8 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.MAX_SPEED);
     for (int i = 0; i < modules.length; i++) {
-      // modules[i].setDesiredState(desiredStates[i]);
-      modules[i].setDesiredState(new SwerveModuleState());
+      modules[i].setDesiredState(desiredStates[i]);
+      // modules[i].setDesiredState(new SwerveModuleState());
     }
   }
 
