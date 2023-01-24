@@ -133,14 +133,15 @@ public final class Constants {
   }
 
   public static final class AutoConstants {
-    public static final double MAX_SPEED = 3; // m/s
-    public static final double MAX_ACCEL = 1; // m/s^2
-    public static final double MAX_ANG_SPEED = Math.PI; // rad/s
+    public static final double MAX_SPEED = DriveConstants.MAX_SPEED; // m/s
+    public static final double MAX_ACCEL = 3; // m/s^2
+    public static final double MAX_ANG_SPEED = 1.5 * DriveConstants.MAX_ANGULAR_SPEED; // rad/s
     public static final double MAX_ANG_ACCEL = Math.PI; // rad/s^2
 
-    public static final double P_X_CONTROLLER = 0.1;
-    public static final double P_Y_CONTROLLER = 0.1;
-    public static final double P_THETA_CONTROLLER = 0.1;
+    public static final double P_X_CONTROLLER = 2;
+    public static final double P_Y_CONTROLLER = 2;
+    public static final double P_THETA_CONTROLLER = 4;
+    ;
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS =
