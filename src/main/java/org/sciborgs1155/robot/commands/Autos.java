@@ -52,7 +52,7 @@ public final class Autos {
         theta,
         drive::setModuleStates,
         drive);
-  }
+  } 
 
   private Autos() {
     throw new UnsupportedOperationException("This is a utility class!");
