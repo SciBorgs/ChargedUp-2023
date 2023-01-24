@@ -63,7 +63,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   // Odometry class for tracking robot pose
   private final SwerveDriveOdometry odometry =
       new SwerveDriveOdometry(
-          DriveConstants.KINEMATICS, Rotation2d.fromDegrees(imu.getAngle()), getModulePositions());
+          DriveConstants.KINEMATICS, getHeading(), getModulePositions());
 
   @Log private final Field2d field2d = new Field2d();
 
@@ -74,6 +74,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
       modules2d[i] = field2d.getObject("module-" + i);
     }
   }
+
   /**
    * Returns the currently-estimated pose of the robot.
    *
@@ -84,12 +85,23 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   }
 
   /**
+   * Returns the heading of the robot, based on our imu
+   * 
+   * <p>The imu is ccw positive, but mounted upside down
+   * 
+   * @return A Rotation2d of our angle
+   */
+  public Rotation2d getHeading() {
+    return Rotation2d.fromDegrees(-imu.getAngle());
+  }
+
+  /**
    * Resets the odometry to the specified pose.
    *
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    odometry.resetPosition(Rotation2d.fromDegrees(imu.getAngle()), getModulePositions(), pose);
+    odometry.resetPosition(getHeading(), getModulePositions(), pose);
   }
 
   /**
@@ -110,7 +122,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     var states =
         DriveConstants.KINEMATICS.toSwerveModuleStates(
             fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, Rotation2d.fromDegrees(imu.getAngle()))
+                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getHeading())
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
 
     setModuleStates(states);
@@ -176,9 +188,9 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   @Override
   public void periodic() {
     // for (int i = 0; i < modules.length; i++) modules[i].setDesiredState(setpoint[i]);
-    odometry.update(Rotation2d.fromDegrees(imu.getAngle()), getModulePositions());
+    odometry.update(getHeading(), getModulePositions());
     field2d.setRobotPose(getPose());
-    System.out.println(Rotation2d.fromDegrees(imu.getAngle()));
+    System.out.println(getHeading());
     for (int i = 0; i < modules2d.length; i++) {
       var transform =
           new Transform2d(DriveConstants.MODULE_OFFSET[i], modules[i].getPosition().angle);

@@ -45,10 +45,10 @@ public class RobotContainer {
         new RunCommand(
             () -> {
               drive.drive(
-                  MathUtil.applyDeadband(-leftJoystick.getY(), Constants.DEADBAND),
-                  MathUtil.applyDeadband(-leftJoystick.getX(), Constants.DEADBAND),
-                  MathUtil.applyDeadband(-rightJoystick.getX(), Constants.DEADBAND),
-                  false);
+                  MathUtil.applyDeadband(-xbox.getLeftY(), Constants.DEADBAND),
+                  MathUtil.applyDeadband(-xbox.getLeftX(), Constants.DEADBAND),
+                  MathUtil.applyDeadband(-xbox.getRightX(), Constants.DEADBAND),
+                  true);
             },
             drive));
   }

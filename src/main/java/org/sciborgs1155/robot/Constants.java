@@ -43,8 +43,8 @@ public final class Constants {
 
   public static final class DriveConstants {
 
-    public static final double MAX_SPEED = 6.115; // m / s
-    public static final double MAX_ANGULAR_SPEED = 3 * Math.PI; // rad / s
+    public static final double MAX_SPEED = 7.5; // m / s
+    public static final double MAX_ANGULAR_SPEED = 4 * Math.PI; // rad / s
 
     // public static final double TRACK_WIDTH = 0.28;
     public static final double TRACK_WIDTH = Units.inchesToMeters(17);
