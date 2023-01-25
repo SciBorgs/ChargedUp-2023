@@ -206,6 +206,10 @@ public class Drivetrain extends SubsystemBase implements Loggable {
                     * Constants.RATE));
   }
 
+  public Command stop() {
+    return this.runOnce(() -> setModuleStates(getModuleStates()));
+  }
+
   /** Sets the drivetrain to an "X" configuration, preventing movement */
   public Command lock() {
     var states =
