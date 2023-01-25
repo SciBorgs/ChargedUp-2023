@@ -62,8 +62,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   // Odometry class for tracking robot pose
   private final SwerveDriveOdometry odometry =
-      new SwerveDriveOdometry(
-          DriveConstants.KINEMATICS, getHeading(), getModulePositions());
+      new SwerveDriveOdometry(DriveConstants.KINEMATICS, getHeading(), getModulePositions());
 
   @Log private final Field2d field2d = new Field2d();
 
@@ -86,9 +85,9 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   /**
    * Returns the heading of the robot, based on our imu
-   * 
+   *
    * <p>The imu is ccw positive, but mounted upside down
-   * 
+   *
    * @return A Rotation2d of our angle
    */
   public Rotation2d getHeading() {
