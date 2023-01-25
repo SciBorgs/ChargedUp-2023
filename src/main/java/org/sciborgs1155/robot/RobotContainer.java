@@ -48,7 +48,7 @@ public class RobotContainer {
                   MathUtil.applyDeadband(-xbox.getLeftY(), Constants.DEADBAND),
                   MathUtil.applyDeadband(-xbox.getLeftX(), Constants.DEADBAND),
                   MathUtil.applyDeadband(-xbox.getRightX(), Constants.DEADBAND),
-                  false);
+                  true);
             },
             drive));
   }
@@ -80,8 +80,11 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // Chain all commands given by autoSequence
-    return autonSequence.stream()
-        .reduce(Command::andThen)
-        .orElseGet(() -> new RunCommand(() -> {}));
+
+    return Autos.followPath(drive, "gamer");
+
+    // return autonSequence.stream()
+    //     .reduce(Command::andThen)
+    //     .orElseGet(() -> new RunCommand(() -> {}));
   }
 }

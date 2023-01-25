@@ -43,8 +43,8 @@ public final class Constants {
 
   public static final class DriveConstants {
 
-    public static final double MAX_SPEED = 4.8; // m / s
-    public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
+    public static final double MAX_SPEED = 7.5; // m / s
+    public static final double MAX_ANGULAR_SPEED = 4 * Math.PI; // rad / s
 
     // public static final double TRACK_WIDTH = 0.28;
     public static final double TRACK_WIDTH = Units.inchesToMeters(17);
@@ -118,7 +118,7 @@ public final class Constants {
       public static final double MAX_ANGULAR_ACCELERATION = 2 * Math.PI; // rad / s^2
 
       public static final double P = 1.5;
-      public static final double I = 0.01;
+      public static final double I = 0;
       public static final double D = 0.02;
 
       // feedforward constants for simulation
@@ -133,14 +133,15 @@ public final class Constants {
   }
 
   public static final class AutoConstants {
-    public static final double MAX_SPEED = 3; // m/s
+    public static final double MAX_SPEED = DriveConstants.MAX_SPEED; // m/s
     public static final double MAX_ACCEL = 3; // m/s^2
-    public static final double MAX_ANG_SPEED = Math.PI; // rad/s
+    public static final double MAX_ANG_SPEED = 1.5 * DriveConstants.MAX_ANGULAR_SPEED; // rad/s
     public static final double MAX_ANG_ACCEL = Math.PI; // rad/s^2
 
-    public static final double P_X_CONTROLLER = 1;
-    public static final double P_Y_CONTROLLER = 1;
-    public static final double P_THETA_CONTROLLER = 1;
+    public static final double P_X_CONTROLLER = 2;
+    public static final double P_Y_CONTROLLER = 2;
+    public static final double P_THETA_CONTROLLER = 4;
+    ;
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS =

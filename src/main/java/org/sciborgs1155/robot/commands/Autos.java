@@ -44,14 +44,15 @@ public final class Autos {
     drive.resetOdometry(path.getInitialPose());
 
     return new SwerveControllerCommand(
-        path,
-        drive::getPose,
-        DriveConstants.KINEMATICS,
-        x,
-        y,
-        theta,
-        drive::setModuleStates,
-        drive);
+            path,
+            drive::getPose,
+            DriveConstants.KINEMATICS,
+            x,
+            y,
+            theta,
+            drive::setModuleStates,
+            drive)
+        .andThen(drive.stop());
   }
 
   private Autos() {
