@@ -141,7 +141,11 @@ public final class Constants {
     public static final double P_X_CONTROLLER = 2;
     public static final double P_Y_CONTROLLER = 2;
     public static final double P_THETA_CONTROLLER = 4;
-    ;
+
+    public static final double BALANCE_KP = 0;
+    public static final double BALANCE_KI = 0;
+    public static final double BALANCE_KD = 0;
+    public static final double BALANCE_SETPOINT = 0;
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS =
