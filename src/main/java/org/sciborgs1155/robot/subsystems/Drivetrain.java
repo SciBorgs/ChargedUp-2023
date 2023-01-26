@@ -1,12 +1,12 @@
 package org.sciborgs1155.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
+import org.photonvision.PhotonCamera;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.DriveConstants;
 import org.sciborgs1155.robot.Ports.DrivePorts;
@@ -61,8 +62,9 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   private final ADIS16470_IMU imu = new ADIS16470_IMU();
 
   // Odometry class for tracking robot pose
-  private final SwerveDriveOdometry odometry =
-      new SwerveDriveOdometry(DriveConstants.KINEMATICS, getHeading(), getModulePositions());
+  private final SwerveDrivePoseEstimator odometry =
+      new SwerveDrivePoseEstimator(
+          DriveConstants.KINEMATICS, getHeading(), getModulePositions(), new Pose2d());
 
   @Log private final Field2d field2d = new Field2d();
 
@@ -73,14 +75,13 @@ public class Drivetrain extends SubsystemBase implements Loggable {
       modules2d[i] = field2d.getObject("module-" + i);
     }
   }
-
   /**
    * Returns the currently-estimated pose of the robot.
    *
    * @return The pose.
    */
   public Pose2d getPose() {
-    return odometry.getPoseMeters();
+    return odometry.getEstimatedPosition();
   }
 
   /**
@@ -183,6 +184,26 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   public double getPitch() {
     return gyro.getPitch();
   }
+
+  private PhotonCamera cam = new PhotonCamera("1155");
+
+  // private void updatePoseEstimator() {
+  //   odometry.update(getHeading(), getModulePositions());
+
+  //   AprilTagFieldLayout aprilTagFieldLayout =
+  // AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
+
+  //   var latest = cam.getLatestResult();
+
+  //   if (latest.hasTargets()) {
+  //     var imageCaptureTime = latest.getTimestampSeconds();
+  //     int id = latest.getBestTarget().getFiducialId();
+  //     var camToTargetTrans = latest.getBestTarget().getBestCameraToTarget();
+  //     var camPose =
+  // aprilTagFieldLayout.getTagPose(id).get().transformBy(camToTargetTrans.inverse());
+  //     odometry.addVisionMeasurement(camPose.toPose2d(), imageCaptureTime);
+  //   }
+  // }
 
   @Override
   public void periodic() {
