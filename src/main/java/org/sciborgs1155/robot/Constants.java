@@ -30,15 +30,15 @@ public final class Constants {
   public static final class Motors {
     public static final MotorConfig DRIVE =
         MotorConfig.base()
-            .setBurnFlash(false)
-            .setNeutralBehavior(NeutralBehavior.BRAKE)
-            .setCurrentLimit(50);
+            .withBurnFlash(false)
+            .withNeutralBehavior(NeutralBehavior.BRAKE)
+            .withCurrentLimit(50);
 
     public static final MotorConfig TURN =
         MotorConfig.base()
-            .setBurnFlash(false)
-            .setNeutralBehavior(NeutralBehavior.BRAKE)
-            .setCurrentLimit(20);
+            .withBurnFlash(false)
+            .withNeutralBehavior(NeutralBehavior.BRAKE)
+            .withCurrentLimit(20);
   }
 
   public static final class DriveConstants {

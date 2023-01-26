@@ -10,7 +10,6 @@ public final class CustomPeriodRunnables {
   private static final Map<Runnable, Double> runnables = new IdentityHashMap<>();
 
   private CustomPeriodRunnables() {}
-  ;
 
   public static void add(Runnable runnable, double rate) {
     runnables.put(runnable, rate);

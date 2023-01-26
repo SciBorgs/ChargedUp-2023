@@ -1,7 +1,5 @@
 package org.sciborgs1155.lib;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
 
 public class WheelSimTest {
