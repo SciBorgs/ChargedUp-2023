@@ -5,22 +5,19 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+
 import org.sciborgs1155.robot.Constants.ElevatorConstants;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Ports.ElevatorPorts;
 
 public class ElevatorSubsystem {
-  private final CANSparkMax elevatorRightMotor =
-      Motors.elevatorMotorConfig.buildCanSparkMax(
-          MotorType.kBrushless, ElevatorPorts.rightElevatorMotor);
-  private final CANSparkMax elevatorLeftMotor =
-      Motors.elevatorMotorConfig.buildCanSparkMax(
-          MotorType.kBrushless, ElevatorPorts.leftElevatorMotor);
-  private final CANSparkMax elevatorCenterMotor =
-      Motors.elevatorMotorConfig.buildCanSparkMax(
-          MotorType.kBrushless, ElevatorPorts.middleElevatorMotor);
-  private final RelativeEncoder elevatorLeftEncoder = elevatorLeftMotor.getEncoder();
-  private final RelativeEncoder elevatorRightEncoder = elevatorRightMotor.getEncoder();
+  private final CANSparkMax[] elevatorMotors = Motors.elevatorMotorConfig.buildCanSparkMax(
+   MotorType.kBrushless,
+   ElevatorPorts.elevatorPorts);
+  private final MotorControllerGroup elevatorGroup = new MotorControllerGroup(elevatorMotors);
+  private final RelativeEncoder elevatorEncoder = elevatorMotors[0].getEncoder();
+  
   private final ElevatorFeedforward elevatorFeedforward =
       new ElevatorFeedforward(
           ElevatorConstants.kS,
@@ -34,5 +31,15 @@ public class ElevatorSubsystem {
           ElevatorConstants.D,
           ElevatorConstants.CONSTRAINTS);
 
-  public ElevatorSubsystem() {}
+  public ElevatorSubsystem() {
+    elevatorEncoder.setPositionConversionFactor(ElevatorConstants.GEAR_RATIO * ElevatorConstants.MOVEMENTPERSPIN);
+    elevatorEncoder.setVelocityConversionFactor(ElevatorConstants.GEAR_RATIO);
+  }
+
+ 
+  public void setElevatorPositon(double position){
+    double fb = elevatorFeedback.calculate(elevatorEncoder.getPosition(), position);
+    double ff = elevatorFeedforward.calculate(elevatorFeedback.getSetpoint().velocity);
+    elevatorGroup.setVoltage(fb+ff);
+  }
 }
