@@ -32,7 +32,7 @@ public final class Constants {
             .setCurrentLimit(20);
     public static final MotorConfig elevatorMotorConfig =
         MotorConfig.base().setNeutralBehavior(NeutralBehavior.BRAKE);
-    public static final MotorConfig armMotorConfig = 
+    public static final MotorConfig armMotorConfig =
         MotorConfig.base().setNeutralBehavior(NeutralBehavior.BRAKE).setCurrentLimit(50);
   }
 
@@ -141,8 +141,9 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints CONSTRAINTS =
         new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration);
     public static final double GEAR_RATIO = 1.0;
-    public static final double MOVEMENTPERSPIN = 1.1938 /  6.0; // m/ (50 rotations of motor)
+    public static final double MOVEMENTPERSPIN = 1.1938 / 6.0; // m/ (50 rotations of motor)
   }
+
   public static final class ArmConstants {
     public static final double maxVelocity = 0.3; // radians / s
     public static final double maxAcceleration = 0.3; // radians / s^2
@@ -156,8 +157,8 @@ public final class Constants {
     public static final double kA = 0;
     public static final TrapezoidProfile.Constraints CONSTRAINTS =
         new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration);
-    public static final double GEAR_RATIO = 1/6.0;
-    public static final double MOVEMENTPERSPIN = (1.5 * Math.PI); // radians 
+    public static final double GEAR_RATIO = 1 / 6.0;
+    public static final double MOVEMENTPERSPIN = (1.5 * Math.PI); // radians
   }
 
   public static final class AutoConstants {

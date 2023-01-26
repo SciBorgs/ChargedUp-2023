@@ -25,18 +25,14 @@ public final class Ports {
     public static final int rightElevatorMotor = 9;
     public static final int middleElevatorMotor = 10;
     public static final int elevatorPorts[] = {
-      leftElevatorMotor,
-      rightElevatorMotor,
-      middleElevatorMotor
+      leftElevatorMotor, rightElevatorMotor, middleElevatorMotor
     };
   }
+
   public static final class ArmPorts {
     public static final int leftArmMotor = 11;
     public static final int rightArmMotor = 12;
-    public static final int armPorts[] = {
-      leftArmMotor,
-      rightArmMotor
-    };
+    public static final int armPorts[] = {leftArmMotor, rightArmMotor};
   }
 
   public static final class Sensors {
