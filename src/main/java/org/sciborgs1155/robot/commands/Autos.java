@@ -57,10 +57,7 @@ public final class Autos {
 
   public static CommandBase balance(Drivetrain drive) {
     PIDController controller = new PIDController(AutoConstants.BALANCE_KP, AutoConstants.BALANCE_KI, AutoConstants.BALANCE_KD);
-    double pitch = drive.getPitch();
-    double output = controller.calculate(pitch, AutoConstants.BALANCE_SETPOINT);
-    controller.close();
-    return Commands.run(() -> drive.drive(output, 0, 0, true));
+    return Command.run(() -> drive.drive(controller.calculate(drive.getPitch()), 0, 0, true));
   }
 
   private Autos() {
