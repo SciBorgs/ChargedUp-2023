@@ -51,6 +51,9 @@ public final class Constants {
 
     public static final MotorConfig ARM =
         MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
+
+    public static final MotorConfig INTAKE =
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
   }
 
   public static final class Vision {
@@ -66,6 +69,15 @@ public final class Constants {
     // test tag at 0
     public static final AprilTag TEST_TAG_0 = new AprilTag(0, new Pose3d());
     public static final List<AprilTag> TEST_TAGS = List.of(TEST_TAG_0);
+  }
+
+  public static final class Claw {
+    // not actual values 
+    public static final double kp = 0.3;
+    public static final double ki = 0.08;
+    public static final double kd = 0.5;
+
+    public static final double ClawWheelsEnableSpeed = 0.6;
   }
 
   public static final class DriveConstants {
@@ -100,6 +112,8 @@ public final class Constants {
       Math.PI / 2 // rear right
     };
   }
+
+  
 
   public static final class ModuleConstants {
 
