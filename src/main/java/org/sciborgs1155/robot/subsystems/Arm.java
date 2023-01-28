@@ -12,7 +12,7 @@ import org.sciborgs1155.robot.Ports.ArmPorts;
 
 public class Arm {
   private final CANSparkMax armMotors =
-      Motors.armMotorConfig.buildCanSparkMaxGearBox(MotorType.kBrushless, ArmPorts.armPorts);
+      Motors.armMotorConfig.buildCanSparkMaxGearbox(MotorType.kBrushless, ArmPorts.armPorts);
   private final MotorControllerGroup armGroup = new MotorControllerGroup(armMotors);
   private final RelativeEncoder armEncoder = armMotors.getEncoder();
   private final ArmFeedforward armFeedforward =
