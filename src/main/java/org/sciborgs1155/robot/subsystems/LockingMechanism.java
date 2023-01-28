@@ -33,10 +33,10 @@ public class LockingMechanism extends SubsystemBase {
   }
 
   public Command start() {
-    return this.runOnce(() -> extend());
+    return this.runOnce(this::extend);
   }
 
   public Command end() {
-    return this.runOnce(() -> retract());
+    return this.runOnce(this::retract);
   }
 }

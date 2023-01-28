@@ -148,6 +148,8 @@ public final class Constants {
   }
 
   public static final class BalanceConstants {
+    // update these!
+    
     // pid
     public static final double KP = 0;
     public static final double KI = 0;
