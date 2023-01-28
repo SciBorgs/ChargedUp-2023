@@ -30,15 +30,15 @@ public final class Constants {
   public static final class Motors {
     public static final MotorConfig DRIVE =
         MotorConfig.base()
-            .setBurnFlash(false)
-            .setNeutralBehavior(NeutralBehavior.BRAKE)
-            .setCurrentLimit(50);
+            .withBurnFlash(false)
+            .withNeutralBehavior(NeutralBehavior.BRAKE)
+            .withCurrentLimit(50);
 
     public static final MotorConfig TURN =
         MotorConfig.base()
-            .setBurnFlash(false)
-            .setNeutralBehavior(NeutralBehavior.BRAKE)
-            .setCurrentLimit(20);
+            .withBurnFlash(false)
+            .withNeutralBehavior(NeutralBehavior.BRAKE)
+            .withCurrentLimit(20);
   }
 
   public static final class DriveConstants {
@@ -148,9 +148,22 @@ public final class Constants {
   }
 
   public static final class BalanceConstants {
-    public static final double BALANCE_KP = 0;
-    public static final double BALANCE_KI = 0;
-    public static final double BALANCE_KD = 0;
-    public static final double BALANCE_SETPOINT = 0;
+    // pid
+    public static final double KP = 0;
+    public static final double KI = 0;
+    public static final double KD = 0;
+    public static final double SETPOINT = 0;
+
+    // ff
+    public static final double KS = 0;
+    public static final double KV = 0;
+    public static final double KA = 0;
+    public static final double KG = 0;
+
+    public static final double MAX_VELOCITY = 0;
+    public static final double MAX_ACCELERATION = 0;
+
+    public static final TrapezoidProfile.Constraints CONSTRAINTS =
+        new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCELERATION);
   }
 }

@@ -9,20 +9,20 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
  * <p>Example usage for a CANSparkMax differential drive:
  *
  * <pre><code>
- * var leftMotor = new MotorConfig()
- *  .setNeutralBehavior(NeutralBehavior.BRAKE)
- *  .setCurrentLimit(20);
+ * var leftConfig = MotorConfig
+ *  .base()
+ *  .withNeutralBehavior(NeutralBehavior.BRAKE)
+ *  .withCurrentLimit(20);
  *
- * var rightMotor = leftMotor.clone()
- *  .setInverted(true);
+ * var rightConfig = leftMotor.withInverted(true);
  *
- * int[] leftPorts = {1, 2, 3};
- * int[] rightPorts = {4, 5, 6};
+ * int[] leftPorts = { 1, 2, 3 };
+ * int[] rightPorts = { 4, 5, 6 };
  *
- * var leftGroup = new MotorControllerGroup(leftMotor.buildCanSparkMax(leftPorts));
- * var rightGroup = new MotorControllerGroup(rightMotor.buildCanSparkMax(rightPorts));
+ * var leftMotor = leftConfig.buildCanSparkMaxGearbox(MotorType.kBrushless, leftPorts);
+ * var rightGroup = rightConfig.buildCanSparkMaxGearbox(MotorType.kBrushless, rightPorts);
  *
- * var driveTrain = new DifferentialDrive(leftGroup, rightGroup);
+ * var drive = new DifferentialDrive(leftMotor, rightGroup);
  * </pre></code>
  */
 public final class MotorConfig {
@@ -42,22 +42,27 @@ public final class MotorConfig {
     }
   }
 
-  private boolean inverted;
-  private NeutralBehavior neutralBehavior;
-  private double openLoopRampRate;
-  private int currentLimit;
-  private boolean burnFlash;
+  private final boolean inverted;
+  private final NeutralBehavior neutralBehavior;
+  private final double openLoopRampRate;
+  private final int currentLimit;
+  private final boolean burnFlash;
 
-  public MotorConfig() {
-    setInverted(false);
-    setNeutralBehavior(NeutralBehavior.COAST);
-    setOpenLoopRampRate(0);
-    setCurrentLimit(80);
-    setBurnFlash(true);
+  public MotorConfig(
+      boolean inverted,
+      NeutralBehavior neutralBehavior,
+      double openLoopRampRate,
+      int currentLimit,
+      boolean burnFlash) {
+    this.inverted = inverted;
+    this.neutralBehavior = neutralBehavior;
+    this.openLoopRampRate = openLoopRampRate;
+    this.currentLimit = currentLimit;
+    this.burnFlash = burnFlash;
   }
 
   public static MotorConfig base() {
-    return new MotorConfig();
+    return new MotorConfig(false, NeutralBehavior.COAST, 0, 80, true);
   }
 
   /**
@@ -88,64 +93,81 @@ public final class MotorConfig {
    * @return array of CANSparkMax objects
    */
   public CANSparkMax[] buildCanSparkMax(MotorType motorType, int... ids) {
+    if (ids.length < 1) {
+      throw new IllegalArgumentException("Number of inputted ids is less than 1.");
+    }
+
     var res = new CANSparkMax[ids.length];
+
     for (int i = 0; i < ids.length; i++) {
       res[i] = buildCanSparkMax(motorType, ids[i]);
     }
+
     return res;
   }
+
+  /**
+   * Returns a lead motor with others bound to follow each other based on their configured values
+   *
+   * <p>One motor controller will be created per id, in order
+   *
+   * @param motorType the rev motor type
+   * @param ids a variable number of ids
+   * @return The lead motor as a CANSparkMax object
+   */
+  public CANSparkMax buildCanSparkMaxGearbox(MotorType motorType, int... ids) {
+    if (ids.length < 1) {
+      throw new IllegalArgumentException("Number of inputted ids is less than 1.");
+    }
+
+    var lead = buildCanSparkMax(motorType, ids[0]);
+
+    for (int i = 1; i < ids.length; i++) {
+      buildCanSparkMax(motorType, ids[i]).follow(lead);
+    }
+
+    return lead;
+  }
+
+  // i hate java
 
   public boolean isInverted() {
     return inverted;
   }
 
-  public MotorConfig setInverted(boolean inverted) {
-    this.inverted = inverted;
-    return this;
+  public MotorConfig withInvert(boolean inverted) {
+    return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
   }
 
   public NeutralBehavior getNeutralBehavior() {
     return neutralBehavior;
   }
 
-  public MotorConfig setNeutralBehavior(NeutralBehavior neutralBehavior) {
-    this.neutralBehavior = neutralBehavior;
-    return this;
+  public MotorConfig withNeutralBehavior(NeutralBehavior neutralBehavior) {
+    return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
   }
 
   public double getOpenLoopRampRate() {
     return openLoopRampRate;
   }
 
-  public MotorConfig setOpenLoopRampRate(double openLoopRampRate) {
-    this.openLoopRampRate = openLoopRampRate;
-    return this;
+  public MotorConfig withOpenLoopRampRate(double openLoopRampRate) {
+    return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
   }
 
   public int getCurrentLimit() {
     return currentLimit;
   }
 
-  public MotorConfig setCurrentLimit(int currentLimit) {
-    this.currentLimit = currentLimit;
-    return this;
+  public MotorConfig withCurrentLimit(int currentLimit) {
+    return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
   }
 
   public boolean getBurnFlash() {
     return burnFlash;
   }
 
-  public MotorConfig setBurnFlash(boolean burnFlash) {
-    this.burnFlash = burnFlash;
-    return this;
-  }
-
-  public MotorConfig clone() {
-    return new MotorConfig()
-        .setInverted(isInverted())
-        .setNeutralBehavior(getNeutralBehavior())
-        .setOpenLoopRampRate(getOpenLoopRampRate())
-        .setCurrentLimit(getCurrentLimit())
-        .setBurnFlash(getBurnFlash());
+  public MotorConfig withBurnFlash(boolean burnFlash) {
+    return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
   }
 }

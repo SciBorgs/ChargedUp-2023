@@ -16,23 +16,27 @@ public class LockingMechanism extends SubsystemBase {
 
   public LockingMechanism() {}
 
-  public void toggleArm() {
+  public Value getStatus() {
+    return piston.get();
+  }
+
+  public void toggle() {
     piston.toggle();
   }
 
-  public void extendArm() {
+  public void extend() {
     piston.set(Value.kForward);
   }
 
-  public void retractArm() {
+  public void retract() {
     piston.set(Value.kReverse);
   }
 
   public Command start() {
-    return this.runOnce(() -> extendArm());
+    return this.runOnce(() -> extend());
   }
 
   public Command end() {
-    return this.runOnce(() -> retractArm());
+    return this.runOnce(() -> retract());
   }
 }
