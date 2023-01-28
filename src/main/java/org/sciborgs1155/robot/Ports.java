@@ -21,12 +21,13 @@ public final class Ports {
   }
 
   public static final class ElevatorPorts {
-    public static final int leftElevatorMotor = 8;
-    public static final int rightElevatorMotor = 9;
-    public static final int middleElevatorMotor = 10;
-    public static final int elevatorPorts[] = {
-      leftElevatorMotor, rightElevatorMotor, middleElevatorMotor
-    };
+    public static final int LEFT_MOTOR = 8;
+    public static final int RIGHT_MOTOR = 9;
+    public static final int MIDDLE_MOTOR = 10;
+    public static final int ELEVATOR_PORTS[] = {LEFT_MOTOR, RIGHT_MOTOR, MIDDLE_MOTOR};
+
+    public static final int ELEVATOR_ENCODER_PORT = 2;
+    public static final int BEAM_BREAK_PORT = 5;
   }
 
   public static final class ArmPorts {
