@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,9 +20,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
+import java.util.Optional;
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.DriveConstants;
+import org.sciborgs1155.robot.Constants.Vision;
 import org.sciborgs1155.robot.Ports.DrivePorts;
 import org.sciborgs1155.robot.Ports.Sensors;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
@@ -65,6 +71,12 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   private final SwerveDrivePoseEstimator odometry =
       new SwerveDrivePoseEstimator(
           DriveConstants.KINEMATICS, getHeading(), getModulePositions(), new Pose2d());
+
+  private final PhotonCamera cam = new PhotonCamera(Vision.CAMERA_NAME);
+  private final AprilTagFieldLayout layout =
+      new AprilTagFieldLayout(Vision.TEST_TAGS, getTurnRate(), getPitch());
+  private final PhotonPoseEstimator visionOdometry =
+      new PhotonPoseEstimator(layout, PoseStrategy.LOWEST_AMBIGUITY, cam, Vision.ROBOT_TO_CAM);
 
   @Log private final Field2d field2d = new Field2d();
 
@@ -185,32 +197,27 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     return gyro.getPitch();
   }
 
-  private PhotonCamera cam = new PhotonCamera("1155");
+  private void updateOdometry() {
+    odometry.update(getHeading(), getModulePositions());
 
-  // private void updatePoseEstimator() {
-  //   odometry.update(getHeading(), getModulePositions());
+    var latest = cam.getLatestResult();
 
-  //   AprilTagFieldLayout aprilTagFieldLayout =
-  // AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
+    visionOdometry.setReferencePose(odometry.getEstimatedPosition());
+    Optional<EstimatedRobotPose> visionEstimate = visionOdometry.update();
 
-  //   var latest = cam.getLatestResult();
-
-  //   if (latest.hasTargets()) {
-  //     var imageCaptureTime = latest.getTimestampSeconds();
-  //     int id = latest.getBestTarget().getFiducialId();
-  //     var camToTargetTrans = latest.getBestTarget().getBestCameraToTarget();
-  //     var camPose =
-  // aprilTagFieldLayout.getTagPose(id).get().transformBy(camToTargetTrans.inverse());
-  //     odometry.addVisionMeasurement(camPose.toPose2d(), imageCaptureTime);
-  //   }
-  // }
+    if (latest.hasTargets()) {
+      EstimatedRobotPose visionPose = visionEstimate.get();
+      odometry.addVisionMeasurement(
+          visionPose.estimatedPose.toPose2d(), visionPose.timestampSeconds);
+    }
+  }
 
   @Override
   public void periodic() {
     // for (int i = 0; i < modules.length; i++) modules[i].setDesiredState(setpoint[i]);
-    odometry.update(getHeading(), getModulePositions());
+    // odometry.update(getHeading(), getModulePositions());
+    updateOdometry();
     field2d.setRobotPose(getPose());
-    // System.out.println(getHeading());
     for (int i = 0; i < modules2d.length; i++) {
       var transform =
           new Transform2d(DriveConstants.MODULE_OFFSET[i], modules[i].getPosition().angle);
