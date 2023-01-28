@@ -17,7 +17,7 @@ import org.sciborgs1155.robot.subsystems.Drivetrain;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  
+
   // The robot's subsystems and commands are defined here...
   private final Drivetrain drive = new Drivetrain();
 
