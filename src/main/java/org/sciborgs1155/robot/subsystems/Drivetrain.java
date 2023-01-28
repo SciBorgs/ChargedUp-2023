@@ -210,7 +210,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     // for (int i = 0; i < modules.length; i++) modules[i].setDesiredState(setpoint[i]);
     odometry.update(getHeading(), getModulePositions());
     field2d.setRobotPose(getPose());
-    System.out.println(getHeading());
+    // System.out.println(getHeading());
     for (int i = 0; i < modules2d.length; i++) {
       var transform =
           new Transform2d(DriveConstants.MODULE_OFFSET[i], modules[i].getPosition().angle);
