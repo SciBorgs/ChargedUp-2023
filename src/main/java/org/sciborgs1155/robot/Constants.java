@@ -64,7 +64,7 @@ public final class Constants {
 
   public static final class DriveConstants {
 
-    public static final double MAX_SPEED = 7.5; // m / s
+    public static final double MAX_SPEED = 7; // m / s
     public static final double MAX_ANGULAR_SPEED = 4 * Math.PI; // rad / s
 
     // public static final double TRACK_WIDTH = 0.28;
@@ -120,13 +120,13 @@ public final class Constants {
       public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0; // m / s
       // public static final double ENCODER_VELOCITY_FACTOR = 1;
 
-      public static final double P = 0.06;
+      public static final double P = 0.07;
       public static final double I = 0;
-      public static final double D = 0;
+      public static final double D = 0.06;
 
-      public static final double S = 0.01;
-      public static final double V = 0.01;
-      public static final double A = 0.01;
+      public static final double S = 0.27;
+      public static final double V = 0.4;
+      public static final double A = 0.2;
     }
 
     public static final class Turning {
@@ -138,7 +138,7 @@ public final class Constants {
       public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
       public static final double MAX_ANGULAR_ACCELERATION = 2 * Math.PI; // rad / s^2
 
-      public static final double P = 1.5;
+      public static final double P = 1.7;
       public static final double I = 0;
       public static final double D = 0.02;
 
@@ -155,7 +155,7 @@ public final class Constants {
 
   public static final class AutoConstants {
     public static final double MAX_SPEED = DriveConstants.MAX_SPEED; // m/s
-    public static final double MAX_ACCEL = 3; // m/s^2
+    public static final double MAX_ACCEL = 4; // m/s^2
     public static final double MAX_ANG_SPEED = 1.5 * DriveConstants.MAX_ANGULAR_SPEED; // rad/s
     public static final double MAX_ANG_ACCEL = Math.PI; // rad/s^2
 
