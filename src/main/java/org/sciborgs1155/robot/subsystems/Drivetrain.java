@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,9 +15,10 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
@@ -125,7 +127,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    SmartDashboard.putNumber("xspeed", xSpeed);
     // scale inputs based on maximum values
     xSpeed *= DriveConstants.MAX_SPEED;
     ySpeed *= DriveConstants.MAX_SPEED;
@@ -153,7 +154,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.MAX_SPEED);
     for (int i = 0; i < modules.length; i++) {
       modules[i].setDesiredState(desiredStates[i]);
-      // modules[i].setDesiredState(new SwerveModuleState());
     }
   }
 
@@ -214,8 +214,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   @Override
   public void periodic() {
-    // for (int i = 0; i < modules.length; i++) modules[i].setDesiredState(setpoint[i]);
-    // odometry.update(getHeading(), getModulePositions());
     updateOdometry();
     field2d.setRobotPose(getPose());
 
@@ -235,8 +233,33 @@ public class Drivetrain extends SubsystemBase implements Loggable {
                     * Constants.RATE));
   }
 
+  /** Drive based on xbox */
+  public Command drive(CommandXboxController xbox, boolean fieldRelative) {
+    return run(
+        () -> {
+          drive(
+              MathUtil.applyDeadband(-xbox.getLeftY(), Constants.DEADBAND),
+              MathUtil.applyDeadband(-xbox.getLeftX(), Constants.DEADBAND),
+              MathUtil.applyDeadband(-xbox.getRightX(), Constants.DEADBAND),
+              fieldRelative);
+        });
+  }
+
+  /** Drive based on joysticks */
+  public Command drive(CommandJoystick left, CommandJoystick right, boolean fieldRelative) {
+    return run(
+        () -> {
+          drive(
+              MathUtil.applyDeadband(-left.getY(), Constants.DEADBAND),
+              MathUtil.applyDeadband(-left.getX(), Constants.DEADBAND),
+              MathUtil.applyDeadband(-right.getX(), Constants.DEADBAND),
+              fieldRelative);
+        });
+  }
+
+  /** Stops drivetrain */
   public Command stop() {
-    return this.runOnce(() -> setModuleStates(getModuleStates()));
+    return runOnce(() -> setModuleStates(getModuleStates()));
   }
 
   /** Sets the drivetrain to an "X" configuration, preventing movement */
@@ -248,6 +271,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
           new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
           new SwerveModuleState(0, Rotation2d.fromDegrees(45))
         };
-    return this.runOnce(() -> setModuleStates(states));
+    return runOnce(() -> setModuleStates(states));
   }
 }

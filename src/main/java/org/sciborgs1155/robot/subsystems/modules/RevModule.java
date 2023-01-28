@@ -31,7 +31,7 @@ public class RevModule implements SwerveModule, Sendable {
   private final SimpleMotorFeedforward driveFeedforward =
       new SimpleMotorFeedforward(Driving.S, Driving.V, Driving.A);
 
-  private final double angularOffset;
+  private final Rotation2d angularOffset;
 
   private SwerveModuleState setpoint = new SwerveModuleState();
 
@@ -80,7 +80,7 @@ public class RevModule implements SwerveModule, Sendable {
     turnMotor.burnFlash();
 
     driveEncoder.setPosition(0);
-    this.angularOffset = angularOffset;
+    this.angularOffset = Rotation2d.fromRadians(angularOffset);
     setpoint.angle = Rotation2d.fromRadians(turningEncoder.getPosition());
   }
 
@@ -92,13 +92,13 @@ public class RevModule implements SwerveModule, Sendable {
   public SwerveModuleState getState() {
     return new SwerveModuleState(
         driveEncoder.getVelocity(),
-        Rotation2d.fromRadians(turningEncoder.getPosition() - angularOffset));
+        Rotation2d.fromRadians(turningEncoder.getPosition()).minus(angularOffset));
   }
 
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(
         driveEncoder.getPosition(),
-        Rotation2d.fromRadians(turningEncoder.getPosition() - angularOffset));
+        Rotation2d.fromRadians(turningEncoder.getPosition()).minus(angularOffset));
   }
 
   /**
@@ -109,7 +109,7 @@ public class RevModule implements SwerveModule, Sendable {
   public void setDesiredState(SwerveModuleState desiredState) {
     SwerveModuleState correctedDesiredState = new SwerveModuleState();
     correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
-    correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(angularOffset));
+    correctedDesiredState.angle = desiredState.angle.plus(angularOffset);
     // Optimize the reference state to avoid spinning further than 90 degrees
     setpoint =
         SwerveModuleState.optimize(

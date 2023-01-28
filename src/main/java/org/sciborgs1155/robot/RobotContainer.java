@@ -1,9 +1,7 @@
 package org.sciborgs1155.robot;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
@@ -41,16 +39,7 @@ public class RobotContainer {
   }
 
   private void configureSubsystemDefaults() {
-    drive.setDefaultCommand(
-        new RunCommand(
-            () -> {
-              drive.drive(
-                  MathUtil.applyDeadband(-xbox.getLeftY(), Constants.DEADBAND),
-                  MathUtil.applyDeadband(-xbox.getLeftX(), Constants.DEADBAND),
-                  MathUtil.applyDeadband(-xbox.getRightX(), Constants.DEADBAND),
-                  true);
-            },
-            drive));
+    drive.setDefaultCommand(drive.drive(xbox, true));
   }
 
   /**
