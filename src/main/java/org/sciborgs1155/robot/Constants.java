@@ -47,10 +47,10 @@ public final class Constants {
             .withCurrentLimit(20);
 
     public static final MotorConfig ELEVATOR =
-            MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
 
     public static final MotorConfig ARM =
-            MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
   }
 
   public static final class Vision {
@@ -92,10 +92,13 @@ public final class Constants {
     public static final boolean GYRO_REVERSED = false;
 
     // angular offsets of the modules, since we use absolute encoders
-    public static final double frontLeftAngularOffset = -Math.PI / 2;
-    public static final double frontRightAngularOffset = 0;
-    public static final double backLeftAngularOffset = Math.PI;
-    public static final double backRightAngularOffset = Math.PI / 2;
+    // ignored (used as 0) in simulation because that's how sim works
+    public static final double[] ANGULAR_OFFSETS = {
+      -Math.PI / 2, // front left
+      0, // front right
+      Math.PI, // rear left
+      Math.PI / 2 // rear right
+    };
   }
 
   public static final class ModuleConstants {
