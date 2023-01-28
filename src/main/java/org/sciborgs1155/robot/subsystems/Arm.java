@@ -10,7 +10,7 @@ import org.sciborgs1155.robot.Constants.ArmConstants;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Ports.ArmPorts;
 
-public class ArmSubsystem {
+public class Arm {
   private final CANSparkMax[] armMotors =
       Motors.armMotorConfig.buildCanSparkMax(MotorType.kBrushless, ArmPorts.armPorts);
   private final MotorControllerGroup armGroup = new MotorControllerGroup(armMotors);
@@ -21,7 +21,7 @@ public class ArmSubsystem {
       new ProfiledPIDController(
           ArmConstants.P, ArmConstants.I, ArmConstants.D, ArmConstants.CONSTRAINTS);
 
-  public ArmSubsystem() {
+  public Arm() {
     armEncoder.setPositionConversionFactor(ArmConstants.GEAR_RATIO * ArmConstants.MOVEMENTPERSPIN);
     armEncoder.setVelocityConversionFactor(ArmConstants.GEAR_RATIO);
   }

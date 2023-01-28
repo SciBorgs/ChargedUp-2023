@@ -10,7 +10,7 @@ import org.sciborgs1155.robot.Constants.ElevatorConstants;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Ports.ElevatorPorts;
 
-public class ElevatorSubsystem {
+public class Elevator {
   private final CANSparkMax[] elevatorMotors =
       Motors.elevatorMotorConfig.buildCanSparkMax(
           MotorType.kBrushless, ElevatorPorts.elevatorPorts);
@@ -27,7 +27,7 @@ public class ElevatorSubsystem {
           ElevatorConstants.D,
           ElevatorConstants.CONSTRAINTS);
 
-  public ElevatorSubsystem() {
+  public Elevator() {
     elevatorEncoder.setPositionConversionFactor(
         ElevatorConstants.GEAR_RATIO * ElevatorConstants.MOVEMENTPERSPIN);
     elevatorEncoder.setVelocityConversionFactor(ElevatorConstants.GEAR_RATIO);
