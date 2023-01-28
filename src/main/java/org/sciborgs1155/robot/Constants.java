@@ -1,9 +1,15 @@
 package org.sciborgs1155.robot;
 
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import java.util.List;
 import org.sciborgs1155.lib.MotorConfig;
 import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
 
@@ -39,6 +45,21 @@ public final class Constants {
             .withBurnFlash(false)
             .withNeutralBehavior(NeutralBehavior.BRAKE)
             .withCurrentLimit(20);
+  }
+
+  public static final class Vision {
+    public static final String CAMERA_NAME = "photonvision";
+
+    public static final Translation3d CAM_TRANSLATION = new Translation3d();
+    public static final Rotation3d CAM_ROTATION = new Rotation3d();
+    public static final Transform3d ROBOT_TO_CAM = new Transform3d(CAM_TRANSLATION, CAM_ROTATION);
+
+    public static final double FIELD_LENGTH = Units.feetToMeters(54);
+    public static final double FIELD_WIDTH = Units.feetToMeters(27);
+
+    // test tag at 0
+    public static final AprilTag TEST_TAG_0 = new AprilTag(0, new Pose3d());
+    public static final List<AprilTag> TEST_TAGS = List.of(TEST_TAG_0);
   }
 
   public static final class DriveConstants {
