@@ -46,12 +46,14 @@ public final class MotorConfig {
   private NeutralBehavior neutralBehavior;
   private double openLoopRampRate;
   private int currentLimit;
+  private boolean burnFlash;
 
   public MotorConfig() {
     setInverted(false);
     setNeutralBehavior(NeutralBehavior.COAST);
     setOpenLoopRampRate(0);
     setCurrentLimit(80);
+    setBurnFlash(true);
   }
 
   public static MotorConfig base() {
@@ -69,9 +71,10 @@ public final class MotorConfig {
     var motor = new CANSparkMax(id, motorType);
     motor.restoreFactoryDefaults();
     motor.setInverted(inverted);
+    motor.setIdleMode(neutralBehavior.getREV());
     motor.setOpenLoopRampRate(openLoopRampRate);
     motor.setSmartCurrentLimit(currentLimit);
-    motor.burnFlash();
+    if (burnFlash) motor.burnFlash();
     return motor;
   }
 
@@ -128,11 +131,21 @@ public final class MotorConfig {
     return this;
   }
 
+  public boolean getBurnFlash() {
+    return burnFlash;
+  }
+
+  public MotorConfig setBurnFlash(boolean burnFlash) {
+    this.burnFlash = burnFlash;
+    return this;
+  }
+
   public MotorConfig clone() {
     return new MotorConfig()
         .setInverted(isInverted())
         .setNeutralBehavior(getNeutralBehavior())
         .setOpenLoopRampRate(getOpenLoopRampRate())
-        .setCurrentLimit(getCurrentLimit());
+        .setCurrentLimit(getCurrentLimit())
+        .setBurnFlash(getBurnFlash());
   }
 }

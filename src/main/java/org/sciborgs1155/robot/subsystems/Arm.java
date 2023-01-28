@@ -11,10 +11,10 @@ import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Ports.ArmPorts;
 
 public class Arm {
-  private final CANSparkMax[] armMotors =
-      Motors.armMotorConfig.buildCanSparkMax(MotorType.kBrushless, ArmPorts.armPorts);
+  private final CANSparkMax armMotors =
+      Motors.armMotorConfig.buildCanSparkMaxGearBox(MotorType.kBrushless, ArmPorts.armPorts);
   private final MotorControllerGroup armGroup = new MotorControllerGroup(armMotors);
-  private final RelativeEncoder armEncoder = armMotors[0].getEncoder();
+  private final RelativeEncoder armEncoder = armMotors.getEncoder();
   private final ArmFeedforward armFeedforward =
       new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA);
   private final ProfiledPIDController armFeedback =

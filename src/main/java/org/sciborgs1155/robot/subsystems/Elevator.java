@@ -11,11 +11,11 @@ import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Ports.ElevatorPorts;
 
 public class Elevator {
-  private final CANSparkMax[] elevatorMotors =
-      Motors.elevatorMotorConfig.buildCanSparkMax(
+  private final CANSparkMax elevatorMotors =
+      Motors.elevatorMotorConfig.buildCanSparkMaxGearBox(
           MotorType.kBrushless, ElevatorPorts.elevatorPorts);
   private final MotorControllerGroup elevatorGroup = new MotorControllerGroup(elevatorMotors);
-  private final RelativeEncoder elevatorEncoder = elevatorMotors[0].getEncoder();
+  private final RelativeEncoder elevatorEncoder = elevatorMotors.getEncoder();
 
   private final ElevatorFeedforward elevatorFeedforward =
       new ElevatorFeedforward(

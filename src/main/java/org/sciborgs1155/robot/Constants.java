@@ -23,17 +23,17 @@ import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
 public final class Constants {
   public static final class Motors {
     public static final MotorConfig moduleDriveConfig =
-        MotorConfig.base().setNeutralBehavior(NeutralBehavior.BRAKE).setCurrentLimit(50);
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
 
     public static final MotorConfig moduleTurnConfig =
         MotorConfig.base()
-            .setInverted(true)
-            .setNeutralBehavior(NeutralBehavior.BRAKE)
-            .setCurrentLimit(20);
+            .withInvert(true)
+            .withNeutralBehavior(NeutralBehavior.BRAKE)
+            .withCurrentLimit(20);
     public static final MotorConfig elevatorMotorConfig =
-        MotorConfig.base().setNeutralBehavior(NeutralBehavior.BRAKE);
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
     public static final MotorConfig armMotorConfig =
-        MotorConfig.base().setNeutralBehavior(NeutralBehavior.BRAKE).setCurrentLimit(50);
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
   }
 
   public static final class DriveConstants {
