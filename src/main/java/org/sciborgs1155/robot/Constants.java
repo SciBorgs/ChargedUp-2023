@@ -1,8 +1,15 @@
 package org.sciborgs1155.robot;
 
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
+import java.util.List;
 import org.sciborgs1155.lib.MotorConfig;
 import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
 
@@ -21,38 +28,68 @@ import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
  * </ul>
  */
 public final class Constants {
-  public static final class Motors {
-    public static final MotorConfig moduleDriveConfig =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
 
-    public static final MotorConfig moduleTurnConfig =
+  public static final double RATE = 0.02; // roborio tickrate
+  public static final double CONTROLLER_RATE = 0.015; // controller tickrate
+  public static final double DEADBAND = 0.06;
+
+  public static final class Motors {
+    public static final MotorConfig DRIVE =
         MotorConfig.base()
-            .withInvert(true)
+            .withBurnFlash(false)
+            .withNeutralBehavior(NeutralBehavior.BRAKE)
+            .withCurrentLimit(50);
+
+    public static final MotorConfig TURN =
+        MotorConfig.base()
+            .withBurnFlash(false)
             .withNeutralBehavior(NeutralBehavior.BRAKE)
             .withCurrentLimit(20);
-    public static final MotorConfig elevatorMotorConfig =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
-    public static final MotorConfig armMotorConfig =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
+
+    public static final MotorConfig ELEVATOR =
+            MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
+
+    public static final MotorConfig ARM =
+            MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
+  }
+
+  public static final class Vision {
+    public static final String CAMERA_NAME = "photonvision";
+
+    public static final Translation3d CAM_TRANSLATION = new Translation3d();
+    public static final Rotation3d CAM_ROTATION = new Rotation3d();
+    public static final Transform3d ROBOT_TO_CAM = new Transform3d(CAM_TRANSLATION, CAM_ROTATION);
+
+    public static final double FIELD_LENGTH = Units.feetToMeters(54);
+    public static final double FIELD_WIDTH = Units.feetToMeters(27);
+
+    // test tag at 0
+    public static final AprilTag TEST_TAG_0 = new AprilTag(0, new Pose3d());
+    public static final List<AprilTag> TEST_TAGS = List.of(TEST_TAG_0);
   }
 
   public static final class DriveConstants {
 
-    public static final double maxSpeed = 4.8; // m / s
-    public static final double maxAngularSpeed = 2 * Math.PI; // rad / s
+    public static final double MAX_SPEED = 7; // m / s
+    public static final double MAX_ANGULAR_SPEED = 4 * Math.PI; // rad / s
 
-    public static final double trackWidth = 0.5;
+    // public static final double TRACK_WIDTH = 0.28;
+    public static final double TRACK_WIDTH = Units.inchesToMeters(17);
     // Distance between centers of right and left wheels on robot
-    public static final double wheelBase = 0.7;
+    // public static final double WHEEL_BASE = 0.28;
+    public static final double WHEEL_BASE = Units.inchesToMeters(17);
     // Distance between front and back wheels on robot
-    public static final SwerveDriveKinematics kinematics =
-        new SwerveDriveKinematics(
-            new Translation2d(wheelBase / 2, trackWidth / 2),
-            new Translation2d(wheelBase / 2, -trackWidth / 2),
-            new Translation2d(-wheelBase / 2, trackWidth / 2),
-            new Translation2d(-wheelBase / 2, -trackWidth / 2));
 
-    public static final boolean gyroReversed = false;
+    public static final Translation2d[] MODULE_OFFSET = {
+      new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), // front left
+      new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), // front right
+      new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), // rear left
+      new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2) // rear right
+    };
+
+    public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(MODULE_OFFSET);
+
+    public static final boolean GYRO_REVERSED = false;
 
     // angular offsets of the modules, since we use absolute encoders
     public static final double frontLeftAngularOffset = -Math.PI / 2;
@@ -63,66 +100,52 @@ public final class Constants {
 
   public static final class ModuleConstants {
 
-    // The MAXSwerve module can be configured with one of three pinion gears: 12T, 13T, or 14T.
-    // This changes the drive speed of the module (a pinion gear with more teeth will result in a
-    // robot that drives faster).
-    public static final int kDrivingMotorPinionTeeth = 14;
+    // we use a 14T pinion
+    public static final int PINION_TEETH = 14;
 
-    public static final boolean kTurningEncoderInverted = true;
+    public static final double WHEEL_DIAMETER = 0.0762;
 
-    // Calculations required for driving motor conversion factors and feed forward
-    public static final double kDrivingMotorFreeSpeedRps = 5676.0 / 60.0;
-    public static final double kWheelDiameterMeters = 0.0762;
-    public static final double kWheelCircumferenceMeters = kWheelDiameterMeters * Math.PI;
-    // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15 teeth on the
-    // bevel pinion
-    public static final double kDrivingMotorReduction =
-        (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
-    public static final double kDriveWheelFreeSpeedRps =
-        (kDrivingMotorFreeSpeedRps * kWheelCircumferenceMeters) / kDrivingMotorReduction;
+    // 45 teeth on the wheel's bevel gear
+    // 22 teeth on the first-stage spur gear
+    // 15 teeth on the bevel pinion
+    public static final double DRIVING_MOTOR_REDUCTION = (45.0 * 22) / (PINION_TEETH * 15);
 
-    public final class Driving {
+    public static final class Driving {
       public static final double ENCODER_POSITION_FACTOR =
-          (kWheelDiameterMeters * Math.PI) / kDrivingMotorReduction;
-      public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0;
+          (WHEEL_DIAMETER * Math.PI) / DRIVING_MOTOR_REDUCTION; // m
+      public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0; // m / s
+      // public static final double ENCODER_VELOCITY_FACTOR = 1;
 
-      public static final double P = 0.04;
+      public static final double P = 0.07;
       public static final double I = 0;
-      public static final double D = 0;
+      public static final double D = 0.06;
 
-      public static final double S = 0;
-      public static final double V = 0; // 1 / kDriveWheelFreeSpeedRps; // ??
-      public static final double A = 0;
-
-      public static final double minOutput = -1;
-      public static final double maxOutput = 1;
+      public static final double S = 0.27;
+      public static final double V = 0.4;
+      public static final double A = 0.2;
     }
 
     public static final class Turning {
-      public static final double ENCODER_POSITION_FACTOR = (2 * Math.PI);
-      public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0;
+      public static final double ENCODER_POSITION_FACTOR = (2 * Math.PI); // rad
+      public static final double ENCODER_VELOCITY_FACTOR =
+          ENCODER_POSITION_FACTOR / 60.0; // rad / s
+      public static final boolean ENCODER_INVERTED = true;
 
-      // TODO tune
-      public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad /
-      public static final double MAX_ANGULAR_ACCELERATION = 2 * Math.PI;
+      public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
+      public static final double MAX_ANGULAR_ACCELERATION = 2 * Math.PI; // rad / s^2
 
-      public static final double P = 0.1;
+      public static final double P = 1.7;
       public static final double I = 0;
-      public static final double D = 0;
+      public static final double D = 0.02;
 
-      public static final double S = 0;
-      public static final double V = 0;
-      public static final double A = 0;
-
-      public static final TrapezoidProfile.Constraints CONSTRAINTS =
-          new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCELERATION);
+      // feedforward constants for simulation
+      public static final double S = 0.1;
+      public static final double V = 0.1;
+      public static final double A = 0.1;
 
       // pid wrapping
       public static final double MIN_INPUT = 0;
       public static final double MAX_INPUT = ENCODER_POSITION_FACTOR;
-
-      public static final double minOutput = -1;
-      public static final double maxOutput = 1;
     }
   }
 
@@ -162,18 +185,18 @@ public final class Constants {
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 3;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
+    public static final double MAX_SPEED = DriveConstants.MAX_SPEED; // m/s
+    public static final double MAX_ACCEL = 4; // m/s^2
+    public static final double MAX_ANG_SPEED = 1.5 * DriveConstants.MAX_ANGULAR_SPEED; // rad/s
+    public static final double MAX_ANG_ACCEL = Math.PI; // rad/s^2
 
-    public static final double kPXController = 1;
-    public static final double kPYController = 1;
-    public static final double kPThetaController = 1;
+    public static final double P_X_CONTROLLER = 2;
+    public static final double P_Y_CONTROLLER = 2;
+    public static final double P_THETA_CONTROLLER = 4;
+    ;
 
     // Constraint for the motion profiled robot angle controller
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
-        new TrapezoidProfile.Constraints(
-            kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+    public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS =
+        new TrapezoidProfile.Constraints(MAX_ANG_SPEED, MAX_ANG_ACCEL);
   }
 }
