@@ -23,4 +23,9 @@ public final class Ports {
   public static final class Sensors {
     public static final int PIGEON = 2;
   }
+
+  public static final class LockingMechanismPorts {
+    public static final int FORWARD_CHANNEL = -1;
+    public static final int REVERSE_CHANNEL = -1;
+  }
 }

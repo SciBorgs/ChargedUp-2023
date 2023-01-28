@@ -55,13 +55,6 @@ public final class Autos {
         .andThen(drive.stop());
   }
 
-  public static CommandBase balance(Drivetrain drive) {
-    PIDController controller =
-        new PIDController(
-            AutoConstants.BALANCE_KP, AutoConstants.BALANCE_KI, AutoConstants.BALANCE_KD);
-    return Commands.run(() -> drive.drive(controller.calculate(drive.getPitch()), 0, 0, true));
-  }
-
   private Autos() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
