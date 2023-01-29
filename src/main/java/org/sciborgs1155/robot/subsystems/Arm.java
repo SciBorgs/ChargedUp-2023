@@ -6,8 +6,8 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-import org.sciborgs1155.robot.Constants.ArmConstants;
 import org.sciborgs1155.robot.Constants.Motors;
+import org.sciborgs1155.robot.Constants.PlacementConstants.Elbow;
 import org.sciborgs1155.robot.Ports.ArmPorts;
 
 public class Arm {
@@ -16,14 +16,13 @@ public class Arm {
   private final MotorControllerGroup armGroup = new MotorControllerGroup(armMotors);
   private final RelativeEncoder armEncoder = armMotors.getEncoder();
   private final ArmFeedforward armFeedforward =
-      new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA);
+      new ArmFeedforward(Elbow.kS, Elbow.kG, Elbow.kV, Elbow.kA);
   private final ProfiledPIDController armFeedback =
-      new ProfiledPIDController(
-          ArmConstants.P, ArmConstants.I, ArmConstants.D, ArmConstants.CONSTRAINTS);
+      new ProfiledPIDController(Elbow.kP, Elbow.kI, Elbow.kD, Elbow.CONSTRAINTS);
 
   public Arm() {
-    armEncoder.setPositionConversionFactor(ArmConstants.GEAR_RATIO * ArmConstants.MOVEMENTPERSPIN);
-    armEncoder.setVelocityConversionFactor(ArmConstants.GEAR_RATIO);
+    armEncoder.setPositionConversionFactor(Elbow.GEAR_RATIO * Elbow.MOVEMENTPERSPIN);
+    armEncoder.setVelocityConversionFactor(Elbow.GEAR_RATIO);
   }
 
   public void setArmPosition(double position) {
