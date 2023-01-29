@@ -5,54 +5,14 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
-public class WheelSim extends LinearSystemSim<N2, N1, N2> {
+/** Temporary class until wpilib DCMotorSim patch gets upstreamed */
+public class WheelSim extends DCMotorSim {
 
-  /**
-   * Create a state-space model for a 1(?) DOF "wheel" system from its kV (volts/(unit/sec)) and kA
-   * (volts/(unit/sec²). These constants cam be found using SysId. The states of the system are
-   * [position, velocity]ᵀ, inputs are [voltage], and outputs are [position, velocity].
-   *
-   * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
-   * {@link edu.wpi.first.math.util.Units} class for converting between unit types.
-   *
-   * <p>The parameters provided by the user are from this feedforward model:
-   *
-   * <p>u = K_v v + K_a a
-   *
-   * <p>this is similar to {@link
-   * edu.wpi.first.math.system.plant.LinearSystemId#identifyPositionSystem(double, double)}, but it
-   * uses a (2x2) matrix to preserve position and velocity
-   *
-   * @param kV The velocity gain, in volts/(unit/sec)
-   * @param kA The acceleration gain, in volts/(unit/sec²)
-   * @see <a href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
-   */
-  public WheelSim(double kV, double kA) {
-    super(identifySystem(kV, kA));
-  }
-
-  /**
-   * Returns the wheel velocity.
-   *
-   * @return The wheel velocity in rad / sec.
-   */
-  public double getVelocity() {
-    return super.getOutput(1);
-  }
-
-  /**
-   * Returns the wheel position.
-   *
-   * @return The wheel position in meters.
-   */
-  public double getPosition() {
-    return super.getOutput(0);
-  }
-
-  public void reset() {
-    super.setState(Matrix.mat(Nat.N2(), Nat.N1()).fill(0, 0));
+  public WheelSim(double kV, double kA, DCMotor gearbox, double gearing) {
+    super(identifySystem(kV, kA), gearbox, gearing);
   }
 
   /**

@@ -93,13 +93,6 @@ public final class Constants {
       Math.PI, // rear left
       Math.PI / 2 // rear right
     };
-    // public static final double[] ANGULAR_OFFSETS = {
-    //   0, // front left
-    //   Math.PI / 2, // front right
-    //   2 * Math.PI / 3, // rear left
-    //   Math.PI // rear right
-    // };
-
   }
 
   public static final class ModuleConstants {
