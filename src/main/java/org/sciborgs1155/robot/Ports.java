@@ -27,7 +27,8 @@ public final class Ports {
     public static final int ELEVATOR_PORTS[] = {LEFT_MOTOR, RIGHT_MOTOR, MIDDLE_MOTOR};
 
     public static final int ELEVATOR_ENCODER_PORT = 2;
-    public static final int BEAM_BREAK_PORT = 5;
+    public static final int BEAM_BREAK_PORTS[] = {5, 6};
+
   }
 
   public static final class ArmPorts {

@@ -32,11 +32,12 @@ public class Elevator extends SubsystemBase {
   private double acceleration = 0.0;
 
   // digital input
-  DigitalInput beambreak = new DigitalInput(ElevatorPorts.BEAM_BREAK_PORT);
+  DigitalInput beambreak = new DigitalInput(ElevatorPorts.BEAM_BREAK_PORTS[0]);
+  DigitalInput beambreakTwo = new DigitalInput(ElevatorPorts.BEAM_BREAK_PORTS[1]);
 
   @Override
   public void periodic() {
-    if (!beambreak.get()) {
+    if (!beambreak.get() || !beambreakTwo.get()) {
       acceleration =
           (elevatorControlledPID.getSetpoint().velocity - lastSpeed)
               / (Timer.getFPGATimestamp() - lastTime);
@@ -45,10 +46,10 @@ public class Elevator extends SubsystemBase {
       motors.setVoltage(pidOutput + ffOutput);
 
       lastSpeed = elevatorControlledPID.getSetpoint().velocity;
-      lastTime = Timer.getFPGATimestamp();
     } else {
       motors.setVoltage(0);
     }
+    lastTime = Timer.getFPGATimestamp();
   }
 
   public void setTargetHeight(double newHeight) {
