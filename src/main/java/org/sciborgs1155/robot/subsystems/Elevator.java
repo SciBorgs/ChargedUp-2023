@@ -1,5 +1,7 @@
 package org.sciborgs1155.robot.subsystems;
 
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -11,17 +13,14 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Ports.ElevatorPorts;
+import org.sciborgs1155.lib.MotorConfig;
 
 public class Elevator extends SubsystemBase {
-  private final DutyCycleEncoder elevatorEncoder =
-      new DutyCycleEncoder(ElevatorPorts.ELEVATOR_ENCODER_PORT);
-  private final MotorControllerGroup motors =
-      new MotorControllerGroup(
-          Motors.ELEVATOR.buildCanSparkMax(MotorType.kBrushed, ElevatorPorts.ELEVATOR_PORTS));
+  private final CANSparkMax motor = Motors.ELEVATOR.buildCanSparkMaxGearbox(MotorType.kBrushless, ElevatorPorts.ELEVATOR_PORTS);
+  private final RelativeEncoder encoder = motor.getEncoder(); 
 
-  // private final PIDController cascadePid = new PIDController(0.1, 0, 0);
-  private final ElevatorFeedforward ff = new ElevatorFeedforward(0, 0, 0, 0);
-  private final ProfiledPIDController elevatorControlledPID =
+  private final ElevatorFeedforward ff = new ElevatorFeedforward(Constants., 0, 0, 0);
+  private final ProfiledPIDController pid =
       new ProfiledPIDController(0, 0, 0, new Constraints(0, 0));
   // goal height
   private double height = 0;
@@ -39,15 +38,15 @@ public class Elevator extends SubsystemBase {
   public void periodic() {
     if (!beambreak.get() || !beambreakTwo.get()) {
       acceleration =
-          (elevatorControlledPID.getSetpoint().velocity - lastSpeed)
+          (pid.getSetpoint().velocity - lastSpeed)
               / (Timer.getFPGATimestamp() - lastTime);
-      double pidOutput = elevatorControlledPID.calculate(elevatorEncoder.getDistance(), height);
-      double ffOutput = ff.calculate(elevatorControlledPID.getSetpoint().velocity, acceleration);
-      motors.setVoltage(pidOutput + ffOutput);
+      double pidOutput = pid.calculate(encoder.getPosition(), height);
+      double ffOutput = ff.calculate(pid.getSetpoint().velocity, acceleration);
+      motor.setVoltage(pidOutput + ffOutput);
 
-      lastSpeed = elevatorControlledPID.getSetpoint().velocity;
+      lastSpeed = pid.getSetpoint().velocity;
     } else {
-      motors.setVoltage(0);
+      motor.stopMotor();
     }
     lastTime = Timer.getFPGATimestamp();
   }
@@ -56,22 +55,3 @@ public class Elevator extends SubsystemBase {
     height = newHeight;
   }
 }
-
-// mid .56 metres
-// high 1.06 metrses
-
-  // public void setVelocity() {
-    // elevatorOne.set(
-    //     cascadePid.calculate(
-    //         cascadeEncoder.getPosition())) /* + ff.calculate(velocity, 2, 0.001) */;
-  // }
-// }
-
-// mid and high
-// public void setMidHeight() {
-//     Elevator.setTargetHeight(Constants.midHeight);
-//   }
-
-// public void setHighHeight() {
-//     Elevator.setTargetHeight(Constants.highHeight);
-//   }
