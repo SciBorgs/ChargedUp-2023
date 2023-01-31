@@ -101,6 +101,23 @@ public final class Constants {
     public static final class Intake {
       public static final double WHEEL_SPEED = 0.6;
     }
+
+    public static final class Elevator {
+      public static final double maxVelocity = 0.3; // m/s
+      public static final double maxAcceleration = 0.3; // m/s^2
+      public static final double P = 0.01;
+      public static final double I = 0;
+      public static final double D = 0;
+
+      public static final double kS = 0;
+      public static final double kG = 0;
+      public static final double kV = 0;
+      public static final double kA = 0;
+      public static final TrapezoidProfile.Constraints CONSTRAINTS =
+          new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration);
+      public static final double GEAR_RATIO = 1.0;
+      public static final double MOVEMENTPERSPIN = 1.1938 / 6.0; // m/ (50 rotations of motor)
+    }
   }
 
   public static final class DriveConstants {
@@ -185,24 +202,6 @@ public final class Constants {
       public static final double MIN_INPUT = 0;
       public static final double MAX_INPUT = ENCODER_POSITION_FACTOR;
     }
-  }
-
-  public static final class ElevatorConstants {
-
-    public static final double maxVelocity = 0.3; // m/s
-    public static final double maxAcceleration = 0.3; // m/s^2
-    public static final double P = 0.01;
-    public static final double I = 0;
-    public static final double D = 0;
-
-    public static final double kS = 0;
-    public static final double kG = 0;
-    public static final double kV = 0;
-    public static final double kA = 0;
-    public static final TrapezoidProfile.Constraints CONSTRAINTS =
-        new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration);
-    public static final double GEAR_RATIO = 1.0;
-    public static final double MOVEMENTPERSPIN = 1.1938 / 6.0; // m/ (50 rotations of motor)
   }
 
   public static final class AutoConstants {

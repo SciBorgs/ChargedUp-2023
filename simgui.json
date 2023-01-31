@@ -30,7 +30,11 @@
       "/Shuffleboard/Drivetrain/frontRight": "PIDController",
       "/Shuffleboard/Drivetrain/gyro": "Gyro",
       "/Shuffleboard/Drivetrain/rearLeft": "PIDController",
-      "/Shuffleboard/Drivetrain/rearRight": "PIDController"
+      "/Shuffleboard/Drivetrain/rearRight": "PIDController",
+      "/Shuffleboard/SillySim/elbowPID": "PIDController",
+      "/Shuffleboard/SillySim/mech2d": "Mechanism2d",
+      "/Shuffleboard/SillySim/wristPID": "PIDController",
+      "/Shuffleboard/Visualizer/mech": "Mechanism2d"
     },
     "windows": {
       "/Shuffleboard/Drivetrain/field2d": {
@@ -128,6 +132,17 @@
         },
         "window": {
           "name": "todo: add among us",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/SillySim/mech2d": {
+        "window": {
+          "name": "Silly sim",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Visualizer/mech": {
+        "window": {
           "visible": true
         }
       }
