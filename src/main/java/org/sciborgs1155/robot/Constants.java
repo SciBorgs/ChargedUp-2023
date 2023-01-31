@@ -52,6 +52,9 @@ public final class Constants {
     public static final MotorConfig ARM =
         MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
 
+    public static final MotorConfig WRIST =
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
+
     public static final MotorConfig INTAKE =
         MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
   }
@@ -71,11 +74,14 @@ public final class Constants {
     public static final List<AprilTag> TEST_TAGS = List.of(TEST_TAG_0);
   }
 
-  public static final class Claw {
-    // not actual values 
+  public static final class Wrist {
+    // not actual values
     public static final double kp = 0.3;
     public static final double ki = 0.08;
     public static final double kd = 0.5;
+  }
+
+  public static final class Intake {
 
     public static final double ClawWheelsEnableSpeed = 0.6;
   }
@@ -112,8 +118,6 @@ public final class Constants {
       Math.PI / 2 // rear right
     };
   }
-
-  
 
   public static final class ModuleConstants {
 

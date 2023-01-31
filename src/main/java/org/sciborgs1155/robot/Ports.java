@@ -40,7 +40,7 @@ public final class Ports {
     public static final int PIGEON = 2;
   }
 
-  public static final class ClawPorts{
+  public static final class ClawPorts {
     public static final int CLAW_WHEELS = 22;
     public static final int CLAW_WRIST = 23;
   }
