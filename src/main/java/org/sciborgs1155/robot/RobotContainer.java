@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
 import java.util.List;
+import org.photonvision.PhotonCamera;
+import org.sciborgs1155.robot.Constants.Vision;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.subsystems.Drivetrain;
@@ -17,9 +19,11 @@ import org.sciborgs1155.robot.subsystems.Drivetrain;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+  // Define camera for PoseEstimation
+  private final PhotonCamera cam = new PhotonCamera(Vision.CAMERA_NAME);
 
   // The robot's subsystems and commands are defined here...
-  private final Drivetrain drive = new Drivetrain();
+  private final Drivetrain drive = new Drivetrain(cam);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController xbox = new CommandXboxController(OI.XBOX);
