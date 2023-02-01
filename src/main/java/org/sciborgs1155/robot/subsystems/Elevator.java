@@ -9,10 +9,14 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Ports.ElevatorPorts;
 
 public class Elevator extends SubsystemBase {
+
+  // Reference to a Mechanism2d for displaying the elevator's movement
+  private final Visualizer visualizer;
 
   // this is all good
   private final CANSparkMax motor;
@@ -36,7 +40,10 @@ public class Elevator extends SubsystemBase {
 
   private double acceleration = 0.0;
 
-  public Elevator() {
+  public Elevator(Visualizer visualizer) {
+
+    this.visualizer = visualizer;
+
     motor =
         Motors.ELEVATOR.buildCanSparkMaxGearbox(MotorType.kBrushless, ElevatorPorts.ELEVATOR_PORTS);
     encoder = motor.getEncoder();

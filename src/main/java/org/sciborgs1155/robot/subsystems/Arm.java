@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Constants.PlacementConstants.Elbow;
 import org.sciborgs1155.robot.Constants.PlacementConstants.Wrist;
@@ -15,6 +16,9 @@ import org.sciborgs1155.robot.Ports.ArmPorts;
 import org.sciborgs1155.robot.Ports.ClawPorts;
 
 public class Arm extends SubsystemBase {
+
+  // Reference to a Mechanism2d for displaying the arm's movement
+  private final Visualizer visualizer;
 
   private final CANSparkMax wrist;
   private final RelativeEncoder wristEncoder;
@@ -41,7 +45,10 @@ public class Arm extends SubsystemBase {
    * generally we'll name things as elbow and wrist
    */
 
-  public Arm() {
+  public Arm(Visualizer visualizer) {
+
+    this.visualizer = visualizer;
+
     // great!
     wrist = Motors.WRIST.buildCanSparkMax(MotorType.kBrushless, ClawPorts.CLAW_WRIST);
     wristEncoder = wrist.getEncoder();
