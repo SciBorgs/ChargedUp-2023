@@ -55,7 +55,7 @@ public class Arm extends SubsystemBase {
 
     wristFeedback = new PIDController(Wrist.kP, Wrist.kI, Wrist.kD);
 
-    armMotors = Motors.ARM.buildCanSparkMaxGearbox(MotorType.kBrushless, ArmPorts.armPorts);
+    armMotors = Motors.ELBOW.buildCanSparkMaxGearbox(MotorType.kBrushless, ArmPorts.armPorts);
     armEncoder = armMotors.getEncoder();
 
     armFeedforward = new ArmFeedforward(Elbow.kS, Elbow.kG, Elbow.kV, Elbow.kA);

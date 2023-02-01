@@ -49,7 +49,7 @@ public final class Constants {
     public static final MotorConfig ELEVATOR =
         MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
 
-    public static final MotorConfig ARM =
+    public static final MotorConfig ELBOW =
         MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
 
     public static final MotorConfig WRIST =
