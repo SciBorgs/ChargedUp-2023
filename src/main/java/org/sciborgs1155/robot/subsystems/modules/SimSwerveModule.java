@@ -18,16 +18,13 @@ import org.sciborgs1155.robot.Constants.ModuleConstants.Turning;
 /** Class to encapsulate a rev max swerve module */
 public class SimSwerveModule implements SwerveModule, Sendable {
 
-  private final WheelSim drive =
-      new WheelSim(Driving.V, Driving.A, DCMotor.getNEO(1), Driving.ENCODER_VELOCITY_FACTOR);
-  private final WheelSim turn =
-      new WheelSim(Turning.V, Turning.A, DCMotor.getNeo550(1), Turning.ENCODER_POSITION_FACTOR);
+  private final WheelSim drive;
+  private final WheelSim turn;
 
-  private final PIDController driveFeedback = new PIDController(Driving.P, Driving.I, Driving.D);
-  private final PIDController turnFeedback = new PIDController(Turning.P, Turning.I, Turning.D);
+  private final PIDController driveFeedback;
+  private final PIDController turnFeedback;
 
-  private final SimpleMotorFeedforward driveFeedforward =
-      new SimpleMotorFeedforward(Driving.S, Driving.V, Driving.A);
+  private final SimpleMotorFeedforward driveFeedforward;
 
   /**
    * Constructs a SwerveModule for rev's product.
@@ -37,6 +34,15 @@ public class SimSwerveModule implements SwerveModule, Sendable {
    * @param angularOffset offset from drivetrain
    */
   public SimSwerveModule() {
+    drive = new WheelSim(Driving.V, Driving.A, DCMotor.getNEO(1), Driving.ENCODER_VELOCITY_FACTOR);
+    turn =
+        new WheelSim(Turning.V, Turning.A, DCMotor.getNeo550(1), Turning.ENCODER_POSITION_FACTOR);
+
+    driveFeedback = new PIDController(Driving.P, Driving.I, Driving.D);
+    turnFeedback = new PIDController(Turning.P, Turning.I, Turning.D);
+
+    driveFeedforward = new SimpleMotorFeedforward(Driving.S, Driving.V, Driving.A);
+
     // set up continuous input for turning
     turnFeedback.enableContinuousInput(Turning.MIN_INPUT, Turning.MAX_INPUT);
   }
