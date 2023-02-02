@@ -1,16 +1,19 @@
 package org.sciborgs1155.robot;
 
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
 import java.util.List;
 import org.photonvision.PhotonCamera;
+import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants.Vision;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drivetrain;
+import org.sciborgs1155.robot.subsystems.Elevator;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -22,13 +25,18 @@ public class RobotContainer {
   // Define camera for PoseEstimation
   private final PhotonCamera cam = new PhotonCamera(Vision.CAMERA_NAME);
 
+  // Visualizer for elevator/arm simulation
+  private final Visualizer visualizer = new Visualizer();
+
   // The robot's subsystems and commands are defined here...
   private final Drivetrain drive = new Drivetrain(cam);
+  private final Arm arm = new Arm(visualizer);
+  private final Elevator elevator = new Elevator(visualizer);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController xbox = new CommandXboxController(OI.XBOX);
-  private final Joystick leftJoystick = new Joystick(OI.LEFT_STICK);
-  private final Joystick rightJoystick = new Joystick(OI.RIGHT_STICK);
+  private final CommandJoystick leftJoystick = new CommandJoystick(OI.LEFT_STICK);
+  private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
 
   private List<Command> autonSequence =
       List.of(Autos.mobility(drive), Autos.followPath(drive, "New Path"));
@@ -44,7 +52,7 @@ public class RobotContainer {
   }
 
   private void configureSubsystemDefaults() {
-    drive.setDefaultCommand(drive.drive(xbox, true));
+    drive.setDefaultCommand(drive.drive(leftJoystick, rightJoystick, true));
   }
 
   /**

@@ -45,6 +45,18 @@ public final class Constants {
             .withBurnFlash(false)
             .withNeutralBehavior(NeutralBehavior.BRAKE)
             .withCurrentLimit(20);
+
+    public static final MotorConfig ELEVATOR =
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
+
+    public static final MotorConfig ELBOW =
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
+
+    public static final MotorConfig WRIST =
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
+
+    public static final MotorConfig INTAKE =
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
   }
 
   public static final class Vision {
@@ -60,6 +72,55 @@ public final class Constants {
     // test tag at 0
     public static final AprilTag TEST_TAG_0 = new AprilTag(0, new Pose3d());
     public static final List<AprilTag> TEST_TAGS = List.of(TEST_TAG_0);
+  }
+
+  public static final class PlacementConstants {
+    public static final class Wrist {
+      // not actual values
+      public static final double kP = 0.3;
+      public static final double kI = 0.08;
+      public static final double kD = 0.5;
+    }
+
+    public static final class Elbow {
+      public static final double kP = 0.01;
+      public static final double kI = 0;
+      public static final double kD = 0;
+
+      public static final double kS = 0;
+      public static final double kG = 0;
+      public static final double kV = 0;
+      public static final double kA = 0;
+
+      public static final double MAX_VELOCITY = 0.3; // radians / s
+      public static final double MAX_ACCEL = 0.3; // radians / s^2
+      public static final TrapezoidProfile.Constraints CONSTRAINTS =
+          new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
+
+      public static final double GEAR_RATIO = 1 / 6.0;
+      public static final double MOVEMENTPERSPIN = (1.5 * Math.PI); // radians
+    }
+
+    public static final class Intake {
+      public static final double WHEEL_SPEED = 0.6;
+    }
+
+    public static final class Elevator {
+      public static final double maxVelocity = 0.3; // m/s
+      public static final double maxAcceleration = 0.3; // m/s^2
+      public static final double P = 0.01;
+      public static final double I = 0;
+      public static final double D = 0;
+
+      public static final double kS = 0;
+      public static final double kG = 0;
+      public static final double kV = 0;
+      public static final double kA = 0;
+      public static final TrapezoidProfile.Constraints CONSTRAINTS =
+          new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration);
+      public static final double GEAR_RATIO = 1.0;
+      public static final double MOVEMENTPERSPIN = 1.1938 / 6.0; // m/ (50 rotations of motor)
+    }
   }
 
   public static final class DriveConstants {
