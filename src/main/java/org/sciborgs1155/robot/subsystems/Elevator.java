@@ -30,8 +30,8 @@ public class Elevator extends SubsystemBase {
   /*
    * the DigitalInputs should be private and final, since they are sensors that must be encapsulated within the subsystem
    */
-  DigitalInput beambreak;
-  DigitalInput beambreakTwo;
+  private final DigitalInput beambreak;
+  private final DigitalInput beambreakTwo;
 
   // goal height
   private double height = 0;
