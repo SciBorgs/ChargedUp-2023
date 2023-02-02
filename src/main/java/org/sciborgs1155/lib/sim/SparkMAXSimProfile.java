@@ -9,10 +9,12 @@ import org.sciborgs1155.lib.sim.PhysicsSim.SimProfile;
 public class SparkMAXSimProfile extends SimProfile {
 
   private final CANSparkMax spark;
+  private final EncoderSim encoder;
   private final LinearSystemSim<N2, N1, N2> system;
 
   public SparkMAXSimProfile(CANSparkMax spark, LinearSystemSim<N2, N1, N2> system) {
     this.spark = spark;
+    this.encoder = new EncoderSim(spark.getDeviceId());
     this.system = system;
   }
 
@@ -21,6 +23,7 @@ public class SparkMAXSimProfile extends SimProfile {
     double out = spark.getAppliedOutput();
     system.setInput(out);
     system.update(getPeriod());
-    spark.getEncoder().setPosition(system.getOutput(0));
+    encoder.setPosition(system.getOutput(0));
+    encoder.setVelocity(system.getOutput(1));
   }
 }
