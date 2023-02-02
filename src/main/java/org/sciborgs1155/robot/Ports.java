@@ -30,10 +30,10 @@ public final class Ports {
     public static final int BEAM_BREAK_PORTS[] = {5, 6};
   }
 
-  public static final class ArmPorts {
-    public static final int leftArmMotor = 11;
-    public static final int rightArmMotor = 12;
-    public static final int armPorts[] = {leftArmMotor, rightArmMotor};
+  public static final class ElbowPorts {
+    public static final int LEFT_ELBOW_MOTOR = 11;
+    public static final int RIGHT_ELBOW_MOTOR = 12;
+    public static final int elbowPorts[] = {LEFT_ELBOW_MOTOR, RIGHT_ELBOW_MOTOR};
   }
 
   public static final class Sensors {

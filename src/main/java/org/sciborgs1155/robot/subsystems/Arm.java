@@ -4,101 +4,94 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Constants.PlacementConstants.Elbow;
 import org.sciborgs1155.robot.Constants.PlacementConstants.Wrist;
-import org.sciborgs1155.robot.Ports.ArmPorts;
+import org.sciborgs1155.robot.Ports.ElbowPorts;
 import org.sciborgs1155.robot.Ports.ClawPorts;
 
 public class Arm extends SubsystemBase {
 
-  // Reference to a Mechanism2d for displaying the arm's movement
+  // Reference to a Mechanism2d for displaying the arm's movement+
   private final Visualizer visualizer;
 
   private final CANSparkMax wrist;
   private final RelativeEncoder wristEncoder;
 
-  // i would strongly consider an additional ArmFeedforward for the wrist, it's quite heavy
-  // in addition, to make that work, we'd want a ProfiledPIDController instead of a normal
-  // PIDController to handle integration of a TrapezoidProfile
-  private final PIDController wristFeedback;
+  private final ProfiledPIDController wristFeedback;
+  private final ArmFeedforward wristFeedforward;
 
-  private final CANSparkMax armMotors; // is the arm only controlled by one motor?
-  private final RelativeEncoder armEncoder; // which arm?
+  private final CANSparkMax elbowMotors;
+  private final RelativeEncoder elbowEncoder;
 
-  private final ArmFeedforward armFeedforward; // ^
-  private final ProfiledPIDController armFeedback; // ^
+  private final ArmFeedforward elbowFeedforward;
+  private final ProfiledPIDController elbowFeedback;
 
-  /*
-   * What mechanism does this goal apply to???
-   */
-  private Rotation2d goal;
+  private double lastSpeed = 0.0;
+  private double lastTime = Timer.getFPGATimestamp();
+  private double acceleration = 0.0;
 
-  /*
-   * We want another goal for the second joint
-   *
-   * generally we'll name things as elbow and wrist
-   */
+  private Rotation2d elbowGoal;
+  private Rotation2d wristGoal;
 
   public Arm(Visualizer visualizer) {
-
     this.visualizer = visualizer;
 
     // great!
     wrist = Motors.WRIST.buildCanSparkMax(MotorType.kBrushless, ClawPorts.CLAW_WRIST);
     wristEncoder = wrist.getEncoder();
 
-    wristFeedback = new PIDController(Wrist.kP, Wrist.kI, Wrist.kD);
+    wristFeedback = new ProfiledPIDController(Wrist.kP, Wrist.kI, Wrist.kD, Wrist.WRIST_CONSTRAINTS);
+    wristFeedforward = new ArmFeedforward(Wrist.kS, Wrist.kG, Wrist.kV, Wrist.kA);
 
-    armMotors = Motors.ARM.buildCanSparkMaxGearbox(MotorType.kBrushless, ArmPorts.armPorts);
-    armEncoder = armMotors.getEncoder();
+    elbowMotors = Motors.ELBOW.buildCanSparkMaxGearbox(MotorType.kBrushless, ElbowPorts.elbowPorts);
+    elbowEncoder = elbowMotors.getEncoder();
 
-    armFeedforward = new ArmFeedforward(Elbow.kS, Elbow.kG, Elbow.kV, Elbow.kA);
-    armFeedback = new ProfiledPIDController(Elbow.kP, Elbow.kI, Elbow.kD, Elbow.CONSTRAINTS);
+    elbowFeedforward = new ArmFeedforward(Elbow.kS, Elbow.kG, Elbow.kV, Elbow.kA);
+    elbowFeedback = new ProfiledPIDController(Elbow.kP, Elbow.kI, Elbow.kD, Elbow.ELBOW_CONSTRAINTS);
 
-    armEncoder.setPositionConversionFactor(
-        Elbow.GEAR_RATIO * Elbow.MOVEMENTPERSPIN); // what is movement per spin?
-    armEncoder.setVelocityConversionFactor(Elbow.GEAR_RATIO);
+    elbowEncoder.setPositionConversionFactor(
+        Elbow.GEAR_RATIO * Elbow.MOVEMENT_PER_SPIN); // what is movement per spin?
+    elbowEncoder.setVelocityConversionFactor(Elbow.GEAR_RATIO);
   }
 
-  /*
-   * Set the goal for which mechanism?
-   */
-  public void setGoal(Rotation2d goal) {
-    this.goal = goal;
+  public void setElbowGoal(Rotation2d elbowGoal) {
+    this.elbowGoal = elbowGoal;
   }
+
+  public void setWristGoal(Rotation2d wristGoal) {
+    this.wristGoal = wristGoal;
+  }
+
+  public Rotation2d getElbowgoal(){
+    return elbowGoal;
+  }
+
+  public Rotation2d getWristGoal(){
+    return wristGoal;
+  }
+
 
   @Override
   public void periodic() {
-    double fb = armFeedback.calculate(armEncoder.getPosition(), goal.getRadians());
-    double ff =
-        armFeedforward.calculate(
-            armFeedback.getSetpoint().position, armFeedback.getSetpoint().velocity);
-    armMotors.setVoltage(fb + ff);
 
-    /*
-     * possibly add acceleration calculations for the arm feedforward
-     * I could add a util class to help keep this neat
-     */
+    acceleration = (elbowFeedback.getSetpoint().velocity - lastSpeed ) / (Timer.getFPGATimestamp() - lastTime);
+    lastSpeed = elbowFeedback.getSetpoint().velocity;
+    lastTime = Timer.getFPGATimestamp();
 
-    // pid.calculate(measurement, setpoint), where measurement is your current position and setpoint
-    // is your desired position
-    // the measurement is good, but we don't ever set setpoint, meaning it'll consistently attempt
-    // to reach 0
-    wrist.set(wristFeedback.calculate(wristEncoder.getPosition()));
-  }
+    double elbowfb = elbowFeedback.calculate(elbowEncoder.getPosition(), elbowGoal.getRadians());
+    double elbowff =
+        elbowFeedforward.calculate(elbowFeedback.getSetpoint().position, elbowFeedback.getSetpoint().velocity, acceleration);
+    elbowMotors.setVoltage(elbowfb + elbowff);
 
-  /**
-   * This is not C#, methods should be in camelCase, not PascalCase - we should only set the motor's
-   * value in {@link this#periodic()} - generally, we also organize subsystems by putting setter
-   * methods (methods that set variables, such as a setpoint here) above periodic
-   */
-  public void DisableWrist() {
-    wrist.set(0);
+    double wristfb = wristFeedback.calculate(wristEncoder.getPosition(), wristGoal.getRadians());
+    double wristff =
+        wristFeedforward.calculate(wristFeedback.getSetpoint().position, wristFeedback.getSetpoint().velocity, acceleration);
+    wrist.setVoltage(wristfb + wristff); 
   }
 }

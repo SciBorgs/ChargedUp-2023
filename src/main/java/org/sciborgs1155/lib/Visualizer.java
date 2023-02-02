@@ -25,7 +25,12 @@ public class Visualizer implements Loggable {
     claw = forearm.append(new MechanismLigament2d("Wrist", 10, -10));
   }
 
-  public void setElevatorHeight(double height) {}
+  public void setElevatorHeight(double height) {
+    elevatorProgress.setAngle(height);
+  }
 
-  public void setArmAngles(Rotation2d elbow, Rotation2d wrist) {}
+  public void setArmAngles(Rotation2d elbow, Rotation2d wrist) {
+    forearm.setAngle(elbow);
+    claw.setAngle(wrist);
+  }
 }

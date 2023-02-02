@@ -2,6 +2,7 @@ package org.sciborgs1155.robot;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -49,7 +50,7 @@ public final class Constants {
     public static final MotorConfig ELEVATOR =
         MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
 
-    public static final MotorConfig ARM =
+    public static final MotorConfig ELBOW =
         MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
 
     public static final MotorConfig WRIST =
@@ -80,6 +81,16 @@ public final class Constants {
       public static final double kP = 0.3;
       public static final double kI = 0.08;
       public static final double kD = 0.5;
+
+      public static final double kS = 0;
+      public static final double kG = 0;
+      public static final double kV = 0;
+      public static final double kA = 0;
+
+      public static final double MAX_WRIST_VELOCITY = 0.3; // radians / s
+      public static final double MAX_WRIST_ACCEL = 0.3; // radians / s^2
+      public static final TrapezoidProfile.Constraints WRIST_CONSTRAINTS =
+          new TrapezoidProfile.Constraints(MAX_WRIST_VELOCITY, MAX_WRIST_ACCEL);
     }
 
     public static final class Elbow {
@@ -92,14 +103,13 @@ public final class Constants {
       public static final double kV = 0;
       public static final double kA = 0;
 
-      public static final double MAX_VELOCITY = 0.3; // radians / s
-      public static final double MAX_ACCEL = 0.3; // radians / s^2
-      public static final TrapezoidProfile.Constraints CONSTRAINTS =
-          new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
+      public static final double MAX_ELBOW_VELOCITY = 0.3; // radians / s
+      public static final double MAX_ELBOW_ACCEL = 0.3; // radians / s^2
+      public static final TrapezoidProfile.Constraints ELBOW_CONSTRAINTS =
+          new TrapezoidProfile.Constraints(MAX_ELBOW_VELOCITY, MAX_ELBOW_ACCEL);
 
       public static final double GEAR_RATIO = 1 / 6.0;
-      public static final double MOVEMENTPERSPIN = (1.5 * Math.PI); // radians
-    }
+      public static final double MOVEMENT_PER_SPIN = (1.5 * Math.PI);
 
     public static final class Intake {
       public static final double WHEEL_SPEED = 0.6;
@@ -222,4 +232,5 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS =
         new TrapezoidProfile.Constraints(MAX_ANG_SPEED, MAX_ANG_ACCEL);
   }
+}
 }
