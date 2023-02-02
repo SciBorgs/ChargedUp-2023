@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Ports.ElevatorPorts;
+import org.sciborgs1155.robot.Constants.PlacementConstants;
 
 public class Elevator extends SubsystemBase {
 
@@ -29,8 +30,8 @@ public class Elevator extends SubsystemBase {
   /*
    * the DigitalInputs should be private and final, since they are sensors that must be encapsulated within the subsystem
    */
-  DigitalInput beambreak;
-  DigitalInput beambreakTwo;
+  private final DigitalInput beambreak;
+  private final DigitalInput beambreakTwo;
 
   // goal height
   private double height = 0;
@@ -48,8 +49,8 @@ public class Elevator extends SubsystemBase {
         Motors.ELEVATOR.buildCanSparkMaxGearbox(MotorType.kBrushless, ElevatorPorts.ELEVATOR_PORTS);
     encoder = motor.getEncoder();
 
-    ff = new ElevatorFeedforward(0, 0, 0, 0);
-    pid = new ProfiledPIDController(0, 0, 0, new Constraints(0, 0));
+    ff = new ElevatorFeedforward(PlacementConstants.Elevator.kS, PlacementConstants.Elevator.kG, PlacementConstants.Elevator.kV, PlacementConstants.Elevator.kA);
+    pid = new ProfiledPIDController(PlacementConstants.Elevator.P, PlacementConstants.Elevator.I, PlacementConstants.Elevator.D, new Constraints(PlacementConstants.Elevator.maxVelocity, PlacementConstants.Elevator.maxAcceleration));
 
     beambreak = new DigitalInput(ElevatorPorts.BEAM_BREAK_PORTS[0]);
     beambreakTwo = new DigitalInput(ElevatorPorts.BEAM_BREAK_PORTS[1]);
