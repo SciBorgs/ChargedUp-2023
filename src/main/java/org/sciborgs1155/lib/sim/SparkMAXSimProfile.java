@@ -9,18 +9,28 @@ import org.sciborgs1155.lib.sim.PhysicsSim.SimProfile;
 public class SparkMAXSimProfile extends SimProfile {
 
   private final CANSparkMax spark;
-  private final EncoderSim encoder;
+  private final SparkMAXSim encoder;
   private final LinearSystemSim<N2, N1, N2> system;
 
   public SparkMAXSimProfile(CANSparkMax spark, LinearSystemSim<N2, N1, N2> system) {
     this.spark = spark;
-    this.encoder = new EncoderSim(spark.getDeviceId());
+    this.encoder = new SparkMAXSim(spark);
     this.system = system;
   }
 
   @Override
   public void run() {
-    double out = spark.getAppliedOutput();
+
+    double out = 0;
+    switch (encoder.getControlMode()) {
+      case 0: // duty cycle mode, uses get/set stored duty cycle variable in spark
+        out = spark.get() * spark.getBusVoltage();
+        break;
+      case 2: // voltage mode, pretty straightforward
+        out = spark.getAppliedOutput();
+        break;
+    }
+
     system.setInput(out);
     system.update(getPeriod());
     encoder.setPosition(system.getOutput(0));

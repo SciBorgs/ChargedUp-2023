@@ -37,4 +37,17 @@ public class PhysicsSimTest {
     System.out.println("sim motor velocity: " + encoder.getVelocity());
     assert encoder.getVelocity() > 0;
   }
+
+  @Test
+  void controlTypes() throws InterruptedException {
+    CANSparkMax simMotor = new CANSparkMax(2, MotorType.kBrushless);
+    RelativeEncoder encoder = simMotor.getEncoder();
+
+    PhysicsSim.getInstance().addSparkMax(simMotor, new WheelSim(1, 1));
+    simMotor.set(0.3333);
+    Thread.sleep(20);
+    PhysicsSim.getInstance().run();
+    System.out.println("sim motor velocity: " + encoder.getVelocity());
+    assert encoder.getVelocity() > 0;
+  }
 }
