@@ -8,6 +8,9 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 import java.util.ArrayList;
 
+/**
+ * A class to update the position and velocity values of motors based on their dynamics.
+ */
 public class PhysicsSim {
 
   private static final PhysicsSim sim = new PhysicsSim();

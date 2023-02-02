@@ -7,7 +7,7 @@ import edu.wpi.first.hal.simulation.SimDeviceDataJNI.SimValueInfo;
 import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
 
 /**
- * Sim class for CAN Encoders that uses JNI to interact with real Encoder instances. Thank you 6738!
+ * Sim class for interacting with the {@link CANSparkMax} HAL. Thank you 6738!
  */
 public class SparkMAXSim {
   private final SimDouble position, velocity, appliedOutput, motorCurrent;
@@ -21,10 +21,20 @@ public class SparkMAXSim {
     }
   }
 
+  /**
+   * Creates a new SparkMAXSim instance.
+   * 
+   * @param spark The spark max to simulate.
+   */
   public SparkMAXSim(CANSparkMax spark) {
     this(spark.getDeviceId());
   }
 
+  /**
+   * Creates a new SparkMAXSim instance.
+   * 
+   * @param deviceID The id of the spark max to simulate.
+   */
   public SparkMAXSim(int deviceID) {
     SimDeviceSim device = new SimDeviceSim("SPARK MAX [" + deviceID + "]");
     // printValues(device);
