@@ -36,8 +36,8 @@ public class Arm extends SubsystemBase {
   private double lastTime = Timer.getFPGATimestamp();
   private double acceleration = 0.0;
 
-  private Rotation2d elbowGoal;
-  private Rotation2d wristGoal;
+  private Rotation2d elbowGoal = new Rotation2d();
+  private Rotation2d wristGoal = new Rotation2d();
 
   public Arm(Visualizer visualizer) {
     this.visualizer = visualizer;

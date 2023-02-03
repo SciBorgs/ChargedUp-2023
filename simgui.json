@@ -31,6 +31,9 @@
       "/Shuffleboard/Drivetrain/gyro": "Gyro",
       "/Shuffleboard/Drivetrain/rearLeft": "PIDController",
       "/Shuffleboard/Drivetrain/rearRight": "PIDController",
+      "/Shuffleboard/Elevator/Visualizer/mech": "Mechanism2d",
+      "/Shuffleboard/Elevator/beambreak": "Digital Input",
+      "/Shuffleboard/Elevator/beambreakTwo": "Digital Input",
       "/Shuffleboard/SillySim/elbowPID": "PIDController",
       "/Shuffleboard/SillySim/mech2d": "Mechanism2d",
       "/Shuffleboard/SillySim/wristPID": "PIDController",
@@ -135,10 +138,14 @@
           "visible": true
         }
       },
+      "/Shuffleboard/Elevator/beambreak": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Shuffleboard/SillySim/mech2d": {
         "window": {
-          "name": "Silly sim",
-          "visible": true
+          "name": "Silly sim"
         }
       },
       "/Shuffleboard/Visualizer/mech": {
@@ -167,11 +174,16 @@
           "frontRight": {
             "open": true
           },
-          "open": true,
           "rearLeft": {
             "open": true
           },
           "rearRight": {
+            "open": true
+          }
+        },
+        "Elevator": {
+          "open": true,
+          "pid": {
             "open": true
           }
         },
