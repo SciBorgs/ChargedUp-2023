@@ -10,9 +10,9 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.sciborgs1155.lib.Visualizer;
+import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Ports.ElevatorPorts;
-import org.sciborgs1155.robot.Constants.PlacementConstants;
 
 public class Elevator extends SubsystemBase {
 
@@ -49,8 +49,18 @@ public class Elevator extends SubsystemBase {
         Motors.ELEVATOR.buildCanSparkMaxGearbox(MotorType.kBrushless, ElevatorPorts.ELEVATOR_PORTS);
     encoder = motor.getEncoder();
 
-    ff = new ElevatorFeedforward(PlacementConstants.Elevator.kS, PlacementConstants.Elevator.kG, PlacementConstants.Elevator.kV, PlacementConstants.Elevator.kA);
-    pid = new ProfiledPIDController(PlacementConstants.Elevator.P, PlacementConstants.Elevator.I, PlacementConstants.Elevator.D, new Constraints(PlacementConstants.Elevator.maxVelocity, PlacementConstants.Elevator.maxAcceleration));
+    ff =
+        new ElevatorFeedforward(
+            Constants.Elevator.kS,
+            Constants.Elevator.kG,
+            Constants.Elevator.kV,
+            Constants.Elevator.kA);
+    pid =
+        new ProfiledPIDController(
+            Constants.Elevator.P,
+            Constants.Elevator.I,
+            Constants.Elevator.D,
+            new Constraints(Constants.Elevator.maxVelocity, Constants.Elevator.maxAcceleration));
 
     beambreak = new DigitalInput(ElevatorPorts.BEAM_BREAK_PORTS[0]);
     beambreakTwo = new DigitalInput(ElevatorPorts.BEAM_BREAK_PORTS[1]);

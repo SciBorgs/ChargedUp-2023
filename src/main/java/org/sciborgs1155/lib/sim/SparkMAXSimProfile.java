@@ -6,9 +6,7 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 import org.sciborgs1155.lib.sim.PhysicsSim.SimProfile;
 
-/**
- * A simulation profile for the {@link CANSparkMax} using a {@link LinearSystem}.
- */
+/** A simulation profile for the {@link CANSparkMax} using a {@link LinearSystem}. */
 public class SparkMAXSimProfile extends SimProfile {
 
   private final CANSparkMax spark;

@@ -4,8 +4,8 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Motors;
-import org.sciborgs1155.robot.Constants.PlacementConstants;
 import org.sciborgs1155.robot.Ports.ClawPorts;
 
 public class Intake extends SubsystemBase {
@@ -22,7 +22,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void turnOnWheels() {
-    wheels.set(PlacementConstants.Intake.WHEEL_SPEED);
+    wheels.set(Constants.Intake.WHEEL_SPEED);
   }
 
   public void stopWheels() {

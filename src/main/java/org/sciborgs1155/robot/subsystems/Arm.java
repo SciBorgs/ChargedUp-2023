@@ -12,8 +12,8 @@ import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Constants.PlacementConstants.Elbow;
 import org.sciborgs1155.robot.Constants.PlacementConstants.Wrist;
-import org.sciborgs1155.robot.Ports.ElbowPorts;
 import org.sciborgs1155.robot.Ports.ClawPorts;
+import org.sciborgs1155.robot.Ports.ElbowPorts;
 
 public class Arm extends SubsystemBase {
 
@@ -46,14 +46,16 @@ public class Arm extends SubsystemBase {
     wrist = Motors.WRIST.buildCanSparkMax(MotorType.kBrushless, ClawPorts.CLAW_WRIST);
     wristEncoder = wrist.getEncoder();
 
-    wristFeedback = new ProfiledPIDController(Wrist.kP, Wrist.kI, Wrist.kD, Wrist.WRIST_CONSTRAINTS);
+    wristFeedback =
+        new ProfiledPIDController(Wrist.kP, Wrist.kI, Wrist.kD, Wrist.WRIST_CONSTRAINTS);
     wristFeedforward = new ArmFeedforward(Wrist.kS, Wrist.kG, Wrist.kV, Wrist.kA);
 
     elbowMotors = Motors.ELBOW.buildCanSparkMaxGearbox(MotorType.kBrushless, ElbowPorts.elbowPorts);
     elbowEncoder = elbowMotors.getEncoder();
 
     elbowFeedforward = new ArmFeedforward(Elbow.kS, Elbow.kG, Elbow.kV, Elbow.kA);
-    elbowFeedback = new ProfiledPIDController(Elbow.kP, Elbow.kI, Elbow.kD, Elbow.ELBOW_CONSTRAINTS);
+    elbowFeedback =
+        new ProfiledPIDController(Elbow.kP, Elbow.kI, Elbow.kD, Elbow.ELBOW_CONSTRAINTS);
 
     elbowEncoder.setPositionConversionFactor(
         Elbow.GEAR_RATIO * Elbow.MOVEMENT_PER_SPIN); // what is movement per spin?
@@ -68,30 +70,36 @@ public class Arm extends SubsystemBase {
     this.wristGoal = wristGoal;
   }
 
-  public Rotation2d getElbowgoal(){
+  public Rotation2d getElbowgoal() {
     return elbowGoal;
   }
 
-  public Rotation2d getWristGoal(){
+  public Rotation2d getWristGoal() {
     return wristGoal;
   }
-
 
   @Override
   public void periodic() {
 
-    acceleration = (elbowFeedback.getSetpoint().velocity - lastSpeed ) / (Timer.getFPGATimestamp() - lastTime);
+    acceleration =
+        (elbowFeedback.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - lastTime);
     lastSpeed = elbowFeedback.getSetpoint().velocity;
     lastTime = Timer.getFPGATimestamp();
 
     double elbowfb = elbowFeedback.calculate(elbowEncoder.getPosition(), elbowGoal.getRadians());
     double elbowff =
-        elbowFeedforward.calculate(elbowFeedback.getSetpoint().position, elbowFeedback.getSetpoint().velocity, acceleration);
+        elbowFeedforward.calculate(
+            elbowFeedback.getSetpoint().position,
+            elbowFeedback.getSetpoint().velocity,
+            acceleration);
     elbowMotors.setVoltage(elbowfb + elbowff);
 
     double wristfb = wristFeedback.calculate(wristEncoder.getPosition(), wristGoal.getRadians());
     double wristff =
-        wristFeedforward.calculate(wristFeedback.getSetpoint().position, wristFeedback.getSetpoint().velocity, acceleration);
-    wrist.setVoltage(wristfb + wristff); 
+        wristFeedforward.calculate(
+            wristFeedback.getSetpoint().position,
+            wristFeedback.getSetpoint().velocity,
+            acceleration);
+    wrist.setVoltage(wristfb + wristff);
   }
 }

@@ -6,9 +6,7 @@ import edu.wpi.first.hal.SimInt;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI.SimValueInfo;
 import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
 
-/**
- * Sim class for interacting with the {@link CANSparkMax} HAL. Thank you 6738!
- */
+/** Sim class for interacting with the {@link CANSparkMax} HAL. Thank you 6738! */
 public class SparkMAXSim {
   private final SimDouble position, velocity, appliedOutput, motorCurrent;
   private final SimInt controlMode;
@@ -23,7 +21,7 @@ public class SparkMAXSim {
 
   /**
    * Creates a new SparkMAXSim instance.
-   * 
+   *
    * @param spark The spark max to simulate.
    */
   public SparkMAXSim(CANSparkMax spark) {
@@ -32,7 +30,7 @@ public class SparkMAXSim {
 
   /**
    * Creates a new SparkMAXSim instance.
-   * 
+   *
    * @param deviceID The id of the spark max to simulate.
    */
   public SparkMAXSim(int deviceID) {
