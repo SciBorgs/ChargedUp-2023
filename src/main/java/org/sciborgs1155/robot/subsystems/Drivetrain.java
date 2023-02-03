@@ -69,26 +69,28 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   @Log private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Sensors.PIGEON);
   private final ADIS16470_IMU imu = new ADIS16470_IMU();
 
-  // Odometry class for tracking robot pose
-  private final SwerveDrivePoseEstimator odometry =
-      new SwerveDrivePoseEstimator(
-          DriveConstants.KINEMATICS, getHeading(), getModulePositions(), new Pose2d());
-
-  private final PhotonCamera cam = new PhotonCamera(Vision.CAMERA_NAME);
-  private final AprilTagFieldLayout layout =
-      new AprilTagFieldLayout(Vision.TEST_TAGS, getTurnRate(), getPitch());
-  private final PhotonPoseEstimator visionOdometry =
-      new PhotonPoseEstimator(layout, PoseStrategy.LOWEST_AMBIGUITY, cam, Vision.ROBOT_TO_CAM);
+  // Odometry and pose estimation
+  private final PhotonCamera cam;
+  private final SwerveDrivePoseEstimator odometry;
+  private final AprilTagFieldLayout layout;
+  private final PhotonPoseEstimator visionOdometry;
 
   @Log private final Field2d field2d = new Field2d();
 
   private final FieldObject2d[] modules2d = new FieldObject2d[modules.length];
 
-  public Drivetrain() {
-    for (int i = 0; i < modules2d.length; i++) {
-      modules2d[i] = field2d.getObject("module-" + i);
-    }
+  public Drivetrain(PhotonCamera cam) {
+    this.cam = cam;
+    odometry =
+        new SwerveDrivePoseEstimator(
+            DriveConstants.KINEMATICS, getHeading(), getModulePositions(), new Pose2d());
+    layout = new AprilTagFieldLayout(Vision.TEST_TAGS, getTurnRate(), getPitch());
+    visionOdometry =
+        new PhotonPoseEstimator(layout, PoseStrategy.LOWEST_AMBIGUITY, cam, Vision.ROBOT_TO_CAM);
+
+    for (int i = 0; i < modules2d.length; i++) modules2d[i] = field2d.getObject("module-" + i);
   }
+
   /**
    * Returns the currently-estimated pose of the robot.
    *
