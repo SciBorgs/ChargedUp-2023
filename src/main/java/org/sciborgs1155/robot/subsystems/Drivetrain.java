@@ -243,17 +243,11 @@ public class Drivetrain extends SubsystemBase implements Loggable {
           double rawY = -xbox.getLeftX();
           double rawSpeed = Math.sqrt(rawX * rawX + rawY * rawY);
           double speedFactor = mapper.map(rawSpeed) / rawSpeed;
-          double mappedX = rawX * speedFactor;
-          double mappedY = rawY * speedFactor;
-      
           double rawOmega = -xbox.getRightX();
-          double mappedOmega = mapper.map(rawOmega);
-      
-          System.out.println(speedFactor);
           drive(
-              MathUtil.applyDeadband(mappedX, Constants.DEADBAND),
-              MathUtil.applyDeadband(mappedY, Constants.DEADBAND),
-              MathUtil.applyDeadband(mappedOmega, Constants.DEADBAND),
+              MathUtil.applyDeadband(rawX * speedFactor, Constants.DEADBAND),
+              MathUtil.applyDeadband(rawY * speedFactor, Constants.DEADBAND),
+              MathUtil.applyDeadband(mapper.map(rawOmega), Constants.DEADBAND),
               fieldRelative);
         });
   }
@@ -269,15 +263,11 @@ public class Drivetrain extends SubsystemBase implements Loggable {
           double rawY = -left.getX();
           double rawSpeed = Math.sqrt(rawX * rawX + rawY * rawY);
           double speedFactor = mapper.map(rawSpeed) / rawSpeed;
-          double mappedX = rawX * speedFactor;
-          double mappedY = rawY * speedFactor;
-
           double rawOmega = -right.getX();
-          double mappedOmega = mapper.map(rawOmega);
           drive(
-              MathUtil.applyDeadband(mappedX, Constants.DEADBAND),
-              MathUtil.applyDeadband(mappedY, Constants.DEADBAND),
-              MathUtil.applyDeadband(mappedOmega, Constants.DEADBAND),
+              MathUtil.applyDeadband(speedFactor * rawX, Constants.DEADBAND),
+              MathUtil.applyDeadband(speedFactor * rawY, Constants.DEADBAND),
+              MathUtil.applyDeadband(mapper.map(rawOmega), Constants.DEADBAND),
               fieldRelative);
         });
   }
