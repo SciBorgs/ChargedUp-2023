@@ -6,9 +6,13 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.sciborgs1155.lib.Visualizer;
+import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Constants.PlacementConstants.Elbow;
 import org.sciborgs1155.robot.Constants.PlacementConstants.Wrist;
@@ -36,13 +40,16 @@ public class Arm extends SubsystemBase {
   private double lastTime = Timer.getFPGATimestamp();
   private double acceleration = 0.0;
 
-  private Rotation2d elbowGoal;
-  private Rotation2d wristGoal;
+  private Rotation2d elbowGoal = new Rotation2d();
+  private Rotation2d wristGoal = new Rotation2d();
+
+  // simulation
+  private final SingleJointedArmSim elbowSim;
+  private final SingleJointedArmSim wristSim;
 
   public Arm(Visualizer visualizer) {
     this.visualizer = visualizer;
 
-    // great!
     wrist = Motors.WRIST.buildCanSparkMax(MotorType.kBrushless, ClawPorts.CLAW_WRIST);
     wristEncoder = wrist.getEncoder();
 
@@ -60,6 +67,28 @@ public class Arm extends SubsystemBase {
     elbowEncoder.setPositionConversionFactor(
         Elbow.GEAR_RATIO * Elbow.MOVEMENT_PER_SPIN); // what is movement per spin?
     elbowEncoder.setVelocityConversionFactor(Elbow.GEAR_RATIO);
+
+    elbowSim =
+        new SingleJointedArmSim(
+            DCMotor.getNEO(2),
+            1,
+            1,
+            Dimensions.FOREARM_LENGTH,
+            Dimensions.ELBOW_MIN_ANGLE,
+            Dimensions.ELBOW_MAX_ANGLE,
+            1,
+            true);
+
+    wristSim =
+        new SingleJointedArmSim(
+            DCMotor.getNeo550(1),
+            1,
+            1,
+            Dimensions.CLAW_LENGTH,
+            Dimensions.WRIST_MIN_ANGLE,
+            Dimensions.WRIST_MAX_ANGLE,
+            1,
+            true);
   }
 
   public void setElbowGoal(Rotation2d elbowGoal) {
@@ -103,5 +132,16 @@ public class Arm extends SubsystemBase {
     wrist.setVoltage(wristfb + wristff);
 
     visualizer.setArmAngles(elbowGoal, wristGoal);
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    elbowSim.setInputVoltage(elbowMotors.getAppliedOutput());
+    elbowSim.update(Constants.RATE);
+    wristSim.setInputVoltage(wrist.getAppliedOutput());
+    wristSim.update(Constants.RATE);
+    visualizer.setArmAngles(
+        Rotation2d.fromRadians(elbowSim.getAngleRads()),
+        Rotation2d.fromRadians(wristSim.getAngleRads()));
   }
 }

@@ -33,6 +33,8 @@ public final class Constants {
   public static final double CONTROLLER_RATE = 0.015; // controller tickrate
   public static final double DEADBAND = 0.06;
 
+  public static final String CAMERA_NAME = "photonvision";
+
   public static final class Motors {
     public static final MotorConfig DRIVE =
         MotorConfig.base()
@@ -59,8 +61,21 @@ public final class Constants {
         MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
   }
 
-  public static final class Vision {
-    public static final String CAMERA_NAME = "photonvision";
+  public static final class Dimensions {
+    // no clue what the actual constants are
+    public static final double ELEVATOR_HEIGHT = 10;
+    public static final double FOREARM_LENGTH = 5;
+    public static final double CLAW_LENGTH = 2;
+
+    public static final double ELBOW_MIN_ANGLE = Units.degreesToRadians(0);
+    public static final double ELBOW_MAX_ANGLE = Units.degreesToRadians(360);
+    public static final double WRIST_MIN_ANGLE = Units.degreesToRadians(-90);
+    public static final double WRIST_MAX_ANGLE = Units.degreesToRadians(90);
+
+    public static final double TRACK_WIDTH = Units.inchesToMeters(17);
+    // Distance between centers of right and left wheels on robot
+    public static final double WHEEL_BASE = Units.inchesToMeters(17);
+    // Distance between front and back wheels on robot
 
     public static final Translation3d CAM_TRANSLATION = new Translation3d();
     public static final Rotation3d CAM_ROTATION = new Rotation3d();
@@ -138,18 +153,11 @@ public final class Constants {
     public static final double MAX_SPEED = 7; // m / s
     public static final double MAX_ANGULAR_SPEED = 4 * Math.PI; // rad / s
 
-    // public static final double TRACK_WIDTH = 0.28;
-    public static final double TRACK_WIDTH = Units.inchesToMeters(17);
-    // Distance between centers of right and left wheels on robot
-    // public static final double WHEEL_BASE = 0.28;
-    public static final double WHEEL_BASE = Units.inchesToMeters(17);
-    // Distance between front and back wheels on robot
-
     public static final Translation2d[] MODULE_OFFSET = {
-      new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), // front left
-      new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), // front right
-      new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), // rear left
-      new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2) // rear right
+      new Translation2d(Dimensions.WHEEL_BASE / 2, Dimensions.TRACK_WIDTH / 2), // front left
+      new Translation2d(Dimensions.WHEEL_BASE / 2, -Dimensions.TRACK_WIDTH / 2), // front right
+      new Translation2d(-Dimensions.WHEEL_BASE / 2, Dimensions.TRACK_WIDTH / 2), // rear left
+      new Translation2d(-Dimensions.WHEEL_BASE / 2, -Dimensions.TRACK_WIDTH / 2) // rear right
     };
 
     public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(MODULE_OFFSET);
@@ -226,7 +234,6 @@ public final class Constants {
     public static final double P_X_CONTROLLER = 2;
     public static final double P_Y_CONTROLLER = 2;
     public static final double P_THETA_CONTROLLER = 4;
-    ;
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS =

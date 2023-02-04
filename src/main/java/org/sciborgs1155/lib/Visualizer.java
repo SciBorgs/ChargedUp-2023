@@ -1,15 +1,16 @@
 package org.sciborgs1155.lib;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
+import org.sciborgs1155.robot.Constants.Dimensions;
 
 /** Visualization class specific for our charged up bot */
-public class Visualizer implements Loggable {
-  @Log private final Mechanism2d mech;
+public class Visualizer implements Sendable {
+  private final Mechanism2d mech;
   private final MechanismRoot2d chassis;
   private final MechanismLigament2d elevatorMax;
   private final MechanismLigament2d elevatorProgress;
@@ -19,10 +20,13 @@ public class Visualizer implements Loggable {
   public Visualizer() {
     mech = new Mechanism2d(20, 50);
     chassis = mech.getRoot("Chassis", 10, 0);
-    elevatorMax = chassis.append(new MechanismLigament2d("Superstructure", 40, 90));
-    elevatorProgress = chassis.append(new MechanismLigament2d("Elevator", 30, 90));
-    forearm = elevatorProgress.append(new MechanismLigament2d("Forearm", 10, 30));
-    claw = forearm.append(new MechanismLigament2d("Wrist", 10, -10));
+    elevatorMax =
+        chassis.append(new MechanismLigament2d("Superstructure", Dimensions.ELEVATOR_HEIGHT, 90));
+    elevatorProgress =
+        chassis.append(new MechanismLigament2d("Elevator", Dimensions.ELEVATOR_HEIGHT / 2, 90));
+    forearm =
+        elevatorProgress.append(new MechanismLigament2d("Forearm", Dimensions.FOREARM_LENGTH, 30));
+    claw = forearm.append(new MechanismLigament2d("Wrist", Dimensions.CLAW_LENGTH, -10));
   }
 
   public void setElevatorHeight(double height) {
@@ -32,5 +36,10 @@ public class Visualizer implements Loggable {
   public void setArmAngles(Rotation2d elbow, Rotation2d wrist) {
     forearm.setAngle(elbow);
     claw.setAngle(wrist);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    mech.initSendable(builder);
   }
 }
