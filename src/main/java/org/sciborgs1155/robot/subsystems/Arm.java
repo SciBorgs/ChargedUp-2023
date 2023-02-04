@@ -101,5 +101,7 @@ public class Arm extends SubsystemBase {
             wristFeedback.getSetpoint().velocity,
             acceleration);
     wrist.setVoltage(wristfb + wristff);
+
+    visualizer.setArmAngles(elbowGoal, wristGoal);
   }
 }

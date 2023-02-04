@@ -26,7 +26,7 @@ public class Visualizer implements Loggable {
   }
 
   public void setElevatorHeight(double height) {
-    elevatorProgress.setAngle(height);
+    elevatorProgress.setLength(height);
   }
 
   public void setArmAngles(Rotation2d elbow, Rotation2d wrist) {
