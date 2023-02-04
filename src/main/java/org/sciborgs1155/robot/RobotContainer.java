@@ -14,6 +14,7 @@ import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drivetrain;
 import org.sciborgs1155.robot.subsystems.Elevator;
+import org.sciborgs1155.robot.subsystems.Intake;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -32,6 +33,7 @@ public class RobotContainer {
   private final Drivetrain drive = new Drivetrain(cam);
   private final Arm arm = new Arm(visualizer);
   private final Elevator elevator = new Elevator(visualizer);
+  private final Intake intake = new Intake();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController xbox = new CommandXboxController(OI.XBOX);

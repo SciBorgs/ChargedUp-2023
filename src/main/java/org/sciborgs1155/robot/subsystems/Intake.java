@@ -10,24 +10,21 @@ import org.sciborgs1155.robot.Ports.ClawPorts;
 
 public class Intake extends SubsystemBase {
 
-  private CANSparkMax wheels;
+  private final CANSparkMax wheels;
 
   public Intake() {
     wheels = Motors.INTAKE.buildCanSparkMax(MotorType.kBrushless, ClawPorts.CLAW_WHEELS);
   }
 
-  public void turnOnWheels() {
-    wheels.set(Constants.Intake.WHEEL_SPEED);
+  public Command start() {
+    return runOnce(() -> wheels.set(Constants.Intake.WHEEL_SPEED));
   }
 
-  public void stopWheels() {
-    wheels.set(0);
+  public Command stop() {
+    return runOnce(wheels::stopMotor);
   }
 
-  /*
-   * amazing
-   */
-  public Command runWheels() {
-    return this.startEnd(() -> this.turnOnWheels(), () -> this.stopWheels());
+  public Command run() {
+    return startEnd(() -> wheels.set(Constants.Intake.WHEEL_SPEED), wheels::stopMotor);
   }
 }
