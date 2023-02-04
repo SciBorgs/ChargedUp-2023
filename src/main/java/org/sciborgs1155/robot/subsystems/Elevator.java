@@ -10,6 +10,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
@@ -103,5 +104,9 @@ public class Elevator extends SubsystemBase implements Loggable {
     sim.setInputVoltage(motor.getAppliedOutput());
     sim.update(Constants.RATE);
     visualizer.setElevatorHeight(sim.getPositionMeters());
+  }
+
+  public Command run() {
+    return run(() -> setTargetHeight(height));
   }
 }
