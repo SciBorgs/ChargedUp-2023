@@ -50,7 +50,7 @@ public class Elevator extends SubsystemBase implements Loggable {
   public Elevator(Visualizer visualizer) {
 
     this.visualizer = visualizer;
-  
+
     motor =
         Motors.ELEVATOR.buildCanSparkMaxGearbox(MotorType.kBrushless, ElevatorPorts.ELEVATOR_PORTS);
     encoder = motor.getEncoder();
