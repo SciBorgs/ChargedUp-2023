@@ -5,17 +5,15 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
-import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
-
 import org.photonvision.PhotonCamera;
-import org.sciborgs1155.lib.Visualizer;
+// import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants.Vision;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
-import org.sciborgs1155.robot.subsystems.Arm;
+// import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drivetrain;
-import org.sciborgs1155.robot.subsystems.Elevator;
+// import org.sciborgs1155.robot.subsystems.Elevator;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -28,12 +26,12 @@ public class RobotContainer {
   private final PhotonCamera cam = new PhotonCamera(Vision.CAMERA_NAME);
 
   // Visualizer for elevator/arm simulation
-  private final Visualizer visualizer = new Visualizer();
+  // private final Visualizer visualizer = new Visualizer();
 
   // The robot's subsystems and commands are defined here...
   private final Drivetrain drive = new Drivetrain(cam);
-  private final Arm arm = new Arm(visualizer);
-  private final Elevator elevator = new Elevator(visualizer);
+  // private final Arm arm = new Arm(visualizer);
+  // private final Elevator elevator = new Elevator(visualizer);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController xbox = new CommandXboxController(OI.XBOX);
@@ -54,7 +52,7 @@ public class RobotContainer {
   }
 
   private void configureSubsystemDefaults() {
-    drive.setDefaultCommand(drive.drive(leftJoystick, rightJoystick, true));
+    drive.setDefaultCommand(drive.drive(xbox, true));
   }
 
   /**

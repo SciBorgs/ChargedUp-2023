@@ -27,6 +27,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.sciborgs1155.lib.ControllerOutputFunction;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.DriveConstants;
 import org.sciborgs1155.robot.Constants.Vision;
@@ -238,22 +239,45 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   public Command drive(CommandXboxController xbox, boolean fieldRelative) {
     return run(
         () -> {
+          double rawX = -xbox.getLeftY();
+          double rawY = -xbox.getLeftX();
+          double rawSpeed = Math.sqrt(rawX * rawX + rawY * rawY);
+          double speedFactor = mapper.map(rawSpeed) / rawSpeed;
+          double mappedX = rawX * speedFactor;
+          double mappedY = rawY * speedFactor;
+      
+          double rawOmega = -xbox.getRightX();
+          double mappedOmega = mapper.map(rawOmega);
+      
+          System.out.println(speedFactor);
           drive(
-              MathUtil.applyDeadband(-xbox.getLeftY(), Constants.DEADBAND),
-              MathUtil.applyDeadband(-xbox.getLeftX(), Constants.DEADBAND),
-              MathUtil.applyDeadband(-xbox.getRightX(), Constants.DEADBAND),
+              MathUtil.applyDeadband(mappedX, Constants.DEADBAND),
+              MathUtil.applyDeadband(mappedY, Constants.DEADBAND),
+              MathUtil.applyDeadband(mappedOmega, Constants.DEADBAND),
               fieldRelative);
         });
   }
 
+  // TODO replace
+  private static final ControllerOutputFunction mapper =
+      ControllerOutputFunction.powerExp(Math.E, Math.PI);
   /** Drive based on joysticks */
   public Command drive(CommandJoystick left, CommandJoystick right, boolean fieldRelative) {
     return run(
         () -> {
+          double rawX = -left.getY();
+          double rawY = -left.getX();
+          double rawSpeed = Math.sqrt(rawX * rawX + rawY * rawY);
+          double speedFactor = mapper.map(rawSpeed) / rawSpeed;
+          double mappedX = rawX * speedFactor;
+          double mappedY = rawY * speedFactor;
+
+          double rawOmega = -right.getX();
+          double mappedOmega = mapper.map(rawOmega);
           drive(
-              MathUtil.applyDeadband(-left.getY(), Constants.DEADBAND),
-              MathUtil.applyDeadband(-left.getX(), Constants.DEADBAND),
-              MathUtil.applyDeadband(-right.getX(), Constants.DEADBAND),
+              MathUtil.applyDeadband(mappedX, Constants.DEADBAND),
+              MathUtil.applyDeadband(mappedY, Constants.DEADBAND),
+              MathUtil.applyDeadband(mappedOmega, Constants.DEADBAND),
               fieldRelative);
         });
   }
