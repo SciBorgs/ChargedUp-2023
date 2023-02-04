@@ -109,7 +109,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
    * @return A Rotation2d of our angle
    */
   public Rotation2d getHeading() {
-    return Rotation2d.fromDegrees(-imu.getAngle());
+    return Rotation2d.fromDegrees(imu.getAngle());
   }
 
   /**
