@@ -99,6 +99,6 @@ public final class Autos implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-      chooser.initSendable(builder);
+    chooser.initSendable(builder);
   }
 }

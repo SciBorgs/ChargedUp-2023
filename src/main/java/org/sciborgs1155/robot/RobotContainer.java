@@ -5,9 +5,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
-import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
-
 import org.photonvision.PhotonCamera;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants.Vision;
