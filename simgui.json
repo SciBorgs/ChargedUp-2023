@@ -5,6 +5,11 @@
         "header": {
           "open": true
         }
+      },
+      "SPARK MAX [23]": {
+        "header": {
+          "open": true
+        }
       }
     }
   },
@@ -34,6 +39,7 @@
       "/Shuffleboard/Elevator/Visualizer/mech": "Mechanism2d",
       "/Shuffleboard/Elevator/beambreak": "Digital Input",
       "/Shuffleboard/Elevator/beambreakTwo": "Digital Input",
+      "/Shuffleboard/RobotContainer/visualizer": "Mechanism2d",
       "/Shuffleboard/SillySim/elbowPID": "PIDController",
       "/Shuffleboard/SillySim/mech2d": "Mechanism2d",
       "/Shuffleboard/SillySim/wristPID": "PIDController",
@@ -143,14 +149,14 @@
           "visible": true
         }
       },
+      "/Shuffleboard/RobotContainer/visualizer": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Shuffleboard/SillySim/mech2d": {
         "window": {
           "name": "Silly sim"
-        }
-      },
-      "/Shuffleboard/Visualizer/mech": {
-        "window": {
-          "visible": true
         }
       }
     }
@@ -182,12 +188,24 @@
           }
         },
         "Elevator": {
+          "Visualizer": {
+            "open": true
+          },
+          "beambreak": {
+            "open": true
+          },
           "open": true,
           "pid": {
             "open": true
           }
         },
         "RobotContainer": {
+          "open": true
+        },
+        "Visualizer": {
+          "mech": {
+            "open": true
+          },
           "open": true
         },
         "open": true

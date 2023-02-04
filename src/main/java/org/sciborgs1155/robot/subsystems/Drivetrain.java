@@ -28,8 +28,8 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.DriveConstants;
-import org.sciborgs1155.robot.Constants.Vision;
 import org.sciborgs1155.robot.Ports.DrivePorts;
 import org.sciborgs1155.robot.Ports.Sensors;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
@@ -84,9 +84,10 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     odometry =
         new SwerveDrivePoseEstimator(
             DriveConstants.KINEMATICS, getHeading(), getModulePositions(), new Pose2d());
-    layout = new AprilTagFieldLayout(Vision.TEST_TAGS, getTurnRate(), getPitch());
+    layout = new AprilTagFieldLayout(Dimensions.TEST_TAGS, getTurnRate(), getPitch());
     visionOdometry =
-        new PhotonPoseEstimator(layout, PoseStrategy.LOWEST_AMBIGUITY, cam, Vision.ROBOT_TO_CAM);
+        new PhotonPoseEstimator(
+            layout, PoseStrategy.LOWEST_AMBIGUITY, cam, Dimensions.ROBOT_TO_CAM);
 
     for (int i = 0; i < modules2d.length; i++) modules2d[i] = field2d.getObject("module-" + i);
   }

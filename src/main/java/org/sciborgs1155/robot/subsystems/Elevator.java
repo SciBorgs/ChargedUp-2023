@@ -5,15 +5,18 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Ports.ElevatorPorts;
 
@@ -27,7 +30,7 @@ public class Elevator extends SubsystemBase implements Loggable {
   private final RelativeEncoder encoder;
 
   private final ElevatorFeedforward ff;
-  @Log @Config private final ProfiledPIDController pid;
+  @Log private final ProfiledPIDController pid;
 
   // digital input
   @Log private final DigitalInput beambreak;
@@ -37,6 +40,9 @@ public class Elevator extends SubsystemBase implements Loggable {
   @Log private double height = 0;
   private double lastSpeed = 0;
   private double lastTime = Timer.getFPGATimestamp();
+
+  // simulation
+  private final ElevatorSim sim;
 
   public Elevator(Visualizer visualizer) {
 
@@ -61,6 +67,8 @@ public class Elevator extends SubsystemBase implements Loggable {
 
     beambreak = new DigitalInput(ElevatorPorts.BEAM_BREAK_PORTS[0]);
     beambreakTwo = new DigitalInput(ElevatorPorts.BEAM_BREAK_PORTS[1]);
+
+    sim = new ElevatorSim(DCMotor.getNEO(3), 1, 10, 0.2, 0, Dimensions.ELEVATOR_HEIGHT, true);
   }
 
   @Config
@@ -71,7 +79,6 @@ public class Elevator extends SubsystemBase implements Loggable {
   @Override
   public void periodic() {
     if (!beambreak.get() || !beambreakTwo.get()) {
-      // i'll add a derivative stream soon to make these calculations cleaner
       double acceleration =
           (pid.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - lastTime);
       double pidOutput = pid.calculate(encoder.getPosition(), height);
@@ -83,5 +90,12 @@ public class Elevator extends SubsystemBase implements Loggable {
       motor.stopMotor();
     }
     lastTime = Timer.getFPGATimestamp();
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    sim.setInputVoltage(motor.getAppliedOutput());
+    sim.update(Constants.RATE);
+    visualizer.setElevatorHeight(sim.getPositionMeters());
   }
 }

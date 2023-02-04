@@ -10,11 +10,6 @@ import org.sciborgs1155.robot.Ports.ClawPorts;
 
 public class Intake extends SubsystemBase {
 
-  /*
-   * I removed the leftover wrist code and renamed to intake, now it's literally just a motor
-   * simplemotorsubsystem fr
-   */
-
   private CANSparkMax wheels;
 
   public Intake() {
