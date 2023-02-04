@@ -174,13 +174,13 @@ public final class Constants {
       public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0; // m / s
       // public static final double ENCODER_VELOCITY_FACTOR = 1;
 
-      public static final double P = 0.07;
-      public static final double I = 0;
-      public static final double D = 0.06;
+      public static final double kP = 0.07;
+      public static final double kI = 0;
+      public static final double kD = 0.06;
 
-      public static final double S = 0.27;
-      public static final double V = 0.4;
-      public static final double A = 0.2;
+      public static final double kS = 0.27;
+      public static final double kV = 0.4;
+      public static final double kA = 0.2;
     }
 
     public static final class Turning {
@@ -192,14 +192,14 @@ public final class Constants {
       public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
       public static final double MAX_ANGULAR_ACCELERATION = 2 * Math.PI; // rad / s^2
 
-      public static final double P = 1.7;
-      public static final double I = 0;
-      public static final double D = 0.02;
+      public static final double kP = 1.7;
+      public static final double kI = 0;
+      public static final double kD = 0.02;
 
       // feedforward constants for simulation
-      public static final double S = 0.1;
-      public static final double V = 0.1;
-      public static final double A = 0.1;
+      public static final double kS = 0.1;
+      public static final double kV = 0.1;
+      public static final double kA = 0.1;
 
       // pid wrapping
       public static final double MIN_INPUT = 0;
@@ -208,25 +208,25 @@ public final class Constants {
   }
 
   public static final class AutoConstants {
-    public static final double MAX_SPEED = DriveConstants.MAX_SPEED; // m/s
-    public static final double MAX_ACCEL = 4; // m/s^2
-    public static final double MAX_ANG_SPEED = 1.5 * DriveConstants.MAX_ANGULAR_SPEED; // rad/s
-    public static final double MAX_ANG_ACCEL = Math.PI; // rad/s^2
-
-    public static final class X {
+    public static final class Cartesian {
       public static final double kP = 3.5;
+      public static final double kI = 0;
+      public static final double kD = 0;
+
+      public static final double MAX_SPEED = DriveConstants.MAX_SPEED; // m/s
+      public static final double MAX_ACCEL = 4; // m/s^2
     }
 
-    public static final class Y {
-      public static final double kP = 3.5; 
-    }
-    public static final double P_X_CONTROLLER = 3.5;
-    public static final double P_Y_CONTROLLER = 3.5;
-    public static final double P_THETA_CONTROLLER = 10;
-    ;
+    public static final class Angular {
+      public static final double kP = 10;
+      public static final double kI = 0;
+      public static final double kD = 1;
 
-    // Constraint for the motion profiled robot angle controller
-    public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS =
-        new TrapezoidProfile.Constraints(MAX_ANG_SPEED, MAX_ANG_ACCEL);
+      public static final double MAX_SPEED = 1.5 * DriveConstants.MAX_ANGULAR_SPEED; // rad/s
+      public static final double MAX_ACCEL = Math.PI; // rad/s^2
+
+      public static final TrapezoidProfile.Constraints CONSTRAINTS =
+          new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ACCEL);
+    }
   }
 }

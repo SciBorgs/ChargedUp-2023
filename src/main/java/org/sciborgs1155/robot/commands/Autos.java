@@ -14,11 +14,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import java.util.List;
-import org.sciborgs1155.robot.Constants.AutoConstants;
+import org.sciborgs1155.robot.Constants.AutoConstants.Angular;
+import org.sciborgs1155.robot.Constants.AutoConstants.Cartesian;
 import org.sciborgs1155.robot.Constants.DriveConstants;
 import org.sciborgs1155.robot.subsystems.Drivetrain;
 
@@ -30,10 +31,10 @@ public final class Autos {
   // }
 
   public static final TrajectoryConfig autoConfig =
-      new TrajectoryConfig(AutoConstants.MAX_SPEED, AutoConstants.MAX_ACCEL)
+      new TrajectoryConfig(Cartesian.MAX_SPEED, Cartesian.MAX_ACCEL)
           .setKinematics(DriveConstants.KINEMATICS);
 
-  public static CommandBase mobility(Drivetrain drive) {
+  public static Command mobility(Drivetrain drive) {
     return Commands.run(() -> drive.drive(0.5, 0, 0, false), drive).withTimeout(5);
   }
 
@@ -42,16 +43,16 @@ public final class Autos {
   //       drive, PathPlanner.loadPath(pathName, AutoConstants.MAX_SPEED, AutoConstants.MAX_ACCEL));
   // }
 
-  public static CommandBase followPath(Drivetrain drive, List<Pose2d> path) {
+  public static Command followPath(Drivetrain drive, List<Pose2d> path) {
     Trajectory generated = TrajectoryGenerator.generateTrajectory(path, autoConfig);
 
     return followTrajectory(drive, generated);
   }
 
-  public static CommandBase followPath(Drivetrain drive, String pathName) {
-    PIDController x = new PIDController(AutoConstants.P_X_CONTROLLER, 0, 0);
-    PIDController y = new PIDController(AutoConstants.P_Y_CONTROLLER, 0, 0);
-    PIDController rot = new PIDController(AutoConstants.P_THETA_CONTROLLER, 0, 1);
+  public static Command followPath(Drivetrain drive, String pathName) {
+    PIDController x = new PIDController(Cartesian.kP, Cartesian.kI, Cartesian.kD);
+    PIDController y = new PIDController(Cartesian.kP, Cartesian.kI, Cartesian.kD);
+    PIDController rot = new PIDController(Angular.kP, Angular.kI, Angular.kD);
     PathPlannerTrajectory loadedPath = PathPlanner.loadPath(pathName, new PathConstraints(5, 4));
 
     drive.resetOdometry(loadedPath.getInitialPose());
@@ -67,15 +68,11 @@ public final class Autos {
         drive);
   }
 
-  public static CommandBase followTrajectory(Drivetrain drive, Trajectory path) {
-    PIDController x = new PIDController(AutoConstants.P_X_CONTROLLER, 0, 0);
-    PIDController y = new PIDController(AutoConstants.P_Y_CONTROLLER, 0, 0);
+  public static Command followTrajectory(Drivetrain drive, Trajectory path) {
+    PIDController x = new PIDController(Cartesian.kP, Cartesian.kI, Cartesian.kD);
+    PIDController y = new PIDController(Cartesian.kP, Cartesian.kI, Cartesian.kD);
     ProfiledPIDController theta =
-        new ProfiledPIDController(
-            AutoConstants.P_THETA_CONTROLLER,
-            AutoConstants.MAX_SPEED,
-            AutoConstants.MAX_ACCEL,
-            AutoConstants.THETA_CONTROLLER_CONSTRAINTS);
+        new ProfiledPIDController(Angular.kP, Angular.kI, Angular.kD, Angular.CONSTRAINTS);
 
     drive.resetOdometry(path.getInitialPose());
 
@@ -95,4 +92,3 @@ public final class Autos {
     throw new UnsupportedOperationException("This is a utility class!");
   }
 }
-

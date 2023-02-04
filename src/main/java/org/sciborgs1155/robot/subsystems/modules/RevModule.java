@@ -52,7 +52,7 @@ public class RevModule implements SwerveModule, Sendable {
     driveFeedback.setFeedbackDevice(driveEncoder);
     turnFeedback.setFeedbackDevice(turningEncoder);
 
-    driveFeedforward = new SimpleMotorFeedforward(Driving.S, Driving.V, Driving.A);
+    driveFeedforward = new SimpleMotorFeedforward(Driving.kS, Driving.kV, Driving.kA);
 
     turningEncoder.setInverted(Turning.ENCODER_INVERTED);
 
@@ -60,9 +60,9 @@ public class RevModule implements SwerveModule, Sendable {
     driveEncoder.setPositionConversionFactor(Driving.ENCODER_POSITION_FACTOR);
     driveEncoder.setVelocityConversionFactor(Driving.ENCODER_VELOCITY_FACTOR);
 
-    driveFeedback.setP(Driving.P);
-    driveFeedback.setI(Driving.I);
-    driveFeedback.setD(Driving.D);
+    driveFeedback.setP(Driving.kP);
+    driveFeedback.setI(Driving.kI);
+    driveFeedback.setD(Driving.kD);
 
     turningEncoder.setPositionConversionFactor(Turning.ENCODER_POSITION_FACTOR);
     turningEncoder.setVelocityConversionFactor(Turning.ENCODER_VELOCITY_FACTOR);
@@ -72,9 +72,9 @@ public class RevModule implements SwerveModule, Sendable {
     turnFeedback.setPositionPIDWrappingMinInput(Turning.MIN_INPUT);
     turnFeedback.setPositionPIDWrappingMaxInput(Turning.MAX_INPUT);
 
-    turnFeedback.setP(Turning.P);
-    turnFeedback.setI(Turning.I);
-    turnFeedback.setD(Turning.D);
+    turnFeedback.setP(Turning.kP);
+    turnFeedback.setI(Turning.kI);
+    turnFeedback.setD(Turning.kD);
 
     // burning to flash again (already done in motor config, there's probably a nicer way)
     driveMotor.burnFlash();

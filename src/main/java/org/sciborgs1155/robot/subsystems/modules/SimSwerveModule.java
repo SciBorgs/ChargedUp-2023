@@ -34,14 +34,15 @@ public class SimSwerveModule implements SwerveModule, Sendable {
    * @param angularOffset offset from drivetrain
    */
   public SimSwerveModule() {
-    drive = new WheelSim(Driving.V, Driving.A, DCMotor.getNEO(1), Driving.ENCODER_VELOCITY_FACTOR);
+    drive =
+        new WheelSim(Driving.kV, Driving.kA, DCMotor.getNEO(1), Driving.ENCODER_VELOCITY_FACTOR);
     turn =
-        new WheelSim(Turning.V, Turning.A, DCMotor.getNeo550(1), Turning.ENCODER_POSITION_FACTOR);
+        new WheelSim(Turning.kV, Turning.kA, DCMotor.getNeo550(1), Turning.ENCODER_POSITION_FACTOR);
 
-    driveFeedback = new PIDController(Driving.P, Driving.I, Driving.D);
-    turnFeedback = new PIDController(Turning.P, Turning.I, Turning.D);
+    driveFeedback = new PIDController(Driving.kP, Driving.kI, Driving.kD);
+    turnFeedback = new PIDController(Turning.kP, Turning.kI, Turning.kD);
 
-    driveFeedforward = new SimpleMotorFeedforward(Driving.S, Driving.V, Driving.A);
+    driveFeedforward = new SimpleMotorFeedforward(Driving.kS, Driving.kV, Driving.kA);
 
     // set up continuous input for turning
     turnFeedback.enableContinuousInput(Turning.MIN_INPUT, Turning.MAX_INPUT);

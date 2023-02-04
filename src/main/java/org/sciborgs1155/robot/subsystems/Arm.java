@@ -37,7 +37,7 @@ public class Arm extends SubsystemBase {
   /*
    * What mechanism does this goal apply to???
    */
-  private Rotation2d goal;
+  private Rotation2d goal = new Rotation2d();
 
   /*
    * We want another goal for the second joint
