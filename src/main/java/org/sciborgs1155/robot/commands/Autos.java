@@ -4,7 +4,10 @@
 
 package org.sciborgs1155.robot.commands;
 
+import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -34,15 +37,34 @@ public final class Autos {
     return Commands.run(() -> drive.drive(0.5, 0, 0, false), drive).withTimeout(5);
   }
 
-  public static CommandBase followPath(Drivetrain drive, String pathName) {
-    return followTrajectory(
-        drive, PathPlanner.loadPath(pathName, AutoConstants.MAX_SPEED, AutoConstants.MAX_ACCEL));
-  }
+  // public static CommandBase followPath(Drivetrain drive, String pathName) {
+  //   return followTrajectory(
+  //       drive, PathPlanner.loadPath(pathName, AutoConstants.MAX_SPEED, AutoConstants.MAX_ACCEL));
+  // }
 
   public static CommandBase followPath(Drivetrain drive, List<Pose2d> path) {
     Trajectory generated = TrajectoryGenerator.generateTrajectory(path, autoConfig);
 
     return followTrajectory(drive, generated);
+  }
+
+  public static CommandBase followPath(Drivetrain drive, String pathName) {
+    PIDController x = new PIDController(AutoConstants.P_X_CONTROLLER, 0, 0);
+    PIDController y = new PIDController(AutoConstants.P_Y_CONTROLLER, 0, 0);
+    PIDController rot = new PIDController(AutoConstants.P_THETA_CONTROLLER, 0, 1);
+    PathPlannerTrajectory loadedPath = PathPlanner.loadPath(pathName, new PathConstraints(5, 4));
+
+    drive.resetOdometry(loadedPath.getInitialPose());
+    return new PPSwerveControllerCommand(
+        loadedPath,
+        drive::getPose,
+        DriveConstants.KINEMATICS,
+        x,
+        y,
+        rot,
+        drive::setModuleStates,
+        false,
+        drive);
   }
 
   public static CommandBase followTrajectory(Drivetrain drive, Trajectory path) {
@@ -73,3 +95,4 @@ public final class Autos {
     throw new UnsupportedOperationException("This is a utility class!");
   }
 }
+

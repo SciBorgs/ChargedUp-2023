@@ -213,9 +213,16 @@ public final class Constants {
     public static final double MAX_ANG_SPEED = 1.5 * DriveConstants.MAX_ANGULAR_SPEED; // rad/s
     public static final double MAX_ANG_ACCEL = Math.PI; // rad/s^2
 
-    public static final double P_X_CONTROLLER = 2;
-    public static final double P_Y_CONTROLLER = 2;
-    public static final double P_THETA_CONTROLLER = 4;
+    public static final class X {
+      public static final double kP = 3.5;
+    }
+
+    public static final class Y {
+      public static final double kP = 3.5; 
+    }
+    public static final double P_X_CONTROLLER = 3.5;
+    public static final double P_Y_CONTROLLER = 3.5;
+    public static final double P_THETA_CONTROLLER = 10;
     ;
 
     // Constraint for the motion profiled robot angle controller

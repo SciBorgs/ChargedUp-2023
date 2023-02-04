@@ -83,7 +83,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // Chain all commands given by autoSequence
 
-    return Autos.followPath(drive, "gamer");
+    return Autos.followPath(drive, "straight");
 
     // return autonSequence.stream()
     //     .reduce(Command::andThen)
