@@ -5,7 +5,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
-import java.util.List;
+import io.github.oblarg.oblog.annotations.Config;
+import io.github.oblarg.oblog.annotations.Log;
+
 import org.photonvision.PhotonCamera;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants.Vision;
@@ -38,8 +40,8 @@ public class RobotContainer {
   private final CommandJoystick leftJoystick = new CommandJoystick(OI.LEFT_STICK);
   private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
 
-  private List<Command> autonSequence =
-      List.of(Autos.mobility(drive), Autos.followPath(drive, "New Path"));
+  // Autos
+  @Log private final Autos autos = new Autos(drive);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -81,12 +83,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // Chain all commands given by autoSequence
-
-    return Autos.followPath(drive, "straight");
-
-    // return autonSequence.stream()
-    //     .reduce(Command::andThen)
-    //     .orElseGet(() -> new RunCommand(() -> {}));
+    return autos.get();
   }
 }

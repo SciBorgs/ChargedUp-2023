@@ -14,6 +14,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
@@ -23,33 +26,39 @@ import org.sciborgs1155.robot.Constants.AutoConstants.Cartesian;
 import org.sciborgs1155.robot.Constants.DriveConstants;
 import org.sciborgs1155.robot.subsystems.Drivetrain;
 
-public final class Autos {
-  /** Example static factory for an autonomous command. */
-  // public static CommandBase exampleAuto(ExampleSubsystem subsystem) {
-  // return Commands.sequence(subsystem.exampleMethodCommand(), new
-  // ExampleCommand(subsystem));
-  // }
+public final class Autos implements Sendable {
 
-  public static final TrajectoryConfig autoConfig =
+  private final Drivetrain drive;
+
+  private final SendableChooser<Command> chooser;
+
+  public Autos(Drivetrain drive) {
+    this.drive = drive;
+
+    chooser = new SendableChooser<>();
+    chooser.setDefaultOption("mobility", mobility());
+    chooser.addOption("other", followPath("New Path"));
+  }
+
+  private final TrajectoryConfig autoConfig =
       new TrajectoryConfig(Cartesian.MAX_SPEED, Cartesian.MAX_ACCEL)
           .setKinematics(DriveConstants.KINEMATICS);
 
-  public static Command mobility(Drivetrain drive) {
+  public Command get() {
+    return chooser.getSelected();
+  }
+
+  private Command mobility() {
     return Commands.run(() -> drive.drive(0.5, 0, 0, false), drive).withTimeout(5);
   }
 
-  // public static CommandBase followPath(Drivetrain drive, String pathName) {
-  //   return followTrajectory(
-  //       drive, PathPlanner.loadPath(pathName, AutoConstants.MAX_SPEED, AutoConstants.MAX_ACCEL));
-  // }
-
-  public static Command followPath(Drivetrain drive, List<Pose2d> path) {
+  private Command followPath(List<Pose2d> path) {
     Trajectory generated = TrajectoryGenerator.generateTrajectory(path, autoConfig);
 
-    return followTrajectory(drive, generated);
+    return followTrajectory(generated);
   }
 
-  public static Command followPath(Drivetrain drive, String pathName) {
+  private Command followPath(String pathName) {
     PIDController x = new PIDController(Cartesian.kP, Cartesian.kI, Cartesian.kD);
     PIDController y = new PIDController(Cartesian.kP, Cartesian.kI, Cartesian.kD);
     PIDController rot = new PIDController(Angular.kP, Angular.kI, Angular.kD);
@@ -68,7 +77,7 @@ public final class Autos {
         drive);
   }
 
-  public static Command followTrajectory(Drivetrain drive, Trajectory path) {
+  private Command followTrajectory(Trajectory path) {
     PIDController x = new PIDController(Cartesian.kP, Cartesian.kI, Cartesian.kD);
     PIDController y = new PIDController(Cartesian.kP, Cartesian.kI, Cartesian.kD);
     ProfiledPIDController theta =
@@ -88,7 +97,8 @@ public final class Autos {
         .andThen(drive.stop());
   }
 
-  private Autos() {
-    throw new UnsupportedOperationException("This is a utility class!");
+  @Override
+  public void initSendable(SendableBuilder builder) {
+      chooser.initSendable(builder);
   }
 }

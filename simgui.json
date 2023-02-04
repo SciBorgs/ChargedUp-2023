@@ -31,6 +31,7 @@
       "/Shuffleboard/Drivetrain/gyro": "Gyro",
       "/Shuffleboard/Drivetrain/rearLeft": "PIDController",
       "/Shuffleboard/Drivetrain/rearRight": "PIDController",
+      "/Shuffleboard/RobotContainer/autos": "String Chooser",
       "/Shuffleboard/SillySim/elbowPID": "PIDController",
       "/Shuffleboard/SillySim/mech2d": "Mechanism2d",
       "/Shuffleboard/SillySim/wristPID": "PIDController",
@@ -167,7 +168,6 @@
           "frontRight": {
             "open": true
           },
-          "open": true,
           "rearLeft": {
             "open": true
           },
@@ -176,6 +176,9 @@
           }
         },
         "RobotContainer": {
+          "autos": {
+            "open": true
+          },
           "open": true
         },
         "open": true
