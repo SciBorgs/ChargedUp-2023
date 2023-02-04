@@ -36,6 +36,9 @@ public class Elevator extends SubsystemBase implements Loggable {
   @Log private final DigitalInput beambreak;
   @Log private final DigitalInput beambreakTwo;
 
+  @Log private final DigitalInput limitSwitchOne;
+  @Log private final DigitalInput limitSwitchTwo;
+
   // goal height
   @Log private double height = 0;
   private double lastSpeed = 0;
@@ -47,7 +50,7 @@ public class Elevator extends SubsystemBase implements Loggable {
   public Elevator(Visualizer visualizer) {
 
     this.visualizer = visualizer;
-
+  
     motor =
         Motors.ELEVATOR.buildCanSparkMaxGearbox(MotorType.kBrushless, ElevatorPorts.ELEVATOR_PORTS);
     encoder = motor.getEncoder();
@@ -68,6 +71,9 @@ public class Elevator extends SubsystemBase implements Loggable {
     beambreak = new DigitalInput(ElevatorPorts.BEAM_BREAK_PORTS[0]);
     beambreakTwo = new DigitalInput(ElevatorPorts.BEAM_BREAK_PORTS[1]);
 
+    limitSwitchOne = new DigitalInput(ElevatorPorts.LIMIT_SWITCH_PORTS[0]);
+    limitSwitchTwo = new DigitalInput(ElevatorPorts.LIMIT_SWITCH_PORTS[1]);
+
     sim = new ElevatorSim(DCMotor.getNEO(3), 1, 10, 0.2, 0, Dimensions.ELEVATOR_HEIGHT, true);
   }
 
@@ -78,7 +84,7 @@ public class Elevator extends SubsystemBase implements Loggable {
 
   @Override
   public void periodic() {
-    if (!beambreak.get() || !beambreakTwo.get()) {
+    if (!beambreak.get() || !beambreakTwo.get() || !limitSwitchOne.get() || !limitSwitchOne.get()) {
       double acceleration =
           (pid.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - lastTime);
       double pidOutput = pid.calculate(encoder.getPosition(), height);
