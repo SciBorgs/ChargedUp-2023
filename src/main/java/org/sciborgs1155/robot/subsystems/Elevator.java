@@ -24,54 +24,40 @@ import org.sciborgs1155.robot.Constants.Motors;
 
 public class Elevator extends SubsystemBase implements Loggable {
 
-  private final CANSparkMax lead, left, right;
-  private final RelativeEncoder encoder;
+  private final CANSparkMax lead = Motors.ELEVATOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
+  private final CANSparkMax left = Motors.ELEVATOR.build(MotorType.kBrushless, LEFT_MOTOR);
+  private final CANSparkMax right = Motors.ELEVATOR.build(MotorType.kBrushless, RIGHT_MOTOR);
 
-  private final ElevatorFeedforward ff;
-  @Log private final ProfiledPIDController pid;
+  private final RelativeEncoder encoder = lead.getEncoder();
+
+  private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
+  @Log private final ProfiledPIDController pid = new ProfiledPIDController(kP, kI, kD, CONSTRAINTS);
 
   // digital input
-  @Log private final DigitalInput beambreak;
-  @Log private final DigitalInput beambreakTwo;
+  @Log private final DigitalInput beambreak = new DigitalInput(BEAM_BREAK_PORTS[0]);
+  @Log private final DigitalInput beambreakTwo = new DigitalInput(BEAM_BREAK_PORTS[1]);
 
-  @Log private final DigitalInput limitSwitchOne;
-  @Log private final DigitalInput limitSwitchTwo;
+  @Log private final DigitalInput limitSwitchOne = new DigitalInput(LIMIT_SWITCH_PORTS[0]);
+  @Log private final DigitalInput limitSwitchTwo = new DigitalInput(LIMIT_SWITCH_PORTS[1]);
 
   @Log private double targetHeight = 0;
 
-  private final Derivative accel;
+  private final Derivative accel = new Derivative();
 
   // simulation
-  private final ElevatorSim sim;
+  private final ElevatorSim sim =
+      new ElevatorSim(
+          DCMotor.getNEO(3),
+          10,
+          4,
+          Units.inchesToMeters(2),
+          Dimensions.ELEVATOR_MIN_HEIGHT,
+          Dimensions.ELEVATOR_MAX_HEIGHT,
+          true);
 
   public Elevator() {
-    lead = Motors.ELEVATOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
-    left = Motors.ELEVATOR.build(MotorType.kBrushless, LEFT_MOTOR);
-    right = Motors.ELEVATOR.build(MotorType.kBrushless, RIGHT_MOTOR);
     left.follow(lead);
     right.follow(lead);
-    encoder = lead.getEncoder();
-
-    ff = new ElevatorFeedforward(kS, kG, kV, kA);
-    pid = new ProfiledPIDController(kP, kI, kD, CONSTRAINTS);
-
-    beambreak = new DigitalInput(BEAM_BREAK_PORTS[0]);
-    beambreakTwo = new DigitalInput(BEAM_BREAK_PORTS[1]);
-
-    limitSwitchOne = new DigitalInput(LIMIT_SWITCH_PORTS[0]);
-    limitSwitchTwo = new DigitalInput(LIMIT_SWITCH_PORTS[1]);
-
-    accel = new Derivative();
-
-    sim =
-        new ElevatorSim(
-            DCMotor.getNEO(3),
-            10,
-            4,
-            Units.inchesToMeters(2),
-            Dimensions.ELEVATOR_MIN_HEIGHT,
-            Dimensions.ELEVATOR_MAX_HEIGHT,
-            true);
   }
 
   public double getHeight() {

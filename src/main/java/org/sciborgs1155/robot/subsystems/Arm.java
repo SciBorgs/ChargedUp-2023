@@ -22,68 +22,56 @@ import org.sciborgs1155.robot.Constants.Motors;
 
 public class Arm extends SubsystemBase implements Loggable {
 
-  private final CANSparkMax wrist;
-  private final RelativeEncoder wristEncoder;
+  private final CANSparkMax wrist = Motors.WRIST.build(MotorType.kBrushless, WRIST_MOTOR);
+  private final CANSparkMax elbowLead = Motors.ELBOW.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
+  private final CANSparkMax elbowFollow =
+      Motors.ELBOW.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
 
-  private final ProfiledPIDController wristFeedback;
-  private final ArmFeedforward wristFeedforward;
+  private final RelativeEncoder wristEncoder = wrist.getEncoder();
+  private final RelativeEncoder elbowEncoder = elbowLead.getEncoder();
 
-  private final CANSparkMax elbowLead, elbowFollow;
-  private final RelativeEncoder elbowEncoder;
+  private final ProfiledPIDController wristFeedback =
+      new ProfiledPIDController(Wrist.kP, Wrist.kI, Wrist.kD, Wrist.CONSTRAINTS);
+  private final ProfiledPIDController elbowFeedback =
+      new ProfiledPIDController(Elbow.kP, Elbow.kI, Elbow.kD, Elbow.CONSTRAINTS);
 
-  private final ArmFeedforward elbowFeedforward;
-  private final ProfiledPIDController elbowFeedback;
-
-  private Derivative elbowAccel = new Derivative();
+  private final ArmFeedforward wristFeedforward =
+      new ArmFeedforward(Wrist.kS, Wrist.kG, Wrist.kV, Wrist.kA);
+  private final ArmFeedforward elbowFeedforward =
+      new ArmFeedforward(Elbow.kS, Elbow.kG, Elbow.kV, Elbow.kA);
 
   private Derivative wristAccel = new Derivative();
+  private Derivative elbowAccel = new Derivative();
 
-  private Rotation2d elbowGoal = new Rotation2d();
   private Rotation2d wristGoal = new Rotation2d();
+  private Rotation2d elbowGoal = new Rotation2d();
 
-  // simulation
-  private final SingleJointedArmSim elbowSim;
-  private final SingleJointedArmSim wristSim;
+  private final SingleJointedArmSim elbowSim =
+      new SingleJointedArmSim(
+          DCMotor.getNEO(2),
+          1,
+          1,
+          Dimensions.FOREARM_LENGTH,
+          Dimensions.ELBOW_MIN_ANGLE,
+          Dimensions.ELBOW_MAX_ANGLE,
+          1,
+          true);
+  private final SingleJointedArmSim wristSim =
+      new SingleJointedArmSim(
+          DCMotor.getNeo550(1),
+          1,
+          1,
+          Dimensions.CLAW_LENGTH,
+          Dimensions.WRIST_MIN_ANGLE,
+          Dimensions.WRIST_MAX_ANGLE,
+          1,
+          true);
 
   public Arm() {
-    wrist = Motors.WRIST.build(MotorType.kBrushless, WRIST_MOTOR);
-    wristEncoder = wrist.getEncoder();
-
-    wristFeedback = new ProfiledPIDController(Wrist.kP, Wrist.kI, Wrist.kD, Wrist.CONSTRAINTS);
-    wristFeedforward = new ArmFeedforward(Wrist.kS, Wrist.kG, Wrist.kV, Wrist.kA);
-
-    elbowLead = Motors.ELBOW.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
-    elbowFollow = Motors.ELBOW.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
-    elbowEncoder = elbowLead.getEncoder();
     elbowFollow.follow(elbowLead);
-
-    elbowFeedforward = new ArmFeedforward(Elbow.kS, Elbow.kG, Elbow.kV, Elbow.kA);
-    elbowFeedback = new ProfiledPIDController(Elbow.kP, Elbow.kI, Elbow.kD, Elbow.CONSTRAINTS);
 
     elbowEncoder.setPositionConversionFactor(Elbow.GEAR_RATIO * Elbow.MOVEMENT_PER_SPIN);
     elbowEncoder.setVelocityConversionFactor(Elbow.GEAR_RATIO);
-
-    elbowSim =
-        new SingleJointedArmSim(
-            DCMotor.getNEO(2),
-            1,
-            1,
-            Dimensions.FOREARM_LENGTH,
-            Dimensions.ELBOW_MIN_ANGLE,
-            Dimensions.ELBOW_MAX_ANGLE,
-            1,
-            true);
-
-    wristSim =
-        new SingleJointedArmSim(
-            DCMotor.getNeo550(1),
-            1,
-            1,
-            Dimensions.CLAW_LENGTH,
-            Dimensions.WRIST_MIN_ANGLE,
-            Dimensions.WRIST_MAX_ANGLE,
-            1,
-            true);
   }
 
   public Rotation2d getElbowPosition() {

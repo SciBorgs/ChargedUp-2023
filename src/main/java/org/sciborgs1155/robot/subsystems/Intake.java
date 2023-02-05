@@ -11,11 +11,7 @@ import org.sciborgs1155.robot.Constants.Motors;
 
 public class Intake extends SubsystemBase {
 
-  private final CANSparkMax wheels;
-
-  public Intake() {
-    wheels = Motors.INTAKE.build(MotorType.kBrushless, WHEEL_MOTOR);
-  }
+  private final CANSparkMax wheels = Motors.INTAKE.build(MotorType.kBrushless, WHEEL_MOTOR);
 
   public Command start() {
     return runOnce(() -> wheels.set(WHEEL_SPEED));
