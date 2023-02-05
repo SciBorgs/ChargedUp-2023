@@ -10,6 +10,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
@@ -35,6 +36,9 @@ public class Elevator extends SubsystemBase implements Loggable {
   // digital input
   @Log private final DigitalInput beambreak;
   @Log private final DigitalInput beambreakTwo;
+
+  @Log private final DigitalInput limitSwitchOne;
+  @Log private final DigitalInput limitSwitchTwo;
 
   // goal height
   @Log private double height = 0;
@@ -68,6 +72,9 @@ public class Elevator extends SubsystemBase implements Loggable {
     beambreak = new DigitalInput(ElevatorPorts.BEAM_BREAK_PORTS[0]);
     beambreakTwo = new DigitalInput(ElevatorPorts.BEAM_BREAK_PORTS[1]);
 
+    limitSwitchOne = new DigitalInput(ElevatorPorts.LIMIT_SWITCH_PORTS[0]);
+    limitSwitchTwo = new DigitalInput(ElevatorPorts.LIMIT_SWITCH_PORTS[1]);
+
     sim = new ElevatorSim(DCMotor.getNEO(3), 1, 10, 0.2, 0, Dimensions.ELEVATOR_HEIGHT, true);
   }
 
@@ -78,7 +85,7 @@ public class Elevator extends SubsystemBase implements Loggable {
 
   @Override
   public void periodic() {
-    if (!beambreak.get() || !beambreakTwo.get()) {
+    if (!beambreak.get() || !beambreakTwo.get() || !limitSwitchOne.get() || !limitSwitchOne.get()) {
       double acceleration =
           (pid.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - lastTime);
       double pidOutput = pid.calculate(encoder.getPosition(), height);
@@ -97,5 +104,9 @@ public class Elevator extends SubsystemBase implements Loggable {
     sim.setInputVoltage(motor.getAppliedOutput());
     sim.update(Constants.RATE);
     visualizer.setElevatorHeight(sim.getPositionMeters());
+  }
+
+  public Command run() {
+    return run(() -> setTargetHeight(height));
   }
 }
