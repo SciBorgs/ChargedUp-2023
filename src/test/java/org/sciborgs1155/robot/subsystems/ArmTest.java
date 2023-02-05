@@ -7,11 +7,17 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import org.junit.jupiter.api.*;
 
 public class ArmTest {
-  static Arm arm = new Arm();
+  static Arm arm;
 
   @BeforeEach
   void setup() {
     assert HAL.initialize(500, 0);
+    arm = new Arm();
+  }
+
+  @AfterEach
+  void reset() {
+    arm.close();
   }
 
   @Test

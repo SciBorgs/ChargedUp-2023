@@ -20,7 +20,7 @@ import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
 
-public class Arm extends SubsystemBase implements Loggable {
+public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   private final CANSparkMax wrist = Motors.WRIST.build(MotorType.kBrushless, WRIST_MOTOR);
   private final CANSparkMax elbowLead = Motors.ELBOW.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
@@ -69,6 +69,13 @@ public class Arm extends SubsystemBase implements Loggable {
 
     elbowEncoder.setPositionConversionFactor(Elbow.GEAR_RATIO * Elbow.MOVEMENT_PER_SPIN);
     elbowEncoder.setVelocityConversionFactor(Elbow.GEAR_RATIO);
+  }
+
+  @Override
+  public void close() {
+    wrist.close();
+    elbowLead.close();
+    elbowFollow.close();
   }
 
   public Rotation2d getElbowPosition() {
