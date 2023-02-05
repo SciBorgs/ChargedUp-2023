@@ -1,5 +1,7 @@
 package org.sciborgs1155.robot.subsystems.modules;
 
+import static org.sciborgs1155.robot.Constants.SwerveModule.*;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.controller.PIDController;
@@ -12,8 +14,6 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import org.sciborgs1155.lib.WheelSim;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Constants.ModuleConstants.Driving;
-import org.sciborgs1155.robot.Constants.ModuleConstants.Turning;
 
 /** Class to encapsulate a rev max swerve module */
 public class SimSwerveModule implements SwerveModule, Sendable {

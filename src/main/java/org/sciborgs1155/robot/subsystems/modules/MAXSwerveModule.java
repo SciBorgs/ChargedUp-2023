@@ -1,5 +1,7 @@
 package org.sciborgs1155.robot.subsystems.modules;
 
+import static org.sciborgs1155.robot.Constants.SwerveModule.*;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -13,8 +15,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import org.sciborgs1155.robot.Constants.ModuleConstants.Driving;
-import org.sciborgs1155.robot.Constants.ModuleConstants.Turning;
 import org.sciborgs1155.robot.Constants.Motors;
 
 /** Class to encapsulate a rev max swerve module */

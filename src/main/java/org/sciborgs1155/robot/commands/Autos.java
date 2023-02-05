@@ -23,16 +23,15 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import java.util.List;
 import org.sciborgs1155.robot.Constants.AutoConstants.Angular;
 import org.sciborgs1155.robot.Constants.AutoConstants.Cartesian;
-import org.sciborgs1155.robot.Constants.DriveConstants;
-import org.sciborgs1155.robot.subsystems.Drivetrain;
+import org.sciborgs1155.robot.subsystems.Drive;
 
 public final class Autos implements Sendable {
 
-  private final Drivetrain drive;
+  private final Drive drive;
 
   private final SendableChooser<Command> chooser;
 
-  public Autos(Drivetrain drive) {
+  public Autos(Drive drive) {
     this.drive = drive;
 
     chooser = new SendableChooser<>();
@@ -42,7 +41,7 @@ public final class Autos implements Sendable {
 
   private final TrajectoryConfig autoConfig =
       new TrajectoryConfig(Cartesian.MAX_SPEED, Cartesian.MAX_ACCEL)
-          .setKinematics(DriveConstants.KINEMATICS);
+          .setKinematics(Drive.KINEMATICS);
 
   public Command get() {
     return chooser.getSelected();
@@ -68,7 +67,7 @@ public final class Autos implements Sendable {
     return new PPSwerveControllerCommand(
             loadedPath,
             drive::getPose,
-            DriveConstants.KINEMATICS,
+            Drive.KINEMATICS,
             x,
             y,
             rot,
@@ -87,14 +86,7 @@ public final class Autos implements Sendable {
     drive.resetOdometry(path.getInitialPose());
 
     return new SwerveControllerCommand(
-            path,
-            drive::getPose,
-            DriveConstants.KINEMATICS,
-            x,
-            y,
-            theta,
-            drive::setModuleStates,
-            drive)
+            path, drive::getPose, Drive.KINEMATICS, x, y, theta, drive::setModuleStates, drive)
         .andThen(drive.stop());
   }
 

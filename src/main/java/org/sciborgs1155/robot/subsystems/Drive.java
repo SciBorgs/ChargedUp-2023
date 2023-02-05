@@ -1,5 +1,8 @@
 package org.sciborgs1155.robot.subsystems;
 
+import static org.sciborgs1155.robot.Constants.Drive.*;
+import static org.sciborgs1155.robot.Ports.Drive.*;
+
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.MathUtil;
@@ -29,40 +32,26 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.ControllerOutputFunction;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Constants.DriveConstants;
 import org.sciborgs1155.robot.Constants.Vision;
-import org.sciborgs1155.robot.Ports.DrivePorts;
 import org.sciborgs1155.robot.Ports.Sensors;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 
-public class Drivetrain extends SubsystemBase implements Loggable {
+public class Drive extends SubsystemBase implements Loggable {
   @Log
   private final SwerveModule frontLeft =
-      SwerveModule.create(
-          DrivePorts.FRONT_LEFT_DRIVE,
-          DrivePorts.FRONT_LEFT_TURNING,
-          DriveConstants.ANGULAR_OFFSETS[0]);
+      SwerveModule.create(FRONT_LEFT_DRIVE, FRONT_LEFT_TURNING, ANGULAR_OFFSETS[0]);
 
   @Log
   private final SwerveModule frontRight =
-      SwerveModule.create(
-          DrivePorts.FRONT_RIGHT_DRIVE,
-          DrivePorts.FRONT_RIGHT_TURNING,
-          DriveConstants.ANGULAR_OFFSETS[1]);
+      SwerveModule.create(FRONT_RIGHT_DRIVE, FRONT_RIGHT_TURNING, ANGULAR_OFFSETS[1]);
 
   @Log
   private final SwerveModule rearLeft =
-      SwerveModule.create(
-          DrivePorts.REAR_LEFT_DRIVE,
-          DrivePorts.REAR_LEFT_TURNING,
-          DriveConstants.ANGULAR_OFFSETS[2]);
+      SwerveModule.create(REAR_LEFT_DRIVE, REAR_LEFT_TURNING, ANGULAR_OFFSETS[2]);
 
   @Log
   private final SwerveModule rearRight =
-      SwerveModule.create(
-          DrivePorts.REAR_RIGHT_DRIVE,
-          DrivePorts.REAR_RIGHT_TURNING,
-          DriveConstants.ANGULAR_OFFSETS[3]);
+      SwerveModule.create(REAR_RIGHT_DRIVE, REAR_RIGHT_TURNING, ANGULAR_OFFSETS[3]);
 
   private final SwerveModule[] modules = {frontLeft, frontRight, rearLeft, rearRight};
 
@@ -73,8 +62,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
   // Odometry and pose estimation
   private final PhotonCamera cam;
   private final SwerveDrivePoseEstimator odometry =
-      new SwerveDrivePoseEstimator(
-          DriveConstants.KINEMATICS, getHeading(), getModulePositions(), new Pose2d());
+      new SwerveDrivePoseEstimator(KINEMATICS, getHeading(), getModulePositions(), new Pose2d());
   private final AprilTagFieldLayout layout =
       new AprilTagFieldLayout(Vision.TEST_TAGS, getTurnRate(), getPitch());
   private final PhotonPoseEstimator visionOdometry;
@@ -83,7 +71,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   private final FieldObject2d[] modules2d = new FieldObject2d[modules.length];
 
-  public Drivetrain(PhotonCamera cam) {
+  public Drive(PhotonCamera cam) {
     this.cam = cam;
     visionOdometry =
         new PhotonPoseEstimator(layout, PoseStrategy.LOWEST_AMBIGUITY, cam, Vision.ROBOT_TO_CAM);
@@ -130,12 +118,12 @@ public class Drivetrain extends SubsystemBase implements Loggable {
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     // scale inputs based on maximum values
-    xSpeed *= DriveConstants.MAX_SPEED;
-    ySpeed *= DriveConstants.MAX_SPEED;
-    rot *= DriveConstants.MAX_ANGULAR_SPEED;
+    xSpeed *= MAX_SPEED;
+    ySpeed *= MAX_SPEED;
+    rot *= MAX_ANGULAR_SPEED;
 
     var states =
-        DriveConstants.KINEMATICS.toSwerveModuleStates(
+        KINEMATICS.toSwerveModuleStates(
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getHeading())
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
@@ -153,7 +141,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
       throw new IllegalArgumentException("desiredStates must have the same length as modules");
     }
 
-    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.MAX_SPEED);
+    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, MAX_SPEED);
     for (int i = 0; i < modules.length; i++) {
       modules[i].setDesiredState(desiredStates[i]);
     }
@@ -186,7 +174,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
    */
   @Log
   public double getTurnRate() {
-    return gyro.getRate() * (DriveConstants.GYRO_REVERSED ? -1.0 : 1.0);
+    return gyro.getRate() * (GYRO_REVERSED ? -1.0 : 1.0);
   }
 
   /**
@@ -219,8 +207,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     updateOdometry();
     field2d.setRobotPose(getPose());
     for (int i = 0; i < modules2d.length; i++) {
-      var transform =
-          new Transform2d(DriveConstants.MODULE_OFFSET[i], modules[i].getPosition().angle);
+      var transform = new Transform2d(MODULE_OFFSET[i], modules[i].getPosition().angle);
       modules2d[i].setPose(getPose().transformBy(transform));
     }
   }
@@ -230,7 +217,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
     gyro.getSimCollection()
         .addHeading(
             Units.radiansToDegrees(
-                DriveConstants.KINEMATICS.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
+                KINEMATICS.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
                     * Constants.RATE));
   }
 
@@ -285,6 +272,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
           new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
           new SwerveModuleState(0, Rotation2d.fromDegrees(45))
         };
-    return runOnce(() -> setModuleStates(states));
+    return run(() -> setModuleStates(states));
   }
 }

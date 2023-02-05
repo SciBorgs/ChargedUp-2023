@@ -8,7 +8,7 @@ public final class Ports {
     public static final int RIGHT_STICK = 2;
   }
 
-  public static final class DrivePorts {
+  public static final class Drive {
     public static final int FRONT_LEFT_DRIVE = 38;
     public static final int REAR_LEFT_DRIVE = 1;
     public static final int FRONT_RIGHT_DRIVE = 5;

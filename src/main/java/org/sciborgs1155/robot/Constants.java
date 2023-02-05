@@ -123,7 +123,7 @@ public final class Constants {
     }
   }
 
-  public static final class DriveConstants {
+  public static final class Drive {
 
     public static final double MAX_SPEED = 7; // m / s
     public static final double MAX_ANGULAR_SPEED = 4 * Math.PI; // rad / s
@@ -156,7 +156,7 @@ public final class Constants {
     };
   }
 
-  public static final class ModuleConstants {
+  public static final class SwerveModule {
 
     // we use a 14T pinion
     public static final int PINION_TEETH = 14;
@@ -213,7 +213,7 @@ public final class Constants {
       public static final double kI = 0;
       public static final double kD = 0;
 
-      public static final double MAX_SPEED = DriveConstants.MAX_SPEED; // m/s
+      public static final double MAX_SPEED = Drive.MAX_SPEED; // m/s
       public static final double MAX_ACCEL = 4; // m/s^2
     }
 
@@ -222,7 +222,7 @@ public final class Constants {
       public static final double kI = 0;
       public static final double kD = 1;
 
-      public static final double MAX_SPEED = 1.5 * DriveConstants.MAX_ANGULAR_SPEED; // rad/s
+      public static final double MAX_SPEED = 1.5 * Drive.MAX_ANGULAR_SPEED; // rad/s
       public static final double MAX_ACCEL = Math.PI; // rad/s^2
 
       public static final TrapezoidProfile.Constraints CONSTRAINTS =
