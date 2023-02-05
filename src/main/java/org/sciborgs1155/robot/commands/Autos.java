@@ -4,8 +4,6 @@
 
 package org.sciborgs1155.robot.commands;
 
-import static org.sciborgs1155.robot.Constants.Auto.*;
-
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -27,10 +25,6 @@ public final class Autos implements Sendable {
     chooser.addOption("other", drive.follow("New Path"));
   }
 
-  // private final TrajectoryConfig autoConfig =
-  //     new TrajectoryConfig(Cartesian.MAX_SPEED, Cartesian.MAX_ACCEL)
-  //         .setKinematics(Drive.KINEMATICS);
-
   public Command get() {
     return chooser.getSelected();
   }
@@ -38,45 +32,6 @@ public final class Autos implements Sendable {
   private Command mobility() {
     return Commands.run(() -> drive.drive(0.5, 0, 0, false), drive).withTimeout(5);
   }
-
-  // private Command followPath(List<Pose2d> path) {
-  //   Trajectory generated = TrajectoryGenerator.generateTrajectory(path, autoConfig);
-
-  //   return followTrajectory(generated);
-  // }
-
-  // private Command followPath(String pathName) {
-  //   PIDController x = new PIDController(Cartesian.kP, Cartesian.kI, Cartesian.kD);
-  //   PIDController y = new PIDController(Cartesian.kP, Cartesian.kI, Cartesian.kD);
-  //   PIDController rot = new PIDController(Angular.kP, Angular.kI, Angular.kD);
-  //   PathPlannerTrajectory loadedPath = PathPlanner.loadPath(pathName, new PathConstraints(5, 4));
-
-  //   drive.resetOdometry(loadedPath.getInitialPose());
-  //   return new PPSwerveControllerCommand(
-  //           loadedPath,
-  //           drive::getPose,
-  //           Drive.KINEMATICS,
-  //           x,
-  //           y,
-  //           rot,
-  //           drive::setModuleStates,
-  //           false,
-  //           drive)
-  //       .andThen(drive.stop());
-  // }
-
-  // private Command followTrajectory(Trajectory path) {
-  //   PIDController x = new PIDController(Cartesian.kP, Cartesian.kI, Cartesian.kD);
-  //   PIDController y = new PIDController(Cartesian.kP, Cartesian.kI, Cartesian.kD);
-  //   ProfiledPIDController theta =
-  //       new ProfiledPIDController(Angular.kP, Angular.kI, Angular.kD, Angular.CONSTRAINTS);
-
-  //   drive.resetOdometry(path.getInitialPose());
-
-  //   return new SwerveControllerCommand(
-  //           path, drive::getPose, Drive.KINEMATICS, x, y, theta, drive::setModuleStates, drive)
-  //       .andThen(drive.stop());
-  // }
 
   @Override
   public void initSendable(SendableBuilder builder) {
