@@ -26,13 +26,12 @@ public class RobotContainer {
   // Define camera for PoseEstimation
   private final PhotonCamera cam = new PhotonCamera(Constants.CAMERA_NAME);
 
-  // Visualizer for elevator/arm simulation
-  @Log private final Visualizer visualizer = new Visualizer();
+  @Log private final Visualizer visualizer = Visualizer.getInstance();
 
   // The robot's subsystems and commands are defined here...
   private final Drivetrain drive = new Drivetrain(cam);
-  private final Arm arm = new Arm(visualizer);
-  private final Elevator elevator = new Elevator(visualizer);
+  private final Arm arm = new Arm();
+  private final Elevator elevator = new Elevator();
   private final Intake intake = new Intake();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed

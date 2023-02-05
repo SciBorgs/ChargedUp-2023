@@ -24,9 +24,6 @@ import org.sciborgs1155.robot.Ports.ElevatorPorts;
 
 public class Elevator extends SubsystemBase implements Loggable {
 
-  // Reference to a Mechanism2d for displaying the elevator's movement
-  private final Visualizer visualizer;
-
   private final CANSparkMax lead, left, right;
   private final RelativeEncoder encoder;
 
@@ -47,10 +44,7 @@ public class Elevator extends SubsystemBase implements Loggable {
   // simulation
   private final ElevatorSim sim;
 
-  public Elevator(Visualizer visualizer) {
-
-    this.visualizer = visualizer;
-
+  public Elevator() {
     lead = Motors.ELEVATOR.build(MotorType.kBrushless, ElevatorPorts.MIDDLE_MOTOR);
     left = Motors.ELEVATOR.build(MotorType.kBrushless, ElevatorPorts.LEFT_MOTOR);
     right = Motors.ELEVATOR.build(MotorType.kBrushless, ElevatorPorts.RIGHT_MOTOR);
@@ -108,7 +102,7 @@ public class Elevator extends SubsystemBase implements Loggable {
 
     lead.setVoltage(isHitting() ? 0 : pidOutput + ffOutput);
 
-    visualizer.setElevatorHeight(encoder.getPosition());
+    Visualizer.getInstance().setElevatorHeight(encoder.getPosition());
   }
 
   @Override

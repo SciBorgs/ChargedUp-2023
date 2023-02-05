@@ -22,9 +22,6 @@ import org.sciborgs1155.robot.Ports.ElbowPorts;
 
 public class Arm extends SubsystemBase {
 
-  // Reference to a Mechanism2d for displaying the arm's movement+
-  private final Visualizer visualizer;
-
   private final CANSparkMax wrist;
   private final RelativeEncoder wristEncoder;
 
@@ -48,9 +45,7 @@ public class Arm extends SubsystemBase {
   private final SingleJointedArmSim elbowSim;
   private final SingleJointedArmSim wristSim;
 
-  public Arm(Visualizer visualizer) {
-    this.visualizer = visualizer;
-
+  public Arm() {
     wrist = Motors.WRIST.build(MotorType.kBrushless, ClawPorts.CLAW_WRIST);
     wristEncoder = wrist.getEncoder();
 
@@ -91,6 +86,14 @@ public class Arm extends SubsystemBase {
             true);
   }
 
+  public Rotation2d getElbowPosition() {
+    return Rotation2d.fromRadians(elbowEncoder.getPosition());
+  }
+
+  public Rotation2d getWristPosition() {
+    return Rotation2d.fromRadians(wristEncoder.getPosition());
+  }
+
   public Rotation2d getElbowGoal() {
     return elbowGoal;
   }
@@ -128,9 +131,7 @@ public class Arm extends SubsystemBase {
             wristAcceleration);
     wrist.setVoltage(wristfb + wristff);
 
-    // visualizer.setArmAngles(
-    //     Rotation2d.fromRadians(elbowSim.getAngleRads()),
-    //     Rotation2d.fromRadians(wristSim.getAngleRads()));
+    Visualizer.getInstance().setArmPositions(getElbowPosition(), getWristPosition());
   }
 
   @Override
