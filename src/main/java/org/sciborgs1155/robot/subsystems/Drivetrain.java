@@ -274,7 +274,7 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   /** Stops drivetrain */
   public Command stop() {
-    return runOnce(() -> setModuleStates(getModuleStates()));
+    return run(() -> setModuleStates(getModuleStates()));
   }
 
   /** Sets the drivetrain to an "X" configuration, preventing movement */

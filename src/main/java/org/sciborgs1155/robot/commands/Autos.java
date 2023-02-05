@@ -74,7 +74,7 @@ public final class Autos implements Sendable {
         rot,
         drive::setModuleStates,
         false,
-        drive);
+        drive).andThen(drive.stop());
   }
 
   private Command followTrajectory(Trajectory path) {
