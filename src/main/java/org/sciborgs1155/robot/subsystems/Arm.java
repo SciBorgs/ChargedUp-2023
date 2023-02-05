@@ -1,5 +1,8 @@
 package org.sciborgs1155.robot.subsystems;
 
+import static org.sciborgs1155.robot.Constants.Arm.*;
+import static org.sciborgs1155.robot.Ports.Arm.*;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
@@ -16,10 +19,6 @@ import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
-import org.sciborgs1155.robot.Constants.PlacementConstants.Elbow;
-import org.sciborgs1155.robot.Constants.PlacementConstants.Wrist;
-import org.sciborgs1155.robot.Ports.ClawPorts;
-import org.sciborgs1155.robot.Ports.ElbowPorts;
 
 public class Arm extends SubsystemBase implements Loggable {
 
@@ -47,14 +46,14 @@ public class Arm extends SubsystemBase implements Loggable {
   private final SingleJointedArmSim wristSim;
 
   public Arm() {
-    wrist = Motors.WRIST.build(MotorType.kBrushless, ClawPorts.CLAW_WRIST);
+    wrist = Motors.WRIST.build(MotorType.kBrushless, WRIST_MOTOR);
     wristEncoder = wrist.getEncoder();
 
     wristFeedback = new ProfiledPIDController(Wrist.kP, Wrist.kI, Wrist.kD, Wrist.CONSTRAINTS);
     wristFeedforward = new ArmFeedforward(Wrist.kS, Wrist.kG, Wrist.kV, Wrist.kA);
 
-    elbowLead = Motors.ELBOW.build(MotorType.kBrushless, ElbowPorts.LEFT_ELBOW_MOTOR);
-    elbowFollow = Motors.ELBOW.build(MotorType.kBrushless, ElbowPorts.RIGHT_ELBOW_MOTOR);
+    elbowLead = Motors.ELBOW.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
+    elbowFollow = Motors.ELBOW.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
     elbowEncoder = elbowLead.getEncoder();
     elbowFollow.follow(elbowLead);
 

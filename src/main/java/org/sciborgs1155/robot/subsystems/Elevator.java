@@ -1,12 +1,14 @@
 package org.sciborgs1155.robot.subsystems;
 
+import static org.sciborgs1155.robot.Constants.Elevator.*;
+import static org.sciborgs1155.robot.Ports.Elevator.*;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -19,8 +21,6 @@ import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
-import org.sciborgs1155.robot.Constants.PlacementConstants;
-import org.sciborgs1155.robot.Ports.ElevatorPorts;
 
 public class Elevator extends SubsystemBase implements Loggable {
 
@@ -45,32 +45,21 @@ public class Elevator extends SubsystemBase implements Loggable {
   private final ElevatorSim sim;
 
   public Elevator() {
-    lead = Motors.ELEVATOR.build(MotorType.kBrushless, ElevatorPorts.MIDDLE_MOTOR);
-    left = Motors.ELEVATOR.build(MotorType.kBrushless, ElevatorPorts.LEFT_MOTOR);
-    right = Motors.ELEVATOR.build(MotorType.kBrushless, ElevatorPorts.RIGHT_MOTOR);
+    lead = Motors.ELEVATOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
+    left = Motors.ELEVATOR.build(MotorType.kBrushless, LEFT_MOTOR);
+    right = Motors.ELEVATOR.build(MotorType.kBrushless, RIGHT_MOTOR);
     left.follow(lead);
     right.follow(lead);
     encoder = lead.getEncoder();
 
-    ff =
-        new ElevatorFeedforward(
-            PlacementConstants.Elevator.kS,
-            PlacementConstants.Elevator.kG,
-            PlacementConstants.Elevator.kV,
-            PlacementConstants.Elevator.kA);
-    pid =
-        new ProfiledPIDController(
-            PlacementConstants.Elevator.kP,
-            PlacementConstants.Elevator.kI,
-            PlacementConstants.Elevator.kD,
-            new Constraints(
-                PlacementConstants.Elevator.MAX_SPEED, PlacementConstants.Elevator.MAX_ACCEL));
+    ff = new ElevatorFeedforward(kS, kG, kV, kA);
+    pid = new ProfiledPIDController(kP, kI, kD, CONSTRAINTS);
 
-    beambreak = new DigitalInput(ElevatorPorts.BEAM_BREAK_PORTS[0]);
-    beambreakTwo = new DigitalInput(ElevatorPorts.BEAM_BREAK_PORTS[1]);
+    beambreak = new DigitalInput(BEAM_BREAK_PORTS[0]);
+    beambreakTwo = new DigitalInput(BEAM_BREAK_PORTS[1]);
 
-    limitSwitchOne = new DigitalInput(ElevatorPorts.LIMIT_SWITCH_PORTS[0]);
-    limitSwitchTwo = new DigitalInput(ElevatorPorts.LIMIT_SWITCH_PORTS[1]);
+    limitSwitchOne = new DigitalInput(LIMIT_SWITCH_PORTS[0]);
+    limitSwitchTwo = new DigitalInput(LIMIT_SWITCH_PORTS[1]);
 
     accel = new Derivative();
 
@@ -83,6 +72,14 @@ public class Elevator extends SubsystemBase implements Loggable {
             Dimensions.ELEVATOR_MIN_HEIGHT,
             Dimensions.ELEVATOR_MAX_HEIGHT,
             true);
+  }
+
+  public double getHeight() {
+    return encoder.getPosition();
+  }
+
+  public double getTargetHeight() {
+    return targetHeight;
   }
 
   public boolean isHitting() {

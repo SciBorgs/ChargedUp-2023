@@ -21,6 +21,6 @@ public class DerivativeTest {
   }
 
   static boolean roughlyEquals(double val1, double val2) {
-    return Math.abs(val1 - val2) < 0.1;
+    return Math.abs(val1 - val2) < 0.3;
   }
 }

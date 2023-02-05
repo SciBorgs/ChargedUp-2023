@@ -90,7 +90,7 @@ public final class Constants {
     public static final List<AprilTag> TEST_TAGS = List.of(TEST_TAG_0);
   }
 
-  public static final class PlacementConstants {
+  public static final class Arm {
     public static final class Wrist {
       // not actual values
       public static final double kP = 0.3;
@@ -126,32 +126,31 @@ public final class Constants {
       public static final double GEAR_RATIO = 1 / 6.0;
       public static final double MOVEMENT_PER_SPIN = (1.5 * Math.PI);
     }
+  }
 
-    public static final class Intake {
-      public static final double WHEEL_SPEED = 0.6;
-    }
+  public static final class Intake {
+    public static final double WHEEL_SPEED = 0.6;
+  }
 
-    public static final class Elevator {
-      public static final double MAX_SPEED = 4; // m/s
-      public static final double MAX_ACCEL = 3; // m/s^2
-      public static final double kP = 5;
-      public static final double kI = 0;
-      public static final double kD = 0.1;
+  public static final class Elevator {
+    public static final double MAX_SPEED = 4; // m/s
+    public static final double MAX_ACCEL = 3; // m/s^2
+    public static final double kP = 5;
+    public static final double kI = 0;
+    public static final double kD = 0.1;
 
-      public static final double kS = 0;
-      public static final double kG = 0.762;
-      public static final double kV = 0.762;
-      public static final double kA = 0;
-      public static final TrapezoidProfile.Constraints CONSTRAINTS =
-          new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ACCEL);
-      public static final double GEAR_RATIO = 1.0;
-      public static final double MOVEMENTPERSPIN =
-          1.1938 / 6.0; // m/ (50 rotations of motor) wtf is this
-    }
+    public static final double kS = 0;
+    public static final double kG = 0.762;
+    public static final double kV = 0.762;
+    public static final double kA = 0;
+    public static final TrapezoidProfile.Constraints CONSTRAINTS =
+        new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ACCEL);
+    public static final double GEAR_RATIO = 1.0;
+    public static final double MOVEMENTPERSPIN =
+        1.1938 / 6.0; // m/ (50 rotations of motor) wtf is this
   }
 
   public static final class DriveConstants {
-
     public static final double MAX_SPEED = 7; // m / s
     public static final double MAX_ANGULAR_SPEED = 4 * Math.PI; // rad / s
 
@@ -177,7 +176,6 @@ public final class Constants {
   }
 
   public static final class ModuleConstants {
-
     // we use a 14T pinion
     public static final int PINION_TEETH = 14;
 
