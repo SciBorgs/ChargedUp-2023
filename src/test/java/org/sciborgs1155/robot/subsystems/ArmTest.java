@@ -5,11 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.junit.jupiter.api.*;
-import org.sciborgs1155.lib.Visualizer;
 
 public class ArmTest {
-  static Visualizer visualizer = new Visualizer();
-  static Arm arm = new Arm(visualizer);
+  static Arm arm = new Arm();
 
   @BeforeEach
   void setup() {

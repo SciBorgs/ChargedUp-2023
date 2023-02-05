@@ -16,8 +16,16 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/Elevator": "Subsystem",
+      "/LiveWindow/Ungrouped/DigitalInput[5]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[6]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[7]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[8]": "Digital Input",
       "/LiveWindow/Ungrouped/PIDController[10]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[11]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[12]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[13]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[14]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
@@ -158,7 +166,8 @@
       },
       "/Shuffleboard/SillySim/mech2d": {
         "window": {
-          "name": "Silly sim"
+          "name": "Silly sim",
+          "visible": true
         }
       }
     }
@@ -196,13 +205,30 @@
           "beambreak": {
             "open": true
           },
-          "open": true,
           "pid": {
             "open": true
           }
         },
         "RobotContainer": {
-          "open": true
+          "open": true,
+          "visualizer": {
+            "Chassis": {
+              "Elevator": {
+                "Forearm": {
+                  "Wrist": {
+                    "open": true
+                  },
+                  "open": true
+                },
+                "open": true
+              },
+              "Superstructure": {
+                "open": true
+              },
+              "open": true
+            },
+            "open": true
+          }
         },
         "Visualizer": {
           "mech": {
@@ -211,6 +237,12 @@
           "open": true
         },
         "open": true
+      },
+      "photonvision": {
+        "open": true,
+        "photonvision": {
+          "open": true
+        }
       }
     }
   }
