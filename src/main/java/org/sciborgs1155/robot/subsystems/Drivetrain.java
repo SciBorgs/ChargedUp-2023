@@ -72,8 +72,11 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   // Odometry and pose estimation
   private final PhotonCamera cam;
-  private final SwerveDrivePoseEstimator odometry;
-  private final AprilTagFieldLayout layout;
+  private final SwerveDrivePoseEstimator odometry =
+      new SwerveDrivePoseEstimator(
+          DriveConstants.KINEMATICS, getHeading(), getModulePositions(), new Pose2d());
+  private final AprilTagFieldLayout layout =
+      new AprilTagFieldLayout(Vision.TEST_TAGS, getTurnRate(), getPitch());
   private final PhotonPoseEstimator visionOdometry;
 
   @Log private final Field2d field2d = new Field2d();
@@ -82,10 +85,6 @@ public class Drivetrain extends SubsystemBase implements Loggable {
 
   public Drivetrain(PhotonCamera cam) {
     this.cam = cam;
-    odometry =
-        new SwerveDrivePoseEstimator(
-            DriveConstants.KINEMATICS, getHeading(), getModulePositions(), new Pose2d());
-    layout = new AprilTagFieldLayout(Vision.TEST_TAGS, getTurnRate(), getPitch());
     visionOdometry =
         new PhotonPoseEstimator(layout, PoseStrategy.LOWEST_AMBIGUITY, cam, Vision.ROBOT_TO_CAM);
 

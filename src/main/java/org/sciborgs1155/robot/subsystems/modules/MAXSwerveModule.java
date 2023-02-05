@@ -18,7 +18,7 @@ import org.sciborgs1155.robot.Constants.ModuleConstants.Turning;
 import org.sciborgs1155.robot.Constants.Motors;
 
 /** Class to encapsulate a rev max swerve module */
-public class RevModule implements SwerveModule, Sendable {
+public class MAXSwerveModule implements SwerveModule, Sendable {
   private final CANSparkMax driveMotor; // Regular Neo
   private final CANSparkMax turnMotor; // Neo 550
 
@@ -28,20 +28,21 @@ public class RevModule implements SwerveModule, Sendable {
   private final SparkMaxPIDController driveFeedback;
   private final SparkMaxPIDController turnFeedback;
 
-  private final SimpleMotorFeedforward driveFeedforward;
+  private final SimpleMotorFeedforward driveFeedforward =
+      new SimpleMotorFeedforward(Driving.kS, Driving.kV, Driving.kA);
 
   private final Rotation2d angularOffset;
 
   private SwerveModuleState setpoint;
 
   /**
-   * Constructs a SwerveModule for rev's product.
+   * Constructs a SwerveModule for rev's MAX Swerve.
    *
    * @param drivePort drive motor port
    * @param turnPort turning motor port
    * @param angularOffset offset from drivetrain
    */
-  public RevModule(int drivePort, int turnPort, double angularOffset) {
+  public MAXSwerveModule(int drivePort, int turnPort, double angularOffset) {
     driveMotor = Motors.DRIVE.buildCanSparkMax(MotorType.kBrushless, drivePort);
     turnMotor = Motors.TURN.buildCanSparkMax(MotorType.kBrushless, turnPort);
 
@@ -51,8 +52,6 @@ public class RevModule implements SwerveModule, Sendable {
     turnFeedback = turnMotor.getPIDController();
     driveFeedback.setFeedbackDevice(driveEncoder);
     turnFeedback.setFeedbackDevice(turningEncoder);
-
-    driveFeedforward = new SimpleMotorFeedforward(Driving.kS, Driving.kV, Driving.kA);
 
     turningEncoder.setInverted(Turning.ENCODER_INVERTED);
 
@@ -76,7 +75,6 @@ public class RevModule implements SwerveModule, Sendable {
     turnFeedback.setI(Turning.kI);
     turnFeedback.setD(Turning.kD);
 
-    // burning to flash again (already done in motor config, there's probably a nicer way)
     driveMotor.burnFlash();
     turnMotor.burnFlash();
 

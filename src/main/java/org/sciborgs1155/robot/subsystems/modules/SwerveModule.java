@@ -8,7 +8,7 @@ public interface SwerveModule {
 
   public static SwerveModule create(int drivePort, int turnPort, double angularOffset) {
     return Robot.isReal()
-        ? new RevModule(drivePort, turnPort, angularOffset)
+        ? new MAXSwerveModule(drivePort, turnPort, angularOffset)
         : new SimSwerveModule();
   }
 
