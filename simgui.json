@@ -202,25 +202,20 @@
           "Visualizer": {
             "open": true
           },
-          "beambreak": {
-            "open": true
-          },
+          "open": true,
           "pid": {
             "open": true
           }
         },
         "RobotContainer": {
-          "open": true,
           "visualizer": {
             "Chassis": {
               "Elevator": {
                 "Forearm": {
                   "Wrist": {
                     "open": true
-                  },
-                  "open": true
-                },
-                "open": true
+                  }
+                }
               },
               "Superstructure": {
                 "open": true

@@ -24,10 +24,13 @@ import org.sciborgs1155.robot.Constants.Motors;
 
 public class Elevator extends SubsystemBase implements Loggable {
 
+  @Log(name = "applied output", methodName = "getAppliedOutput")
   private final CANSparkMax lead = Motors.ELEVATOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
+
   private final CANSparkMax left = Motors.ELEVATOR.build(MotorType.kBrushless, LEFT_MOTOR);
   private final CANSparkMax right = Motors.ELEVATOR.build(MotorType.kBrushless, RIGHT_MOTOR);
 
+  @Log(name = "velocity", methodName = "getVelocity")
   private final RelativeEncoder encoder = lead.getEncoder();
 
   private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
@@ -40,8 +43,7 @@ public class Elevator extends SubsystemBase implements Loggable {
   @Log private final DigitalInput limitSwitchOne = new DigitalInput(LIMIT_SWITCH_PORTS[0]);
   @Log private final DigitalInput limitSwitchTwo = new DigitalInput(LIMIT_SWITCH_PORTS[1]);
 
-  @Log private double targetHeight = 0;
-
+  @Log(name = "acceleration", methodName = "getLastOutput")
   private final Derivative accel = new Derivative();
 
   // simulation
@@ -60,12 +62,14 @@ public class Elevator extends SubsystemBase implements Loggable {
     right.follow(lead);
   }
 
+  @Log(name = "current height")
   public double getHeight() {
     return encoder.getPosition();
   }
 
+  @Log(name = "target height")
   public double getTargetHeight() {
-    return targetHeight;
+    return pid.getGoal().position;
   }
 
   public boolean isHitting() {
@@ -74,12 +78,12 @@ public class Elevator extends SubsystemBase implements Loggable {
   }
 
   public Command setTargetHeight(double targetHeight) {
-    return runOnce(() -> this.targetHeight = targetHeight);
+    return runOnce(() -> pid.setGoal(targetHeight));
   }
 
   @Override
   public void periodic() {
-    double pidOutput = pid.calculate(encoder.getPosition(), targetHeight);
+    double pidOutput = pid.calculate(encoder.getPosition());
     double ffOutput =
         ff.calculate(pid.getSetpoint().velocity, accel.calculate(pid.getSetpoint().velocity));
 

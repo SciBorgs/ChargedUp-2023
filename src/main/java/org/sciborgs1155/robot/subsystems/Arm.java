@@ -43,9 +43,6 @@ public class Arm extends SubsystemBase implements Loggable {
   private Derivative wristAccel = new Derivative();
   private Derivative elbowAccel = new Derivative();
 
-  private Rotation2d wristGoal = new Rotation2d();
-  private Rotation2d elbowGoal = new Rotation2d();
-
   private final SingleJointedArmSim elbowSim =
       new SingleJointedArmSim(
           DCMotor.getNEO(2),
@@ -83,25 +80,24 @@ public class Arm extends SubsystemBase implements Loggable {
   }
 
   public Rotation2d getElbowGoal() {
-    return elbowGoal;
+    return Rotation2d.fromRadians(elbowFeedback.getGoal().position);
   }
 
   public Rotation2d getWristGoal() {
-    return wristGoal;
+    return Rotation2d.fromRadians(wristFeedback.getGoal().position);
   }
 
-  public Command setElbowGoal(Rotation2d elbowGoal) {
-    return runOnce(() -> this.elbowGoal = elbowGoal);
+  public Command setElbowGoal(Rotation2d goal) {
+    return runOnce(() -> elbowFeedback.setGoal(goal.getRadians()));
   }
 
-  public Command setWristGoal(Rotation2d wristGoal) {
-    return runOnce(() -> this.wristGoal = wristGoal);
+  public Command setWristGoal(Rotation2d goal) {
+    return runOnce(() -> wristFeedback.setGoal(goal.getRadians()));
   }
 
   @Override
   public void periodic() {
-
-    double elbowfb = elbowFeedback.calculate(elbowEncoder.getPosition(), elbowGoal.getRadians());
+    double elbowfb = elbowFeedback.calculate(elbowEncoder.getPosition());
     double elbowff =
         elbowFeedforward.calculate(
             elbowFeedback.getSetpoint().position,
@@ -109,7 +105,7 @@ public class Arm extends SubsystemBase implements Loggable {
             elbowAccel.calculate(elbowFeedback.getSetpoint().velocity));
     elbowLead.setVoltage(elbowfb + elbowff);
 
-    double wristfb = wristFeedback.calculate(wristEncoder.getPosition(), wristGoal.getRadians());
+    double wristfb = wristFeedback.calculate(wristEncoder.getPosition());
     double wristff =
         wristFeedforward.calculate(
             wristFeedback.getSetpoint().position,

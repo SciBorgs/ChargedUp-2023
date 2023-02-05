@@ -8,6 +8,7 @@ public class Derivative implements DoubleUnaryOperator {
 
   private double lastValue;
   private double lastTime;
+  private double out;
 
   /** Creates a derivative with initial value 0. */
   public Derivative() {
@@ -22,9 +23,14 @@ public class Derivative implements DoubleUnaryOperator {
    * @return dx/dt
    */
   public double calculate(double value) {
-    double out = (value - lastValue) / (Timer.getFPGATimestamp() - lastTime);
+    out = (value - lastValue) / (Timer.getFPGATimestamp() - lastTime);
     lastValue = value;
     lastTime = Timer.getFPGATimestamp();
+    return out;
+  }
+
+  /** Returns the last calculated value. */
+  public double getLastOutput() {
     return out;
   }
 
