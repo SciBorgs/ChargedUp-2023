@@ -17,14 +17,14 @@ public class ArmTest {
   }
 
   @Test
-  void setElbowGoalTest() throws InterruptedException {
+  void setElbowGoalTest() {
     Rotation2d newElbowGoal = new Rotation2d(2);
     arm.setElbowGoal(newElbowGoal).ignoringDisable(true).schedule();
     assertEquals(newElbowGoal, arm.getElbowGoal());
   }
 
   @Test
-  void setWristGoalTest() throws InterruptedException {
+  void setWristGoalTest() {
     Rotation2d newWristGoal = new Rotation2d(4);
     arm.setWristGoal(newWristGoal).ignoringDisable(true).schedule();
     assertEquals(newWristGoal, arm.getWristGoal());
