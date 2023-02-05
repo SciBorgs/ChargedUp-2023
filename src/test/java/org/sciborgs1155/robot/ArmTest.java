@@ -30,5 +30,4 @@ public class ArmTest {
     arm.setWristGoal(newWristGoal).ignoringDisable(true).schedule();
     assertEquals(newWristGoal, arm.getWristGoal());
   }
-
 }

@@ -100,11 +100,11 @@ public class Arm extends SubsystemBase {
     return wristGoal;
   }
 
-  public Command setElbowGoal(Rotation2d elbowGoal){
+  public Command setElbowGoal(Rotation2d elbowGoal) {
     return runOnce(() -> this.elbowGoal = elbowGoal);
   }
 
-  public Command setWristGoal(Rotation2d wristGoal){
+  public Command setWristGoal(Rotation2d wristGoal) {
     return runOnce(() -> this.wristGoal = wristGoal);
   }
 
