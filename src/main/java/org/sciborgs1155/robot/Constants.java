@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot;
 
+import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -207,14 +208,14 @@ public final class Constants {
     }
   }
 
-  public static final class AutoConstants {
+  public static final class Auto {
     public static final class Cartesian {
       public static final double kP = 3.5;
       public static final double kI = 0;
       public static final double kD = 0;
 
-      public static final double MAX_SPEED = Drive.MAX_SPEED; // m/s
-      public static final double MAX_ACCEL = 4; // m/s^2
+      // public static final double MAX_SPEED = Drive.MAX_SPEED; // m/s
+      // public static final double MAX_ACCEL = 4; // m/s^2
     }
 
     public static final class Angular {
@@ -222,11 +223,12 @@ public final class Constants {
       public static final double kI = 0;
       public static final double kD = 1;
 
-      public static final double MAX_SPEED = 1.5 * Drive.MAX_ANGULAR_SPEED; // rad/s
-      public static final double MAX_ACCEL = Math.PI; // rad/s^2
-
-      public static final TrapezoidProfile.Constraints CONSTRAINTS =
-          new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ACCEL);
+      // public static final double MAX_SPEED = 1.5 * Drive.MAX_ANGULAR_SPEED; // rad/s
+      // public static final double MAX_ACCEL = Math.PI; // rad/s^2
     }
+
+    public static final double MAX_SPEED = Drive.MAX_SPEED; // m/s
+    public static final double MAX_ACCEL = 4; // m/s^2
+    public static final PathConstraints CONSTRAINTS = new PathConstraints(RATE, RATE);
   }
 }

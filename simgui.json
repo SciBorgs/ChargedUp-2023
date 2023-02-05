@@ -24,6 +24,8 @@
       "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
       "/LiveWindow/Ungrouped/Pigeon IMU [2]": "Gyro",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
+      "/Shuffleboard/Drive/field2d": "Field2d",
+      "/Shuffleboard/Drive/gyro": "Gyro",
       "/Shuffleboard/DriveSubsystem/field2d": "Field2d",
       "/Shuffleboard/Drivetrain/field2d": "Field2d",
       "/Shuffleboard/Drivetrain/frontLeft": "PIDController",
@@ -152,6 +154,12 @@
   "NetworkTables": {
     "transitory": {
       "Shuffleboard": {
+        "Drive": {
+          "field2d": {
+            "open": true
+          },
+          "open": true
+        },
         "DriveSubsystem": {
           "field2d": {
             "open": true

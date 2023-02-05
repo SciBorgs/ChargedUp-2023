@@ -4,8 +4,12 @@ import static org.sciborgs1155.robot.Constants.Drive.*;
 import static org.sciborgs1155.robot.Ports.Drive.*;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -32,6 +36,7 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.ControllerOutputFunction;
 import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.Constants.Auto;
 import org.sciborgs1155.robot.Constants.Vision;
 import org.sciborgs1155.robot.Ports.Sensors;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
@@ -219,6 +224,19 @@ public class Drive extends SubsystemBase implements Loggable {
             Units.radiansToDegrees(
                 KINEMATICS.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
                     * Constants.RATE));
+  }
+
+  /** Follows the specified path planner path */
+  public Command follow(String pathName) {
+    PIDController x = new PIDController(Auto.Cartesian.kP, Auto.Cartesian.kI, Auto.Cartesian.kD);
+    PIDController y = new PIDController(Auto.Cartesian.kP, Auto.Cartesian.kI, Auto.Cartesian.kD);
+    PIDController rot = new PIDController(Auto.Angular.kP, Auto.Angular.kI, Auto.Angular.kD);
+    PathPlannerTrajectory loadedPath = PathPlanner.loadPath(pathName, Auto.CONSTRAINTS);
+
+    resetOdometry(loadedPath.getInitialPose());
+    return new PPSwerveControllerCommand(
+            loadedPath, this::getPose, KINEMATICS, x, y, rot, this::setModuleStates, false)
+        .andThen(stop());
   }
 
   /** Drive based on xbox */
