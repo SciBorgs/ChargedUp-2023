@@ -40,6 +40,72 @@
       "/Shuffleboard/Visualizer/mech": "Mechanism2d"
     },
     "windows": {
+      "/Shuffleboard/Drive/field2d": {
+        "Robot": {
+          "arrows": false,
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            255.0
+          ],
+          "length": 0.4318000078201294,
+          "weight": 8.0,
+          "width": 0.4318000078201294
+        },
+        "image": "/home/asa/Projects/ChargedUp-2023/field/2023-field.png",
+        "module-0": {
+          "arrowColor": [
+            1.0,
+            1.0,
+            0.0,
+            255.0
+          ],
+          "arrowSize": 11,
+          "style": "Line",
+          "weight": 0.0
+        },
+        "module-1": {
+          "arrowColor": [
+            1.0,
+            1.0,
+            0.0,
+            255.0
+          ],
+          "arrowSize": 11,
+          "selectable": false,
+          "style": "Line",
+          "weight": 0.0
+        },
+        "module-2": {
+          "arrowColor": [
+            1.0,
+            1.0,
+            0.0,
+            255.0
+          ],
+          "arrowSize": 11,
+          "selectable": false,
+          "style": "Line",
+          "weight": 0.0
+        },
+        "module-3": {
+          "arrowColor": [
+            1.0,
+            1.0,
+            0.0,
+            255.0
+          ],
+          "arrowSize": 11,
+          "selectable": false,
+          "style": "Line",
+          "weight": 0.0
+        },
+        "window": {
+          "name": "field",
+          "visible": true
+        }
+      },
       "/Shuffleboard/Drivetrain/field2d": {
         "Robot": {
           "arrows": false,
@@ -134,18 +200,17 @@
           "weight": 2.0
         },
         "window": {
-          "name": "todo: add among us",
-          "visible": true
+          "name": "todo: add among us"
         }
       },
       "/Shuffleboard/SillySim/mech2d": {
         "window": {
-          "name": "Silly sim",
-          "visible": true
+          "name": "Silly sim"
         }
       },
       "/Shuffleboard/Visualizer/mech": {
         "window": {
+          "name": "visualizer",
           "visible": true
         }
       }

@@ -129,10 +129,8 @@ public final class Constants {
     public static final double MAX_SPEED = 7; // m / s
     public static final double MAX_ANGULAR_SPEED = 4 * Math.PI; // rad / s
 
-    // public static final double TRACK_WIDTH = 0.28;
     public static final double TRACK_WIDTH = Units.inchesToMeters(17);
     // Distance between centers of right and left wheels on robot
-    // public static final double WHEEL_BASE = 0.28;
     public static final double WHEEL_BASE = Units.inchesToMeters(17);
     // Distance between front and back wheels on robot
 
@@ -148,7 +146,7 @@ public final class Constants {
     public static final boolean GYRO_REVERSED = false;
 
     // angular offsets of the modules, since we use absolute encoders
-    // ignored (used as 0) in simulation because that's how sim works
+    // ignored (used as 0) in simulation because the simulated robot doesn't have offsets
     public static final double[] ANGULAR_OFFSETS = {
       -Math.PI / 2, // front left
       0, // front right
@@ -172,8 +170,7 @@ public final class Constants {
     public static final class Driving {
       public static final double ENCODER_POSITION_FACTOR =
           (WHEEL_DIAMETER * Math.PI) / DRIVING_MOTOR_REDUCTION; // m
-      public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0; // m / s
-      // public static final double ENCODER_VELOCITY_FACTOR = 1;
+      public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0; // m/s
 
       public static final double kP = 0.07;
       public static final double kI = 0;
@@ -213,18 +210,12 @@ public final class Constants {
       public static final double kP = 3.5;
       public static final double kI = 0;
       public static final double kD = 0;
-
-      // public static final double MAX_SPEED = Drive.MAX_SPEED; // m/s
-      // public static final double MAX_ACCEL = 4; // m/s^2
     }
 
     public static final class Angular {
       public static final double kP = 10;
       public static final double kI = 0;
       public static final double kD = 1;
-
-      // public static final double MAX_SPEED = 1.5 * Drive.MAX_ANGULAR_SPEED; // rad/s
-      // public static final double MAX_ACCEL = Math.PI; // rad/s^2
     }
 
     public static final double MAX_SPEED = Drive.MAX_SPEED; // m/s
