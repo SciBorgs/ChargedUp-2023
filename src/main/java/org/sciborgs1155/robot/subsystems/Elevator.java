@@ -19,6 +19,7 @@ import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
+import org.sciborgs1155.robot.Constants.PlacementConstants;
 import org.sciborgs1155.robot.Ports.ElevatorPorts;
 
 public class Elevator extends SubsystemBase implements Loggable {
@@ -26,8 +27,7 @@ public class Elevator extends SubsystemBase implements Loggable {
   // Reference to a Mechanism2d for displaying the elevator's movement
   private final Visualizer visualizer;
 
-  // this is all good
-  private final CANSparkMax motor;
+  private final CANSparkMax lead, left, right;
   private final RelativeEncoder encoder;
 
   private final ElevatorFeedforward ff;
@@ -52,22 +52,25 @@ public class Elevator extends SubsystemBase implements Loggable {
 
     this.visualizer = visualizer;
 
-    motor =
-        Motors.ELEVATOR.buildCanSparkMaxGearbox(MotorType.kBrushless, ElevatorPorts.ELEVATOR_PORTS);
-    encoder = motor.getEncoder();
+    lead = Motors.ELEVATOR.build(MotorType.kBrushless, ElevatorPorts.MIDDLE_MOTOR);
+    left = Motors.ELEVATOR.build(MotorType.kBrushless, ElevatorPorts.LEFT_MOTOR);
+    right = Motors.ELEVATOR.build(MotorType.kBrushless, ElevatorPorts.RIGHT_MOTOR);
+    encoder = lead.getEncoder();
 
     ff =
         new ElevatorFeedforward(
-            Constants.Elevator.kS,
-            Constants.Elevator.kG,
-            Constants.Elevator.kV,
-            Constants.Elevator.kA);
+            PlacementConstants.Elevator.kS,
+            PlacementConstants.Elevator.kG,
+            PlacementConstants.Elevator.kV,
+            PlacementConstants.Elevator.kA);
     pid =
         new ProfiledPIDController(
-            Constants.Elevator.P,
-            Constants.Elevator.I,
-            Constants.Elevator.D,
-            new Constraints(Constants.Elevator.maxVelocity, Constants.Elevator.maxAcceleration));
+            PlacementConstants.Elevator.P,
+            PlacementConstants.Elevator.I,
+            PlacementConstants.Elevator.D,
+            new Constraints(
+                PlacementConstants.Elevator.maxVelocity,
+                PlacementConstants.Elevator.maxAcceleration));
 
     beambreak = new DigitalInput(ElevatorPorts.BEAM_BREAK_PORTS[0]);
     beambreakTwo = new DigitalInput(ElevatorPorts.BEAM_BREAK_PORTS[1]);
@@ -90,18 +93,18 @@ public class Elevator extends SubsystemBase implements Loggable {
           (pid.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - lastTime);
       double pidOutput = pid.calculate(encoder.getPosition(), height);
       double ffOutput = ff.calculate(pid.getSetpoint().velocity, acceleration);
-      motor.setVoltage(pidOutput + ffOutput);
+      lead.setVoltage(pidOutput + ffOutput);
 
       lastSpeed = pid.getSetpoint().velocity;
     } else {
-      motor.stopMotor();
+      lead.stopMotor();
     }
     lastTime = Timer.getFPGATimestamp();
   }
 
   @Override
   public void simulationPeriodic() {
-    sim.setInputVoltage(motor.getAppliedOutput());
+    sim.setInputVoltage(lead.getAppliedOutput());
     sim.update(Constants.RATE);
     visualizer.setElevatorHeight(sim.getPositionMeters());
   }

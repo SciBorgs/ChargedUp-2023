@@ -31,7 +31,7 @@ public class Arm extends SubsystemBase {
   private final ProfiledPIDController wristFeedback;
   private final ArmFeedforward wristFeedforward;
 
-  private final CANSparkMax elbowMotors;
+  private final CANSparkMax elbowLead, elbowFollow;
   private final RelativeEncoder elbowEncoder;
 
   private final ArmFeedforward elbowFeedforward;
@@ -51,19 +51,19 @@ public class Arm extends SubsystemBase {
   public Arm(Visualizer visualizer) {
     this.visualizer = visualizer;
 
-    wrist = Motors.WRIST.buildCanSparkMax(MotorType.kBrushless, ClawPorts.CLAW_WRIST);
+    wrist = Motors.WRIST.build(MotorType.kBrushless, ClawPorts.CLAW_WRIST);
     wristEncoder = wrist.getEncoder();
 
-    wristFeedback =
-        new ProfiledPIDController(Wrist.kP, Wrist.kI, Wrist.kD, Wrist.WRIST_CONSTRAINTS);
+    wristFeedback = new ProfiledPIDController(Wrist.kP, Wrist.kI, Wrist.kD, Wrist.CONSTRAINTS);
     wristFeedforward = new ArmFeedforward(Wrist.kS, Wrist.kG, Wrist.kV, Wrist.kA);
 
-    elbowMotors = Motors.ELBOW.buildCanSparkMaxGearbox(MotorType.kBrushless, ElbowPorts.elbowPorts);
-    elbowEncoder = elbowMotors.getEncoder();
+    elbowLead = Motors.ELBOW.build(MotorType.kBrushless, ElbowPorts.LEFT_ELBOW_MOTOR);
+    elbowFollow = Motors.ELBOW.build(MotorType.kBrushless, ElbowPorts.RIGHT_ELBOW_MOTOR);
+    elbowEncoder = elbowLead.getEncoder();
+    elbowFollow.follow(elbowLead);
 
     elbowFeedforward = new ArmFeedforward(Elbow.kS, Elbow.kG, Elbow.kV, Elbow.kA);
-    elbowFeedback =
-        new ProfiledPIDController(Elbow.kP, Elbow.kI, Elbow.kD, Elbow.ELBOW_CONSTRAINTS);
+    elbowFeedback = new ProfiledPIDController(Elbow.kP, Elbow.kI, Elbow.kD, Elbow.CONSTRAINTS);
 
     elbowEncoder.setPositionConversionFactor(
         Elbow.GEAR_RATIO * Elbow.MOVEMENT_PER_SPIN); // what is movement per spin?
@@ -122,7 +122,7 @@ public class Arm extends SubsystemBase {
             elbowFeedback.getSetpoint().position,
             elbowFeedback.getSetpoint().velocity,
             acceleration);
-    elbowMotors.setVoltage(elbowfb + elbowff);
+    elbowLead.setVoltage(elbowfb + elbowff);
 
     double wristfb = wristFeedback.calculate(wristEncoder.getPosition(), wristGoal.getRadians());
     double wristff =
@@ -137,7 +137,7 @@ public class Arm extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    elbowSim.setInputVoltage(elbowMotors.getAppliedOutput());
+    elbowSim.setInputVoltage(elbowLead.getAppliedOutput());
     elbowSim.update(Constants.RATE);
     wristSim.setInputVoltage(wrist.getAppliedOutput());
     wristSim.update(Constants.RATE);
