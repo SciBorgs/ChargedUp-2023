@@ -90,7 +90,7 @@ public class Arm extends SubsystemBase {
             1,
             true);
   }
-  
+
   public Rotation2d getElbowgoal() {
     return elbowGoal;
   }
@@ -108,7 +108,8 @@ public class Arm extends SubsystemBase {
   }
 
   // public Command changeElbowGoal(Rotation2d goal){
-  //   return runOnce(() -> this.elbowGoal = goal);//.andThen(Commands.print("rad: " + goal.getRadians()));
+  //   return runOnce(() -> this.elbowGoal = goal);//.andThen(Commands.print("rad: " +
+  // goal.getRadians()));
   // }
 
   // public Command changeWristGoal(Rotation2d goal){
@@ -142,8 +143,6 @@ public class Arm extends SubsystemBase {
     visualizer.setArmAngles(elbowGoal, wristGoal);
   }
 
-  
-
   @Override
   public void simulationPeriodic() {
     elbowSim.setInputVoltage(elbowMotors.getAppliedOutput());
@@ -154,5 +153,4 @@ public class Arm extends SubsystemBase {
         Rotation2d.fromRadians(elbowSim.getAngleRads()),
         Rotation2d.fromRadians(wristSim.getAngleRads()));
   }
-
 }
