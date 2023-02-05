@@ -66,15 +66,16 @@ public final class Autos implements Sendable {
 
     drive.resetOdometry(loadedPath.getInitialPose());
     return new PPSwerveControllerCommand(
-        loadedPath,
-        drive::getPose,
-        DriveConstants.KINEMATICS,
-        x,
-        y,
-        rot,
-        drive::setModuleStates,
-        false,
-        drive).andThen(drive.stop());
+            loadedPath,
+            drive::getPose,
+            DriveConstants.KINEMATICS,
+            x,
+            y,
+            rot,
+            drive::setModuleStates,
+            false,
+            drive)
+        .andThen(drive.stop());
   }
 
   private Command followTrajectory(Trajectory path) {
