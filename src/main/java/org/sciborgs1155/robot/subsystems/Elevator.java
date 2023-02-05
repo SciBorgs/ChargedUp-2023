@@ -10,7 +10,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
@@ -55,6 +54,8 @@ public class Elevator extends SubsystemBase implements Loggable {
     lead = Motors.ELEVATOR.build(MotorType.kBrushless, ElevatorPorts.MIDDLE_MOTOR);
     left = Motors.ELEVATOR.build(MotorType.kBrushless, ElevatorPorts.LEFT_MOTOR);
     right = Motors.ELEVATOR.build(MotorType.kBrushless, ElevatorPorts.RIGHT_MOTOR);
+    left.follow(lead);
+    right.follow(lead);
     encoder = lead.getEncoder();
 
     ff =
@@ -100,16 +101,14 @@ public class Elevator extends SubsystemBase implements Loggable {
       lead.stopMotor();
     }
     lastTime = Timer.getFPGATimestamp();
+
+    visualizer.setElevatorHeight(encoder.getPosition());
   }
 
   @Override
   public void simulationPeriodic() {
     sim.setInputVoltage(lead.getAppliedOutput());
     sim.update(Constants.RATE);
-    visualizer.setElevatorHeight(sim.getPositionMeters());
-  }
-
-  public Command run() {
-    return run(() -> setTargetHeight(height));
+    encoder.setPosition(sim.getPositionMeters());
   }
 }

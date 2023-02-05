@@ -12,7 +12,6 @@ import org.sciborgs1155.robot.Constants.Dimensions;
 public class Visualizer implements Sendable {
   private final Mechanism2d mech;
   private final MechanismRoot2d chassis;
-  private final MechanismLigament2d elevatorMax;
   private final MechanismLigament2d elevatorProgress;
   private final MechanismLigament2d forearm;
   private final MechanismLigament2d claw;
@@ -20,8 +19,7 @@ public class Visualizer implements Sendable {
   public Visualizer() {
     mech = new Mechanism2d(20, 50);
     chassis = mech.getRoot("Chassis", 10, 0);
-    elevatorMax =
-        chassis.append(new MechanismLigament2d("Superstructure", Dimensions.ELEVATOR_HEIGHT, 90));
+    chassis.append(new MechanismLigament2d("Superstructure", Dimensions.ELEVATOR_HEIGHT, 90));
     elevatorProgress =
         chassis.append(new MechanismLigament2d("Elevator", Dimensions.ELEVATOR_HEIGHT / 2, 90));
     forearm =

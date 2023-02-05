@@ -65,8 +65,7 @@ public class Arm extends SubsystemBase {
     elbowFeedforward = new ArmFeedforward(Elbow.kS, Elbow.kG, Elbow.kV, Elbow.kA);
     elbowFeedback = new ProfiledPIDController(Elbow.kP, Elbow.kI, Elbow.kD, Elbow.CONSTRAINTS);
 
-    elbowEncoder.setPositionConversionFactor(
-        Elbow.GEAR_RATIO * Elbow.MOVEMENT_PER_SPIN); // what is movement per spin?
+    elbowEncoder.setPositionConversionFactor(Elbow.GEAR_RATIO * Elbow.MOVEMENT_PER_SPIN);
     elbowEncoder.setVelocityConversionFactor(Elbow.GEAR_RATIO);
 
     elbowSim =
@@ -132,17 +131,19 @@ public class Arm extends SubsystemBase {
             acceleration);
     wrist.setVoltage(wristfb + wristff);
 
-    visualizer.setArmAngles(elbowGoal, wristGoal);
+    visualizer.setArmAngles(
+        Rotation2d.fromRadians(elbowSim.getAngleRads()),
+        Rotation2d.fromRadians(wristSim.getAngleRads()));
   }
 
   @Override
   public void simulationPeriodic() {
     elbowSim.setInputVoltage(elbowLead.getAppliedOutput());
     elbowSim.update(Constants.RATE);
+    elbowEncoder.setPosition(elbowSim.getAngleRads());
+
     wristSim.setInputVoltage(wrist.getAppliedOutput());
     wristSim.update(Constants.RATE);
-    visualizer.setArmAngles(
-        Rotation2d.fromRadians(elbowSim.getAngleRads()),
-        Rotation2d.fromRadians(wristSim.getAngleRads()));
+    wristEncoder.setPosition(wristSim.getAngleRads());
   }
 }
