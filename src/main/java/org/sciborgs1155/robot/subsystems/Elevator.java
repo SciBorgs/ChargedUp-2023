@@ -7,13 +7,14 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
+import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
@@ -39,10 +40,9 @@ public class Elevator extends SubsystemBase implements Loggable {
   @Log private final DigitalInput limitSwitchOne;
   @Log private final DigitalInput limitSwitchTwo;
 
-  // goal height
-  @Log private double height = 0;
-  private double lastSpeed = 0;
-  private double lastTime = Timer.getFPGATimestamp();
+  @Log private double targetHeight = 0;
+
+  private final Derivative accel;
 
   // simulation
   private final ElevatorSim sim;
@@ -66,12 +66,11 @@ public class Elevator extends SubsystemBase implements Loggable {
             PlacementConstants.Elevator.kA);
     pid =
         new ProfiledPIDController(
-            PlacementConstants.Elevator.P,
-            PlacementConstants.Elevator.I,
-            PlacementConstants.Elevator.D,
+            PlacementConstants.Elevator.kP,
+            PlacementConstants.Elevator.kI,
+            PlacementConstants.Elevator.kD,
             new Constraints(
-                PlacementConstants.Elevator.maxVelocity,
-                PlacementConstants.Elevator.maxAcceleration));
+                PlacementConstants.Elevator.MAX_SPEED, PlacementConstants.Elevator.MAX_ACCEL));
 
     beambreak = new DigitalInput(ElevatorPorts.BEAM_BREAK_PORTS[0]);
     beambreakTwo = new DigitalInput(ElevatorPorts.BEAM_BREAK_PORTS[1]);
@@ -79,28 +78,35 @@ public class Elevator extends SubsystemBase implements Loggable {
     limitSwitchOne = new DigitalInput(ElevatorPorts.LIMIT_SWITCH_PORTS[0]);
     limitSwitchTwo = new DigitalInput(ElevatorPorts.LIMIT_SWITCH_PORTS[1]);
 
-    sim = new ElevatorSim(DCMotor.getNEO(3), 1, 10, 0.2, 0, Dimensions.ELEVATOR_HEIGHT, true);
+    accel = new Derivative();
+
+    sim =
+        new ElevatorSim(
+            DCMotor.getNEO(3),
+            10,
+            4,
+            Units.inchesToMeters(2),
+            Dimensions.ELEVATOR_MIN_HEIGHT,
+            Dimensions.ELEVATOR_MAX_HEIGHT,
+            true);
   }
 
-  @Config
-  public void setTargetHeight(double newHeight) {
-    height = newHeight;
+  public boolean isHitting() {
+    // return beambreak.get() || beambreakTwo.get() || limitSwitchOne.get() || limitSwitchOne.get();
+    return false;
+  }
+
+  public Command setTargetHeight(double targetHeight) {
+    return runOnce(() -> this.targetHeight = targetHeight);
   }
 
   @Override
   public void periodic() {
-    if (!beambreak.get() || !beambreakTwo.get() || !limitSwitchOne.get() || !limitSwitchOne.get()) {
-      double acceleration =
-          (pid.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - lastTime);
-      double pidOutput = pid.calculate(encoder.getPosition(), height);
-      double ffOutput = ff.calculate(pid.getSetpoint().velocity, acceleration);
-      lead.setVoltage(pidOutput + ffOutput);
+    double pidOutput = pid.calculate(encoder.getPosition(), targetHeight);
+    double ffOutput =
+        ff.calculate(pid.getSetpoint().velocity, accel.calculate(pid.getSetpoint().velocity));
 
-      lastSpeed = pid.getSetpoint().velocity;
-    } else {
-      lead.stopMotor();
-    }
-    lastTime = Timer.getFPGATimestamp();
+    lead.setVoltage(isHitting() ? 0 : pidOutput + ffOutput);
 
     visualizer.setElevatorHeight(encoder.getPosition());
   }

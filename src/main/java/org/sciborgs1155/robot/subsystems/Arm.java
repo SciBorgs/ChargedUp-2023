@@ -131,9 +131,9 @@ public class Arm extends SubsystemBase {
             acceleration);
     wrist.setVoltage(wristfb + wristff);
 
-    visualizer.setArmAngles(
-        Rotation2d.fromRadians(elbowSim.getAngleRads()),
-        Rotation2d.fromRadians(wristSim.getAngleRads()));
+    // visualizer.setArmAngles(
+    //     Rotation2d.fromRadians(elbowSim.getAngleRads()),
+    //     Rotation2d.fromRadians(wristSim.getAngleRads()));
   }
 
   @Override

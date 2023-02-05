@@ -63,7 +63,8 @@ public final class Constants {
 
   public static final class Dimensions {
     // no clue what the actual constants are
-    public static final double ELEVATOR_HEIGHT = 10;
+    public static final double ELEVATOR_MIN_HEIGHT = 2;
+    public static final double ELEVATOR_MAX_HEIGHT = 40;
     public static final double FOREARM_LENGTH = 5;
     public static final double CLAW_LENGTH = 2;
 
@@ -108,7 +109,7 @@ public final class Constants {
     }
 
     public static final class Elbow {
-      public static final double kP = 0.01;
+      public static final double kP = 0.1;
       public static final double kI = 0;
       public static final double kD = 0;
 
@@ -117,10 +118,10 @@ public final class Constants {
       public static final double kV = 0;
       public static final double kA = 0;
 
-      public static final double MAX_ELBOW_VELOCITY = 0.3; // radians / s
-      public static final double MAX_ELBOW_ACCEL = 0.3; // radians / s^2
+      public static final double MAX_VELOCITY = 0.3; // radians / s
+      public static final double MAX_ACCEL = 0.3; // radians / s^2
       public static final TrapezoidProfile.Constraints CONSTRAINTS =
-          new TrapezoidProfile.Constraints(MAX_ELBOW_VELOCITY, MAX_ELBOW_ACCEL);
+          new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
 
       public static final double GEAR_RATIO = 1 / 6.0;
       public static final double MOVEMENT_PER_SPIN = (1.5 * Math.PI);
@@ -131,20 +132,21 @@ public final class Constants {
     }
 
     public static final class Elevator {
-      public static final double maxVelocity = 0.3; // m/s
-      public static final double maxAcceleration = 0.3; // m/s^2
-      public static final double P = 0.01;
-      public static final double I = 0;
-      public static final double D = 0;
+      public static final double MAX_SPEED = 4; // m/s
+      public static final double MAX_ACCEL = 3; // m/s^2
+      public static final double kP = 5;
+      public static final double kI = 0;
+      public static final double kD = 0.1;
 
       public static final double kS = 0;
-      public static final double kG = 0;
-      public static final double kV = 0;
+      public static final double kG = 0.762;
+      public static final double kV = 0.762;
       public static final double kA = 0;
       public static final TrapezoidProfile.Constraints CONSTRAINTS =
-          new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration);
+          new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ACCEL);
       public static final double GEAR_RATIO = 1.0;
-      public static final double MOVEMENTPERSPIN = 1.1938 / 6.0; // m/ (50 rotations of motor)
+      public static final double MOVEMENTPERSPIN =
+          1.1938 / 6.0; // m/ (50 rotations of motor) wtf is this
     }
   }
 

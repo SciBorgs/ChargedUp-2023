@@ -19,9 +19,9 @@ public class Visualizer implements Sendable {
   public Visualizer() {
     mech = new Mechanism2d(20, 50);
     chassis = mech.getRoot("Chassis", 10, 0);
-    chassis.append(new MechanismLigament2d("Superstructure", Dimensions.ELEVATOR_HEIGHT, 90));
+    // chassis.append(new MechanismLigament2d("Superstructure", Dimensions.ELEVATOR_HEIGHT, 90));
     elevatorProgress =
-        chassis.append(new MechanismLigament2d("Elevator", Dimensions.ELEVATOR_HEIGHT / 2, 90));
+        chassis.append(new MechanismLigament2d("Elevator", Dimensions.ELEVATOR_MAX_HEIGHT / 2, 90));
     forearm =
         elevatorProgress.append(new MechanismLigament2d("Forearm", Dimensions.FOREARM_LENGTH, 30));
     claw = forearm.append(new MechanismLigament2d("Wrist", Dimensions.CLAW_LENGTH, -10));
