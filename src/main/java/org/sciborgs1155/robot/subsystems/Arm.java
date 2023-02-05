@@ -10,6 +10,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import io.github.oblarg.oblog.Loggable;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
@@ -20,7 +21,7 @@ import org.sciborgs1155.robot.Constants.PlacementConstants.Wrist;
 import org.sciborgs1155.robot.Ports.ClawPorts;
 import org.sciborgs1155.robot.Ports.ElbowPorts;
 
-public class Arm extends SubsystemBase {
+public class Arm extends SubsystemBase implements Loggable {
 
   // Reference to a Mechanism2d for displaying the arm's movement+
   private final Visualizer visualizer;
