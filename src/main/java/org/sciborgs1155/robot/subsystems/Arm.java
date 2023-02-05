@@ -34,9 +34,9 @@ public class Arm extends SubsystemBase implements Loggable {
   private final ArmFeedforward elbowFeedforward;
   private final ProfiledPIDController elbowFeedback;
 
-  private Derivative elbowAccel;
+  private Derivative elbowAccel = new Derivative();
 
-  private Derivative wristAccel;
+  private Derivative wristAccel = new Derivative();
 
   private Rotation2d elbowGoal = new Rotation2d();
   private Rotation2d wristGoal = new Rotation2d();
