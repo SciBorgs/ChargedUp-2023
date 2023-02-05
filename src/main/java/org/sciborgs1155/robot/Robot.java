@@ -100,7 +100,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    CommandScheduler.getInstance().run();
+  }
 
   /** This function is called once when the robot is first started up. */
   @Override
@@ -110,5 +112,6 @@ public class Robot extends TimedRobot {
   @Override
   public void simulationPeriodic() {
     PhysicsSim.getInstance().run();
+    CommandScheduler.getInstance().run();
   }
 }

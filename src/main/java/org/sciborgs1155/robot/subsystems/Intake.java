@@ -23,7 +23,7 @@ public class Intake extends SubsystemBase {
   public Command stop() {
     return runOnce(wheels::stopMotor);
   }
-
+  
   public Command run() {
     return startEnd(() -> wheels.set(Constants.Intake.WHEEL_SPEED), wheels::stopMotor);
   }
