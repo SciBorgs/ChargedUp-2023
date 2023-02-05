@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
@@ -91,7 +92,7 @@ public class Arm extends SubsystemBase {
             true);
   }
 
-  public Rotation2d getElbowgoal() {
+  public Rotation2d getElbowGoal() {
     return elbowGoal;
   }
 
@@ -99,22 +100,13 @@ public class Arm extends SubsystemBase {
     return wristGoal;
   }
 
-  public void setElbowGoal(Rotation2d elbowGoal) {
-    this.elbowGoal = elbowGoal;
+  public Command setElbowGoal(Rotation2d elbowGoal){
+    return runOnce(() -> this.elbowGoal = elbowGoal);
   }
 
-  public void setWristGoal(Rotation2d wristGoal) {
-    this.wristGoal = wristGoal;
+  public Command setWristGoal(Rotation2d wristGoal){
+    return runOnce(() -> this.wristGoal = wristGoal);
   }
-
-  // public Command changeElbowGoal(Rotation2d goal){
-  //   return runOnce(() -> this.elbowGoal = goal);//.andThen(Commands.print("rad: " +
-  // goal.getRadians()));
-  // }
-
-  // public Command changeWristGoal(Rotation2d goal){
-  //   return runOnce(() -> this.wristGoal = goal);
-  // }
 
   @Override
   public void periodic() {

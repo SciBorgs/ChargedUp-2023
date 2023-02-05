@@ -2,6 +2,8 @@ package org.sciborgs1155.robot;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.ejml.dense.row.decomposition.eig.watched.WatchedDoubleStepQREigenvector_DDRM;
+
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.junit.jupiter.api.*;
@@ -18,17 +20,17 @@ public class ArmTest {
   }
 
   @Test
-  void changeElbowGoalTest() throws InterruptedException {
+  void setElbowGoalTest() throws InterruptedException {
     Rotation2d newElbowGoal = new Rotation2d(2);
-    arm.setElbowGoal(newElbowGoal);
-    // arm.changeElbowGoal(newElbowGoal).execute();
-    assertEquals(newElbowGoal, arm.getElbowgoal());
+    arm.setElbowGoal(newElbowGoal).ignoringDisable(true).schedule();
+    assertEquals(newElbowGoal, arm.getElbowGoal());
   }
 
   @Test
-  void changeWristGoalTest() throws InterruptedException {
+  void setWristGoalTest() throws InterruptedException {
     Rotation2d newWristGoal = new Rotation2d(4);
-    arm.setWristGoal(newWristGoal);
+    arm.setWristGoal(newWristGoal).ignoringDisable(true).schedule();
     assertEquals(newWristGoal, arm.getWristGoal());
   }
+
 }
