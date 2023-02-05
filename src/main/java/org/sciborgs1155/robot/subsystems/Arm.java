@@ -113,22 +113,20 @@ public class Arm extends SubsystemBase implements Loggable {
   @Override
   public void periodic() {
 
-    double elbowAcceleration = elbowAccel.calculate(elbowFeedback.getSetpoint().velocity);
     double elbowfb = elbowFeedback.calculate(elbowEncoder.getPosition(), elbowGoal.getRadians());
     double elbowff =
         elbowFeedforward.calculate(
             elbowFeedback.getSetpoint().position,
             elbowFeedback.getSetpoint().velocity,
-            elbowAcceleration);
+            elbowAccel.calculate(elbowFeedback.getSetpoint().velocity));
     elbowLead.setVoltage(elbowfb + elbowff);
 
-    double wristAcceleration = wristAccel.calculate(wristFeedback.getSetpoint().velocity);
     double wristfb = wristFeedback.calculate(wristEncoder.getPosition(), wristGoal.getRadians());
     double wristff =
         wristFeedforward.calculate(
             wristFeedback.getSetpoint().position,
             wristFeedback.getSetpoint().velocity,
-            wristAcceleration);
+            wristAccel.calculate(wristFeedback.getSetpoint().velocity));
     wrist.setVoltage(wristfb + wristff);
 
     Visualizer.getInstance().setArmPositions(getElbowPosition(), getWristPosition());
