@@ -10,7 +10,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
@@ -125,10 +124,10 @@ public class Arm extends SubsystemBase {
     double wristff =
         wristFeedforward.calculate(
             wristFeedback.getSetpoint().position,
-            wristFeedback.getSetpoint().velocity, wristAcceleration);
+            wristFeedback.getSetpoint().velocity,
+            wristAcceleration);
     wrist.setVoltage(wristfb + wristff);
 
-   
     visualizer.setArmAngles(
         Rotation2d.fromRadians(elbowSim.getAngleRads()),
         Rotation2d.fromRadians(wristSim.getAngleRads()));
