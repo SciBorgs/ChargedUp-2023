@@ -7,10 +7,11 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
@@ -37,9 +38,9 @@ public class Arm extends SubsystemBase {
   private final ArmFeedforward elbowFeedforward;
   private final ProfiledPIDController elbowFeedback;
 
-  private double lastSpeed = 0.0;
-  private double lastTime = Timer.getFPGATimestamp();
-  private double acceleration = 0.0;
+  private Derivative elbowAccel;
+
+  private Derivative wristAccel;
 
   private Rotation2d elbowGoal = new Rotation2d();
   private Rotation2d wristGoal = new Rotation2d();
@@ -110,27 +111,24 @@ public class Arm extends SubsystemBase {
   @Override
   public void periodic() {
 
-    acceleration =
-        (elbowFeedback.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - lastTime);
-    lastSpeed = elbowFeedback.getSetpoint().velocity;
-    lastTime = Timer.getFPGATimestamp();
-
+    double elbowAcceleration = elbowAccel.calculate(elbowFeedback.getSetpoint().velocity);
     double elbowfb = elbowFeedback.calculate(elbowEncoder.getPosition(), elbowGoal.getRadians());
     double elbowff =
         elbowFeedforward.calculate(
             elbowFeedback.getSetpoint().position,
             elbowFeedback.getSetpoint().velocity,
-            acceleration);
+            elbowAcceleration);
     elbowLead.setVoltage(elbowfb + elbowff);
 
+    double wristAcceleration = wristAccel.calculate(wristFeedback.getSetpoint().velocity);
     double wristfb = wristFeedback.calculate(wristEncoder.getPosition(), wristGoal.getRadians());
     double wristff =
         wristFeedforward.calculate(
             wristFeedback.getSetpoint().position,
-            wristFeedback.getSetpoint().velocity,
-            acceleration);
+            wristFeedback.getSetpoint().velocity, wristAcceleration);
     wrist.setVoltage(wristfb + wristff);
 
+   
     visualizer.setArmAngles(
         Rotation2d.fromRadians(elbowSim.getAngleRads()),
         Rotation2d.fromRadians(wristSim.getAngleRads()));
