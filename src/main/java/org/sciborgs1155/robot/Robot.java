@@ -1,14 +1,12 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package org.sciborgs1155.robot;
 
 import com.revrobotics.REVPhysicsSim;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import io.github.oblarg.oblog.Logger;
+import org.sciborgs1155.lib.CustomPeriodRunnables;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -21,6 +19,10 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
+  public Robot() {
+    super(Constants.RATE);
+  }
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -30,6 +32,10 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    // Start networktables logger
+    DataLogManager.start();
+    // binds FunctionRegistry to be ran at 0.01 hertz
+    CustomPeriodRunnables.forEachRunnable(this::addPeriodic);
   }
 
   /**
