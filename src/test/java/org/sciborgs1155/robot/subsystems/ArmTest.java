@@ -6,7 +6,6 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 public class ArmTest {
@@ -48,5 +47,4 @@ public class ArmTest {
     }
     assertEquals(goal.getRadians(), arm.getRelativeWristGoal().getRadians(), 5e-5);
   }
-
 }
