@@ -175,6 +175,14 @@
   "NetworkTables": {
     "transitory": {
       "Shuffleboard": {
+        "Arm": {
+          "elbowFeedback": {
+            "open": true
+          },
+          "wristFeedback": {
+            "open": true
+          }
+        },
         "DriveSubsystem": {
           "field2d": {
             "open": true
@@ -205,9 +213,6 @@
           "pid": {
             "open": true
           }
-        },
-        "Intake": {
-          "open": true
         },
         "RobotContainer": {
           "visualizer": {

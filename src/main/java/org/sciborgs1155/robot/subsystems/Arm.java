@@ -23,17 +23,26 @@ import org.sciborgs1155.robot.Constants.Motors;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
+  @Log(name = "wrist applied output", methodName = "getAppliedOutput")
   private final CANSparkMax wrist = Motors.WRIST.build(MotorType.kBrushless, WRIST_MOTOR);
+
+  @Log(name = "elbow applied output", methodName = "getAppliedOutput")
   private final CANSparkMax elbowLead = Motors.ELBOW.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
+
   private final CANSparkMax elbowFollow =
       Motors.ELBOW.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
 
+  @Log(name = "wrist velocity", methodName = "getVelocity")
   private final RelativeEncoder wristEncoder = wrist.getEncoder();
 
+  @Log(name = "elbow velocity", methodName = "getVelocity")
   private final RelativeEncoder elbowEncoder = elbowLead.getEncoder();
 
+  @Log
   private final ProfiledPIDController wristFeedback =
       new ProfiledPIDController(Wrist.kP, Wrist.kI, Wrist.kD, Wrist.CONSTRAINTS);
+
+  @Log
   private final ProfiledPIDController elbowFeedback =
       new ProfiledPIDController(Elbow.kP, Elbow.kI, Elbow.kD, Elbow.CONSTRAINTS);
 
@@ -42,7 +51,10 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   private final ArmFeedforward elbowFeedforward =
       new ArmFeedforward(Elbow.kS, Elbow.kG, Elbow.kV, Elbow.kA);
 
+  @Log(name = "wrist acceleration", methodName = "getLastOutput")
   private final Derivative wristAccel = new Derivative();
+
+  @Log(name = "elbow acceleration", methodName = "getLastOutput")
   private final Derivative elbowAccel = new Derivative();
 
   private final SingleJointedArmSim elbowSim =
@@ -73,39 +85,39 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowEncoder.setVelocityConversionFactor(Elbow.GEAR_RATIO);
   }
 
-  @Log(name = "elbow position", methodName = "getDegrees")
   /** Elbow position relative to the chassis */
+  @Log(name = "elbow position", methodName = "getDegrees")
   public Rotation2d getElbowPosition() {
     return Rotation2d.fromRadians(elbowEncoder.getPosition());
   }
 
-  @Log(name = "wrist relative positon", methodName = "getDegrees")
   /** Wrist position relative to the forearm */
+  @Log(name = "wrist relative positon", methodName = "getDegrees")
   public Rotation2d getRelativeWristPosition() {
     return Rotation2d.fromRadians(wristEncoder.getPosition());
   }
 
-  @Log(name = "wrist absolute positon", methodName = "getDegrees")
   /** Wrist position relative to chassis */
+  @Log(name = "wrist absolute positon", methodName = "getDegrees")
   public Rotation2d getAbsoluteWristPosition() {
 
     return getRelativeWristPosition().plus(getElbowPosition());
   }
 
-  @Log(name = "elbow goal", methodName = "getDegrees")
   /** Elbow goal relative to the chassis */
+  @Log(name = "elbow goal", methodName = "getDegrees")
   public Rotation2d getElbowGoal() {
     return Rotation2d.fromRadians(elbowFeedback.getGoal().position);
   }
 
-  @Log(name = "wrist relative goal", methodName = "getDegrees")
   /** Wrist goal relative to forearm */
+  @Log(name = "wrist relative goal", methodName = "getDegrees")
   public Rotation2d getRelativeWristGoal() {
     return Rotation2d.fromRadians(wristFeedback.getGoal().position);
   }
 
-  @Log(name = "wrist absolute goal", methodName = "getDegrees")
   /** Wrist goal relative to the chassis */
+  @Log(name = "wrist absolute goal", methodName = "getDegrees")
   public Rotation2d getAbsoluteWristGoal() {
     return getRelativeWristGoal().plus(getElbowGoal());
   }

@@ -69,12 +69,13 @@ public class Elevator extends SubsystemBase implements Loggable {
   }
 
   /** Elevator goal from the base, in meters */
-  @Log(name = "target height")
+  @Log(name = "goal height")
   public double getGoal() {
     return pid.getGoal().position;
   }
 
   /** If a limit switch is triggered */
+  @Log(name = "hitting")
   public boolean isHitting() {
     // return beambreak.get() || beambreakTwo.get() || limitSwitchOne.get() || limitSwitchOne.get();
     return false;
