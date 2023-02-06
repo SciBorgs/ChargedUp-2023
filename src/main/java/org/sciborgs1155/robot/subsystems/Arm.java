@@ -28,10 +28,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   private final CANSparkMax elbowFollow =
       Motors.ELBOW.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
 
-  @Log(name = "wrist relative  positon", methodName = "getPosition")
   private final RelativeEncoder wristEncoder = wrist.getEncoder();
 
-  @Log(name = "elboew positon", methodName = "getPosition")
   private final RelativeEncoder elbowEncoder = elbowLead.getEncoder();
 
   private final ProfiledPIDController wristFeedback =
@@ -74,32 +72,39 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowEncoder.setPositionConversionFactor(Elbow.GEAR_RATIO * Elbow.MOVEMENT_PER_SPIN);
     elbowEncoder.setVelocityConversionFactor(Elbow.GEAR_RATIO);
   }
+
+  @Log(name = "elbow position", methodName = "getDegrees")
   /** Elbow position relative to the chassis */
   public Rotation2d getElbowPosition() {
     return Rotation2d.fromRadians(elbowEncoder.getPosition());
   }
 
+  @Log(name = "wrist relative positon", methodName = "getDegrees")
   /** Wrist position relative to the forearm */
   public Rotation2d getRelativeWristPosition() {
     return Rotation2d.fromRadians(wristEncoder.getPosition());
   }
 
-  @Log(name = "wrist relative positon")
+  @Log(name = "wrist absolute positon", methodName = "getDegrees")
   /** Wrist position relative to chassis */
   public Rotation2d getAbsoluteWristPosition() {
+
     return getRelativeWristPosition().plus(getElbowPosition());
   }
 
+  @Log(name = "elbow goal", methodName = "getDegrees")
   /** Elbow goal relative to the chassis */
   public Rotation2d getElbowGoal() {
     return Rotation2d.fromRadians(elbowFeedback.getGoal().position);
   }
 
+  @Log(name = "wrist relative goal", methodName = "getDegrees")
   /** Wrist goal relative to forearm */
   public Rotation2d getRelativeWristGoal() {
     return Rotation2d.fromRadians(wristFeedback.getGoal().position);
   }
 
+  @Log(name = "wrist absolute goal", methodName = "getDegrees")
   /** Wrist goal relative to the chassis */
   public Rotation2d getAbsoluteWristGoal() {
     return getRelativeWristGoal().plus(getElbowGoal());
