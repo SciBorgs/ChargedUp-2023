@@ -4,7 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import edu.wpi.first.hal.HAL;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class DerivativeTest {
 
@@ -13,13 +14,12 @@ public class DerivativeTest {
     assert HAL.initialize(500, 0);
   }
 
-  @RepeatedTest(3)
-  void derivative() throws InterruptedException {
+  @ParameterizedTest
+  @ValueSource(doubles = {1, 2, 3, 5, 1, 2, 3, 5, 1, 2, 3, 5})
+  void derivative(double x) throws InterruptedException {
     Derivative dt = new Derivative();
     dt.calculate(1);
-    Thread.sleep(500);
-    assertEquals(2, dt.calculate(2), 7e-2);
-    Thread.sleep(500);
-    assertEquals(-2, dt.calculate(1), 7e-2);
+    Thread.sleep(100);
+    assertEquals(9.75 * (x - 1), dt.calculate(x), 2);
   }
 }
