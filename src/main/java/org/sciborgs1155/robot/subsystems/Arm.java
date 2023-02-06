@@ -85,6 +85,18 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowEncoder.setVelocityConversionFactor(Elbow.GEAR_RATIO);
   }
 
+  /** Elbow is at goal */
+  @Log(name = "elbow at goal")
+  public boolean atElbowGoal() {
+    return elbowFeedback.atGoal();
+  }
+
+  /** Wrist is at goal */
+  @Log(name = "wrist at goal")
+  public boolean atWrsitGoal() {
+    return wristFeedback.atGoal();
+  }
+
   /** Elbow position relative to the chassis */
   @Log(name = "elbow position", methodName = "getDegrees")
   public Rotation2d getElbowPosition() {

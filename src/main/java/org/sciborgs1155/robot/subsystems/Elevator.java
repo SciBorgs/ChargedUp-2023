@@ -62,6 +62,10 @@ public class Elevator extends SubsystemBase implements Loggable {
     right.follow(lead);
   }
 
+  public boolean atGoal() {
+    return pid.atGoal();
+  }
+
   /** Elevator height from the base, in meters */
   @Log(name = "current height")
   public double getHeight() {
