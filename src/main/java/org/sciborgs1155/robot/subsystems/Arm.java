@@ -40,8 +40,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   private final ArmFeedforward elbowFeedforward =
       new ArmFeedforward(Elbow.kS, Elbow.kG, Elbow.kV, Elbow.kA);
 
-  private Derivative wristAccel = new Derivative();
-  private Derivative elbowAccel = new Derivative();
+  private final Derivative wristAccel = new Derivative();
+  private final Derivative elbowAccel = new Derivative();
 
   private final SingleJointedArmSim elbowSim =
       new SingleJointedArmSim(

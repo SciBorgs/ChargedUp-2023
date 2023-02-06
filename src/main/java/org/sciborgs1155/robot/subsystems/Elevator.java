@@ -62,23 +62,27 @@ public class Elevator extends SubsystemBase implements Loggable {
     right.follow(lead);
   }
 
+  /** Elevator height from the base, in meters */
   @Log(name = "current height")
   public double getHeight() {
     return encoder.getPosition();
   }
 
+  /** Elevator goal from the base, in meters */
   @Log(name = "target height")
-  public double getTargetHeight() {
+  public double getGoal() {
     return pid.getGoal().position;
   }
 
+  /** If a limit switch is triggered */
   public boolean isHitting() {
     // return beambreak.get() || beambreakTwo.get() || limitSwitchOne.get() || limitSwitchOne.get();
     return false;
   }
 
-  public Command setTargetHeight(double targetHeight) {
-    return runOnce(() -> pid.setGoal(targetHeight));
+  /** Elevator goal from the base, in meters */
+  public Command setGoal(double height) {
+    return runOnce(() -> pid.setGoal(height));
   }
 
   @Override
