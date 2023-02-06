@@ -93,17 +93,17 @@ public final class Constants {
   public static final class Arm {
     public static final class Wrist {
       // not actual values
-      public static final double kP = 0.3;
-      public static final double kI = 0.08;
-      public static final double kD = 0.5;
+      public static final double kP = 500;
+      public static final double kI = 10;
+      public static final double kD = 30;
 
       public static final double kS = 0;
-      public static final double kG = 0;
+      public static final double kG = 180;
       public static final double kV = 0;
       public static final double kA = 0;
 
-      public static final double MAX_WRIST_VELOCITY = 0.3; // radians / s
-      public static final double MAX_WRIST_ACCEL = 0.3; // radians / s^2
+      public static final double MAX_WRIST_VELOCITY = 3; // radians / s
+      public static final double MAX_WRIST_ACCEL = 3; // radians / s^2
       public static final TrapezoidProfile.Constraints CONSTRAINTS =
           new TrapezoidProfile.Constraints(MAX_WRIST_VELOCITY, MAX_WRIST_ACCEL);
     }

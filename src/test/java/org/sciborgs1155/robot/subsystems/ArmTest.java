@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class ArmTest {
   static Arm arm;
@@ -33,4 +36,17 @@ public class ArmTest {
     arm.setWristGoal(newWristGoal).ignoringDisable(true).schedule();
     assertEquals(newWristGoal, arm.getRelativeWristGoal());
   }
+
+  @ParameterizedTest
+  @ValueSource(doubles = {-0.7, -0.3, 0.0, 0.3, 0.7})
+  void moveWristToGoal(double radGoal) {
+    Rotation2d goal = new Rotation2d(radGoal);
+    arm.setWristGoal(goal).ignoringDisable(true).schedule();
+    for (int i = 0; i < 1000; i++) {
+      arm.periodic();
+      arm.simulationPeriodic();
+    }
+    assertEquals(goal.getRadians(), arm.getRelativeWristGoal().getRadians(), 5e-5);
+  }
+
 }
