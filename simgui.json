@@ -202,10 +202,12 @@
           "Visualizer": {
             "open": true
           },
-          "open": true,
           "pid": {
             "open": true
           }
+        },
+        "Intake": {
+          "open": true
         },
         "RobotContainer": {
           "visualizer": {
@@ -234,7 +236,6 @@
         "open": true
       },
       "photonvision": {
-        "open": true,
         "photonvision": {
           "open": true
         }

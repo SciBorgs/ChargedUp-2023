@@ -5,13 +5,20 @@ import static org.sciborgs1155.robot.Ports.Intake.*;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.robot.Constants.Motors;
 
-public class Intake extends SubsystemBase {
+public class Intake extends SubsystemBase implements Loggable {
 
+  @Log(name = "applied output", methodName = "getAppliedOutput")
   private final CANSparkMax wheels = Motors.INTAKE.build(MotorType.kBrushless, WHEEL_MOTOR);
+
+  @Log(name = "velocity", methodName = "getVelocity")
+  private final RelativeEncoder encoder = wheels.getEncoder();
 
   public Command start() {
     return runOnce(() -> wheels.set(WHEEL_SPEED));
