@@ -31,6 +31,6 @@ public class ArmTest {
   void setWristGoalTest() {
     Rotation2d newWristGoal = new Rotation2d(4);
     arm.setWristGoal(newWristGoal).ignoringDisable(true).schedule();
-    assertEquals(newWristGoal, arm.getWristGoal());
+    assertEquals(newWristGoal, arm.getRelativeWristGoal());
   }
 }

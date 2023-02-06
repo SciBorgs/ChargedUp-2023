@@ -78,26 +78,42 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowFollow.close();
   }
 
+  /** Elbow position relative to the chassis */
   public Rotation2d getElbowPosition() {
     return Rotation2d.fromRadians(elbowEncoder.getPosition());
   }
 
-  public Rotation2d getWristPosition() {
+  /** Wrist position relative to the forearm */
+  public Rotation2d getRelativeWristPosition() {
     return Rotation2d.fromRadians(wristEncoder.getPosition());
   }
 
+  /** Wrist position relative to chassis */
+  public Rotation2d getAbsoluteWristPosition() {
+    return getRelativeWristPosition().plus(getElbowPosition());
+  }
+
+  /** Elbow goal relative to the chassis */
   public Rotation2d getElbowGoal() {
     return Rotation2d.fromRadians(elbowFeedback.getGoal().position);
   }
 
-  public Rotation2d getWristGoal() {
+  /** Wrist goal relative to forearm */
+  public Rotation2d getRelativeWristGoal() {
     return Rotation2d.fromRadians(wristFeedback.getGoal().position);
   }
 
+  /** Wrist goal relative to the chassis */
+  public Rotation2d getAbsoluteWristGoal() {
+    return getRelativeWristGoal().plus(getElbowGoal());
+  }
+
+  /** Sets elbow goal relative to the chassis */
   public Command setElbowGoal(Rotation2d goal) {
     return runOnce(() -> elbowFeedback.setGoal(goal.getRadians()));
   }
 
+  /** Sets wrist goal relative to the chassis */
   public Command setWristGoal(Rotation2d goal) {
     return runOnce(() -> wristFeedback.setGoal(goal.getRadians()));
   }
@@ -112,15 +128,20 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             elbowAccel.calculate(elbowFeedback.getSetpoint().velocity));
     elbowLead.setVoltage(elbowfb + elbowff);
 
+    // wrist feedback is calculated using an absolute angle setpoint, rather than a relative one
+    // this means the extra voltage calculated to cancel out gravity is kG * cos(θ + ϕ), where θ is
+    // the elbow setpoint and ϕ is the wrist setpoint
+    // the elbow angle is used as a setpoint instead of current position because we're using a
+    // profiled pid controller, which means setpoints are achievable states, rather than goals
     double wristfb = wristFeedback.calculate(wristEncoder.getPosition());
     double wristff =
         wristFeedforward.calculate(
-            wristFeedback.getSetpoint().position,
+            wristFeedback.getSetpoint().position + elbowFeedback.getSetpoint().position,
             wristFeedback.getSetpoint().velocity,
             wristAccel.calculate(wristFeedback.getSetpoint().velocity));
     wrist.setVoltage(wristfb + wristff);
 
-    Visualizer.getInstance().setArmPositions(getElbowPosition(), getWristPosition());
+    Visualizer.getInstance().setArmPositions(getElbowPosition(), getRelativeWristPosition());
   }
 
   @Override
