@@ -15,11 +15,13 @@ public class DerivativeTest {
   }
 
   @ParameterizedTest
-  @ValueSource(doubles = {1, 2, 3, 5, 1, 2, 3, 5, 1, 2, 3, 5})
+  @ValueSource(doubles = {1, 2, 3, 4, 5})
   void derivative(double x) throws InterruptedException {
-    Derivative dt = new Derivative();
-    dt.calculate(1);
-    Thread.sleep(100);
-    assertEquals(9.75 * (x - 1), dt.calculate(x), 2);
+    for (int i = 0; i < 3; i++) {
+      Derivative dt = new Derivative();
+      dt.calculate(1);
+      Thread.sleep(100);
+      assertEquals(9.75 * (x - 1), dt.calculate(x), 2);
+    }
   }
 }
