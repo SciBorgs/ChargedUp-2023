@@ -38,13 +38,25 @@ public class ArmTest {
 
   @ParameterizedTest
   @ValueSource(doubles = {-0.7, -0.3, 0.0, 0.3, 0.7})
-  void moveWristToGoal(double radGoal) {
+  void moveWristToRelativeGoal(double radGoal) {
     Rotation2d goal = new Rotation2d(radGoal);
-    arm.setWristGoal(goal).ignoringDisable(true).schedule();
+    arm.setRelativeWristGoal(goal).ignoringDisable(true).schedule();
     for (int i = 0; i < 1000; i++) {
       arm.periodic();
       arm.simulationPeriodic();
     }
-    assertEquals(goal.getRadians(), arm.getRelativeWristGoal().getRadians(), 5e-5);
+    assertEquals(goal.getRadians(), arm.getRelativeWristPosition().getRadians(), 5e-2);
+  }
+
+  @ParameterizedTest
+  @ValueSource(doubles = {-0.7, -0.3, 0.0, 0.3, 0.7})
+  void moveWristToAbsoluteGoal(double radGoal) {
+    Rotation2d goal = new Rotation2d(radGoal);
+    arm.setAbsoluteWristGoal(goal).ignoringDisable(true).schedule();
+    for (int i = 0; i < 1000; i++) {
+      arm.periodic();
+      arm.simulationPeriodic();
+    }
+    assertEquals(goal.getRadians(), arm.getAbsoluteWristPosition().getRadians(), 5e-2);
   }
 }
