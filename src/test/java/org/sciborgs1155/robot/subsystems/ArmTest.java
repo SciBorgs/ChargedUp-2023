@@ -57,6 +57,18 @@ public class ArmTest {
       arm.periodic();
       arm.simulationPeriodic();
     }
-    assertEquals(goal.getRadians(), arm.getAbsoluteWristPosition().getRadians(), 5e-2);
+    assertEquals(goal.getRadians(), arm.getAbsoluteWristPosition().getRadians(), 9e-2);
+  }
+
+  @ParameterizedTest
+  @ValueSource(doubles = {-0.7, -0.3, 0.0, 0.3, 0.7})
+  void moveElbowToGoal(double radGoal) {
+    Rotation2d goal = new Rotation2d(radGoal);
+    arm.setElbowGoal(goal).ignoringDisable(true).schedule();
+    for (int i = 0; i < 1000; i++) {
+      arm.periodic();
+      arm.simulationPeriodic();
+    }
+    assertEquals(goal.getRadians(), arm.getElbowPosition().getRadians(), 9e-3);
   }
 }

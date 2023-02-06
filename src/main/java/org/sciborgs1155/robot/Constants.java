@@ -68,8 +68,8 @@ public final class Constants {
     public static final double FOREARM_LENGTH = 5;
     public static final double CLAW_LENGTH = 2;
 
-    public static final double ELBOW_MIN_ANGLE = Units.degreesToRadians(0);
-    public static final double ELBOW_MAX_ANGLE = Units.degreesToRadians(360);
+    public static final double ELBOW_MIN_ANGLE = Units.degreesToRadians(-90);
+    public static final double ELBOW_MAX_ANGLE = Units.degreesToRadians(270);
     public static final double WRIST_MIN_ANGLE = Units.degreesToRadians(-90);
     public static final double WRIST_MAX_ANGLE = Units.degreesToRadians(90);
 
@@ -109,17 +109,17 @@ public final class Constants {
     }
 
     public static final class Elbow {
-      public static final double kP = 0.1;
-      public static final double kI = 0;
-      public static final double kD = 0;
+      public static final double kP = 500;
+      public static final double kI = 5;
+      public static final double kD = 10;
 
       public static final double kS = 0;
-      public static final double kG = 0;
+      public static final double kG = 10;
       public static final double kV = 0;
       public static final double kA = 0;
 
-      public static final double MAX_VELOCITY = 0.3; // radians / s
-      public static final double MAX_ACCEL = 0.3; // radians / s^2
+      public static final double MAX_VELOCITY = 3; // radians / s
+      public static final double MAX_ACCEL = 3; // radians / s^2
       public static final TrapezoidProfile.Constraints CONSTRAINTS =
           new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
 
