@@ -41,7 +41,7 @@ public class ArmTest {
   void moveWristToRelativeGoal(double radGoal) {
     Rotation2d goal = new Rotation2d(radGoal);
     arm.setRelativeWristGoal(goal).ignoringDisable(true).schedule();
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 200; i++) {
       arm.periodic();
       arm.simulationPeriodic();
     }
@@ -53,7 +53,7 @@ public class ArmTest {
   void moveWristToAbsoluteGoal(double radGoal) {
     Rotation2d goal = new Rotation2d(radGoal);
     arm.setAbsoluteWristGoal(goal).ignoringDisable(true).schedule();
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 200; i++) {
       arm.periodic();
       arm.simulationPeriodic();
     }
@@ -65,7 +65,7 @@ public class ArmTest {
   void moveElbowToGoal(double radGoal) {
     Rotation2d goal = new Rotation2d(radGoal);
     arm.setElbowGoal(goal).ignoringDisable(true).schedule();
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 200; i++) {
       arm.periodic();
       arm.simulationPeriodic();
     }
