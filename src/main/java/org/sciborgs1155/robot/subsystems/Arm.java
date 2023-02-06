@@ -71,13 +71,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowEncoder.setVelocityConversionFactor(Elbow.GEAR_RATIO);
   }
 
-  @Override
-  public void close() {
-    wrist.close();
-    elbowLead.close();
-    elbowFollow.close();
-  }
-
   /** Elbow position relative to the chassis */
   public Rotation2d getElbowPosition() {
     return Rotation2d.fromRadians(elbowEncoder.getPosition());
@@ -113,8 +106,13 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     return runOnce(() -> elbowFeedback.setGoal(goal.getRadians()));
   }
 
-  /** Sets wrist goal relative to the chassis */
-  public Command setWristGoal(Rotation2d goal) {
+  /** Sets wrist goal relative to the chassis, uses {@link #getElbowPosition()} as reference */
+  public Command setAbsoluteWristGoal(Rotation2d goal) {
+    return runOnce(() -> wristFeedback.setGoal(goal.plus(getElbowPosition()).getRadians()));
+  }
+
+  /** Sets wrist goal relative to the forearm */
+  public Command setRelativeWristGoal(Rotation2d goal) {
     return runOnce(() -> wristFeedback.setGoal(goal.getRadians()));
   }
 
@@ -153,5 +151,12 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     wristSim.setInputVoltage(wrist.getAppliedOutput());
     wristSim.update(Constants.RATE);
     wristEncoder.setPosition(wristSim.getAngleRads());
+  }
+
+  @Override
+  public void close() {
+    wrist.close();
+    elbowLead.close();
+    elbowFollow.close();
   }
 }
