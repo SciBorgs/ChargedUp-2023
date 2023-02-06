@@ -8,7 +8,7 @@ public class Camera {
   private static final PhotonCamera cam = new PhotonCamera(Constants.Vision.CAMERA_NAME);
 
   private Camera() {}
-  
+
   public static PhotonCamera getInstance() {
     return cam;
   }
