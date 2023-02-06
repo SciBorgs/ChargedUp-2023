@@ -19,6 +19,7 @@ import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
+import io.github.oblarg.oblog.annotations.Log;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
@@ -27,7 +28,9 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   private final CANSparkMax elbowFollow =
       Motors.ELBOW.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
 
+  @Log(name = "wrist relative  positon", methodName = "getPosition")
   private final RelativeEncoder wristEncoder = wrist.getEncoder();
+  @Log(name = "elboew positon", methodName = "getPosition")
   private final RelativeEncoder elbowEncoder = elbowLead.getEncoder();
 
   private final ProfiledPIDController wristFeedback =
@@ -70,7 +73,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowEncoder.setPositionConversionFactor(Elbow.GEAR_RATIO * Elbow.MOVEMENT_PER_SPIN);
     elbowEncoder.setVelocityConversionFactor(Elbow.GEAR_RATIO);
   }
-
   /** Elbow position relative to the chassis */
   public Rotation2d getElbowPosition() {
     return Rotation2d.fromRadians(elbowEncoder.getPosition());
@@ -81,6 +83,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     return Rotation2d.fromRadians(wristEncoder.getPosition());
   }
 
+  @Log(name = "wrist relative positon")
   /** Wrist position relative to chassis */
   public Rotation2d getAbsoluteWristPosition() {
     return getRelativeWristPosition().plus(getElbowPosition());
