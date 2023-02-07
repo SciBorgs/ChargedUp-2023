@@ -13,6 +13,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import org.sciborgs1155.lib.WheelSim;
+import org.sciborgs1155.lib.Kinematics.SciSwerveModuleState;
 import org.sciborgs1155.robot.Constants;
 
 /** Class to encapsulate a rev max swerve module */
@@ -39,8 +40,8 @@ public class SimSwerveModule implements SwerveModule, Sendable {
    *
    * @return The current state of the module.
    */
-  public SwerveModuleState getState() {
-    return new SwerveModuleState(
+  public SciSwerveModuleState getState() {
+    return new SciSwerveModuleState(0,
         drive.getAngularVelocityRadPerSec(),
         Rotation2d.fromRadians(turn.getAngularVelocityRadPerSec()));
   }
@@ -55,10 +56,10 @@ public class SimSwerveModule implements SwerveModule, Sendable {
    *
    * @param desiredState Desired state with speed and angle.
    */
-  public void setDesiredState(SwerveModuleState desiredState) {
+  public void setDesiredState(SciSwerveModuleState desiredState) {
     // Optimize the reference state to avoid spinning further than 90 degrees
-    SwerveModuleState state =
-        SwerveModuleState.optimize(
+    SciSwerveModuleState state =
+        SciSwerveModuleState.optimize(
             desiredState, Rotation2d.fromRadians(turn.getAngularPositionRad()));
 
     final double driveFB =

@@ -14,6 +14,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -35,6 +36,7 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.ControllerOutputFunction;
+import org.sciborgs1155.lib.Kinematics.SciSwerveModuleState;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Auto;
 import org.sciborgs1155.robot.Constants.Vision;
@@ -128,10 +130,11 @@ public class Drive extends SubsystemBase implements Loggable {
     rot *= MAX_ANGULAR_SPEED;
 
     var states =
-        KINEMATICS.toSwerveModuleStates(
+        KINEMATICS.toSwerveModuleStates(imu,
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getHeading())
-                : new ChassisSpeeds(xSpeed, ySpeed, rot));
+                : new ChassisSpeeds(xSpeed, ySpeed, rot),
+                new Translation2d());
 
     setModuleStates(states);
   }
@@ -141,7 +144,7 @@ public class Drive extends SubsystemBase implements Loggable {
    *
    * @param desiredStates The desired SwerveModule states.
    */
-  public void setModuleStates(SwerveModuleState[] desiredStates) {
+  public void setModuleStates(SciSwerveModuleState[] desiredStates) {
     if (desiredStates.length != modules.length) {
       throw new IllegalArgumentException("desiredStates must have the same length as modules");
     }
