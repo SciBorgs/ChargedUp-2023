@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.subsystems;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -41,11 +42,11 @@ public class ArmTest {
   void moveWristToRelativeGoal(double radGoal) {
     Rotation2d goal = new Rotation2d(radGoal);
     arm.setRelativeWristGoal(goal).ignoringDisable(true).schedule();
-    for (int i = 0; i < 200; i++) {
+    for (int i = 0; i < 400; i++) {
       arm.periodic();
       arm.simulationPeriodic();
     }
-    assertEquals(goal.getRadians(), arm.getRelativeWristPosition().getRadians(), 5e-2);
+    assertTrue(arm.atWrsitGoal());
   }
 
   @ParameterizedTest
@@ -53,11 +54,11 @@ public class ArmTest {
   void moveWristToAbsoluteGoal(double radGoal) {
     Rotation2d goal = new Rotation2d(radGoal);
     arm.setAbsoluteWristGoal(goal).ignoringDisable(true).schedule();
-    for (int i = 0; i < 200; i++) {
+    for (int i = 0; i < 400; i++) {
       arm.periodic();
       arm.simulationPeriodic();
     }
-    assertEquals(goal.getRadians(), arm.getAbsoluteWristPosition().getRadians(), 9e-2);
+    assertTrue(arm.atWrsitGoal());
   }
 
   @ParameterizedTest
@@ -65,10 +66,10 @@ public class ArmTest {
   void moveElbowToGoal(double radGoal) {
     Rotation2d goal = new Rotation2d(radGoal);
     arm.setElbowGoal(goal).ignoringDisable(true).schedule();
-    for (int i = 0; i < 200; i++) {
+    for (int i = 0; i < 400; i++) {
       arm.periodic();
       arm.simulationPeriodic();
     }
-    assertEquals(goal.getRadians(), arm.getElbowPosition().getRadians(), 9e-3);
+    assertTrue(arm.atElbowGoal());
   }
 }

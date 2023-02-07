@@ -60,22 +60,20 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   private final SingleJointedArmSim elbowSim =
       new SingleJointedArmSim(
           DCMotor.getNEO(2),
-          1,
-          1,
+          5,
+          SingleJointedArmSim.estimateMOI(Dimensions.FOREARM_LENGTH, 2),
           Dimensions.FOREARM_LENGTH,
           Dimensions.ELBOW_MIN_ANGLE,
           Dimensions.ELBOW_MAX_ANGLE,
-          1,
           true);
   private final SingleJointedArmSim wristSim =
       new SingleJointedArmSim(
           DCMotor.getNeo550(1),
-          1,
-          1,
+          5,
+          SingleJointedArmSim.estimateMOI(Dimensions.CLAW_LENGTH, 1),
           Dimensions.CLAW_LENGTH,
           Dimensions.WRIST_MIN_ANGLE,
           Dimensions.WRIST_MAX_ANGLE,
-          1,
           true);
 
   public Arm() {
@@ -112,7 +110,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   /** Wrist position relative to chassis */
   @Log(name = "wrist absolute positon", methodName = "getDegrees")
   public Rotation2d getAbsoluteWristPosition() {
-
     return getRelativeWristPosition().plus(getElbowPosition());
   }
 

@@ -94,7 +94,7 @@ public final class Constants {
     public static final class Wrist {
       // not actual values
       public static final double kP = 500;
-      public static final double kI = 10;
+      public static final double kI = 0;
       public static final double kD = 30;
 
       public static final double kS = 0;
@@ -110,8 +110,8 @@ public final class Constants {
 
     public static final class Elbow {
       public static final double kP = 500;
-      public static final double kI = 5;
-      public static final double kD = 10;
+      public static final double kI = 0;
+      public static final double kD = 30;
 
       public static final double kS = 0;
       public static final double kG = 10;
