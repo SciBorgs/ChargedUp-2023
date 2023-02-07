@@ -8,7 +8,6 @@ import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 
 public class WheelSim extends LinearSystemSim<N2, N1, N2> {
-
   /**
    * Create a state-space model for a 1(?) DOF "wheel" system from its kV (volts/(unit/sec)) and kA
    * (volts/(unit/sec²). These constants cam be found using SysId. The states of the system are
@@ -33,13 +32,10 @@ public class WheelSim extends LinearSystemSim<N2, N1, N2> {
     super(identifySystem(kV, kA));
   }
 
-  /**
-   * Returns the wheel velocity.
-   *
-   * @return The wheel velocity in rad / sec.
-   */
-  public double getVelocity() {
-    return super.getOutput(1);
+  /** Output values for LinearSystemSim#getOutput */
+  private enum Output {
+    POSITION,
+    VELOCITY
   }
 
   /**
@@ -48,7 +44,16 @@ public class WheelSim extends LinearSystemSim<N2, N1, N2> {
    * @return The wheel position in meters.
    */
   public double getPosition() {
-    return super.getOutput(0);
+    return super.getOutput(Output.POSITION);
+  }
+  
+  /**
+   * Returns the wheel velocity.
+   *
+   * @return The wheel velocity in rad / sec.
+   */
+  public double getVelocity() {
+    return super.getOutput(Output.VELOCITY);
   }
 
   public void reset() {
