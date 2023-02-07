@@ -78,6 +78,7 @@ public class Drive extends SubsystemBase implements Loggable {
 
   public Drive(PhotonCamera cam) {
     this.cam = cam;
+
     visionOdometry =
         new PhotonPoseEstimator(layout, PoseStrategy.LOWEST_AMBIGUITY, cam, Vision.ROBOT_TO_CAM);
 
@@ -226,17 +227,21 @@ public class Drive extends SubsystemBase implements Loggable {
                     * Constants.RATE));
   }
 
-  /** Follows the specified path planner path */
-  public Command follow(String pathName) {
+  public Command follow(PathPlannerTrajectory trajectory) {
     PIDController x = new PIDController(Auto.Cartesian.kP, Auto.Cartesian.kI, Auto.Cartesian.kD);
     PIDController y = new PIDController(Auto.Cartesian.kP, Auto.Cartesian.kI, Auto.Cartesian.kD);
     PIDController rot = new PIDController(Auto.Angular.kP, Auto.Angular.kI, Auto.Angular.kD);
-    PathPlannerTrajectory loadedPath = PathPlanner.loadPath(pathName, Auto.CONSTRAINTS);
 
-    resetOdometry(loadedPath.getInitialPose());
+    resetOdometry(trajectory.getInitialPose());
     return new PPSwerveControllerCommand(
-            loadedPath, this::getPose, KINEMATICS, x, y, rot, this::setModuleStates, false)
+            trajectory, this::getPose, KINEMATICS, x, y, rot, this::setModuleStates, false)
         .andThen(stop());
+  }
+
+  /** Follows the specified path planner path */
+  public Command follow(String pathName) {
+    PathPlannerTrajectory loadedPath = PathPlanner.loadPath(pathName, Auto.CONSTRAINTS);
+    return follow(loadedPath);
   }
 
   /** Drive based on xbox */
@@ -259,6 +264,7 @@ public class Drive extends SubsystemBase implements Loggable {
   // TODO replace
   private static final ControllerOutputFunction mapper =
       ControllerOutputFunction.powerExp(Math.E, Math.PI);
+
   /** Drive based on joysticks */
   public Command drive(CommandJoystick left, CommandJoystick right, boolean fieldRelative) {
     return run(
