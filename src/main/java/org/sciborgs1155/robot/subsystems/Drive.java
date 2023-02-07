@@ -31,9 +31,9 @@ import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.sciborgs1155.lib.Camera;
 import org.sciborgs1155.lib.ControllerOutputFunction;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Auto;
@@ -65,22 +65,22 @@ public class Drive extends SubsystemBase implements Loggable {
   private final ADIS16470_IMU imu = new ADIS16470_IMU();
 
   // Odometry and pose estimation
-  private final PhotonCamera cam;
-  private final SwerveDrivePoseEstimator odometry =
-      new SwerveDrivePoseEstimator(KINEMATICS, getHeading(), getModulePositions(), new Pose2d());
-  private final AprilTagFieldLayout layout =
-      new AprilTagFieldLayout(Vision.TEST_TAGS, getTurnRate(), getPitch());
+  private final SwerveDrivePoseEstimator odometry;
+  private final AprilTagFieldLayout layout;
   private final PhotonPoseEstimator visionOdometry;
 
   @Log private final Field2d field2d = new Field2d();
 
   private final FieldObject2d[] modules2d = new FieldObject2d[modules.length];
 
-  public Drive(PhotonCamera cam) {
-    this.cam = cam;
-
+  public Drive() {
+    odometry =
+        new SwerveDrivePoseEstimator(
+            KINEMATICS, getHeading(), getModulePositions(), new Pose2d()); // change to initial pose
+    layout = new AprilTagFieldLayout(Vision.TEST_TAGS, getTurnRate(), getPitch());
     visionOdometry =
-        new PhotonPoseEstimator(layout, PoseStrategy.LOWEST_AMBIGUITY, cam, Vision.ROBOT_TO_CAM);
+        new PhotonPoseEstimator(
+            layout, PoseStrategy.LOWEST_AMBIGUITY, Camera.getInstance(), Vision.ROBOT_TO_CAM);
 
     for (int i = 0; i < modules2d.length; i++) modules2d[i] = field2d.getObject("module-" + i);
   }
@@ -196,7 +196,7 @@ public class Drive extends SubsystemBase implements Loggable {
   private void updateOdometry() {
     odometry.update(getHeading(), getModulePositions());
 
-    var latest = cam.getLatestResult();
+    var latest = Camera.getInstance().getLatestResult();
 
     visionOdometry.setReferencePose(odometry.getEstimatedPosition());
     Optional<EstimatedRobotPose> visionEstimate = visionOdometry.update();

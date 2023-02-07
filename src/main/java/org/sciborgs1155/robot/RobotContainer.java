@@ -29,7 +29,7 @@ public class RobotContainer {
   // private final Visualizer visualizer = new Visualizer();
 
   // The robot's subsystems and commands are defined here...
-  private final Drive drive = new Drive(cam);
+  private final Drive drive = new Drive();
   // private final Arm arm = new Arm(visualizer);
   // private final Elevator elevator = new Elevator(visualizer);
 
