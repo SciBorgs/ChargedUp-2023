@@ -42,11 +42,11 @@ public final class MotorConfig {
     }
   }
 
-  private final boolean inverted;
-  private final NeutralBehavior neutralBehavior;
-  private final double openLoopRampRate;
-  private final int currentLimit;
-  private final boolean burnFlash;
+  public final boolean inverted;
+  public final NeutralBehavior neutralBehavior;
+  public final double openLoopRampRate;
+  public final int currentLimit;
+  public final boolean burnFlash;
 
   public MotorConfig(
       boolean inverted,
@@ -129,44 +129,21 @@ public final class MotorConfig {
     return lead;
   }
 
-  // i hate java
-
-  public boolean isInverted() {
-    return inverted;
-  }
-
   public MotorConfig withInvert(boolean inverted) {
     return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
-  }
-
-  public NeutralBehavior getNeutralBehavior() {
-    return neutralBehavior;
   }
 
   public MotorConfig withNeutralBehavior(NeutralBehavior neutralBehavior) {
     return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
   }
-
-  public double getOpenLoopRampRate() {
-    return openLoopRampRate;
-  }
-
   public MotorConfig withOpenLoopRampRate(double openLoopRampRate) {
     return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
-  }
-
-  public int getCurrentLimit() {
-    return currentLimit;
   }
 
   public MotorConfig withCurrentLimit(int currentLimit) {
     return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
   }
-
-  public boolean getBurnFlash() {
-    return burnFlash;
-  }
-
+  
   public MotorConfig withBurnFlash(boolean burnFlash) {
     return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
   }
