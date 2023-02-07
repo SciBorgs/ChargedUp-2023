@@ -62,6 +62,8 @@ public class Elevator extends SubsystemBase implements Loggable {
     right.follow(lead);
   }
 
+  /** Elevator is at goal */
+  @Log(name = "at goal")
   public boolean atGoal() {
     return pid.atGoal();
   }

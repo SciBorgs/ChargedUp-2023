@@ -5,7 +5,7 @@ import java.util.List;
 
 public class PlacementTrajectory {
 
-  private final List<State> states;
+  private List<State> states;
 
   public static class State {
     public final double elevatorHeight;

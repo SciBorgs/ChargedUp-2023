@@ -20,7 +20,7 @@ public class Placement {
     return elevator.atGoal() && arm.atElbowGoal() && arm.atWrsitGoal();
   }
 
-  public Command goTo(Arm arm, Elevator elevator, PlacementTrajectory.State state) {
+  public Command goToState(PlacementTrajectory.State state) {
     return Commands.parallel(
             elevator.setGoal(state.elevatorHeight),
             arm.setElbowGoal(state.elbowAngle),
