@@ -8,12 +8,11 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import org.sciborgs1155.lib.WheelSim;
 import org.sciborgs1155.lib.Kinematics.SciSwerveModuleState;
+import org.sciborgs1155.lib.WheelSim;
 import org.sciborgs1155.robot.Constants;
 
 /** Class to encapsulate a rev max swerve module */
@@ -41,7 +40,8 @@ public class SimSwerveModule implements SwerveModule, Sendable {
    * @return The current state of the module.
    */
   public SciSwerveModuleState getState() {
-    return new SciSwerveModuleState(0,
+    return new SciSwerveModuleState(
+        0,
         drive.getAngularVelocityRadPerSec(),
         Rotation2d.fromRadians(turn.getAngularVelocityRadPerSec()));
   }

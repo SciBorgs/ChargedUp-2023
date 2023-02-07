@@ -1,8 +1,6 @@
 package org.sciborgs1155.robot.subsystems.modules;
 
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-
 import org.sciborgs1155.lib.Kinematics.SciSwerveModuleState;
 import org.sciborgs1155.robot.Robot;
 

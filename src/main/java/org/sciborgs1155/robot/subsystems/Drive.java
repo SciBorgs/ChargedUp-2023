@@ -130,11 +130,12 @@ public class Drive extends SubsystemBase implements Loggable {
     rot *= MAX_ANGULAR_SPEED;
 
     var states =
-        KINEMATICS.toSwerveModuleStates(imu,
+        KINEMATICS.toSwerveModuleStates(
+            imu,
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getHeading())
                 : new ChassisSpeeds(xSpeed, ySpeed, rot),
-                new Translation2d());
+            new Translation2d());
 
     setModuleStates(states);
   }
