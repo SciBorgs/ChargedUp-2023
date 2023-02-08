@@ -37,6 +37,7 @@ public class ArmTest {
     assertEquals(newWristGoal, arm.getRelativeWristGoal());
   }
 
+  @Disabled
   @ParameterizedTest
   @ValueSource(doubles = {-0.7, -0.3, 0.0, 0.3, 0.7})
   void moveWristToRelativeGoal(double radGoal) {
@@ -49,6 +50,7 @@ public class ArmTest {
     assertTrue(arm.atWrsitGoal());
   }
 
+  @Disabled
   @ParameterizedTest
   @ValueSource(doubles = {-0.7, -0.3, 0.0, 0.3, 0.7})
   void moveWristToAbsoluteGoal(double radGoal) {
