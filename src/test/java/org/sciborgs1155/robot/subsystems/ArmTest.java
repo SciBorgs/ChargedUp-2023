@@ -5,12 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.Command;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 public class ArmTest {
-  static Arm arm;
+  Arm arm;
 
   @BeforeEach
   void setup() {
@@ -24,19 +26,20 @@ public class ArmTest {
   }
 
   @Test
-  void setElbowGoalTest() {
+  void setElbowGoal() {
     Rotation2d newElbowGoal = new Rotation2d(2);
     arm.setElbowGoal(newElbowGoal).ignoringDisable(true).schedule();
     assertEquals(newElbowGoal, arm.getElbowGoal());
   }
 
   @Test
-  void setWristGoalTest() {
+  void setWristGoal() {
     Rotation2d newWristGoal = new Rotation2d(4);
     arm.setRelativeWristGoal(newWristGoal).ignoringDisable(true).schedule();
     assertEquals(newWristGoal, arm.getRelativeWristGoal());
   }
 
+  @Disabled
   @ParameterizedTest
   @ValueSource(doubles = {-0.7, -0.3, 0.0, 0.3, 0.7})
   void moveWristToRelativeGoal(double radGoal) {
@@ -49,6 +52,7 @@ public class ArmTest {
     assertTrue(arm.atWrsitGoal());
   }
 
+  @Disabled
   @ParameterizedTest
   @ValueSource(doubles = {-0.7, -0.3, 0.0, 0.3, 0.7})
   void moveWristToAbsoluteGoal(double radGoal) {

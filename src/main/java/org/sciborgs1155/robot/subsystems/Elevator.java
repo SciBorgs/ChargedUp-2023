@@ -6,6 +6,8 @@ import static org.sciborgs1155.robot.Ports.Elevator.*;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -35,10 +37,6 @@ public class Elevator extends SubsystemBase implements Loggable {
 
   private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
   @Log private final ProfiledPIDController pid = new ProfiledPIDController(kP, kI, kD, CONSTRAINTS);
-
-  // digital input
-  @Log private final DigitalInput beambreak = new DigitalInput(BEAM_BREAK_PORTS[0]);
-  @Log private final DigitalInput beambreakTwo = new DigitalInput(BEAM_BREAK_PORTS[1]);
 
   @Log private final DigitalInput limitSwitchOne = new DigitalInput(LIMIT_SWITCH_PORTS[0]);
   @Log private final DigitalInput limitSwitchTwo = new DigitalInput(LIMIT_SWITCH_PORTS[1]);
@@ -89,7 +87,7 @@ public class Elevator extends SubsystemBase implements Loggable {
 
   /** Elevator goal from the base, in meters */
   public Command setGoal(double height) {
-    return runOnce(() -> pid.setGoal(height));
+    return runOnce(() -> pid.setGoal(MathUtil.clamp(height, Dimensions.ELEVATOR_MIN_HEIGHT, Dimensions.ELEVATOR_MAX_HEIGHT)));
   }
 
   @Override
