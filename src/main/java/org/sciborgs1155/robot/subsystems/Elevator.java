@@ -23,7 +23,7 @@ import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
 
-public class Elevator extends SubsystemBase implements Loggable {
+public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log(name = "applied output", methodName = "getAppliedOutput")
   private final CANSparkMax lead = Motors.ELEVATOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
@@ -57,6 +57,16 @@ public class Elevator extends SubsystemBase implements Loggable {
   public Elevator() {
     left.follow(lead);
     right.follow(lead);
+  }
+
+  @Override
+  public void close() {
+    lead.close();
+    left.close();
+    right.close();
+
+    limitSwitchOne.close();
+    limitSwitchTwo.close();
   }
 
   /** Elevator is at goal */
