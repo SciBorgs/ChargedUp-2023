@@ -23,6 +23,11 @@ import org.sciborgs1155.robot.Constants.Motors;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
+  public enum Side {
+    FRONT,
+    BACK;
+  }
+
   @Log(name = "wrist applied output", methodName = "getAppliedOutput")
   private final CANSparkMax wrist = Motors.WRIST.build(MotorType.kBrushless, WRIST_MOTOR);
 
@@ -93,6 +98,11 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log(name = "wrist at goal")
   public boolean atWrsitGoal() {
     return wristFeedback.atGoal();
+  }
+
+  /** The side of the robot that the arm is currently at */
+  public Side getSide() {
+    return getElbowPosition().getCos() > 0 ? Side.FRONT : Side.BACK;
   }
 
   /** Elbow position relative to the chassis */
