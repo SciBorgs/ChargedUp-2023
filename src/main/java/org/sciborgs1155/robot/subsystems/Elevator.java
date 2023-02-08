@@ -6,7 +6,6 @@ import static org.sciborgs1155.robot.Ports.Elevator.*;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -87,7 +86,11 @@ public class Elevator extends SubsystemBase implements Loggable {
 
   /** Elevator goal from the base, in meters */
   public Command setGoal(double height) {
-    return runOnce(() -> pid.setGoal(MathUtil.clamp(height, Dimensions.ELEVATOR_MIN_HEIGHT, Dimensions.ELEVATOR_MAX_HEIGHT)));
+    return runOnce(
+        () ->
+            pid.setGoal(
+                MathUtil.clamp(
+                    height, Dimensions.ELEVATOR_MIN_HEIGHT, Dimensions.ELEVATOR_MAX_HEIGHT)));
   }
 
   @Override
