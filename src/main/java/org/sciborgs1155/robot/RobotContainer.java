@@ -6,9 +6,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
-import org.photonvision.PhotonCamera;
 // import org.sciborgs1155.lib.Visualizer;
-import org.sciborgs1155.robot.Constants.Vision;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 // import org.sciborgs1155.robot.subsystems.Arm;
@@ -23,8 +21,6 @@ import org.sciborgs1155.robot.subsystems.Drive;
  */
 public class RobotContainer {
   // Define camera for PoseEstimation
-  private final PhotonCamera cam = new PhotonCamera(Vision.CAMERA_NAME);
-
   // Visualizer for elevator/arm simulation
   // private final Visualizer visualizer = new Visualizer();
 

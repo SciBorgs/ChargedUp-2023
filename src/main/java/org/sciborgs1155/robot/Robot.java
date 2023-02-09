@@ -110,5 +110,6 @@ public class Robot extends TimedRobot {
   @Override
   public void simulationPeriodic() {
     // PhysicsSim.getInstance().run();
+    // VisionSim.getInstance().run();
   }
 }

@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import java.util.Arrays;
 import java.util.List;
 import org.sciborgs1155.lib.MotorConfig;
 import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
@@ -61,18 +62,62 @@ public final class Constants {
   }
 
   public static final class Vision {
-    public static final String CAMERA_NAME = "photonvision";
+    public static final String CAM_NAME = "photonvision";
 
     public static final Translation3d CAM_TRANSLATION = new Translation3d();
     public static final Rotation3d CAM_ROTATION = new Rotation3d();
     public static final Transform3d ROBOT_TO_CAM = new Transform3d(CAM_TRANSLATION, CAM_ROTATION);
 
-    public static final double FIELD_LENGTH = Units.feetToMeters(54);
-    public static final double FIELD_WIDTH = Units.feetToMeters(27);
-
+    public static final double TARGET_HEIGHT_SUBSTATIONS = Units.inchesToMeters(23.375);
+    public static final double TARGET_HEIGHT_NODES = Units.inchesToMeters(14.25);
     // test tag at 0
     public static final AprilTag TEST_TAG_0 = new AprilTag(0, new Pose3d());
     public static final List<AprilTag> TEST_TAGS = List.of(TEST_TAG_0);
+
+    public static final double FIELD_LENGTH = 16.54175; // meters
+    public static final double FIELD_WIDTH = 8.0137;
+
+    public static final
+    class AprilTagPose { // TODO correct rotation values (physics stuff i cant read :skull:)
+      public static final Pose3d APRIL_TAG_1_POSE =
+          new Pose3d(
+              15.513558, 1.071626, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(180)));
+
+      public static final Pose3d APRIL_TAG_2_POSE =
+          new Pose3d(
+              15.513558, 2.748026, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(180)));
+
+      public static final Pose3d APRIL_TAG_3_POSE =
+          new Pose3d(
+              15.513558, 4.424426, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(180)));
+
+      public static final Pose3d APRIL_TAG_4_POSE =
+          new Pose3d(
+              16.178784, 6.749796, 0.695452, new Rotation3d(0, 0, Units.degreesToRadians(180)));
+
+      public static final Pose3d APRIL_TAG_5_POSE =
+          new Pose3d(0.36195, 6.749796, 0.695452, new Rotation3d(0, 0, Units.degreesToRadians(0)));
+
+      public static final Pose3d APRIL_TAG_6_POSE =
+          new Pose3d(1.02743, 4.424426, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(0)));
+
+      public static final Pose3d APRIL_TAG_7_POSE =
+          new Pose3d(1.02743, 2.748026, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(0)));
+
+      public static final Pose3d APRIL_TAG_8_POSE =
+          new Pose3d(1.02743, 1.071626, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(0)));
+
+      public static final List<AprilTag> APRIL_TAGS =
+          Arrays.asList(
+              new AprilTag(1, APRIL_TAG_1_POSE),
+              new AprilTag(2, APRIL_TAG_2_POSE),
+              new AprilTag(3, APRIL_TAG_3_POSE),
+              new AprilTag(4, APRIL_TAG_4_POSE),
+              new AprilTag(5, APRIL_TAG_5_POSE),
+              new AprilTag(6, APRIL_TAG_6_POSE),
+              new AprilTag(7, APRIL_TAG_7_POSE),
+              new AprilTag(8, APRIL_TAG_8_POSE));
+    }
   }
 
   public static final class PlacementConstants {
