@@ -14,16 +14,18 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
+import java.util.function.Function;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
 
-public class Elevator extends SubsystemBase implements Loggable {
+public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log(name = "applied output", methodName = "getAppliedOutput")
   private final CANSparkMax lead = Motors.ELEVATOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
@@ -59,6 +61,16 @@ public class Elevator extends SubsystemBase implements Loggable {
     right.follow(lead);
   }
 
+  @Override
+  public void close() {
+    lead.close();
+    left.close();
+    right.close();
+
+    limitSwitchOne.close();
+    limitSwitchTwo.close();
+  }
+
   /** Elevator is at goal */
   @Log(name = "at goal")
   public boolean atGoal() {
@@ -91,6 +103,17 @@ public class Elevator extends SubsystemBase implements Loggable {
             pid.setGoal(
                 MathUtil.clamp(
                     height, Dimensions.ELEVATOR_MIN_HEIGHT, Dimensions.ELEVATOR_MAX_HEIGHT)));
+  }
+
+  public Command initTest() {
+    Function<Double, Command> moveToGoal =
+        (Double height) ->
+            Commands.print("moving to " + height)
+                .alongWith(setGoal(height))
+                .andThen(Commands.waitUntil(this::atGoal))
+                .andThen(Commands.print("at " + height))
+                .alongWith(Commands.waitSeconds(3));
+    return moveToGoal.apply(3.).andThen(moveToGoal.apply(8.)).andThen(moveToGoal.apply(5.));
   }
 
   @Override
