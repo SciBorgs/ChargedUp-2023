@@ -26,29 +26,33 @@ import org.sciborgs1155.robot.Constants.Motors;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
+  /** Represents the side of the robot the arm is on */
   public enum Side {
     FRONT,
     BACK;
   }
 
   /** State class to store relative angles for the arm. */
-  public static final class State implements Sendable {
-    public final Rotation2d elbowAngle;
-    public final Rotation2d wristAngle;
+  public record State(Rotation2d elbowAngle, Rotation2d wristAngle) implements Sendable {
 
-    public State(Rotation2d elbowAngle, Rotation2d wristAngle) {
-      this.elbowAngle = elbowAngle;
-      this.wristAngle = wristAngle;
+    /**
+     * Returns a new {@link State} from angles in radians, with the wrist state relative to the
+     * chassis
+     */
+    public static State fromAbsolute(double elbowAngle, double wristAngle) {
+      return new State(
+          Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle - elbowAngle));
     }
 
-    public static State fromAbsolute(Rotation2d elbowAngle, Rotation2d wristAngle) {
-      return new State(elbowAngle, wristAngle.minus(elbowAngle));
+    /**
+     * Returns a new {@link State} from angles in radians, with the wrist state relative to the
+     * forearm
+     */
+    public static State fromRelative(double elbowAngle, double wristAngle) {
+      return new State(Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle));
     }
 
-    public static State fromRelative(Rotation2d elbowAngle, Rotation2d wristAngle) {
-      return new State(elbowAngle, elbowAngle);
-    }
-
+    /** The side of the robot the arm is on */
     public Side toSide() {
       return elbowAngle.getCos() > 0 ? Side.FRONT : Side.BACK;
     }
@@ -125,17 +129,13 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   /** Relative state of the arm */
   @Log(name = "state")
   public State getState() {
-    return new State(
-        Rotation2d.fromRadians(elbowEncoder.getPosition()),
-        Rotation2d.fromRadians(wristEncoder.getPosition()));
+    return State.fromRelative(elbowEncoder.getPosition(), wristEncoder.getPosition());
   }
 
   /** Relative goal of the arm */
   @Log(name = "goal")
   public State getGoal() {
-    return new State(
-        Rotation2d.fromRadians(elbowFeedback.getGoal().position),
-        Rotation2d.fromRadians(wristFeedback.getGoal().position));
+    return State.fromRelative(elbowFeedback.getGoal().position, wristFeedback.getGoal().position);
   }
 
   /** Elbow is at goal */

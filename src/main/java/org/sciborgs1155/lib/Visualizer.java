@@ -39,8 +39,8 @@ public class Visualizer implements Sendable {
   }
 
   public void setArmPositions(Arm.State state) {
-    forearm.setAngle(state.elbowAngle);
-    claw.setAngle(state.wristAngle);
+    forearm.setAngle(state.elbowAngle());
+    claw.setAngle(state.wristAngle());
   }
 
   @Override
