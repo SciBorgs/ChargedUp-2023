@@ -10,8 +10,11 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
@@ -26,6 +29,37 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   public enum Side {
     FRONT,
     BACK;
+  }
+
+  /** State class to store relative angles for the arm. */
+  public static final class State implements Sendable {
+    public final Rotation2d elbowAngle;
+    public final Rotation2d wristAngle;
+
+    public State(Rotation2d elbowAngle, Rotation2d wristAngle) {
+      this.elbowAngle = elbowAngle;
+      this.wristAngle = wristAngle;
+    }
+
+    public static State fromAbsolute(Rotation2d elbowAngle, Rotation2d wristAngle) {
+      return new State(elbowAngle, wristAngle.minus(elbowAngle));
+    }
+
+    public static State fromRelative(Rotation2d elbowAngle, Rotation2d wristAngle) {
+      return new State(elbowAngle, elbowAngle);
+    }
+
+    public Side toSide() {
+      return elbowAngle.getCos() > 0 ? Side.FRONT : Side.BACK;
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+      builder.addDoubleProperty("elbow angle", () -> elbowAngle.getDegrees(), null);
+      builder.addDoubleProperty("relative wrist angle", () -> wristAngle.getDegrees(), null);
+      builder.addDoubleProperty(
+          "absolute wrist angle", () -> elbowAngle.plus(wristAngle).getDegrees(), null);
+    }
   }
 
   @Log(name = "wrist applied output", methodName = "getAppliedOutput")
@@ -88,6 +122,22 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowEncoder.setVelocityConversionFactor(Elbow.GEAR_RATIO);
   }
 
+  /** Relative state of the arm */
+  @Log(name = "state")
+  public State getState() {
+    return new State(
+        Rotation2d.fromRadians(elbowEncoder.getPosition()),
+        Rotation2d.fromRadians(wristEncoder.getPosition()));
+  }
+
+  /** Relative goal of the arm */
+  @Log(name = "goal")
+  public State getGoal() {
+    return new State(
+        Rotation2d.fromRadians(elbowFeedback.getGoal().position),
+        Rotation2d.fromRadians(wristFeedback.getGoal().position));
+  }
+
   /** Elbow is at goal */
   @Log(name = "elbow at goal")
   public boolean atElbowGoal() {
@@ -96,64 +146,23 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   /** Wrist is at goal */
   @Log(name = "wrist at goal")
-  public boolean atWrsitGoal() {
+  public boolean atWristGoal() {
     return wristFeedback.atGoal();
   }
 
-  /** The side of the robot that the arm is currently at */
-  public Side getSide() {
-    return getElbowPosition().getCos() > 0 ? Side.FRONT : Side.BACK;
+  /** Wrist and elbow are at goal */
+  public boolean atGoal() {
+    return atElbowGoal() && atWristGoal();
   }
 
-  /** Elbow position relative to the chassis */
-  @Log(name = "elbow position", methodName = "getDegrees")
-  public Rotation2d getElbowPosition() {
-    return Rotation2d.fromRadians(elbowEncoder.getPosition());
+  /** Sets arm and wrist goals, with the wrist goal relative to the arm */
+  public Command setGoal(State goal) {
+    return runOnce(() -> elbowFeedback.setGoal(goal.elbowAngle.getRadians()))
+        .andThen(() -> wristFeedback.setGoal(goal.wristAngle.getRadians()));
   }
 
-  /** Wrist position relative to the forearm */
-  @Log(name = "wrist relative positon", methodName = "getDegrees")
-  public Rotation2d getRelativeWristPosition() {
-    return Rotation2d.fromRadians(wristEncoder.getPosition());
-  }
-
-  /** Wrist position relative to chassis */
-  @Log(name = "wrist absolute positon", methodName = "getDegrees")
-  public Rotation2d getAbsoluteWristPosition() {
-    return getRelativeWristPosition().plus(getElbowPosition());
-  }
-
-  /** Elbow goal relative to the chassis */
-  @Log(name = "elbow goal", methodName = "getDegrees")
-  public Rotation2d getElbowGoal() {
-    return Rotation2d.fromRadians(elbowFeedback.getGoal().position);
-  }
-
-  /** Wrist goal relative to forearm */
-  @Log(name = "wrist relative goal", methodName = "getDegrees")
-  public Rotation2d getRelativeWristGoal() {
-    return Rotation2d.fromRadians(wristFeedback.getGoal().position);
-  }
-
-  /** Wrist goal relative to the chassis */
-  @Log(name = "wrist absolute goal", methodName = "getDegrees")
-  public Rotation2d getAbsoluteWristGoal() {
-    return getRelativeWristGoal().plus(getElbowGoal());
-  }
-
-  /** Sets elbow goal relative to the chassis */
-  public Command setElbowGoal(Rotation2d goal) {
-    return runOnce(() -> elbowFeedback.setGoal(goal.getRadians()));
-  }
-
-  /** Sets wrist goal relative to the chassis, uses {@link #getElbowPosition()} as reference */
-  public Command setAbsoluteWristGoal(Rotation2d goal) {
-    return runOnce(() -> wristFeedback.setGoal(goal.plus(getElbowPosition()).getRadians()));
-  }
-
-  /** Sets wrist goal relative to the forearm */
-  public Command setRelativeWristGoal(Rotation2d goal) {
-    return runOnce(() -> wristFeedback.setGoal(goal.getRadians()));
+  public Command runToGoal(State goal) {
+    return setGoal(goal).andThen(Commands.waitUntil(this::atGoal));
   }
 
   @Override
@@ -179,7 +188,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             wristAccel.calculate(wristFeedback.getSetpoint().velocity));
     wrist.setVoltage(wristfb + wristff);
 
-    Visualizer.getInstance().setArmPositions(getElbowPosition(), getRelativeWristPosition());
+    Visualizer.getInstance().setArmPositions(getState());
   }
 
   @Override

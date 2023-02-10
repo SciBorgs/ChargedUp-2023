@@ -1,10 +1,6 @@
 package org.sciborgs1155.robot.commands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import org.sciborgs1155.robot.subsystems.Arm;
-import org.sciborgs1155.robot.subsystems.Elevator;
 
 /** Trajectory for elevator and arm, without respect for time */
 public final class Placement {
@@ -21,20 +17,21 @@ public final class Placement {
     }
   }
 
-  public static Command goToState(Arm arm, Elevator elevator, State state) {
-    return Commands.parallel(
-            elevator.setGoal(state.elevatorHeight),
-            arm.setElbowGoal(state.elbowAngle),
-            arm.setAbsoluteWristGoal(state.wristAngle))
-        .andThen(
-            Commands.waitUntil(() -> elevator.atGoal() && arm.atElbowGoal() && arm.atWrsitGoal()));
-  }
+  // public static Command goToState(Arm arm, Elevator elevator, State state) {
+  //   return Commands.parallel(
+  //           elevator.setGoal(state.elevatorHeight),
+  //           arm.setElbowGoal(state.elbowAngle),
+  //           arm.setAbsoluteWristGoal(state.wristAngle))
+  //       .andThen(
+  //           Commands.waitUntil(() -> elevator.atGoal() && arm.atElbowGoal() &&
+  // arm.atWrsitGoal()));
+  // }
 
-  public static Command goToState(Arm arm, Elevator elevator, State... states) {
-    Command cmd = Commands.none();
-    for (State state : states) {
-      cmd = cmd.andThen(goToState(arm, elevator, state));
-    }
-    return cmd;
-  }
+  // public static Command goToState(Arm arm, Elevator elevator, State... states) {
+  //   Command cmd = Commands.none();
+  //   for (State state : states) {
+  //     cmd = cmd.andThen(goToState(arm, elevator, state));
+  //   }
+  //   return cmd;
+  // }
 }
