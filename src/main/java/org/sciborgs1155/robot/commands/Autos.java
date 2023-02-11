@@ -13,19 +13,17 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
-import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.Drive;
 import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+import java.util.ArrayList;
+import java.util.List;
+import org.sciborgs1155.robot.Constants;
 
 
 public final class Autos implements Sendable {
@@ -33,12 +31,10 @@ public final class Autos implements Sendable {
   private final Drive drive;
   private final PhotonCamera cam;
   private final SendableChooser<Command> chooser;
-  private final SwerveDrivePoseEstimator odometry;
 
-  public Autos(Drive drive, PhotonCamera cam, SwerveDrivePoseEstimator odometry) {
+  public Autos(Drive drive, PhotonCamera cam) {
     this.drive = drive;
     this.cam = cam;
-    this.odometry = odometry;
 
     chooser = new SendableChooser<>();
     chooser.setDefaultOption("mobility", mobility());
@@ -57,19 +53,24 @@ public final class Autos implements Sendable {
   public void initSendable(SendableBuilder builder) {
     chooser.initSendable(builder);
   }
+  // public Command cameraAlignment() {
 
-  public Command cameraAlignment() {
-    var result = cam.getLatestResult();
-    PhotonTrackedTarget target = result.getBestTarget();
-    Transform3d bestCameraToTarget = target.getBestCameraToTarget();
-    double xp = bestCameraToTarget.getX();
-    double yp = bestCameraToTarget.getY();
-    double currentX = odometry.getEstimatedPosition().getX();
-    double currentY = odometry.getEstimatedPosition().getY();
-    double xpole = xp + currentX;
-    double ypole = yp + currentY;
-    return align(xpole, ypole); 
-  }
+  //   var result = cam.getLatestResult();
+  //   PhotonTrackedTarget target = result.getBestTarget();
+  //   Transform3d bestCameraToTarget = target.getBestCameraToTarget();
+  //   double xp = bestCameraToTarget.getX();
+  //   double yp = bestCameraToTarget.getY();
+  //   double currentX = odometry.getEstimatedPosition().getX();
+  //   double currentY = odometry.getEstimatedPosition().getY();
+  //   double xpole = xp + currentX;
+  //   double ypole = yp + currentY;
+  //   return align(xpole, ypole);
+  // }
+  // public Command align(double xpole, double ypole) {
+  //   PathPlannerTrajectory trajectory;
+  //   return Commands.run(
+  //     () -> drive.follow(PathPlannerTrajectory trajectory));
+  // }
 
   public List<PathPoint> generatePointList(double xpole, double ypole) {
     Translation2d pointPosition = new Translation2d(xpole, ypole);

@@ -77,8 +77,8 @@ public final class Constants {
     public static final double FIELD_LENGTH = 16.54175; // meters
     public static final double FIELD_WIDTH = 8.0137;
 
-    public static final
-    class AprilTagPose { // TODO correct rotation values (physics stuff i cant read :skull:)
+    public static final class AprilTagPose {
+      // TODO correct rotation values (physics stuff i cant read :skull:)
       public static final Pose3d APRIL_TAG_1_POSE =
           new Pose3d(
               15.513558, 1.071626, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(180)));
@@ -117,6 +117,14 @@ public final class Constants {
               new AprilTag(6, APRIL_TAG_6_POSE),
               new AprilTag(7, APRIL_TAG_7_POSE),
               new AprilTag(8, APRIL_TAG_8_POSE));
+    }
+
+    public static final class VisionSim {
+      public static final double maxLEDRangeMeters = 9000;
+      public static final double camDiagFOVDegrees = 68.5;
+      public static final double minTargetArea = 90;
+      public static final int CAMERA_RES_WIDTH = 960;
+      public static final int CAMERA_RES_HEIGHT = 544;
     }
   }
 
