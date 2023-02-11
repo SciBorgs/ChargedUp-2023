@@ -28,37 +28,21 @@ public final class Placement {
 
     
   }
-  
+
   public static Command goToState(Arm arm, Elevator elevator, State state) {
-
-
-
- 
-    double lowHeight =0 ;//placeholder garbage
-    
     return Commands.parallel(
-
-            /*
-            Drives elevator down to lowHeight if state side is opposite to arm side
-            
-
-
-            */
-            Commands.either(elevator.setGoal(lowHeight),Commands.none(),()->state.getSide()!=arm.getSide()).andThen(elevator.setGoal(state.elevatorHeight)),
-            
+            elevator.setGoal(state.elevatorHeight),
             arm.setElbowGoal(state.elbowAngle),
             arm.setAbsoluteWristGoal(state.wristAngle))
         .andThen(
-            Commands.waitUntil(() -> elevator.atGoal() && arm.atElbowGoal() && arm.atWrsitGoal())
-            
-            );
+            Commands.waitUntil(() -> elevator.atGoal() && arm.atElbowGoal() && arm.atWrsitGoal()));
   }
 
-  public static Command goToState(Arm arm, Elevator elevator, State... states) {
-    Command cmd = Commands.none();
-    for (State state : states) {
-      cmd = cmd.andThen(goToState(arm, elevator, state));
-    }
-    return cmd;
-  }
+  // public static Command goToState(Arm arm, Elevator elevator, State... states) {
+  //   Command cmd = Commands.none();
+  //   for (State state : states) {
+  //     cmd = cmd.andThen(goToState(arm, elevator, state));
+  //   }
+  //   return cmd;
+  // }
 }

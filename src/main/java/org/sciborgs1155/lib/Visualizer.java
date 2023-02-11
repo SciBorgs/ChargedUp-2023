@@ -1,12 +1,12 @@
 package org.sciborgs1155.lib;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import org.sciborgs1155.robot.Constants.Dimensions;
+import org.sciborgs1155.robot.subsystems.Arm;
 
 /** Visualization class specific for our charged up bot */
 public class Visualizer implements Sendable {
@@ -38,9 +38,9 @@ public class Visualizer implements Sendable {
     elevatorProgress.setLength(height);
   }
 
-  public void setArmPositions(Rotation2d elbow, Rotation2d wrist) {
-    forearm.setAngle(elbow);
-    claw.setAngle(wrist);
+  public void setArmPositions(Arm.State state) {
+    forearm.setAngle(state.elbowAngle);
+    claw.setAngle(state.wristAngle);
   }
 
   @Override
