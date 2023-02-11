@@ -1,9 +1,6 @@
 package org.sciborgs1155.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import org.photonvision.PhotonCamera;
-import org.sciborgs1155.lib.ArmState;
 import org.sciborgs1155.robot.subsystems.Arm;
 
 /** Trajectory for elevator and arm, without respect for time */
@@ -17,14 +14,14 @@ public final class Placement {
     this.cam = cam;
   }
 
-  public Command goToCameraTarget() {
-    return Commands.either(
-        arm.runToGoal(
-            ArmState.fromIK(
-                cam.getLatestResult().getBestTarget().getBestCameraToTarget().getTranslation())),
-        Commands.none(),
-        () -> cam.getLatestResult().hasTargets());
-  }
+  // public Command goToCameraTarget() {
+  //   return Commands.either(
+  //       arm.runToGoals(
+  //           ArmState.fromIK(
+  //               cam.getLatestResult().getBestTarget().getBestCameraToTarget().getTranslation())),
+  //       Commands.none(),
+  //       () -> cam.getLatestResult().hasTargets());
+  // }
 
   // public static Command goToState(Arm arm, Elevator elevator, State state) {
   //   return Commands.parallel(

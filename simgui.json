@@ -217,7 +217,6 @@
           "Visualizer": {
             "open": true
           },
-          "open": true,
           "pid": {
             "open": true
           }
@@ -244,6 +243,12 @@
           "mech": {
             "open": true
           },
+          "open": true
+        },
+        "open": true
+      },
+      "SmartDashboard": {
+        "goal": {
           "open": true
         },
         "open": true

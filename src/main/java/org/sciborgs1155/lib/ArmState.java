@@ -29,6 +29,8 @@ public record ArmState(Rotation2d elbowAngle, Rotation2d wristAngle) implements 
    * forearm
    */
   public static ArmState fromRelative(double elbowAngle, double wristAngle) {
+    // System.out.println("elbow: " + elbowAngle);
+    // System.out.println("wrist: " + Rotation2d.fromRadians(wristAngle));
     return new ArmState(Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle));
   }
 
@@ -59,11 +61,21 @@ public record ArmState(Rotation2d elbowAngle, Rotation2d wristAngle) implements 
     return fromAbsolute(elbowAngle, wristAngle);
   }
 
+  public double elbowAngleRadians() {
+    return elbowAngle().getRadians();
+  }
+
+  public double wristAngleRadians() {
+    return wristAngle().getRadians();
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.addDoubleProperty("elbow angle", () -> elbowAngle.getDegrees(), null);
-    builder.addDoubleProperty("relative wrist angle", () -> wristAngle.getDegrees(), null);
-    builder.addDoubleProperty(
-        "absolute wrist angle", () -> elbowAngle.plus(wristAngle).getDegrees(), null);
+    builder.addStringProperty("this", this::toString, null);
+    // builder.addDoubleProperty("thing", () -> 2, null);
+    // builder.addDoubleProperty("elbow angle", () -> elbowAngle().getDegrees(), null);
+    // builder.addDoubleProperty("relative wrist angle", () -> wristAngle().getDegrees(), null);
+    // builder.addDoubleProperty(
+    //     "absolute wrist angle", () -> elbowAngle().plus(wristAngle()).getDegrees(), null);
   }
 }
