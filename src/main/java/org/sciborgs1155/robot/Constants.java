@@ -65,8 +65,8 @@ public final class Constants {
     // no clue what the actual constants are
     public static final double ELEVATOR_MIN_HEIGHT = 2;
     public static final double ELEVATOR_MAX_HEIGHT = 40;
-    public static final double FOREARM_LENGTH = 5;
-    public static final double CLAW_LENGTH = 2;
+    public static final double FOREARM_LENGTH = Units.inchesToMeters(41);
+    public static final double CLAW_LENGTH = Units.inchesToMeters(20);
 
     public static final double ELBOW_MIN_ANGLE = Units.degreesToRadians(-90);
     public static final double ELBOW_MAX_ANGLE = Units.degreesToRadians(270);
