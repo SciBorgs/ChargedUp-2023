@@ -15,7 +15,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -36,6 +35,7 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.ControllerOutputFunction;
+import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Kinematics.ChassisState;
 import org.sciborgs1155.lib.Kinematics.SciSwerveKinematics;
 import org.sciborgs1155.lib.Kinematics.SciSwerveModuleState;
@@ -71,11 +71,14 @@ public class Drive extends SubsystemBase implements Loggable {
   // Odometry and pose estimation
   private final PhotonCamera cam;
   private final SwerveDrivePoseEstimator odometry =
-      new SwerveDrivePoseEstimator(KINEMATICS, getHeading(), getModulePositions(), new Pose2d());
+      new SwerveDrivePoseEstimator(
+          AUTOKINEMATICS, getHeading(), getModulePositions(), new Pose2d());
   private final AprilTagFieldLayout layout =
       new AprilTagFieldLayout(Vision.TEST_TAGS, getTurnRate(), getPitch());
   private final PhotonPoseEstimator visionOdometry;
-
+  private final Derivative accelX = new Derivative();
+  private final Derivative accelY = new Derivative();
+  private final Derivative rotAccel = new Derivative();
   @Log private final Field2d field2d = new Field2d();
 
   private final FieldObject2d[] modules2d = new FieldObject2d[modules.length];
@@ -131,7 +134,10 @@ public class Drive extends SubsystemBase implements Loggable {
     ySpeed *= MAX_SPEED;
     rot *= MAX_ANGULAR_SPEED;
 
-    
+    xSpeed = accelX.calculate(xSpeed);
+    ySpeed = accelY.calculate(ySpeed);
+    rot = rotAccel.calculate(rot);
+
     var states =
         DRIVERKINEMATICS.toSwerveModuleStates(
             fieldRelative
@@ -141,8 +147,8 @@ public class Drive extends SubsystemBase implements Loggable {
 
     setModuleStates(states);
   }
-//angery
-//reeeeeeeeeeeeeeeeeeeeeeeeeeee
+  // angery
+  // reeeeeeeeeeeeeeeeeeeeeeeeeeee
   /**
    * Sets the swerve ModuleStates.
    *
@@ -158,7 +164,17 @@ public class Drive extends SubsystemBase implements Loggable {
       modules[i].setDesiredState(desiredStates[i]);
     }
   }
-  
+
+  public void setModuleStates(SwerveModuleState[] desiredStates) {
+    if (desiredStates.length != modules.length) {
+      throw new IllegalArgumentException("desiredStates must have the same length as modules");
+    }
+
+    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, MAX_SPEED);
+    for (int i = 0; i < modules.length; i++) {
+      modules[i].setDesiredState(desiredStates[i]);
+    }
+  }
 
   /** Resets the drive encoders to currently read a position of 0. */
   public void resetEncoders() {
@@ -230,7 +246,7 @@ public class Drive extends SubsystemBase implements Loggable {
     gyro.getSimCollection()
         .addHeading(
             Units.radiansToDegrees(
-                KINEMATICS.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
+                DRIVERKINEMATICS.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
                     * Constants.RATE));
   }
 

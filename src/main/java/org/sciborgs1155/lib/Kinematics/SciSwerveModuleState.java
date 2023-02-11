@@ -7,17 +7,17 @@ public class SciSwerveModuleState extends SwerveModuleState {
   /** IN METERS PER SECOND SQUARED */
   public double moduleAcceleration;
 
-
   /** Create an empty ModuleState with no accel or angle */
   public SciSwerveModuleState() {}
-  //TODO NOAH Rename Parameters
+  // TODO NOAH Rename Parameters
 
   public SciSwerveModuleState(double moduleAcceleration, double velocity, Rotation2d angle) {
     this.moduleAcceleration = moduleAcceleration;
     this.angle = angle;
     speedMetersPerSecond = velocity;
   }
-  public SciSwerveModuleState(double moduleAcceleration, Rotation2d angle){
+
+  public SciSwerveModuleState(double moduleAcceleration, Rotation2d angle) {
     this.moduleAcceleration = moduleAcceleration;
     this.angle = angle;
   }
@@ -36,9 +36,7 @@ public class SciSwerveModuleState extends SwerveModuleState {
           -desiredState.moduleAcceleration,
           desiredState.angle.rotateBy(Rotation2d.fromDegrees(180.0)));
     } else {
-      return new SciSwerveModuleState(
-          desiredState.moduleAcceleration, desiredState.angle);
+      return new SciSwerveModuleState(desiredState.moduleAcceleration, desiredState.angle);
     }
   }
-
 }

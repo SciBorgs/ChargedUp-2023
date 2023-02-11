@@ -2,8 +2,6 @@ package org.sciborgs1155.robot.subsystems.modules;
 
 import static org.sciborgs1155.robot.Constants.SwerveModule.*;
 
-import org.sciborgs1155.lib.Kinematics.SciSwerveModuleState;
-
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -17,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import org.sciborgs1155.lib.Kinematics.SciSwerveModuleState;
 import org.sciborgs1155.robot.Constants.Motors;
 
 /** Class to encapsulate a rev max swerve module */
@@ -82,7 +81,7 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
 
     driveEncoder.setPosition(0);
     this.angularOffset = Rotation2d.fromRadians(angularOffset);
-    setpoint = new SciSwerveModuleState(0,0, Rotation2d.fromRadians(turningEncoder.getPosition()));
+    setpoint = new SciSwerveModuleState(0, 0, Rotation2d.fromRadians(turningEncoder.getPosition()));
   }
 
   /**
@@ -110,7 +109,7 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
    */
   public void setDesiredState(SciSwerveModuleState desiredState) {
     SciSwerveModuleState correctedDesiredState = new SciSwerveModuleState();
-    correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
+    correctedDesiredState.moduleAcceleration = desiredState.moduleAcceleration;
     correctedDesiredState.angle = desiredState.angle.plus(angularOffset);
     // Optimize the reference state to avoid spinning further than 90 degrees
     setpoint =
@@ -118,7 +117,24 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
             correctedDesiredState, Rotation2d.fromRadians(turningEncoder.getPosition()));
 
     // setpoint = desiredState;
-    double driveFF = driveFeedforward.calculate(setpoint.speedMetersPerSecond, setpoint.moduleAcceleration);
+    double driveFF =
+        driveFeedforward.calculate(setpoint.speedMetersPerSecond, setpoint.moduleAcceleration);
+    driveFeedback.setReference(setpoint.moduleAcceleration, ControlType.kVelocity, 0, driveFF);
+    turnFeedback.setReference(setpoint.angle.getRadians(), ControlType.kPosition);
+  }
+
+  public void setDesiredState(SwerveModuleState desiredState) {
+    SwerveModuleState correctedDesiredState = new SwerveModuleState();
+    correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
+    correctedDesiredState.angle = desiredState.angle.plus(angularOffset);
+    // Optimize the reference state to avoid spinning further than 90 degrees
+    SwerveModuleState setpointAuto =
+        SciSwerveModuleState.optimize(
+            correctedDesiredState, Rotation2d.fromRadians(turningEncoder.getPosition()));
+
+    // setpoint = desiredState;
+    double driveFF =
+        driveFeedforward.calculate(setpoint.speedMetersPerSecond, setpoint.moduleAcceleration);
     driveFeedback.setReference(setpoint.speedMetersPerSecond, ControlType.kVelocity, 0, driveFF);
     turnFeedback.setReference(setpoint.angle.getRadians(), ControlType.kPosition);
   }

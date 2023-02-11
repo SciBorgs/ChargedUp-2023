@@ -4,10 +4,8 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import java.util.Arrays;
 import org.ejml.simple.SimpleMatrix;
 
@@ -45,7 +43,9 @@ public class SciSwerveKinematics extends SwerveDriveKinematics {
 
   public SciSwerveModuleState[] toSwerveModuleStates(
       ChassisState chassisState, Translation2d centerOfRotationMeters) {
-    if (chassisState.axMetersPerSecondSquared == 0 && chassisState.ayMetersPerSecondSquared == 0 && chassisState.alphaRadiansPerSecondSquared == 0) {
+    if (chassisState.axMetersPerSecondSquared == 0
+        && chassisState.ayMetersPerSecondSquared == 0
+        && chassisState.alphaRadiansPerSecondSquared == 0) {
       SciSwerveModuleState[] newModuleStates = new SciSwerveModuleState[m_numModules];
       for (int i = 0; i < m_numModules; i++) {
         newModuleStates[i] = new SciSwerveModuleState(0.0, 0.0, m_moduleStates[i].angle);
@@ -88,12 +88,12 @@ public class SciSwerveKinematics extends SwerveDriveKinematics {
       double acceleration = Math.hypot(x, y);
       Rotation2d angle = new Rotation2d(x, y);
 
-      m_moduleStates[i] =
-          new SciSwerveModuleState(acceleration, angle);
+      m_moduleStates[i] = new SciSwerveModuleState(acceleration, angle);
     }
 
     return m_moduleStates;
   }
+
   public SciSwerveModuleState[] toSwerveModuleStates(ChassisState chassisSpeeds) {
     return toSwerveModuleStates(chassisSpeeds, new Translation2d());
   }

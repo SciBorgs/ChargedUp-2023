@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.subsystems.modules;
 
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import org.sciborgs1155.lib.Kinematics.SciSwerveModuleState;
 import org.sciborgs1155.robot.Robot;
 
@@ -16,7 +17,9 @@ public interface SwerveModule {
 
   public SwerveModulePosition getPosition();
 
-  public void setDesiredState(SciSwerveModuleState desiredState);
+  public void setDesiredState(SciSwerveModuleState desiredStates);
+
+  public void setDesiredState(SwerveModuleState desiredStates);
 
   public void resetEncoders();
 }
