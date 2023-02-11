@@ -6,12 +6,11 @@ import static org.sciborgs1155.robot.Ports.Arm.*;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -25,42 +24,6 @@ import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
-
-  public enum Side {
-    FRONT,
-    BACK;
-  }
-
-  /** State class to store relative angles for the arm. */
-  public static final class State implements Sendable {
-    public final Rotation2d elbowAngle;
-    public final Rotation2d wristAngle;
-
-    public State(Rotation2d elbowAngle, Rotation2d wristAngle) {
-      this.elbowAngle = elbowAngle;
-      this.wristAngle = wristAngle;
-    }
-
-    public static State fromAbsolute(Rotation2d elbowAngle, Rotation2d wristAngle) {
-      return new State(elbowAngle, wristAngle.minus(elbowAngle));
-    }
-
-    public static State fromRelative(Rotation2d elbowAngle, Rotation2d wristAngle) {
-      return new State(elbowAngle, elbowAngle);
-    }
-
-    public Side toSide() {
-      return elbowAngle.getCos() > 0 ? Side.FRONT : Side.BACK;
-    }
-
-    @Override
-    public void initSendable(SendableBuilder builder) {
-      builder.addDoubleProperty("elbow angle", () -> elbowAngle.getDegrees(), null);
-      builder.addDoubleProperty("relative wrist angle", () -> wristAngle.getDegrees(), null);
-      builder.addDoubleProperty(
-          "absolute wrist angle", () -> elbowAngle.plus(wristAngle).getDegrees(), null);
-    }
-  }
 
   @Log(name = "wrist applied output", methodName = "getAppliedOutput")
   private final CANSparkMax wrist = Motors.WRIST.build(MotorType.kBrushless, WRIST_MOTOR);
@@ -115,54 +78,90 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
           Dimensions.WRIST_MAX_ANGLE,
           true);
 
-  public Arm() {
+  private final Visualizer visualizer;
+
+  public Arm(Visualizer visualizer) {
     elbowFollow.follow(elbowLead);
 
     elbowEncoder.setPositionConversionFactor(Elbow.GEAR_RATIO * Elbow.MOVEMENT_PER_SPIN);
     elbowEncoder.setVelocityConversionFactor(Elbow.GEAR_RATIO);
+
+    this.visualizer = visualizer;
   }
 
-  /** Relative state of the arm */
-  @Log(name = "state")
-  public State getState() {
-    return new State(
-        Rotation2d.fromRadians(elbowEncoder.getPosition()),
-        Rotation2d.fromRadians(wristEncoder.getPosition()));
+  /** Elbow position relative to the chassis */
+  @Log(name = "elbow position", methodName = "getDegrees")
+  public Rotation2d getElbowPosition() {
+    return Rotation2d.fromRadians(elbowEncoder.getPosition());
   }
 
-  /** Relative goal of the arm */
-  @Log(name = "goal")
-  public State getGoal() {
-    return new State(
-        Rotation2d.fromRadians(elbowFeedback.getGoal().position),
-        Rotation2d.fromRadians(wristFeedback.getGoal().position));
+  /** Wrist position relative to the forearm */
+  @Log(name = "wrist relative positon", methodName = "getDegrees")
+  public Rotation2d getRelativeWristPosition() {
+    return Rotation2d.fromRadians(wristEncoder.getPosition());
   }
 
-  /** Elbow is at goal */
-  @Log(name = "elbow at goal")
-  public boolean atElbowGoal() {
-    return elbowFeedback.atGoal();
+  /** Wrist position relative to chassis */
+  @Log(name = "wrist absolute positon", methodName = "getDegrees")
+  public Rotation2d getAbsoluteWristPosition() {
+    return getRelativeWristPosition().plus(getElbowPosition());
   }
 
-  /** Wrist is at goal */
-  @Log(name = "wrist at goal")
-  public boolean atWristGoal() {
-    return wristFeedback.atGoal();
+  /** Elbow goal relative to the chassis */
+  @Log(name = "elbow goal", methodName = "getDegrees")
+  public Rotation2d getElbowGoal() {
+    return Rotation2d.fromRadians(elbowFeedback.getGoal().position);
   }
 
-  /** Wrist and elbow are at goal */
-  public boolean atGoal() {
-    return atElbowGoal() && atWristGoal();
+  /** Wrist goal relative to forearm */
+  @Log(name = "wrist relative goal", methodName = "getDegrees")
+  public Rotation2d getRelativeWristGoal() {
+    return Rotation2d.fromRadians(wristFeedback.getGoal().position);
   }
 
-  /** Sets arm and wrist goals, with the wrist goal relative to the arm */
-  public Command setGoal(State goal) {
-    return runOnce(() -> elbowFeedback.setGoal(goal.elbowAngle.getRadians()))
-        .andThen(() -> wristFeedback.setGoal(goal.wristAngle.getRadians()));
+  /** Wrist goal relative to the chassis */
+  @Log(name = "wrist absolute goal", methodName = "getDegrees")
+  public Rotation2d getAbsoluteWristGoal() {
+    return getRelativeWristGoal().plus(getElbowGoal());
   }
 
-  public Command runToGoal(State goal) {
-    return setGoal(goal).andThen(Commands.waitUntil(this::atGoal));
+  /** Sets elbow goal relative to the chassis */
+  public Command setElbowGoal(Rotation2d goal) {
+    return runOnce(
+        () ->
+            elbowFeedback.setGoal(
+                MathUtil.clamp(
+                    goal.getRadians(), Dimensions.ELBOW_MIN_ANGLE, Dimensions.ELBOW_MAX_ANGLE)));
+  }
+
+  /** Sets wrist goal relative to the forearm */
+  public Command setWristGoal(Rotation2d goal) {
+    return runOnce(
+        () ->
+            wristFeedback.setGoal(
+                MathUtil.clamp(
+                    goal.getRadians(), Dimensions.WRIST_MIN_ANGLE, Dimensions.WRIST_MAX_ANGLE)));
+  }
+
+  /** Sets elbow and wrist goals, with the wrist goal relative to the forearm */
+  public Command setGoals(Rotation2d elbowGoal, Rotation2d wristGoal) {
+    return setElbowGoal(elbowGoal).andThen(setWristGoal(wristGoal));
+  }
+
+  /** Runs elbow to goal relative to the chassis */
+  public Command runElbowToGoal(Rotation2d goal) {
+    return setElbowGoal(goal).andThen(Commands.waitUntil(elbowFeedback::atGoal));
+  }
+
+  /** Runs wrist to goal relative to the forearm */
+  public Command runWristToGoal(Rotation2d goal) {
+    return setWristGoal(goal).andThen(Commands.waitUntil(wristFeedback::atGoal));
+  }
+
+  /** Runs elbow and wrist go provided goals, with the wrist goal relative to the forearm */
+  public Command runToGoals(Rotation2d elbowGoal, Rotation2d wristGoal) {
+    return setGoals(elbowGoal, wristGoal)
+        .andThen(Commands.waitUntil(() -> elbowFeedback.atGoal() && wristFeedback.atGoal()));
   }
 
   @Override
@@ -188,7 +187,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             wristAccel.calculate(wristFeedback.getSetpoint().velocity));
     wrist.setVoltage(wristfb + wristff);
 
-    Visualizer.getInstance().setArmPositions(getState());
+    visualizer.setArmPositions(getElbowPosition(), getRelativeWristPosition());
   }
 
   @Override

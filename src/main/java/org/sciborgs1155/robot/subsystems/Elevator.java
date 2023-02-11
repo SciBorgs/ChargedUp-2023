@@ -56,19 +56,13 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
           Dimensions.ELEVATOR_MAX_HEIGHT,
           true);
 
-  public Elevator() {
+  private final Visualizer visualizer;
+
+  public Elevator(Visualizer visualizer) {
     left.follow(lead);
     right.follow(lead);
-  }
 
-  @Override
-  public void close() {
-    lead.close();
-    left.close();
-    right.close();
-
-    limitSwitchOne.close();
-    limitSwitchTwo.close();
+    this.visualizer = visualizer;
   }
 
   /** Elevator is at goal */
@@ -124,7 +118,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
     lead.setVoltage(isHitting() ? 0 : pidOutput + ffOutput);
 
-    Visualizer.getInstance().setElevatorHeight(encoder.getPosition());
+    visualizer.setElevatorHeight(encoder.getPosition());
   }
 
   @Override
@@ -132,5 +126,15 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     sim.setInputVoltage(lead.getAppliedOutput());
     sim.update(Constants.RATE);
     encoder.setPosition(sim.getPositionMeters());
+  }
+
+  @Override
+  public void close() {
+    lead.close();
+    left.close();
+    right.close();
+
+    limitSwitchOne.close();
+    limitSwitchTwo.close();
   }
 }

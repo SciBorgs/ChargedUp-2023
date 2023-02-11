@@ -29,14 +29,24 @@ public final class Placement {
     
   }
 
-  public static Command goToState(Arm arm, Elevator elevator, Arm.State armState, double elevatorHeight) {
-    return Commands.parallel(
-            Commands.either(elevator.runToGoal(0),Commands.none(),()->armState.getSide()!=Arm.getSide()).andThen(elevator.runToGoal(elevatorHeight)),
-            arm.runToGoal(armState)
-            
+  // public Command goToCameraTarget() {
+  //   return Commands.either(
+  //       arm.runToGoals(
+  //           ArmState.fromIK(
+  //               cam.getLatestResult().getBestTarget().getBestCameraToTarget().getTranslation())),
+  //       Commands.none(),
+  //       () -> cam.getLatestResult().hasTargets());
+  // }
 
-    );
-  }
+  // public static Command goToState(Arm arm, Elevator elevator, State state) {
+  //   return Commands.parallel(
+  //           elevator.setGoal(state.elevatorHeight),
+  //           arm.setElbowGoal(state.elbowAngle),
+  //           arm.setAbsoluteWristGoal(state.wristAngle))
+  //       .andThen(
+  //           Commands.waitUntil(() -> elevator.atGoal() && arm.atElbowGoal() &&
+  // arm.atWrsitGoal()));
+  // }
 
   // public static Command goToState(Arm arm, Elevator elevator, State... states) {
   //   Command cmd = Commands.none();
