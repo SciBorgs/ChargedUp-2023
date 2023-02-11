@@ -22,6 +22,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -35,10 +36,12 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 // import org.sciborgs1155.lib.Camera;
+import org.photonvision.SimVisionSystem;
 import org.sciborgs1155.lib.ControllerOutputFunction;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Auto;
 import org.sciborgs1155.robot.Constants.Vision;
+import org.sciborgs1155.robot.Constants.Vision.VisionSim;
 import org.sciborgs1155.robot.Ports.Sensors;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 
@@ -70,26 +73,37 @@ public class Drive extends SubsystemBase implements Loggable {
   private final AprilTagFieldLayout layout;
   private final PhotonCamera cam;
   private final PhotonPoseEstimator visionOdometry;
-
+  private final SimVisionSystem sim;
   @Log private final Field2d field2d = new Field2d();
 
   private final FieldObject2d[] modules2d = new FieldObject2d[modules.length];
 
   public Drive(PhotonCamera cam) {
-    this.cam = cam;
+    this.cam = cam;   
+    layout =
+        new AprilTagFieldLayout(
+            Vision.AprilTagPose.APRIL_TAGS, Vision.FIELD_LENGTH, Vision.FIELD_WIDTH);
     odometry =
         new SwerveDrivePoseEstimator(
             KINEMATICS,
             getHeading(),
             getModulePositions(),
             new Pose2d()); // TODO change to initial pose
-    layout =
-        new AprilTagFieldLayout(
-            Vision.AprilTagPose.APRIL_TAGS, Vision.FIELD_LENGTH, Vision.FIELD_WIDTH);
     visionOdometry =
         new PhotonPoseEstimator(layout, PoseStrategy.LOWEST_AMBIGUITY, cam, Vision.ROBOT_TO_CAM);
-
+    sim =
+        new SimVisionSystem(
+            Vision.CAM_NAME,
+            VisionSim.camDiagFOVDegrees,
+            Vision.ROBOT_TO_CAM,
+            VisionSim.maxLEDRangeMeters,
+            VisionSim.CAMERA_RES_WIDTH,
+            VisionSim.CAMERA_RES_HEIGHT,
+            VisionSim.minTargetArea);
     for (int i = 0; i < modules2d.length; i++) modules2d[i] = field2d.getObject("module-" + i);
+
+    sim.addVisionTargets(layout);
+    SmartDashboard.putData("Field", field2d);
   }
 
   /**
@@ -201,18 +215,27 @@ public class Drive extends SubsystemBase implements Loggable {
   }
 
   private void updateOdometry() {
+    // Real field odometry
     odometry.update(getHeading(), getModulePositions());
 
     var latest = cam.getLatestResult();
-
+    var bestTarget = latest.getBestTarget();
     visionOdometry.setReferencePose(odometry.getEstimatedPosition());
     Optional<EstimatedRobotPose> visionEstimate = visionOdometry.update();
 
     if (latest.hasTargets()) {
       EstimatedRobotPose visionPose = visionEstimate.get();
-      odometry.addVisionMeasurement(
-          visionPose.estimatedPose.toPose2d(), visionPose.timestampSeconds);
+      Pose2d visionPoseEstimate = visionPose.estimatedPose.toPose2d();
+      odometry.addVisionMeasurement(visionPoseEstimate, visionPose.timestampSeconds);
+      
+      // sim
+      field2d.getObject("Cam Est Pose").setPose(visionPoseEstimate);
+    } else {
+      field2d.getObject("Cam Est Pose").setPose(new Pose2d(-100, -100, new Rotation2d()));
     }
+    field2d.getObject("Actual Pose").setPose(getPose());
+    field2d.setRobotPose(getPose());
+    sim.processFrame(getPose());
   }
 
   @Override
@@ -227,6 +250,13 @@ public class Drive extends SubsystemBase implements Loggable {
 
   @Override
   public void simulationPeriodic() {
+    // ArrayList<PhotonTrackedTarget> visibleTgtList = new ArrayList<PhotonTrackedTarget>();
+    // for (AprilTag aprilTag : Vision.AprilTagPose.APRIL_TAGS) {
+    //   visibleTgtList.add(new PhotonTrackedTarget(aprilTag.pose.getX(),
+    //   aprilTag.pose.getRotation().getAngle(),
+    //   ));
+    // }
+
     gyro.getSimCollection()
         .addHeading(
             Units.radiansToDegrees(

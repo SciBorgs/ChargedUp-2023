@@ -42,7 +42,9 @@
       "/Shuffleboard/SillySim/elbowPID": "PIDController",
       "/Shuffleboard/SillySim/mech2d": "Mechanism2d",
       "/Shuffleboard/SillySim/wristPID": "PIDController",
-      "/Shuffleboard/Visualizer/mech": "Mechanism2d"
+      "/Shuffleboard/Visualizer/mech": "Mechanism2d",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/photonvision Sim Field": "Field2d"
     },
     "windows": {
       "/Shuffleboard/Drive/field2d": {
@@ -220,6 +222,12 @@
           "name": "visualizer",
           "visible": true
         }
+      },
+      "/SmartDashboard/photonvision Sim Field": {
+        "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\2023-field.png",
+        "window": {
+          "visible": true
+        }
       }
     }
   },
@@ -264,5 +272,8 @@
         "open": true
       }
     }
+  },
+  "NetworkTables View": {
+    "visible": false
   }
 }
