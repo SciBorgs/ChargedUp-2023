@@ -71,20 +71,22 @@ public final class Autos implements Sendable {
     return align(xpole, ypole); 
   }
 
-  public PathPoint pathPoint(double xpole, double ypole){
+  public List<PathPoint> generatePointList(double xpole, double ypole) {
     Translation2d pointPosition = new Translation2d(xpole, ypole);
-    Rotation2d heading = new Rotation2d(0);
-    Rotation2d holonomicRotation = new Rotation2d(0);
-    return new PathPoint(pointPosition, new Rotation2d(0), new Rotation2d(0), 0);
-  }
-  public PathPlannerTrajectory trajectory(){
-  public final PathConstraints trajectoryConstraints = new PathConstraints(Constants.Auto.MAX_SPEED, Constants.Auto.MAX_ACCEL);
-  return new PathPlannerTrajectory() trajectory = PathPlanner.generatePath(trajectoryConstraints, PathPoint());
+    PathPoint polePoint = new PathPoint(pointPosition, new Rotation2d(0), new Rotation2d(0), 0);
+    List<PathPoint> pointList = new ArrayList<PathPoint>();
+    pointList.add(polePoint);
+    return pointList;
   }
 
+  public PathPlannerTrajectory generateTrajectory(double xpole, double ypole) {
+    PathConstraints trajectoryConstraints = new PathConstraints(Constants.Auto.MAX_SPEED, Constants.Auto.MAX_ACCEL);
+    PathPlannerTrajectory trajectory = PathPlanner.generatePath(trajectoryConstraints, generatePointList(xpole, ypole));
+    return trajectory;
+  }
 
   public Command align(double xpole, double ypole) {
-    PathPlannerTrajectory trajectory = new PathPlannerTrajectory();
+    PathPlannerTrajectory trajectory = generateTrajectory(xpole, ypole);
     return drive.follow(trajectory, false, false);
   }
   
