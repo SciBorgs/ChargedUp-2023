@@ -8,17 +8,14 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
+import org.sciborgs1155.lib.ArmState;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
@@ -26,46 +23,6 @@ import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
-
-  /** Represents the side of the robot the arm is on */
-  public enum Side {
-    FRONT,
-    BACK;
-  }
-
-  /** State class to store relative angles for the arm. */
-  public record State(Rotation2d elbowAngle, Rotation2d wristAngle) implements Sendable {
-
-    /**
-     * Returns a new {@link State} from angles in radians, with the wrist state relative to the
-     * chassis
-     */
-    public static State fromAbsolute(double elbowAngle, double wristAngle) {
-      return new State(
-          Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle - elbowAngle));
-    }
-
-    /**
-     * Returns a new {@link State} from angles in radians, with the wrist state relative to the
-     * forearm
-     */
-    public static State fromRelative(double elbowAngle, double wristAngle) {
-      return new State(Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle));
-    }
-
-    /** The side of the robot the arm is on */
-    public Side toSide() {
-      return elbowAngle.getCos() > 0 ? Side.FRONT : Side.BACK;
-    }
-
-    @Override
-    public void initSendable(SendableBuilder builder) {
-      builder.addDoubleProperty("elbow angle", () -> elbowAngle.getDegrees(), null);
-      builder.addDoubleProperty("relative wrist angle", () -> wristAngle.getDegrees(), null);
-      builder.addDoubleProperty(
-          "absolute wrist angle", () -> elbowAngle.plus(wristAngle).getDegrees(), null);
-    }
-  }
 
   @Log(name = "wrist applied output", methodName = "getAppliedOutput")
   private final CANSparkMax wrist = Motors.WRIST.build(MotorType.kBrushless, WRIST_MOTOR);
@@ -129,14 +86,15 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   /** Relative state of the arm */
   @Log(name = "state")
-  public State getState() {
-    return State.fromRelative(elbowEncoder.getPosition(), wristEncoder.getPosition());
+  public ArmState getState() {
+    return ArmState.fromRelative(elbowEncoder.getPosition(), wristEncoder.getPosition());
   }
 
   /** Relative goal of the arm */
   @Log(name = "goal")
-  public State getGoal() {
-    return State.fromRelative(elbowFeedback.getGoal().position, wristFeedback.getGoal().position);
+  public ArmState getGoal() {
+    return ArmState.fromRelative(
+        elbowFeedback.getGoal().position, wristFeedback.getGoal().position);
   }
 
   /** Elbow is at goal */
@@ -157,35 +115,13 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Sets arm and wrist goals, with the wrist goal relative to the arm */
-  public Command setGoal(State goal) {
-    return runOnce(() -> elbowFeedback.setGoal(goal.elbowAngle.getRadians()))
-        .andThen(() -> wristFeedback.setGoal(goal.wristAngle.getRadians()));
+  public Command setGoal(ArmState goal) {
+    return runOnce(() -> elbowFeedback.setGoal(goal.elbowAngle().getRadians()))
+        .andThen(() -> wristFeedback.setGoal(goal.wristAngle().getRadians()));
   }
 
-  public Command runToGoal(State goal) {
+  public Command runToGoal(ArmState goal) {
     return setGoal(goal).andThen(Commands.waitUntil(this::atGoal));
-  }
-
-  /**
-   * Returns the corresponding arm state given a target Math can be found <a
-   * href="https://robotacademy.net.au/lesson/inverse-kinematics-for-a-2-joint-robot-arm-using-geometry">here.</a>
-   */
-  public State inverseRR(Transform3d target) {
-    double wristAngle =
-        -Math.acos(
-            (Math.pow(target.getY(), 2)
-                    + Math.pow(target.getZ(), 2)
-                    - Math.pow(Dimensions.FOREARM_LENGTH, 2)
-                    - Math.pow(Dimensions.CLAW_LENGTH, 2))
-                / 2
-                * Dimensions.CLAW_LENGTH
-                * Dimensions.FOREARM_LENGTH);
-    double elbowAngle =
-        Math.atan2(target.getZ(), target.getY())
-            + Math.atan2(
-                Dimensions.CLAW_LENGTH * Math.sin(wristAngle),
-                Dimensions.FOREARM_LENGTH + Dimensions.CLAW_LENGTH * Math.cos(wristAngle));
-    return new State(Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle));
   }
 
   @Override

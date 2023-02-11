@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import org.sciborgs1155.robot.Constants.Dimensions;
-import org.sciborgs1155.robot.subsystems.Arm;
 
 /** Visualization class specific for our charged up bot */
 public class Visualizer implements Sendable {
@@ -38,7 +37,7 @@ public class Visualizer implements Sendable {
     elevatorProgress.setLength(height);
   }
 
-  public void setArmPositions(Arm.State state) {
+  public void setArmPositions(ArmState state) {
     forearm.setAngle(state.elbowAngle());
     claw.setAngle(state.wristAngle());
   }
