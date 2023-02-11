@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.junit.jupiter.api.*;
+import org.sciborgs1155.lib.Visualizer;
 
 public class ArmTest {
   Arm arm;
@@ -12,7 +13,7 @@ public class ArmTest {
   @BeforeEach
   void setup() {
     assert HAL.initialize(500, 0);
-    arm = new Arm();
+    arm = new Arm(new Visualizer());
   }
 
   @AfterEach

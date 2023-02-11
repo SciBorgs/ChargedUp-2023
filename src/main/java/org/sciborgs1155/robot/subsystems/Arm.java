@@ -78,11 +78,15 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
           Dimensions.WRIST_MAX_ANGLE,
           true);
 
-  public Arm() {
+  private final Visualizer visualizer;
+
+  public Arm(Visualizer visualizer) {
     elbowFollow.follow(elbowLead);
 
     elbowEncoder.setPositionConversionFactor(Elbow.GEAR_RATIO * Elbow.MOVEMENT_PER_SPIN);
     elbowEncoder.setVelocityConversionFactor(Elbow.GEAR_RATIO);
+
+    this.visualizer = visualizer;
   }
 
   /** Elbow position relative to the chassis */
@@ -183,7 +187,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             wristAccel.calculate(wristFeedback.getSetpoint().velocity));
     wrist.setVoltage(wristfb + wristff);
 
-    Visualizer.getInstance().setArmPositions(getElbowPosition(), getRelativeWristPosition());
+    visualizer.setArmPositions(getElbowPosition(), getRelativeWristPosition());
   }
 
   @Override

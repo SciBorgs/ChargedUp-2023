@@ -6,6 +6,7 @@ import edu.wpi.first.hal.HAL;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants.Dimensions;
 
 public class ElevatorTest {
@@ -15,7 +16,7 @@ public class ElevatorTest {
   @BeforeEach
   void setup() {
     assert HAL.initialize(500, 0);
-    elevator = new Elevator();
+    elevator = new Elevator(new Visualizer());
   }
 
   @AfterEach
