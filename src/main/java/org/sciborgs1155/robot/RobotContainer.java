@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -30,6 +31,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public final PhotonCamera cam = new PhotonCamera(Vision.CAM_NAME);
   private final Drive drive = new Drive(cam);
+  private final SwerveDrivePoseEstimator odometry = new SwerveDrivePoseEstimator(null, null, null, null);
   // private final Arm arm = new Arm(visualizer);
   // private final Elevator elevator = new Elevator(visualizer);
 
@@ -39,7 +41,7 @@ public class RobotContainer {
   private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
 
   // Autos
-  @Log private final Autos autos = new Autos(drive);
+  @Log private final Autos autos = new Autos(drive, cam, odometry);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

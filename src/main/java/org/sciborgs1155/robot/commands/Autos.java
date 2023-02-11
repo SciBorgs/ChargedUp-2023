@@ -5,7 +5,9 @@
 package org.sciborgs1155.robot.commands;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -17,12 +19,14 @@ import java.util.List;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
+import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.Drive;
 import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+
 
 public final class Autos implements Sendable {
 
@@ -53,8 +57,8 @@ public final class Autos implements Sendable {
   public void initSendable(SendableBuilder builder) {
     chooser.initSendable(builder);
   }
+
   public Command cameraAlignment() {
-    
     var result = cam.getLatestResult();
     PhotonTrackedTarget target = result.getBestTarget();
     Transform3d bestCameraToTarget = target.getBestCameraToTarget();
@@ -65,11 +69,23 @@ public final class Autos implements Sendable {
     double xpole = xp + currentX;
     double ypole = yp + currentY;
     return align(xpole, ypole); 
-  }  
+  }
+
+  public PathPoint pathPoint(double xpole, double ypole){
+    Translation2d pointPosition = new Translation2d(xpole, ypole);
+    Rotation2d heading = new Rotation2d(0);
+    Rotation2d holonomicRotation = new Rotation2d(0);
+    return new PathPoint(pointPosition, new Rotation2d(0), new Rotation2d(0), 0);
+  }
+  public PathPlannerTrajectory trajectory(){
+  public final PathConstraints trajectoryConstraints = new PathConstraints(Constants.Auto.MAX_SPEED, Constants.Auto.MAX_ACCEL);
+  return new PathPlannerTrajectory() trajectory = PathPlanner.generatePath(trajectoryConstraints, PathPoint());
+  }
+
+
   public Command align(double xpole, double ypole) {
-    PathPlannerTrajectory trajectory;
-    return Commands.run(
-      () -> drive.follow(PathPlannerTrajectory trajectory));
+    PathPlannerTrajectory trajectory = new PathPlannerTrajectory();
+    return drive.follow(trajectory, false, false);
   }
   
 }
