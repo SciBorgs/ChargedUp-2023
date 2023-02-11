@@ -1,20 +1,23 @@
 package org.sciborgs1155.robot.commands;
 
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import org.photonvision.PhotonCamera;
+import org.sciborgs1155.robot.subsystems.Arm;
 
 /** Trajectory for elevator and arm, without respect for time */
 public final class Placement {
 
-  public static class State {
-    public final double elevatorHeight;
-    public final Rotation2d elbowAngle;
-    public final Rotation2d wristAngle;
+  private final Arm arm;
+  private final PhotonCamera cam;
 
-    public State(double elevatorHeight, Rotation2d elbowAngle, Rotation2d wristAngle) {
-      this.elevatorHeight = elevatorHeight;
-      this.elbowAngle = elbowAngle;
-      this.wristAngle = wristAngle;
-    }
+  public Placement(Arm arm, PhotonCamera cam) {
+    this.arm = arm;
+    this.cam = cam;
+  }
+
+  public Command goToCameraTarget() {
+    return arm.runToGoal(
+        arm.inverseRR(cam.getLatestResult().getBestTarget().getBestCameraToTarget()));
   }
 
   // public static Command goToState(Arm arm, Elevator elevator, State state) {
