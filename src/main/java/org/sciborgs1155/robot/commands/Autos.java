@@ -4,27 +4,22 @@
 
 package org.sciborgs1155.robot.commands;
 
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPoint;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonTrackedTarget;
-import org.sciborgs1155.robot.subsystems.Drive;
-import com.pathplanner.lib.PathPoint;
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import java.util.ArrayList;
 import java.util.List;
+import org.photonvision.PhotonCamera;
 import org.sciborgs1155.robot.Constants;
-
+import org.sciborgs1155.robot.subsystems.Drive;
 
 public final class Autos implements Sendable {
 
@@ -81,8 +76,10 @@ public final class Autos implements Sendable {
   }
 
   public PathPlannerTrajectory generateTrajectory(double xpole, double ypole) {
-    PathConstraints trajectoryConstraints = new PathConstraints(Constants.Auto.MAX_SPEED, Constants.Auto.MAX_ACCEL);
-    PathPlannerTrajectory trajectory = PathPlanner.generatePath(trajectoryConstraints, generatePointList(xpole, ypole));
+    PathConstraints trajectoryConstraints =
+        new PathConstraints(Constants.Auto.MAX_SPEED, Constants.Auto.MAX_ACCEL);
+    PathPlannerTrajectory trajectory =
+        PathPlanner.generatePath(trajectoryConstraints, generatePointList(xpole, ypole));
     return trajectory;
   }
 
@@ -90,5 +87,4 @@ public final class Autos implements Sendable {
     PathPlannerTrajectory trajectory = generateTrajectory(xpole, ypole);
     return drive.follow(trajectory, false, false);
   }
-  
 }

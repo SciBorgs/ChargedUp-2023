@@ -215,7 +215,6 @@ public class Drive extends SubsystemBase implements Loggable {
   }
 
   private void updateOdometry() {
-    // Real field odometry
     odometry.update(getHeading(), getModulePositions());
 
     var latest = cam.getLatestResult();
@@ -227,19 +226,16 @@ public class Drive extends SubsystemBase implements Loggable {
       Pose2d visionPoseEstimate = visionPose.estimatedPose.toPose2d();
       odometry.addVisionMeasurement(visionPoseEstimate, visionPose.timestampSeconds);
 
-      // sim
       field2d.getObject("Cam Est Pose").setPose(visionPoseEstimate);
     } else {
       field2d.getObject("Cam Est Pose").setPose(new Pose2d(-100, -100, new Rotation2d()));
     }
     field2d.getObject("Actual Pose").setPose(getPose());
-    field2d.setRobotPose(getPose());
   }
 
   @Override
   public void periodic() {
     updateOdometry();
-    field2d.setRobotPose(getPose());
     for (int i = 0; i < modules2d.length; i++) {
       var transform = new Transform2d(MODULE_OFFSET[i], modules[i].getPosition().angle);
       modules2d[i].setPose(getPose().transformBy(transform));
@@ -248,13 +244,8 @@ public class Drive extends SubsystemBase implements Loggable {
 
   @Override
   public void simulationPeriodic() {
-    // ArrayList<PhotonTrackedTarget> visibleTgtList = new ArrayList<PhotonTrackedTarget>();
-    // for (AprilTag aprilTag : Vision.AprilTagPose.APRIL_TAGS) {
-    //   visibleTgtList.add(new PhotonTrackedTarget(aprilTag.pose.getX(),
-    //   aprilTag.pose.getRotation().getAngle(),
-    //   ));
-    // }
     sim.processFrame(getPose());
+
     gyro.getSimCollection()
         .addHeading(
             Units.radiansToDegrees(

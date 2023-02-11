@@ -238,9 +238,6 @@
     "transitory": {
       "Shuffleboard": {
         "Drive": {
-          "field2d": {
-            "open": true
-          },
           "open": true
         },
         "DriveSubsystem": {
@@ -269,14 +266,36 @@
         "RobotContainer": {
           "autos": {
             "open": true
-          },
-          "open": true
+          }
         },
         "open": true
+      },
+      "SmartDashboard": {
+        "open": true,
+        "photonvision Sim Field": {
+          "open": true
+        }
+      },
+      "photonvision": {
+        "open": true,
+        "photonvision": {
+          "open": true
+        }
       }
     }
   },
-  "NetworkTables View": {
-    "visible": false
+  "NetworkTables Info": {
+    "Clients": {
+      "open": true
+    },
+    "Connections": {
+      "open": true
+    },
+    "Server": {
+      "Publishers": {
+        "open": true
+      },
+      "open": true
+    }
   }
 }
