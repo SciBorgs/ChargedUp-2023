@@ -236,21 +236,31 @@ public class Drive extends SubsystemBase implements Loggable {
 
   /**
    * Follows a path on the field.
-   * 
-   * @param trajectory  The pathplanner trajectory the robot will follow
-   * @param resetPosition Whether the robot should set its odometry to the initial pose of the trajectory
-   * @param useAllianceColor  Whether the robot should take into account alliance color before following
-   * @return  The command that follows the trajectory
+   *
+   * @param trajectory The pathplanner trajectory the robot will follow
+   * @param resetPosition Whether the robot should set its odometry to the initial pose of the
+   *     trajectory
+   * @param useAllianceColor Whether the robot should take into account alliance color before
+   *     following
+   * @return The command that follows the trajectory
    */
-  public Command follow(PathPlannerTrajectory trajectory, boolean resetPosition, boolean useAllianceColor) {
+  public Command follow(
+      PathPlannerTrajectory trajectory, boolean resetPosition, boolean useAllianceColor) {
     PIDController x = new PIDController(Auto.Cartesian.kP, Auto.Cartesian.kI, Auto.Cartesian.kD);
     PIDController y = new PIDController(Auto.Cartesian.kP, Auto.Cartesian.kI, Auto.Cartesian.kD);
     PIDController rot = new PIDController(Auto.Angular.kP, Auto.Angular.kI, Auto.Angular.kD);
 
-    if(resetPosition) resetOdometry(trajectory.getInitialPose());
+    if (resetPosition) resetOdometry(trajectory.getInitialPose());
 
     return new PPSwerveControllerCommand(
-            trajectory, this::getPose, KINEMATICS, x, y, rot, this::setModuleStates, useAllianceColor)
+            trajectory,
+            this::getPose,
+            KINEMATICS,
+            x,
+            y,
+            rot,
+            this::setModuleStates,
+            useAllianceColor)
         .andThen(stop());
   }
 
