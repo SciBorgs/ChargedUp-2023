@@ -29,7 +29,7 @@ public class ArmTest {
 
   @Test
   void setWristGoalTest() {
-    Rotation2d newWristGoal = new Rotation2d(4);
+    Rotation2d newWristGoal = new Rotation2d(1);
     arm.setWristGoal(newWristGoal).ignoringDisable(true).schedule();
     assertEquals(newWristGoal, arm.getRelativeWristGoal());
   }

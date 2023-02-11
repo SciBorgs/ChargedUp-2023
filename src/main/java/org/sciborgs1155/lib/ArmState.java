@@ -7,7 +7,8 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import org.sciborgs1155.robot.Constants.Dimensions;
 
 /** ArmState class to store relative angles for the arm. */
-public record ArmState(Rotation2d elbowAngle, Rotation2d wristAngle) implements Sendable {
+public record ArmState(Rotation2d elbowAngle, Rotation2d wristAngle, double elevatorHeight)
+    implements Sendable {
 
   /** Represents the side of the robot the arm is on */
   public enum Side {
@@ -19,19 +20,22 @@ public record ArmState(Rotation2d elbowAngle, Rotation2d wristAngle) implements 
    * Returns a new {@link ArmState} from angles in radians, with the wrist state relative to the
    * chassis
    */
-  public static ArmState fromAbsolute(double elbowAngle, double wristAngle) {
+  public static ArmState fromAbsolute(double elbowAngle, double wristAngle, double elevatorHeight) {
     return new ArmState(
-        Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle - elbowAngle));
+        Rotation2d.fromRadians(elbowAngle),
+        Rotation2d.fromRadians(wristAngle - elbowAngle),
+        elevatorHeight);
   }
 
   /**
    * Returns a new {@link ArmState} from angles in radians, with the wrist state relative to the
    * forearm
    */
-  public static ArmState fromRelative(double elbowAngle, double wristAngle) {
+  public static ArmState fromRelative(double elbowAngle, double wristAngle, double elevatorHeight) {
     // System.out.println("elbow: " + elbowAngle);
     // System.out.println("wrist: " + Rotation2d.fromRadians(wristAngle));
-    return new ArmState(Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle));
+    return new ArmState(
+        Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle), elevatorHeight);
   }
 
   /** The side of the robot the arm is on */
@@ -58,7 +62,7 @@ public record ArmState(Rotation2d elbowAngle, Rotation2d wristAngle) implements 
             + Math.atan2(
                 Dimensions.CLAW_LENGTH * Math.sin(wristAngle),
                 Dimensions.FOREARM_LENGTH + Dimensions.CLAW_LENGTH * Math.cos(wristAngle));
-    return fromAbsolute(elbowAngle, wristAngle);
+    return fromAbsolute(elbowAngle, wristAngle, 0);
   }
 
   public double elbowAngleRadians() {
@@ -71,11 +75,10 @@ public record ArmState(Rotation2d elbowAngle, Rotation2d wristAngle) implements 
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.addStringProperty("this", this::toString, null);
-    // builder.addDoubleProperty("thing", () -> 2, null);
-    // builder.addDoubleProperty("elbow angle", () -> elbowAngle().getDegrees(), null);
-    // builder.addDoubleProperty("relative wrist angle", () -> wristAngle().getDegrees(), null);
-    // builder.addDoubleProperty(
-    //     "absolute wrist angle", () -> elbowAngle().plus(wristAngle()).getDegrees(), null);
+    builder.addDoubleProperty("elbow angle", () -> elbowAngle().getDegrees(), null);
+    builder.addDoubleProperty("relative wrist angle", () -> wristAngle().getDegrees(), null);
+    builder.addDoubleProperty(
+        "absolute wrist angle", () -> elbowAngle().plus(wristAngle()).getDegrees(), null);
+    builder.addDoubleProperty("elevator height", this::elevatorHeight, null);
   }
 }

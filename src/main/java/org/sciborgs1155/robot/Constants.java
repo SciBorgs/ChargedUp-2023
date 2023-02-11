@@ -68,10 +68,10 @@ public final class Constants {
     public static final double FOREARM_LENGTH = Units.inchesToMeters(41);
     public static final double CLAW_LENGTH = Units.inchesToMeters(20);
 
-    public static final double ELBOW_MIN_ANGLE = Units.degreesToRadians(-90);
-    public static final double ELBOW_MAX_ANGLE = Units.degreesToRadians(270);
-    public static final double WRIST_MIN_ANGLE = Units.degreesToRadians(-90);
-    public static final double WRIST_MAX_ANGLE = Units.degreesToRadians(90);
+    public static final double ELBOW_MIN_ANGLE = -Math.PI / 2.0;
+    public static final double ELBOW_MAX_ANGLE = 3.0 * Math.PI / 2.0;
+    public static final double WRIST_MIN_ANGLE = -Math.PI;
+    public static final double WRIST_MAX_ANGLE = Math.PI;
 
     public static final double TRACK_WIDTH = Units.inchesToMeters(17);
     // Distance between centers of right and left wheels on robot
@@ -93,12 +93,12 @@ public final class Constants {
   public static final class Arm {
     public static final class Wrist {
       // not actual values
-      public static final double kP = 0;
+      public static final double kP = 5;
       public static final double kI = 0;
-      public static final double kD = 0;
+      public static final double kD = 1;
 
       public static final double kS = 0;
-      public static final double kG = 0;
+      public static final double kG = 5;
       public static final double kV = 0;
       public static final double kA = 0;
 
@@ -111,10 +111,10 @@ public final class Constants {
     public static final class Elbow {
       public static final double kP = 10;
       public static final double kI = 0;
-      public static final double kD = 0;
+      public static final double kD = 2;
 
       public static final double kS = 0;
-      public static final double kG = 10;
+      public static final double kG = 4.5;
       public static final double kV = 0;
       public static final double kA = 0;
 

@@ -6,6 +6,7 @@ import static org.sciborgs1155.robot.Ports.Arm.*;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -82,7 +83,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
     elbowEncoder.setPositionConversionFactor(Elbow.GEAR_RATIO * Elbow.MOVEMENT_PER_SPIN);
     elbowEncoder.setVelocityConversionFactor(Elbow.GEAR_RATIO);
-    elbowFeedback.setGoal(0);
   }
 
   /** Elbow position relative to the chassis */
@@ -123,12 +123,20 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   /** Sets elbow goal relative to the chassis */
   public Command setElbowGoal(Rotation2d goal) {
-    return runOnce(() -> elbowFeedback.setGoal(goal.getRadians()));
+    return runOnce(
+        () ->
+            elbowFeedback.setGoal(
+                MathUtil.clamp(
+                    goal.getRadians(), Dimensions.ELBOW_MIN_ANGLE, Dimensions.ELBOW_MAX_ANGLE)));
   }
 
   /** Sets wrist goal relative to the forearm */
   public Command setWristGoal(Rotation2d goal) {
-    return runOnce(() -> wristFeedback.setGoal(goal.getRadians()));
+    return runOnce(
+        () ->
+            wristFeedback.setGoal(
+                MathUtil.clamp(
+                    goal.getRadians(), Dimensions.WRIST_MIN_ANGLE, Dimensions.WRIST_MAX_ANGLE)));
   }
 
   /** Sets elbow and wrist goals, with the wrist goal relative to the forearm */
@@ -175,7 +183,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             wristAccel.calculate(wristFeedback.getSetpoint().velocity));
     wrist.setVoltage(wristfb + wristff);
 
-    Visualizer.getInstance().setArmPositions(getElbowPosition(), Rotation2d.fromRadians(0));
+    Visualizer.getInstance().setArmPositions(getElbowPosition(), getRelativeWristPosition());
   }
 
   @Override
