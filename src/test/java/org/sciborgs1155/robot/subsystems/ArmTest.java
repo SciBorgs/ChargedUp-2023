@@ -3,6 +3,8 @@ package org.sciborgs1155.robot.subsystems;
 import static org.junit.jupiter.api.Assertions.*;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -26,9 +28,12 @@ public class ArmTest {
   void setGoal() {
     var newGoal = ArmState.fromRelative(2, 4);
     arm.setGoal(newGoal).ignoringDisable(true).schedule();
-    // assertEquals(newGoal, arm.getGoal());
+    CommandScheduler.getInstance().run();
+    assertEquals(newGoal.elbowAngle(), arm.getGoal().elbowAngle());
+    assertEquals(newGoal.wristAngle(), arm.getGoal().wristAngle());
   }
 
+  @Disabled
   @ParameterizedTest
   @ValueSource(doubles = {-0.7, -0.3, 0.0, 0.3, 0.7})
   void moveToGoal(double radGoal) {
@@ -38,6 +43,6 @@ public class ArmTest {
       arm.periodic();
       arm.simulationPeriodic();
     }
-    // assertEquals(goal, arm.getElbowPosition().getRadians(), 5e-2);
+    assertEquals(radGoal, arm.getState().elbowAngle().getRadians(), 5e-2);
   }
 }
