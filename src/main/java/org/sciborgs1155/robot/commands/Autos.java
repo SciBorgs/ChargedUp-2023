@@ -22,7 +22,7 @@ public final class Autos implements Sendable {
 
     chooser = new SendableChooser<>();
     chooser.setDefaultOption("mobility", mobility());
-    chooser.addOption("other", drive.follow("New Path"));
+    chooser.addOption("other", drive.follow("New Path", true, false));
   }
 
   public Command get() {
