@@ -227,7 +227,10 @@
         }
       },
       "/SmartDashboard/photonvision Sim Field": {
-        "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\2023-field.png"
+        "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\2023-field.png",
+        "window": {
+          "visible": true
+        }
       }
     }
   },
