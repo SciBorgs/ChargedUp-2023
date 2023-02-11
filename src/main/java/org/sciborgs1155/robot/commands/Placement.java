@@ -18,11 +18,12 @@ public final class Placement {
   }
 
   public Command goToCameraTarget() {
-    return cam.getLatestResult().hasTargets()
-        ? arm.runToGoal(
+    return Commands.either(
+        arm.runToGoal(
             ArmState.fromIK(
-                cam.getLatestResult().getBestTarget().getBestCameraToTarget().getTranslation()))
-        : Commands.none();
+                cam.getLatestResult().getBestTarget().getBestCameraToTarget().getTranslation())),
+        Commands.none(),
+        () -> cam.getLatestResult().hasTargets());
   }
 
   // public static Command goToState(Arm arm, Elevator elevator, State state) {
