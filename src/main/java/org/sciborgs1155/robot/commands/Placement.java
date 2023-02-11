@@ -29,13 +29,13 @@ public final class Placement {
     
   }
 
-  public static Command goToState(Arm arm, Elevator elevator, State state) {
+  public static Command goToState(Arm arm, Elevator elevator, Arm.State armState, double elevatorHeight) {
     return Commands.parallel(
-            elevator.setGoal(state.elevatorHeight),
-            arm.setElbowGoal(state.elbowAngle),
-            arm.setAbsoluteWristGoal(state.wristAngle))
-        .andThen(
-            Commands.waitUntil(() -> elevator.atGoal() && arm.atElbowGoal() && arm.atWrsitGoal()));
+            Commands.either(elevator.runToGoal(0),Commands.none(),()->armState.getSide()!=Arm.getSide()).andThen(elevator.runToGoal(elevatorHeight)),
+            arm.runToGoal(armState)
+            
+
+    );
   }
 
   // public static Command goToState(Arm arm, Elevator elevator, State... states) {
