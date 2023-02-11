@@ -9,6 +9,7 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -165,6 +166,28 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     return setGoal(goal).andThen(Commands.waitUntil(this::atGoal));
   }
 
+  /**
+   * Returns the corresponding arm state given a target Math can be found <a
+   * href="https://robotacademy.net.au/lesson/inverse-kinematics-for-a-2-joint-robot-arm-using-geometry">here.</a>
+   */
+  public State inverseRR(Transform3d target) {
+    double wristAngle =
+        -Math.acos(
+            (Math.pow(target.getY(), 2)
+                    + Math.pow(target.getZ(), 2)
+                    - Math.pow(Dimensions.FOREARM_LENGTH, 2)
+                    - Math.pow(Dimensions.CLAW_LENGTH, 2))
+                / 2
+                * Dimensions.CLAW_LENGTH
+                * Dimensions.FOREARM_LENGTH);
+    double elbowAngle =
+        Math.atan2(target.getZ(), target.getY())
+            + Math.atan2(
+                Dimensions.CLAW_LENGTH * Math.sin(wristAngle),
+                Dimensions.FOREARM_LENGTH + Dimensions.CLAW_LENGTH * Math.cos(wristAngle));
+    return new State(Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle));
+  }
+
   @Override
   public void periodic() {
     double elbowfb = elbowFeedback.calculate(elbowEncoder.getPosition());
@@ -175,11 +198,15 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             elbowAccel.calculate(elbowFeedback.getSetpoint().velocity));
     elbowLead.setVoltage(elbowfb + elbowff);
 
-    // wrist feedback is calculated using an absolute angle setpoint, rather than a relative one
-    // this means the extra voltage calculated to cancel out gravity is kG * cos(θ + ϕ), where θ is
+    // wrist feedback is calculated using an absolute angle setpoint, rather than a
+    // relative one
+    // this means the extra voltage calculated to cancel out gravity is kG * cos(θ +
+    // ϕ), where θ is
     // the elbow setpoint and ϕ is the wrist setpoint
-    // the elbow angle is used as a setpoint instead of current position because we're using a
-    // profiled pid controller, which means setpoints are achievable states, rather than goals
+    // the elbow angle is used as a setpoint instead of current position because
+    // we're using a
+    // profiled pid controller, which means setpoints are achievable states, rather
+    // than goals
     double wristfb = wristFeedback.calculate(wristEncoder.getPosition());
     double wristff =
         wristFeedforward.calculate(
