@@ -6,7 +6,7 @@
           "open": true
         }
       },
-      "SPARK MAX [23]": {
+      "SPARK MAX [11]": {
         "header": {
           "open": true
         }
@@ -176,11 +176,17 @@
     "transitory": {
       "Shuffleboard": {
         "Arm": {
-          "elbowFeedback": {
+          "funny": {
+            "open": true
+          },
+          "goal": {
             "open": true
           },
           "open": true,
-          "wristFeedback": {
+          "relative state": {
+            "open": true
+          },
+          "state": {
             "open": true
           }
         },
@@ -211,6 +217,7 @@
           "Visualizer": {
             "open": true
           },
+          "open": true,
           "pid": {
             "open": true
           }

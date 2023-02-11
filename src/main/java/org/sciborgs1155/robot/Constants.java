@@ -63,8 +63,8 @@ public final class Constants {
 
   public static final class Dimensions {
     // no clue what the actual constants are
-    public static final double ELEVATOR_MIN_HEIGHT = 2;
-    public static final double ELEVATOR_MAX_HEIGHT = 40;
+    public static final double ELEVATOR_MIN_HEIGHT = 0;
+    public static final double ELEVATOR_MAX_HEIGHT = Units.inchesToMeters(49.3);
     public static final double FOREARM_LENGTH = Units.inchesToMeters(41);
     public static final double CLAW_LENGTH = Units.inchesToMeters(20);
 
@@ -93,28 +93,28 @@ public final class Constants {
   public static final class Arm {
     public static final class Wrist {
       // not actual values
-      public static final double kP = 800;
+      public static final double kP = 1;
       public static final double kI = 0;
-      public static final double kD = 30;
+      public static final double kD = 0;
 
       public static final double kS = 0;
-      public static final double kG = 45;
+      public static final double kG = 0;
       public static final double kV = 0;
       public static final double kA = 0;
 
-      public static final double MAX_WRIST_VELOCITY = 3; // radians / s
-      public static final double MAX_WRIST_ACCEL = 3; // radians / s^2
+      public static final double MAX_VELOCITY = 3; // radians / s
+      public static final double MAX_ACCEL = 3; // radians / s^2
       public static final TrapezoidProfile.Constraints CONSTRAINTS =
-          new TrapezoidProfile.Constraints(MAX_WRIST_VELOCITY, MAX_WRIST_ACCEL);
+          new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
     }
 
     public static final class Elbow {
-      public static final double kP = 500;
+      public static final double kP = 2;
       public static final double kI = 0;
-      public static final double kD = 30;
+      public static final double kD = 0;
 
       public static final double kS = 0;
-      public static final double kG = 10;
+      public static final double kG = 15;
       public static final double kV = 0;
       public static final double kA = 0;
 

@@ -61,16 +61,6 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     right.follow(lead);
   }
 
-  @Override
-  public void close() {
-    lead.close();
-    left.close();
-    right.close();
-
-    limitSwitchOne.close();
-    limitSwitchTwo.close();
-  }
-
   /** Elevator is at goal */
   @Log(name = "at goal")
   public boolean atGoal() {
@@ -132,5 +122,15 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     sim.setInputVoltage(lead.getAppliedOutput());
     sim.update(Constants.RATE);
     encoder.setPosition(sim.getPositionMeters());
+  }
+
+  @Override
+  public void close() {
+    lead.close();
+    left.close();
+    right.close();
+
+    limitSwitchOne.close();
+    limitSwitchTwo.close();
   }
 }

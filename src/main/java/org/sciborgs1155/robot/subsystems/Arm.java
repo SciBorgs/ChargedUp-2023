@@ -82,6 +82,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
     elbowEncoder.setPositionConversionFactor(Elbow.GEAR_RATIO * Elbow.MOVEMENT_PER_SPIN);
     elbowEncoder.setVelocityConversionFactor(Elbow.GEAR_RATIO);
+    elbowFeedback.setGoal(3);
   }
 
   /** Relative state of the arm */
@@ -134,15 +135,11 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             elbowAccel.calculate(elbowFeedback.getSetpoint().velocity));
     elbowLead.setVoltage(elbowfb + elbowff);
 
-    // wrist feedback is calculated using an absolute angle setpoint, rather than a
-    // relative one
-    // this means the extra voltage calculated to cancel out gravity is kG * cos(θ +
-    // ϕ), where θ is
+    // wrist feedback is calculated using an absolute angle setpoint, rather than a relative one
+    // this means the extra voltage calculated to cancel out gravity is kG * cos(θ + ϕ), where θ is
     // the elbow setpoint and ϕ is the wrist setpoint
-    // the elbow angle is used as a setpoint instead of current position because
-    // we're using a
-    // profiled pid controller, which means setpoints are achievable states, rather
-    // than goals
+    // the elbow angle is used as a setpoint instead of current position because we're using a
+    // profiled pid controller, which means setpoints are achievable states, rather than goals
     double wristfb = wristFeedback.calculate(wristEncoder.getPosition());
     double wristff =
         wristFeedforward.calculate(
@@ -151,6 +148,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             wristAccel.calculate(wristFeedback.getSetpoint().velocity));
     wrist.setVoltage(wristfb + wristff);
 
+    // System.out.println("state: " + getState());
+    // System.out.println("goal: " + getGoal());
     Visualizer.getInstance().setArmPositions(getState());
   }
 
