@@ -36,6 +36,8 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.ControllerOutputFunction;
+import org.sciborgs1155.lib.Kinematics.ChassisState;
+import org.sciborgs1155.lib.Kinematics.SciSwerveKinematics;
 import org.sciborgs1155.lib.Kinematics.SciSwerveModuleState;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Auto;
@@ -129,17 +131,18 @@ public class Drive extends SubsystemBase implements Loggable {
     ySpeed *= MAX_SPEED;
     rot *= MAX_ANGULAR_SPEED;
 
+    
     var states =
-        KINEMATICS.toSwerveModuleStates(
-            imu,
+        DRIVERKINEMATICS.toSwerveModuleStates(
             fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getHeading())
-                : new ChassisSpeeds(xSpeed, ySpeed, rot),
+                ? ChassisState.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getHeading())
+                : new ChassisState(xSpeed, ySpeed, rot),
             new Translation2d());
 
     setModuleStates(states);
   }
-
+//angery
+//reeeeeeeeeeeeeeeeeeeeeeeeeeee
   /**
    * Sets the swerve ModuleStates.
    *
@@ -150,11 +153,12 @@ public class Drive extends SubsystemBase implements Loggable {
       throw new IllegalArgumentException("desiredStates must have the same length as modules");
     }
 
-    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, MAX_SPEED);
+    SciSwerveKinematics.desaturateWheelSpeeds(desiredStates, MAX_SPEED);
     for (int i = 0; i < modules.length; i++) {
       modules[i].setDesiredState(desiredStates[i]);
     }
   }
+  
 
   /** Resets the drive encoders to currently read a position of 0. */
   public void resetEncoders() {
@@ -166,8 +170,8 @@ public class Drive extends SubsystemBase implements Loggable {
     gyro.reset();
   }
 
-  private SwerveModuleState[] getModuleStates() {
-    return Arrays.stream(modules).map(SwerveModule::getState).toArray(SwerveModuleState[]::new);
+  private SciSwerveModuleState[] getModuleStates() {
+    return Arrays.stream(modules).map(SwerveModule::getState).toArray(SciSwerveModuleState[]::new);
   }
 
   private SwerveModulePosition[] getModulePositions() {
@@ -239,7 +243,7 @@ public class Drive extends SubsystemBase implements Loggable {
 
     resetOdometry(loadedPath.getInitialPose());
     return new PPSwerveControllerCommand(
-            loadedPath, this::getPose, KINEMATICS, x, y, rot, this::setModuleStates, false)
+            loadedPath, this::getPose, AUTOKINEMATICS, x, y, rot, this::setModuleStates, false)
         .andThen(stop());
   }
 
@@ -288,11 +292,11 @@ public class Drive extends SubsystemBase implements Loggable {
   /** Sets the drivetrain to an "X" configuration, preventing movement */
   public Command lock() {
     var states =
-        new SwerveModuleState[] {
-          new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(45))
+        new SciSwerveModuleState[] {
+          new SciSwerveModuleState(0, 0, Rotation2d.fromDegrees(45)),
+          new SciSwerveModuleState(0, 0, Rotation2d.fromDegrees(-45)),
+          new SciSwerveModuleState(0, 0, Rotation2d.fromDegrees(-45)),
+          new SciSwerveModuleState(0, 0, Rotation2d.fromDegrees(45))
         };
     return run(() -> setModuleStates(states));
   }

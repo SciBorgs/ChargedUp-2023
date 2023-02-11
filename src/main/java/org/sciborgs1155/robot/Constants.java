@@ -12,6 +12,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import java.util.List;
 import org.sciborgs1155.lib.MotorConfig;
+import org.sciborgs1155.lib.Kinematics.SciSwerveKinematics;
 import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
 
 /**
@@ -141,7 +142,8 @@ public final class Constants {
       new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2) // rear right
     };
 
-    public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(MODULE_OFFSET);
+    public static final SciSwerveKinematics DRIVERKINEMATICS = new SciSwerveKinematics(MODULE_OFFSET);
+    public static final SwerveDriveKinematics AUTOKINEMATICS = new SwerveDriveKinematics(MODULE_OFFSET);
 
     public static final boolean GYRO_REVERSED = false;
 
