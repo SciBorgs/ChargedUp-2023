@@ -39,7 +39,7 @@ public class RobotContainer {
   private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
 
   // Autos
-  @Log private final Autos autos = new Autos(drive);
+  @Log private final Autos autos = new Autos(drive, cam);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

@@ -79,7 +79,7 @@ public class Drive extends SubsystemBase implements Loggable {
   private final FieldObject2d[] modules2d = new FieldObject2d[modules.length];
 
   public Drive(PhotonCamera cam) {
-    this.cam = cam;   
+    this.cam = cam;
     layout =
         new AprilTagFieldLayout(
             Vision.AprilTagPose.APRIL_TAGS, Vision.FIELD_LENGTH, Vision.FIELD_WIDTH);
@@ -219,7 +219,6 @@ public class Drive extends SubsystemBase implements Loggable {
     odometry.update(getHeading(), getModulePositions());
 
     var latest = cam.getLatestResult();
-    var bestTarget = latest.getBestTarget();
     visionOdometry.setReferencePose(odometry.getEstimatedPosition());
     Optional<EstimatedRobotPose> visionEstimate = visionOdometry.update();
 
@@ -227,7 +226,7 @@ public class Drive extends SubsystemBase implements Loggable {
       EstimatedRobotPose visionPose = visionEstimate.get();
       Pose2d visionPoseEstimate = visionPose.estimatedPose.toPose2d();
       odometry.addVisionMeasurement(visionPoseEstimate, visionPose.timestampSeconds);
-      
+
       // sim
       field2d.getObject("Cam Est Pose").setPose(visionPoseEstimate);
     } else {
@@ -235,7 +234,6 @@ public class Drive extends SubsystemBase implements Loggable {
     }
     field2d.getObject("Actual Pose").setPose(getPose());
     field2d.setRobotPose(getPose());
-    sim.processFrame(getPose());
   }
 
   @Override
@@ -256,7 +254,7 @@ public class Drive extends SubsystemBase implements Loggable {
     //   aprilTag.pose.getRotation().getAngle(),
     //   ));
     // }
-
+    sim.processFrame(getPose());
     gyro.getSimCollection()
         .addHeading(
             Units.radiansToDegrees(
