@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import org.photonvision.PhotonCamera;
 import org.sciborgs1155.lib.State;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Elevator;
@@ -9,14 +10,16 @@ import org.sciborgs1155.robot.subsystems.Elevator;
 /** Trajectory for elevator and arm, without respect for time */
 public final class Placement {
 
-  // public Command goToCameraTarget() {
-  //   return Commands.either(
-  //       arm.runToGoals(
-  //           ArmState.fromIK(
-  //               cam.getLatestResult().getBestTarget().getBestCameraToTarget().getTranslation())),
-  //       Commands.none(),
-  //       () -> cam.getLatestResult().hasTargets());
-  // }
+  public static Command goToCameraTarget(Arm arm, Elevator elevator, PhotonCamera cam) {
+    return Commands.either(
+        goToState(
+            arm,
+            elevator,
+            State.fromIK(
+                cam.getLatestResult().getBestTarget().getBestCameraToTarget().getTranslation())),
+        Commands.none(),
+        () -> cam.getLatestResult().hasTargets());
+  }
 
   // TODO (andrew): safe goToState command
   // 1. sets wrist to 0 and runs elevator to set height
