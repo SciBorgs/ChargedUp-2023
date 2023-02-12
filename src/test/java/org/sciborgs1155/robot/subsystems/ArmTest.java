@@ -2,21 +2,15 @@ package org.sciborgs1155.robot.subsystems;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.stream.Stream;
-
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
+import java.util.stream.Stream;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.sciborgs1155.lib.ArmState;
 import org.sciborgs1155.lib.Visualizer;
-
-import com.fasterxml.jackson.databind.deser.impl.CreatorCandidate.Param;
 
 public class ArmTest {
   Arm arm;
@@ -89,10 +83,9 @@ public class ArmTest {
 
   static Stream<Arguments> moveToGoal() {
     return Stream.of(
-      Arguments.arguments(-1, -0.8),
-      Arguments.arguments(-1, 0.7),
-      Arguments.arguments(0, 0),
-      Arguments.arguments(0.3, 1)
-    );
+        Arguments.arguments(-1, -0.8),
+        Arguments.arguments(-1, 0.7),
+        Arguments.arguments(0, 0),
+        Arguments.arguments(0.3, 1));
   }
 }
