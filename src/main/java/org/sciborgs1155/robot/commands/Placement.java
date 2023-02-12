@@ -1,5 +1,11 @@
 package org.sciborgs1155.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import org.sciborgs1155.lib.State;
+import org.sciborgs1155.robot.subsystems.Arm;
+import org.sciborgs1155.robot.subsystems.Elevator;
+
 /** Trajectory for elevator and arm, without respect for time */
 public final class Placement {
 
@@ -12,21 +18,22 @@ public final class Placement {
   //       () -> cam.getLatestResult().hasTargets());
   // }
 
-  // public static Command goToState(Arm arm, Elevator elevator, State state) {
-  //   return Commands.parallel(
-  //           elevator.setGoal(state.elevatorHeight),
-  //           arm.setElbowGoal(state.elbowAngle),
-  //           arm.setAbsoluteWristGoal(state.wristAngle))
-  //       .andThen(
-  //           Commands.waitUntil(() -> elevator.atGoal() && arm.atElbowGoal() &&
-  // arm.atWrsitGoal()));
-  // }
+  // TODO (andrew): safe goToState command
+  // 1. sets wrist to 0 and runs elevator to set height
+  // 2. runs to goal state
 
-  // public static Command goToState(Arm arm, Elevator elevator, State... states) {
-  //   Command cmd = Commands.none();
-  //   for (State state : states) {
-  //     cmd = cmd.andThen(goToState(arm, elevator, state));
-  //   }
-  //   return cmd;
-  // }
+  /** Runs arm and elevator to setpoints, specified in a {@link org.sciborgs1155.lib.State} */
+  public static Command goToState(Arm arm, Elevator elevator, State state) {
+    return Commands.parallel(
+        elevator.runToGoal(state.elevatorHeight()),
+        arm.runToGoals(state.elbowAngle(), state.wristAngle()));
+  }
+
+  public static Command goToState(Arm arm, Elevator elevator, State... states) {
+    Command cmd = Commands.none();
+    for (State state : states) {
+      cmd = cmd.andThen(goToState(arm, elevator, state));
+    }
+    return cmd;
+  }
 }

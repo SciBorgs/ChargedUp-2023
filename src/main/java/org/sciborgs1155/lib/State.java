@@ -7,7 +7,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import org.sciborgs1155.robot.Constants.Dimensions;
 
 /** ArmState class to store relative angles for the arm. */
-public record ArmState(Rotation2d elbowAngle, Rotation2d wristAngle, double elevatorHeight)
+public record State(Rotation2d elbowAngle, Rotation2d wristAngle, double elevatorHeight)
     implements Sendable {
 
   /** Represents the side of the robot the arm is on */
@@ -17,24 +17,24 @@ public record ArmState(Rotation2d elbowAngle, Rotation2d wristAngle, double elev
   }
 
   /**
-   * Returns a new {@link ArmState} from angles in radians, with the wrist state relative to the
+   * Returns a new {@link State} from angles in radians, with the wrist state relative to the
    * chassis
    */
-  public static ArmState fromAbsolute(double elbowAngle, double wristAngle, double elevatorHeight) {
-    return new ArmState(
+  public static State fromAbsolute(double elbowAngle, double wristAngle, double elevatorHeight) {
+    return new State(
         Rotation2d.fromRadians(elbowAngle),
         Rotation2d.fromRadians(wristAngle - elbowAngle),
         elevatorHeight);
   }
 
   /**
-   * Returns a new {@link ArmState} from angles in radians, with the wrist state relative to the
+   * Returns a new {@link State} from angles in radians, with the wrist state relative to the
    * forearm
    */
-  public static ArmState fromRelative(double elbowAngle, double wristAngle, double elevatorHeight) {
+  public static State fromRelative(double elbowAngle, double wristAngle, double elevatorHeight) {
     // System.out.println("elbow: " + elbowAngle);
     // System.out.println("wrist: " + Rotation2d.fromRadians(wristAngle));
-    return new ArmState(
+    return new State(
         Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle), elevatorHeight);
   }
 
@@ -47,7 +47,7 @@ public record ArmState(Rotation2d elbowAngle, Rotation2d wristAngle, double elev
    * Returns the corresponding arm state given a target Math can be found {@link
    * https://robotacademy.net.au/lesson/inverse-kinematics-for-a-2-joint-robot-arm-using-geometry}
    */
-  public static ArmState fromIK(Translation3d target) {
+  public static State fromIK(Translation3d target) {
     double wristAngle =
         -Math.acos(
             (Math.pow(target.getY(), 2)
