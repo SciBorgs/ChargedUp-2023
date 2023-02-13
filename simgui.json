@@ -220,6 +220,7 @@
           "Visualizer": {
             "open": true
           },
+          "open": true,
           "pid": {
             "open": true
           }

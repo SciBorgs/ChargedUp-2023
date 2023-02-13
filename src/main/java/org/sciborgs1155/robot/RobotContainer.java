@@ -1,5 +1,3 @@
-// TODO(Noah): fix code
-
 package org.sciborgs1155.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;

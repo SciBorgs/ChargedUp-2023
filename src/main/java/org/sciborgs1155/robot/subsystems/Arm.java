@@ -3,9 +3,11 @@ package org.sciborgs1155.robot.subsystems;
 import static org.sciborgs1155.robot.Constants.Arm.*;
 import static org.sciborgs1155.robot.Ports.Arm.*;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -35,10 +37,11 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
       Motors.ELBOW.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
 
   @Log(name = "wrist velocity", methodName = "getVelocity")
-  private final RelativeEncoder wristEncoder = wrist.getEncoder();
+  private final AbsoluteEncoder wristEncoder = wrist.getAbsoluteEncoder(Type.kDutyCycle);
 
   @Log(name = "elbow velocity", methodName = "getVelocity")
-  private final RelativeEncoder elbowEncoder = elbowLead.getEncoder();
+  private final RelativeEncoder elbowEncoder =
+      elbowLead.getAlternateEncoder(Constants.THROUGH_BORE_CPR);
 
   @Log
   private final ProfiledPIDController wristFeedback =
@@ -198,7 +201,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
     wristSim.setInputVoltage(wrist.getAppliedOutput());
     wristSim.update(Constants.RATE);
-    wristEncoder.setPosition(wristSim.getAngleRads());
+    // wristEncoder.setPosition(wristSim.getAngleRads());
   }
 
   @Override

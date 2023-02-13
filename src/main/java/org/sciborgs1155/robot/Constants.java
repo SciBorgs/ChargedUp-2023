@@ -32,6 +32,7 @@ public final class Constants {
   public static final double RATE = 0.02; // roborio tickrate
   public static final double CONTROLLER_RATE = 0.015; // controller tickrate
   public static final double DEADBAND = 0.06;
+  public static final int THROUGH_BORE_CPR = 8192;
 
   public static final String CAMERA_NAME = "photonvision";
 

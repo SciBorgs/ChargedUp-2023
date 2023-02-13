@@ -32,8 +32,6 @@ public record State(Rotation2d elbowAngle, Rotation2d wristAngle, double elevato
    * forearm
    */
   public static State fromRelative(double elbowAngle, double wristAngle, double elevatorHeight) {
-    // System.out.println("elbow: " + elbowAngle);
-    // System.out.println("wrist: " + Rotation2d.fromRadians(wristAngle));
     return new State(
         Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle), elevatorHeight);
   }
