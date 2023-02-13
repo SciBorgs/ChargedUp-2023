@@ -3,15 +3,10 @@ package org.sciborgs1155.robot.subsystems;
 import static org.sciborgs1155.robot.Constants.ArmConstants.*;
 import static org.sciborgs1155.robot.Ports.Arm.*;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,25 +14,15 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Visualizer;
-import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
-import org.sciborgs1155.robot.Constants.Motors;
+import org.sciborgs1155.robot.subsystems.joints.Elbow;
 import org.sciborgs1155.robot.subsystems.joints.Wrist;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log private final Wrist wrist = Wrist.create(WRIST_MOTOR);
 
-  @Log(name = "elbow applied output", methodName = "getAppliedOutput")
-  private final CANSparkMax elbowLead =
-      Motors.ElbowConstants.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
-
-  private final CANSparkMax elbowFollow =
-      Motors.ElbowConstants.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
-
-  @Log(name = "elbow velocity", methodName = "getVelocity")
-  private final RelativeEncoder elbowEncoder =
-      elbowLead.getAlternateEncoder(Constants.THROUGH_BORE_CPR);
+  @Log private final Elbow elbow = Elbow.create(LEFT_ELBOW_MOTOR, RIGHT_ELBOW_MOTOR);
 
   @Log
   private final ProfiledPIDController wristFeedback =
@@ -62,32 +47,16 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log(name = "elbow acceleration", methodName = "getLastOutput")
   private final Derivative elbowAccel = new Derivative();
 
-  private final SingleJointedArmSim elbowSim =
-      new SingleJointedArmSim(
-          DCMotor.getNEO(2),
-          5,
-          SingleJointedArmSim.estimateMOI(Dimensions.FOREARM_LENGTH, 2),
-          Dimensions.FOREARM_LENGTH,
-          Dimensions.ELBOW_MIN_ANGLE,
-          Dimensions.ELBOW_MAX_ANGLE,
-          true);
-
   private final Visualizer visualizer;
 
   public Arm(Visualizer visualizer) {
-    elbowFollow.follow(elbowLead);
-
-    elbowEncoder.setPositionConversionFactor(
-        ElbowConstants.GEAR_RATIO * ElbowConstants.MOVEMENT_PER_SPIN);
-    elbowEncoder.setVelocityConversionFactor(ElbowConstants.GEAR_RATIO);
-
     this.visualizer = visualizer;
   }
 
   /** Elbow position relative to the chassis */
   @Log(name = "elbow position", methodName = "getDegrees")
   public Rotation2d getElbowPosition() {
-    return Rotation2d.fromRadians(elbowEncoder.getPosition());
+    return elbow.getPosition();
   }
 
   /** Wrist position relative to the forearm */
@@ -161,13 +130,13 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Override
   public void periodic() {
-    double elbowfb = elbowFeedback.calculate(elbowEncoder.getPosition());
+    double elbowfb = elbowFeedback.calculate(elbow.getPosition().getRadians());
     double elbowff =
         elbowFeedforward.calculate(
             elbowFeedback.getSetpoint().position,
             elbowFeedback.getSetpoint().velocity,
             elbowAccel.calculate(elbowFeedback.getSetpoint().velocity));
-    elbowLead.setVoltage(elbowfb + elbowff);
+    elbow.setVoltage(elbowfb + elbowff);
 
     // wrist feedback is calculated using an absolute angle setpoint, rather than a relative one
     // this means the extra voltage calculated to cancel out gravity is kG * cos(θ + ϕ), where θ is
@@ -188,7 +157,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Override
   public void close() {
     wrist.close();
-    elbowLead.close();
-    elbowFollow.close();
+    elbow.close();
   }
 }
