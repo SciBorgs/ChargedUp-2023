@@ -1,13 +1,11 @@
 package org.sciborgs1155.robot.subsystems;
 
-import static org.sciborgs1155.robot.Constants.Arm.*;
+import static org.sciborgs1155.robot.Constants.ArmConstants.*;
 import static org.sciborgs1155.robot.Ports.Arm.*;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -24,20 +22,18 @@ import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
+import org.sciborgs1155.robot.subsystems.joints.Wrist;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
-  @Log(name = "wrist applied output", methodName = "getAppliedOutput")
-  private final CANSparkMax wrist = Motors.WRIST.build(MotorType.kBrushless, WRIST_MOTOR);
+  @Log private final Wrist wrist = Wrist.create(WRIST_MOTOR);
 
   @Log(name = "elbow applied output", methodName = "getAppliedOutput")
-  private final CANSparkMax elbowLead = Motors.ELBOW.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
+  private final CANSparkMax elbowLead =
+      Motors.ElbowConstants.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
 
   private final CANSparkMax elbowFollow =
-      Motors.ELBOW.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
-
-  @Log(name = "wrist velocity", methodName = "getVelocity")
-  private final AbsoluteEncoder wristEncoder = wrist.getAbsoluteEncoder(Type.kDutyCycle);
+      Motors.ElbowConstants.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
 
   @Log(name = "elbow velocity", methodName = "getVelocity")
   private final RelativeEncoder elbowEncoder =
@@ -45,16 +41,20 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log
   private final ProfiledPIDController wristFeedback =
-      new ProfiledPIDController(Wrist.kP, Wrist.kI, Wrist.kD, Wrist.CONSTRAINTS);
+      new ProfiledPIDController(
+          WristConstants.kP, WristConstants.kI, WristConstants.kD, WristConstants.CONSTRAINTS);
 
   @Log
   private final ProfiledPIDController elbowFeedback =
-      new ProfiledPIDController(Elbow.kP, Elbow.kI, Elbow.kD, Elbow.CONSTRAINTS);
+      new ProfiledPIDController(
+          ElbowConstants.kP, ElbowConstants.kI, ElbowConstants.kD, ElbowConstants.CONSTRAINTS);
 
   private final ArmFeedforward wristFeedforward =
-      new ArmFeedforward(Wrist.kS, Wrist.kG, Wrist.kV, Wrist.kA);
+      new ArmFeedforward(
+          WristConstants.kS, WristConstants.kG, WristConstants.kV, WristConstants.kA);
   private final ArmFeedforward elbowFeedforward =
-      new ArmFeedforward(Elbow.kS, Elbow.kG, Elbow.kV, Elbow.kA);
+      new ArmFeedforward(
+          ElbowConstants.kS, ElbowConstants.kG, ElbowConstants.kV, ElbowConstants.kA);
 
   @Log(name = "wrist acceleration", methodName = "getLastOutput")
   private final Derivative wristAccel = new Derivative();
@@ -71,23 +71,15 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
           Dimensions.ELBOW_MIN_ANGLE,
           Dimensions.ELBOW_MAX_ANGLE,
           true);
-  private final SingleJointedArmSim wristSim =
-      new SingleJointedArmSim(
-          DCMotor.getNeo550(1),
-          5,
-          SingleJointedArmSim.estimateMOI(Dimensions.CLAW_LENGTH, 1),
-          Dimensions.CLAW_LENGTH,
-          Dimensions.WRIST_MIN_ANGLE,
-          Dimensions.WRIST_MAX_ANGLE,
-          true);
 
   private final Visualizer visualizer;
 
   public Arm(Visualizer visualizer) {
     elbowFollow.follow(elbowLead);
 
-    elbowEncoder.setPositionConversionFactor(Elbow.GEAR_RATIO * Elbow.MOVEMENT_PER_SPIN);
-    elbowEncoder.setVelocityConversionFactor(Elbow.GEAR_RATIO);
+    elbowEncoder.setPositionConversionFactor(
+        ElbowConstants.GEAR_RATIO * ElbowConstants.MOVEMENT_PER_SPIN);
+    elbowEncoder.setVelocityConversionFactor(ElbowConstants.GEAR_RATIO);
 
     this.visualizer = visualizer;
   }
@@ -101,7 +93,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   /** Wrist position relative to the forearm */
   @Log(name = "wrist relative positon", methodName = "getDegrees")
   public Rotation2d getRelativeWristPosition() {
-    return Rotation2d.fromRadians(wristEncoder.getPosition());
+    return wrist.getPosition();
   }
 
   /** Wrist position relative to chassis */
@@ -182,7 +174,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     // the elbow setpoint and ϕ is the wrist setpoint
     // the elbow angle is used as a setpoint instead of current position because we're using a
     // profiled pid controller, which means setpoints are achievable states, rather than goals
-    double wristfb = wristFeedback.calculate(wristEncoder.getPosition());
+    double wristfb = wristFeedback.calculate(wrist.getPosition().getRadians());
     double wristff =
         wristFeedforward.calculate(
             wristFeedback.getSetpoint().position + elbowFeedback.getSetpoint().position,
@@ -191,17 +183,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     wrist.setVoltage(wristfb + wristff);
 
     visualizer.setArmPositions(getElbowPosition(), getRelativeWristPosition());
-  }
-
-  @Override
-  public void simulationPeriodic() {
-    elbowSim.setInputVoltage(elbowLead.getAppliedOutput());
-    elbowSim.update(Constants.RATE);
-    elbowEncoder.setPosition(elbowSim.getAngleRads());
-
-    wristSim.setInputVoltage(wrist.getAppliedOutput());
-    wristSim.update(Constants.RATE);
-    // wristEncoder.setPosition(wristSim.getAngleRads());
   }
 
   @Override

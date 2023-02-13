@@ -91,9 +91,8 @@ public final class Constants {
     public static final List<AprilTag> TEST_TAGS = List.of(TEST_TAG_0);
   }
 
-  public static final class Arm {
-    public static final class Wrist {
-      // not actual values
+  public static final class ArmConstants {
+    public static final class WristConstants {
       public static final double kP = 5;
       public static final double kI = 0;
       public static final double kD = 1;
@@ -109,7 +108,7 @@ public final class Constants {
           new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
     }
 
-    public static final class Elbow {
+    public static final class ElbowConstants {
       public static final double kP = 10;
       public static final double kI = 0;
       public static final double kD = 2;
