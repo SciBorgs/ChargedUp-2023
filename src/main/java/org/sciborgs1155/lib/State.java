@@ -42,21 +42,22 @@ public record State(Rotation2d elbowAngle, Rotation2d wristAngle, double elevato
   }
 
   /**
-   * Returns the corresponding arm state given a target Math can be found {@link
+   * Returns the corresponding arm state given a target
+   * Math can be found {@link
    * https://robotacademy.net.au/lesson/inverse-kinematics-for-a-2-joint-robot-arm-using-geometry}
    */
-  public static State fromIK(Translation3d target) {
+  public static State fromIK(Translation3d target, double height) {
     double wristAngle =
         -Math.acos(
             (Math.pow(target.getY(), 2)
-                    + Math.pow(target.getZ(), 2)
+                    + Math.pow(target.getZ() - height, 2)
                     - Math.pow(Dimensions.FOREARM_LENGTH, 2)
                     - Math.pow(Dimensions.CLAW_LENGTH, 2))
                 / 2.0
                 * Dimensions.CLAW_LENGTH
                 * Dimensions.FOREARM_LENGTH);
     double elbowAngle =
-        Math.atan2(target.getZ(), target.getY())
+        Math.atan2(target.getZ() - height, target.getY())
             + Math.atan2(
                 Dimensions.CLAW_LENGTH * Math.sin(wristAngle),
                 Dimensions.FOREARM_LENGTH + Dimensions.CLAW_LENGTH * Math.cos(wristAngle));

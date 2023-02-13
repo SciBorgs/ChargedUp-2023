@@ -16,7 +16,8 @@ public final class Placement {
             arm,
             elevator,
             State.fromIK(
-                cam.getLatestResult().getBestTarget().getBestCameraToTarget().getTranslation())),
+                cam.getLatestResult().getBestTarget().getBestCameraToTarget().getTranslation(),
+                elevator.getHeight())),
         Commands.none(),
         () -> cam.getLatestResult().hasTargets());
   }
