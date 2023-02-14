@@ -18,10 +18,16 @@ import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.robot.Constants.Motors;
 
 public class Intake extends SubsystemBase implements Loggable {
-  public static class GamePieces {
-    public static final Color NOTHING = new Color(0, 0, 0);
-    public static final Color CONE = new Color(255, 214, 7);
-    public static final Color CUBE = new Color(128, 0, 128);
+  public enum GamePieces {
+    NOTHING(new Color(0, 0, 0)),
+    CONE(new Color(255, 214, 7)),
+    CUBE(new Color(128, 0, 128));
+
+    public final Color color;
+
+    private GamePieces(Color color) {
+      this.color = color;
+    }
   }
 
   private final I2C.Port i2cPort = I2C.Port.kOnboard;
@@ -29,16 +35,18 @@ public class Intake extends SubsystemBase implements Loggable {
   private final ColorMatch matcher = new ColorMatch();
 
   public Intake() {
-    matcher.addColorMatch(GamePieces.CONE);
-    matcher.addColorMatch(GamePieces.CUBE);
+    matcher.addColorMatch(GamePieces.CONE.color);
+    matcher.addColorMatch(GamePieces.CUBE.color);
   }
 
-  public Color getGamePiece() {
+  public GamePieces getGamePiece() {
     Color detected = sensor.getColor();
     ColorMatchResult match = matcher.matchClosestColor(detected);
 
-    if (match.color == GamePieces.CONE || match.color == GamePieces.CUBE) {
-      return match.color;
+    if (match.color == GamePieces.CONE.color) {
+      return GamePieces.CONE;
+    } else if (match.color == GamePieces.CUBE.color) {
+      return GamePieces.CUBE;
     } else {
       return GamePieces.NOTHING;
     }
