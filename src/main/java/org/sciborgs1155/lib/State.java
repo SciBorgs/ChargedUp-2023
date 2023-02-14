@@ -42,8 +42,7 @@ public record State(Rotation2d elbowAngle, Rotation2d wristAngle, double elevato
   }
 
   /**
-   * Returns the corresponding arm state given a target
-   * Math can be found {@link
+   * Returns the corresponding arm state given a target Math can be found {@link
    * https://robotacademy.net.au/lesson/inverse-kinematics-for-a-2-joint-robot-arm-using-geometry}
    */
   public static State fromIK(Translation3d target, double height) {
