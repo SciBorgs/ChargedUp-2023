@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-import java.util.function.Function;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
@@ -35,7 +34,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   private final CANSparkMax right = Motors.ELEVATOR.build(MotorType.kBrushless, RIGHT_MOTOR);
 
   @Log(name = "velocity", methodName = "getVelocity")
-  private final RelativeEncoder encoder = lead.getEncoder();
+  private final RelativeEncoder encoder = lead.getAlternateEncoder(Constants.THROUGH_BORE_CPR);
 
   private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
   @Log private final ProfiledPIDController pid = new ProfiledPIDController(kP, kI, kD, CONSTRAINTS);
@@ -60,19 +59,13 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
           Dimensions.ELEVATOR_MAX_HEIGHT,
           true);
 
-  public Elevator() {
+  private final Visualizer visualizer;
+
+  public Elevator(Visualizer visualizer) {
     left.follow(lead);
     right.follow(lead);
-  }
 
-  @Override
-  public void close() {
-    lead.close();
-    left.close();
-    right.close();
-
-    limitSwitchOne.close();
-    limitSwitchTwo.close();
+    this.visualizer = visualizer;
   }
 
   /** Elevator is at goal */
@@ -108,15 +101,9 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
                     height, Dimensions.ELEVATOR_MIN_HEIGHT, Dimensions.ELEVATOR_MAX_HEIGHT)));
   }
 
-  public Command initTest() {
-    Function<Double, Command> moveToGoal =
-        (Double height) ->
-            Commands.print("moving to " + height)
-                .alongWith(setGoal(height))
-                .andThen(Commands.waitUntil(this::atGoal))
-                .andThen(Commands.print("at " + height))
-                .alongWith(Commands.waitSeconds(3));
-    return moveToGoal.apply(3.).andThen(moveToGoal.apply(8.)).andThen(moveToGoal.apply(5.));
+  /** Runs elevator to goal height, from the base in meters */
+  public Command runToGoal(double height) {
+    return setGoal(height).andThen(Commands.waitUntil(this::atGoal));
   }
 
   @Override
@@ -127,7 +114,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
     lead.setVoltage(isHitting() ? 0 : pidOutput + ffOutput);
 
-    Visualizer.getInstance().setElevatorHeight(encoder.getPosition());
+    visualizer.setElevatorHeight(encoder.getPosition());
   }
 
   @Override
@@ -138,5 +125,15 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     
     limitOneSim.setValue(false);
     limitTwoSim.setValue(false);
+  }
+
+  @Override
+  public void close() {
+    lead.close();
+    left.close();
+    right.close();
+
+    limitSwitchOne.close();
+    limitSwitchTwo.close();
   }
 }

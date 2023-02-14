@@ -6,7 +6,7 @@
           "open": true
         }
       },
-      "SPARK MAX [23]": {
+      "SPARK MAX [11]": {
         "header": {
           "open": true
         }
@@ -26,6 +26,9 @@
       "/LiveWindow/Ungrouped/PIDController[12]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[13]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[14]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[15]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[16]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[17]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
@@ -176,9 +179,31 @@
     "transitory": {
       "Shuffleboard": {
         "Arm": {
+          "elbow": {
+            "open": true
+          },
           "elbowFeedback": {
             "open": true
           },
+<<<<<<< HEAD
+=======
+          "funny": {
+            "open": true
+          },
+          "goal": {
+            "open": true
+          },
+          "open": true,
+          "relative state": {
+            "open": true
+          },
+          "state": {
+            "open": true
+          },
+          "wrist": {
+            "open": true
+          },
+>>>>>>> c42e20984fcaa2626ce8d94cbd07a0f5cc67f4d6
           "wristFeedback": {
             "open": true
           }
@@ -210,12 +235,15 @@
           "Visualizer": {
             "open": true
           },
+<<<<<<< HEAD
           "limitSwitchOne": {
             "open": true
           },
           "limitSwitchTwo": {
             "open": true
           },
+=======
+>>>>>>> c42e20984fcaa2626ce8d94cbd07a0f5cc67f4d6
           "open": true,
           "pid": {
             "open": true
@@ -243,6 +271,12 @@
           "mech": {
             "open": true
           },
+          "open": true
+        },
+        "open": true
+      },
+      "SmartDashboard": {
+        "goal": {
           "open": true
         },
         "open": true

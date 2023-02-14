@@ -36,6 +36,7 @@ public final class Constants {
   public static final double RATE = 0.02; // roborio tickrate
   public static final double CONTROLLER_RATE = 0.015; // controller tickrate
   public static final double DEADBAND = 0.06;
+  public static final int THROUGH_BORE_CPR = 8192;
 
   public static final String CAMERA_NAME = "photonvision";
 
@@ -67,15 +68,15 @@ public final class Constants {
 
   public static final class Dimensions {
     // no clue what the actual constants are
-    public static final double ELEVATOR_MIN_HEIGHT = 2;
-    public static final double ELEVATOR_MAX_HEIGHT = 40;
-    public static final double FOREARM_LENGTH = 5;
-    public static final double CLAW_LENGTH = 2;
+    public static final double ELEVATOR_MIN_HEIGHT = 0;
+    public static final double ELEVATOR_MAX_HEIGHT = Units.inchesToMeters(49.3);
+    public static final double FOREARM_LENGTH = Units.inchesToMeters(41);
+    public static final double CLAW_LENGTH = Units.inchesToMeters(20);
 
-    public static final double ELBOW_MIN_ANGLE = Units.degreesToRadians(-90);
-    public static final double ELBOW_MAX_ANGLE = Units.degreesToRadians(270);
-    public static final double WRIST_MIN_ANGLE = Units.degreesToRadians(-90);
-    public static final double WRIST_MAX_ANGLE = Units.degreesToRadians(90);
+    public static final double ELBOW_MIN_ANGLE = -Math.PI / 2.0;
+    public static final double ELBOW_MAX_ANGLE = 3.0 * Math.PI / 2.0;
+    public static final double WRIST_MIN_ANGLE = -Math.PI;
+    public static final double WRIST_MAX_ANGLE = Math.PI;
 
     public static final double TRACK_WIDTH = Units.inchesToMeters(17);
     // Distance between centers of right and left wheels on robot
@@ -94,31 +95,30 @@ public final class Constants {
     public static final List<AprilTag> TEST_TAGS = List.of(TEST_TAG_0);
   }
 
-  public static final class Arm {
-    public static final class Wrist {
-      // not actual values
-      public static final double kP = 800;
+  public static final class ArmConstants {
+    public static final class WristConstants {
+      public static final double kP = 5;
       public static final double kI = 0;
-      public static final double kD = 30;
+      public static final double kD = 1;
 
       public static final double kS = 0;
-      public static final double kG = 45;
+      public static final double kG = 5;
       public static final double kV = 0;
       public static final double kA = 0;
 
-      public static final double MAX_WRIST_VELOCITY = 3; // radians / s
-      public static final double MAX_WRIST_ACCEL = 3; // radians / s^2
+      public static final double MAX_VELOCITY = 3; // radians / s
+      public static final double MAX_ACCEL = 3; // radians / s^2
       public static final TrapezoidProfile.Constraints CONSTRAINTS =
-          new TrapezoidProfile.Constraints(MAX_WRIST_VELOCITY, MAX_WRIST_ACCEL);
+          new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
     }
 
-    public static final class Elbow {
-      public static final double kP = 500;
+    public static final class ElbowConstants {
+      public static final double kP = 10;
       public static final double kI = 0;
-      public static final double kD = 30;
+      public static final double kD = 2;
 
       public static final double kS = 0;
-      public static final double kG = 10;
+      public static final double kG = 4.5;
       public static final double kV = 0;
       public static final double kA = 0;
 
