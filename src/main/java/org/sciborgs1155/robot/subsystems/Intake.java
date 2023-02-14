@@ -14,8 +14,8 @@ import io.github.oblarg.oblog.Loggable;
 public class Intake extends SubsystemBase implements Loggable {
   public enum GamePieces {
     NOTHING(new Color(0, 0, 0)),
-    CONE(new Color(255, 214, 7)),
-    CUBE(new Color(128, 0, 128));
+    CONE(new Color(90, 134, 30)),
+    CUBE(new Color(65, 120, 68));
 
     public final Color color;
 
@@ -29,6 +29,7 @@ public class Intake extends SubsystemBase implements Loggable {
   private final ColorMatch matcher = new ColorMatch();
 
   public Intake() {
+    matcher.addColorMatch(GamePieces.NOTHING.color);
     matcher.addColorMatch(GamePieces.CONE.color);
     matcher.addColorMatch(GamePieces.CUBE.color);
   }
@@ -37,21 +38,32 @@ public class Intake extends SubsystemBase implements Loggable {
     Color detected = sensor.getColor();
     ColorMatchResult match = matcher.matchClosestColor(detected);
 
-    if (match.color == GamePieces.CONE.color) {
+    System.out.println(detected.red * 255 + " " + detected.green * 255 + " " + detected.blue * 255);
+
+    double r = detected.red * 255;
+    double g = detected.green * 255;
+    double b = detected.blue * 255;
+
+    if (r >= 75 && r <= 92 && g >= 127 && g <= 141 && b >= 20 && b <= 46) {
       return GamePieces.CONE;
-    } else if (match.color == GamePieces.CUBE.color) {
+    } else if (r >= 55 && r <= 67 && g >= 87 && g <= 120 && b >= 69 && b <= 112) {
       return GamePieces.CUBE;
     } else {
       return GamePieces.NOTHING;
     }
+    // if (match.color == GamePieces.CONE.color) {
+    //   return GamePieces.CONE;
+    // } else if (match.color == GamePieces.CUBE.color) {
+    //   return GamePieces.CUBE;
+    // } else {
+    //   return GamePieces.NOTHING;
+    // }
   }
 
   @Override
   public void periodic() {
     GamePieces piece = getGamePiece();
-    if (piece != GamePieces.NOTHING) {
-      System.out.println(piece.name());
-    }
+    System.out.println(piece.name());
   }
 
   // @Log(name = "applied output", methodName = "getAppliedOutput")
