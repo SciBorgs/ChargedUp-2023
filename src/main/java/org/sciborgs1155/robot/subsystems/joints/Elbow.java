@@ -8,14 +8,13 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import java.io.Closeable;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.ArmConstants.ElbowConstants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Robot;
 
-public interface Elbow extends Sendable, Closeable {
+public interface Elbow extends Sendable, AutoCloseable {
   public static Elbow create(int leadDeviceId, int followDeviceId) {
     return Robot.isReal() ? new SparkElbow(leadDeviceId, followDeviceId) : new SimElbow();
   }
@@ -92,26 +91,22 @@ public interface Elbow extends Sendable, Closeable {
 
     @Override
     public Rotation2d getPosition() {
-      // TODO Auto-generated method stu
       return Rotation2d.fromRadians(elbowSim.getAngleRads());
     }
 
     @Override
     public double getVelocity() {
-      // TODO Auto-generated method stub
       return elbowSim.getVelocityRadPerSec();
     }
 
     @Override
     public void setVoltage(double voltage) {
-      // TODO Auto-generated method stub
       elbowSim.setInputVoltage(voltage);
       elbowSim.update(Constants.RATE);
     }
 
     @Override
     public double getCurrentDrawn() {
-      // TODO Auto-generated method stub
       return elbowSim.getCurrentDrawAmps();
     }
 

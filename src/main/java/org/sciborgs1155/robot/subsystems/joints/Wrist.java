@@ -9,13 +9,12 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import java.io.Closeable;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Robot;
 
-public interface Wrist extends Sendable, Closeable {
+public interface Wrist extends Sendable, AutoCloseable {
 
   public static Wrist create(int deviceId) {
     return Robot.isReal() ? new SparkWrist(deviceId) : new SimWrist();

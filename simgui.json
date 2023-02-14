@@ -179,6 +179,12 @@
     "transitory": {
       "Shuffleboard": {
         "Arm": {
+          "elbow": {
+            "open": true
+          },
+          "elbowFeedback": {
+            "open": true
+          },
           "funny": {
             "open": true
           },
@@ -190,6 +196,12 @@
             "open": true
           },
           "state": {
+            "open": true
+          },
+          "wrist": {
+            "open": true
+          },
+          "wristFeedback": {
             "open": true
           }
         },

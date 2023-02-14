@@ -54,13 +54,11 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Elbow position relative to the chassis */
-  @Log(name = "elbow position", methodName = "getDegrees")
   public Rotation2d getElbowPosition() {
     return elbow.getPosition();
   }
 
   /** Wrist position relative to the forearm */
-  @Log(name = "wrist relative positon", methodName = "getDegrees")
   public Rotation2d getRelativeWristPosition() {
     return wrist.getPosition();
   }
@@ -72,19 +70,16 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Elbow goal relative to the chassis */
-  @Log(name = "elbow goal", methodName = "getDegrees")
   public Rotation2d getElbowGoal() {
     return Rotation2d.fromRadians(elbowFeedback.getGoal().position);
   }
 
   /** Wrist goal relative to forearm */
-  @Log(name = "wrist relative goal", methodName = "getDegrees")
   public Rotation2d getRelativeWristGoal() {
     return Rotation2d.fromRadians(wristFeedback.getGoal().position);
   }
 
   /** Wrist goal relative to the chassis */
-  @Log(name = "wrist absolute goal", methodName = "getDegrees")
   public Rotation2d getAbsoluteWristGoal() {
     return getRelativeWristGoal().plus(getElbowGoal());
   }
@@ -156,7 +151,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Override
   public void close() {
-    wrist.close();
-    elbow.close();
+    // wrist.close();
+    // elbow.close();
   }
 }
