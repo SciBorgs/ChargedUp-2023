@@ -242,16 +242,8 @@ public final class Constants {
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS =
         new TrapezoidProfile.Constraints(MAX_ANG_SPEED, MAX_ANG_ACCEL);
-  }
+    }
 
   //make Trajectory for Build
-  public static final Trajectory trajectory = 
-    new Trajectory(
-      .generateTrajectory(
-        new Pose2d(0, 0, new Rotation2d(0)), 
-        null, 
-        new Pose2d(3, 0, new Rotation2d(0)), 
-        null
-        )
-    );
+ 
 }
