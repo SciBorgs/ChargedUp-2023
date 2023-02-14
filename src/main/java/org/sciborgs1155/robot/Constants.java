@@ -74,6 +74,11 @@ public final class Constants {
     public static final double WRIST_MIN_ANGLE = -Math.PI;
     public static final double WRIST_MAX_ANGLE = Math.PI;
 
+    private static final double CLAW_WEIGHT = 0;
+    private static final double ELBOW_WEIGHT = 0;
+    private static final double R1 = 0; // Distance from base pivot to center of gravity of elbow
+    private static final double R2 = 0; // Distance from the first joint to center of mass of the claw
+
     public static final double TRACK_WIDTH = Units.inchesToMeters(17);
     // Distance between centers of right and left wheels on robot
     public static final double WHEEL_BASE = Units.inchesToMeters(17);
