@@ -179,7 +179,6 @@
           "elbowFeedback": {
             "open": true
           },
-          "open": true,
           "wristFeedback": {
             "open": true
           }
@@ -211,6 +210,13 @@
           "Visualizer": {
             "open": true
           },
+          "limitSwitchOne": {
+            "open": true
+          },
+          "limitSwitchTwo": {
+            "open": true
+          },
+          "open": true,
           "pid": {
             "open": true
           }

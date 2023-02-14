@@ -2,12 +2,18 @@
 
 package org.sciborgs1155.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
+
+import java.util.ArrayList;
 import java.util.List;
 import org.photonvision.PhotonCamera;
 import org.sciborgs1155.lib.Visualizer;
@@ -92,4 +98,27 @@ public class RobotContainer {
     //     .reduce(Command::andThen)
     //     .orElseGet(() -> new RunCommand(() -> {}));
   }
+
+
+  public Command getTankAutoCommand(){
+    // make trajectory
+    // for pose suplier: drive::getPose
+    // ramsete controller
+    RamseteCommand ramseteCommand = 
+      new RamseteCommand(
+
+      )
+
+    public void generateTrajectry(){
+      Pose2d startWaypoint = new Pose2d(0, 0, new Rotation2d(0));
+
+      Pose2d endWaypoint = new Pose2d(6, 0, new Rotation2d(0));
+
+      ArrayList<Translation2d> interiorWaypoints = new ArrayList<Translation2d>();
+      interiorWaypoints.add(new Translation2d(2,3));
+      interiorWaypoints.add(new Translation2d(1, 4));
+      interiorWaypoints.add(new Translation2d( 6, 7));
+      interiorWaypoints.add(new Translation2d( 23, 78));
+      interiorWaypoints.add(new Translation2d( 3, 2));
+    }
 }

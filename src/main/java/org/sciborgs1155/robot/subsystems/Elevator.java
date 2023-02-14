@@ -12,6 +12,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.simulation.DIOSim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -41,6 +42,9 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log private final DigitalInput limitSwitchOne = new DigitalInput(LIMIT_SWITCH_PORTS[0]);
   @Log private final DigitalInput limitSwitchTwo = new DigitalInput(LIMIT_SWITCH_PORTS[1]);
+
+  private final DIOSim limitOneSim = new DIOSim(limitSwitchOne);
+  private final DIOSim limitTwoSim = new DIOSim(limitSwitchTwo);
 
   @Log(name = "acceleration", methodName = "getLastOutput")
   private final Derivative accel = new Derivative();
@@ -92,8 +96,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   /** If a limit switch is triggered */
   @Log(name = "hitting")
   public boolean isHitting() {
-    // return beambreak.get() || beambreakTwo.get() || limitSwitchOne.get() || limitSwitchOne.get();
-    return false;
+    return limitSwitchOne.get() || limitSwitchOne.get();
   }
 
   /** Elevator goal from the base, in meters */
@@ -132,5 +135,8 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     sim.setInputVoltage(lead.getAppliedOutput());
     sim.update(Constants.RATE);
     encoder.setPosition(sim.getPositionMeters());
+    
+    limitOneSim.setValue(false);
+    limitTwoSim.setValue(false);
   }
 }
