@@ -62,23 +62,19 @@ public final class Constants {
   }
 
   public static final class Vision {
-    public static final String CAM_NAME = "photonvision";
+    public static final String FRONT_CAMERA = "frontPhotonVision";
+    public static final String BACK_CAMERA = "backPhotonVision";
 
     public static final Translation3d CAM_TRANSLATION = new Translation3d();
     public static final Rotation3d CAM_ROTATION = new Rotation3d();
     public static final Transform3d ROBOT_TO_CAM = new Transform3d(CAM_TRANSLATION, CAM_ROTATION);
 
-    public static final double TARGET_HEIGHT_SUBSTATIONS = Units.inchesToMeters(23.375);
-    public static final double TARGET_HEIGHT_NODES = Units.inchesToMeters(14.25);
-    // test tag at 0
-    public static final AprilTag TEST_TAG_0 = new AprilTag(0, new Pose3d());
-    public static final List<AprilTag> TEST_TAGS = List.of(TEST_TAG_0);
-
     public static final double FIELD_LENGTH = 16.54175; // meters
     public static final double FIELD_WIDTH = 8.0137;
 
+    public static final String SECONDARY_POSE_STRATEGY = "LOWEST_AMBIGUITY";
+
     public static final class AprilTagPose {
-      // TODO correct rotation values (physics stuff i cant read :skull:)
       public static final Pose3d APRIL_TAG_1_POSE =
           new Pose3d(
               15.513558, 1.071626, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(180)));

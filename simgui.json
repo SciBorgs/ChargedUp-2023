@@ -47,10 +47,21 @@
       "/Shuffleboard/SillySim/wristPID": "PIDController",
       "/Shuffleboard/Visualizer/mech": "Mechanism2d",
       "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/backPhotonVision Sim Field": "Field2d",
+      "/SmartDashboard/frontPhotonVision Sim Field": "Field2d",
+      "/SmartDashboard/photonVision Sim Field": "Field2d",
       "/SmartDashboard/photonvision Sim Field": "Field2d"
     },
     "windows": {
       "/Shuffleboard/Drive/field2d": {
+        "Cam Est Pose": {
+          "color": [
+            0.10318857431411743,
+            0.2006860375404358,
+            0.8734177350997925,
+            255.0
+          ]
+        },
         "Robot": {
           "arrows": false,
           "color": [
@@ -210,7 +221,6 @@
           "weight": 2.0
         },
         "window": {
-          "name": "todo: add among us",
           "visible": true
         }
       },
@@ -226,8 +236,12 @@
           "visible": true
         }
       },
-      "/SmartDashboard/photonvision Sim Field": {
-        "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\2023-field.png",
+      "/SmartDashboard/backPhotonVision Sim Field": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/frontPhotonVision Sim Field": {
         "window": {
           "visible": true
         }
@@ -235,9 +249,15 @@
     }
   },
   "NetworkTables": {
+    "Retained Values": {
+      "open": false
+    },
     "transitory": {
       "Shuffleboard": {
         "Drive": {
+          "field2d": {
+            "open": true
+          },
           "open": true
         },
         "DriveSubsystem": {
@@ -267,17 +287,28 @@
           "autos": {
             "open": true
           }
-        },
-        "open": true
+        }
       },
       "SmartDashboard": {
+        "frontPhotonVision Sim Field": {
+          "open": true
+        },
         "open": true,
+        "photonVision Sim Field": {
+          "open": true
+        },
         "photonvision Sim Field": {
           "open": true
         }
       },
       "photonvision": {
+        "frontPhotonVision": {
+          "open": true
+        },
         "open": true,
+        "photonVision": {
+          "open": true
+        },
         "photonvision": {
           "open": true
         }

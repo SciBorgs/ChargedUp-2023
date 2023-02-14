@@ -6,9 +6,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
-import org.photonvision.PhotonCamera;
 // import org.sciborgs1155.lib.Camera;
-import org.sciborgs1155.robot.Constants.Vision;
 // import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
@@ -28,8 +26,7 @@ public class RobotContainer {
   // private final Visualizer visualizer = new Visualizer();
 
   // The robot's subsystems and commands are defined here...
-  public final PhotonCamera cam = new PhotonCamera(Vision.CAM_NAME);
-  private final Drive drive = new Drive(cam);
+  private final Drive drive = new Drive();
 
   // private final Arm arm = new Arm(visualizer);
   // private final Elevator elevator = new Elevator(visualizer);
@@ -40,7 +37,7 @@ public class RobotContainer {
   private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
 
   // Autos
-  @Log private final Autos autos = new Autos(drive, cam);
+  @Log private final Autos autos = new Autos(drive);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -53,7 +50,7 @@ public class RobotContainer {
   }
 
   private void configureSubsystemDefaults() {
-    drive.setDefaultCommand(drive.drive(xbox, true));
+    drive.setDefaultCommand(drive.drive(leftJoystick, rightJoystick, true));
   }
 
   /**

@@ -17,20 +17,19 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.ArrayList;
 import java.util.List;
-import org.photonvision.PhotonCamera;
+import org.sciborgs1155.lib.VisionWrapper;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.Drive;
 
 public final class Autos implements Sendable {
 
+  private final VisionWrapper vision;
   private final Drive drive;
-  private final PhotonCamera cam;
   private final SendableChooser<Command> chooser;
 
-  public Autos(Drive drive, PhotonCamera cam) {
+  public Autos(Drive drive) {
+    vision = new VisionWrapper();
     this.drive = drive;
-    this.cam = cam;
-
     chooser = new SendableChooser<>();
     chooser.setDefaultOption("mobility", mobility());
     chooser.addOption("other", drive.follow("New Path", true, false));
