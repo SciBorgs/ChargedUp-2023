@@ -24,6 +24,7 @@ public class VisionWrapper {
 
   // Pose Estimation & Alignment
   public final PhotonCamera frontCam;
+
   public final PhotonCamera backCam;
   public final AprilTagFieldLayout tagLayout;
 
