@@ -1,19 +1,8 @@
 package org.sciborgs1155.robot;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
-import io.github.oblarg.oblog.annotations.Log;
-import java.util.List;
-import org.photonvision.PhotonCamera;
-import org.sciborgs1155.lib.Visualizer;
-import org.sciborgs1155.robot.Ports.OI;
-import org.sciborgs1155.robot.commands.Autos;
-import org.sciborgs1155.robot.subsystems.Arm;
-import org.sciborgs1155.robot.subsystems.Drivetrain;
-import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
 
 /**
@@ -24,23 +13,23 @@ import org.sciborgs1155.robot.subsystems.Intake;
  */
 public class RobotContainer {
   // Define camera for PoseEstimation
-  private final PhotonCamera cam = new PhotonCamera(Constants.CAMERA_NAME);
+  // private final PhotonCamera cam = new PhotonCamera(Constants.CAMERA_NAME);
 
-  @Log private final Visualizer visualizer = new Visualizer();
+  // @Log private final Visualizer visualizer = new Visualizer();
 
   // The robot's subsystems and commands are defined here...
-  private final Drivetrain drive = new Drivetrain(cam);
-  private final Arm arm = new Arm(visualizer);
-  private final Elevator elevator = new Elevator(visualizer);
+  // private final Drivetrain drive = new Drivetrain(cam);
+  // private final Arm arm = new Arm(visualizer);
+  // private final Elevator elevator = new Elevator(visualizer);
   private final Intake intake = new Intake();
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController xbox = new CommandXboxController(OI.XBOX);
-  private final CommandJoystick leftJoystick = new CommandJoystick(OI.LEFT_STICK);
-  private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
+  // // Replace with CommandPS4Controller or CommandJoystick if needed
+  // private final CommandXboxController xbox = new CommandXboxController(OI.XBOX);
+  // private final CommandJoystick leftJoystick = new CommandJoystick(OI.LEFT_STICK);
+  // private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
 
-  private List<Command> autonSequence =
-      List.of(Autos.mobility(drive), Autos.followPath(drive, "New Path"));
+  // private List<Command> autonSequence =
+  //     List.of(Autos.mobility(drive), Autos.followPath(drive, "New Path"));
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -53,7 +42,7 @@ public class RobotContainer {
   }
 
   private void configureSubsystemDefaults() {
-    drive.setDefaultCommand(drive.drive(leftJoystick, rightJoystick, true));
+    // drive.setDefaultCommand(drive.drive(leftJoystick, rightJoystick, true));
   }
 
   /**
@@ -81,13 +70,13 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
-    // Chain all commands given by autoSequence
+  // public Command getAutonomousCommand() {
+  //   // Chain all commands given by autoSequence
 
-    return Autos.followPath(drive, "gamer");
+  //   return Autos.followPath(drive, "gamer");
 
-    // return autonSequence.stream()
-    //     .reduce(Command::andThen)
-    //     .orElseGet(() -> new RunCommand(() -> {}));
-  }
+  //   // return autonSequence.stream()
+  //   //     .reduce(Command::andThen)
+  //   //     .orElseGet(() -> new RunCommand(() -> {}));
+  // }
 }
