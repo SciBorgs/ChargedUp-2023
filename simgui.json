@@ -185,6 +185,8 @@
           "elbowFeedback": {
             "open": true
           },
+<<<<<<< HEAD
+=======
           "funny": {
             "open": true
           },
@@ -201,6 +203,7 @@
           "wrist": {
             "open": true
           },
+>>>>>>> c42e20984fcaa2626ce8d94cbd07a0f5cc67f4d6
           "wristFeedback": {
             "open": true
           }
@@ -232,6 +235,15 @@
           "Visualizer": {
             "open": true
           },
+<<<<<<< HEAD
+          "limitSwitchOne": {
+            "open": true
+          },
+          "limitSwitchTwo": {
+            "open": true
+          },
+=======
+>>>>>>> c42e20984fcaa2626ce8d94cbd07a0f5cc67f4d6
           "open": true,
           "pid": {
             "open": true
