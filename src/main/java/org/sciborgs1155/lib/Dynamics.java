@@ -22,12 +22,12 @@ public class Dynamics {
    * @param velocity The velocity setpoints for the elbow and wrist
    * @return Returns a vector of voltages for the elbow and wrist, respectively
    */
-  public Vector<N2> calculate(Vector<N2> position, Vector<N2> velocity) {
+  public Vector<N2> calculate(Vector<N2> position, Vector<N2> velocity, Vector<N2> accel) {
     Matrix<N2, N1> tg = Tg(position);
     return VecBuilder.fill(
-        elbowFeedforward.calculate(position.get(0, 0) ,velocity.get(0, 0))
+        elbowFeedforward.calculate(position.get(0, 0), velocity.get(0, 0), accel.get(0, 0))
             + motor.getVoltage(tg.get(0, 0), velocity.get(0, 0)),
-        wristFeedforward.calculate(position.get(1, 0), velocity.get(1, 0))
+        wristFeedforward.calculate(position.get(1, 0), velocity.get(1, 0), accel.get(1, 0))
             + motor.getVoltage(tg.get(1, 0), velocity.get(1, 0)));
   }
 
