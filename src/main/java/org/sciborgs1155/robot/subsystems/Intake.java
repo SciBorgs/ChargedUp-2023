@@ -4,7 +4,6 @@ import static org.sciborgs1155.robot.Constants.Intake.*;
 import static org.sciborgs1155.robot.Ports.Intake.*;
 
 import com.revrobotics.ColorMatch;
-import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.util.Color;
@@ -29,6 +28,39 @@ public class Intake extends SubsystemBase implements Loggable {
   private final ColorSensorV3 sensor = new ColorSensorV3(i2cPort);
   private final ColorMatch matcher = new ColorMatch();
 
+  private boolean led = true;
+
+  // 8.5
+  // 3 - 2
+
+  private final double MIN_R_CONE = 91;
+  private final double MAX_R_CONE = 108;
+  private final double MIN_G_CONE = 113;
+  private final double MAX_G_CONE = 125;
+  private final double MIN_B_CONE = 28;
+  private final double MAX_B_CONE = 45;
+
+  private final double LED_MIN_R_CONE = 79;
+  private final double LED_MAX_R_CONE = 91;
+  private final double LED_MIN_G_CONE = 120;
+  private final double LED_MAX_G_CONE = 133;
+  private final double LED_MIN_B_CONE = 23;
+  private final double LED_MAX_B_CONE = 51;
+
+  private final double MIN_R_CUBE = 71;
+  private final double MAX_R_CUBE = 81;
+  private final double MIN_G_CUBE = 115;
+  private final double MAX_G_CUBE = 125;
+  private final double MIN_B_CUBE = 54;
+  private final double MAX_B_CUBE = 65;
+
+  private final double LED_MIN_R_CUBE = 65;
+  private final double LED_MAX_R_CUBE = 70;
+  private final double LED_MIN_G_CUBE = 115;
+  private final double LED_MAX_G_CUBE = 125;
+  private final double LED_MIN_B_CUBE = 65;
+  private final double LED_MAX_B_CUBE = 70;
+
   public Intake() {
     matcher.addColorMatch(GamePieces.CONE.color);
     matcher.addColorMatch(GamePieces.CUBE.color);
@@ -45,49 +77,47 @@ public class Intake extends SubsystemBase implements Loggable {
 
     System.out.println(r + " " + g + " " + b);
 
-    if (r >= 70 && r <= 95 && g >= 120 && g <= 145 && b >= 15 && b <= 50) {
-      /*
-       * old values were:
-       * r >= 75 && r <= 92 && g >= 127 && g <= 141 && b >= 20 && b <= 46
-       *
-       */
-      return GamePieces.CONE;
-    } else if (r >= 50 && r <= 70 && g >= 80 && g <= 125 && b >= 65 && b <= 120) {
-      /*
-       * old values were:
-       * r >= 55 && r <= 67 && g >= 87 && g <= 120 && b >= 69 && b <= 112
-       *
-       */
-      return GamePieces.CUBE;
+    if (led) {
+      if (r >= LED_MIN_R_CONE
+          && r <= LED_MAX_R_CONE
+          && g >= LED_MIN_G_CONE
+          && g <= LED_MAX_G_CONE
+          && b >= LED_MIN_B_CONE
+          && b <= LED_MAX_B_CONE) {
+        return GamePieces.CONE;
+      } else if (r >= LED_MIN_R_CUBE
+          && r <= LED_MAX_R_CUBE
+          && g >= LED_MIN_G_CUBE
+          && g <= LED_MAX_G_CUBE
+          && b >= LED_MIN_B_CUBE
+          && b <= LED_MAX_B_CUBE) {
+        return GamePieces.CUBE;
+      } else {
+        return GamePieces.NOTHING;
+      }
     } else {
-      return GamePieces.NOTHING;
-    }
-  }
-
-  public GamePieces getGamePieceByMatching() {
-    Color detected = sensor.getColor();
-    ColorMatchResult match = matcher.matchClosestColor(detected);
-
-    System.out.println(detected.red * 255 + " " + detected.green * 255 + " " + detected.blue * 255);
-
-    if (match.color == GamePieces.CONE.color) {
-      return GamePieces.CONE;
-    } else if (match.color == GamePieces.CUBE.color) {
-      return GamePieces.CUBE;
-    } else {
-      return GamePieces.NOTHING;
+      if (r >= MIN_R_CONE
+          && r <= MAX_R_CONE
+          && g >= MIN_G_CONE
+          && g <= MAX_G_CONE
+          && b >= MIN_B_CONE
+          && b <= MAX_B_CONE) {
+        return GamePieces.CONE;
+      } else if (r >= MIN_R_CUBE
+          && r <= MAX_R_CUBE
+          && g >= MIN_G_CUBE
+          && g <= MAX_G_CUBE
+          && b >= MIN_B_CUBE
+          && b <= MAX_B_CUBE) {
+        return GamePieces.CUBE;
+      } else {
+        return GamePieces.NOTHING;
+      }
     }
   }
 
   public void test() {
     GamePieces piece = getGamePiece();
-    System.out.println(sensor.getProximity());
-    System.out.println(piece.name());
-  }
-
-  public void testMatch() {
-    GamePieces piece = getGamePieceByMatching();
-    System.out.println(sensor.getProximity());
     System.out.println(piece.name());
   }
 
