@@ -1,16 +1,12 @@
 package org.sciborgs1155.robot;
 
 import edu.wpi.first.apriltag.AprilTag;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import java.util.List;
@@ -78,10 +74,11 @@ public final class Constants {
     public static final double WRIST_MIN_ANGLE = -Math.PI;
     public static final double WRIST_MAX_ANGLE = Math.PI;
 
-    private static final double CLAW_WEIGHT = 0;
-    private static final double ELBOW_WEIGHT = 0;
-    private static final double R1 = 0; // Distance from base pivot to center of gravity of elbow
-    private static final double R2 = 0; // Distance from the first joint to center of mass of the claw
+    public static final double CLAW_MASS = 0;
+    public static final double FOREARM_MASS = 0;
+    public static final double R1 = 0; // Distance from base pivot to center of gravity of elbow
+    public static final double R2 =
+        0; // Distance from the first joint to center of mass of the claw
 
     public static final double TRACK_WIDTH = Units.inchesToMeters(17);
     // Distance between centers of right and left wheels on robot
@@ -247,8 +244,8 @@ public final class Constants {
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS =
         new TrapezoidProfile.Constraints(MAX_ANG_SPEED, MAX_ANG_ACCEL);
-    }
+  }
 
-  //make Trajectory for Build
- 
+  // make Trajectory for Build
+
 }

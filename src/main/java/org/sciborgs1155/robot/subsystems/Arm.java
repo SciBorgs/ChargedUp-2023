@@ -6,7 +6,6 @@ import static org.sciborgs1155.robot.Ports.Arm.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -43,9 +42,11 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
       new ArmFeedforward(
           ElbowConstants.kS, ElbowConstants.kG, ElbowConstants.kV, ElbowConstants.kA);
 
-  // private final SimpleMotorFeedforward wristFeedforward = new SimpleMotorFeedforward(WristConstants.kS, WristConstants.kV, WristConstants.kA);
+  // private final SimpleMotorFeedforward wristFeedforward = new
+  // SimpleMotorFeedforward(WristConstants.kS, WristConstants.kV, WristConstants.kA);
 
-  // private final SimpleMotorFeedforward elbowFeedforward = new SimpleMotorFeedforward(ElbowConstants.kS, ElbowConstants.kV, ElbowConstants.kA);
+  // private final SimpleMotorFeedforward elbowFeedforward = new
+  // SimpleMotorFeedforward(ElbowConstants.kS, ElbowConstants.kV, ElbowConstants.kA);
 
   @Log(name = "wrist acceleration", methodName = "getLastOutput")
   private final Derivative wristAccel = new Derivative();
@@ -128,7 +129,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     return setGoals(elbowGoal, wristGoal)
         .andThen(Commands.waitUntil(() -> elbowFeedback.atGoal() && wristFeedback.atGoal()));
   }
-
 
   @Override
   public void periodic() {
