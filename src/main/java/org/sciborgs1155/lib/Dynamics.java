@@ -25,14 +25,15 @@ public class Dynamics {
   public Vector<N2> calculate(Vector<N2> position, Vector<N2> velocity) {
     Matrix<N2, N1> tg = Tg(position);
     return VecBuilder.fill(
-        elbowFeedforward.calculate(velocity.get(0, 0))
+        elbowFeedforward.calculate(position.get(0, 0) ,velocity.get(0, 0))
             + motor.getVoltage(tg.get(0, 0), velocity.get(0, 0)),
-        wristFeedforward.calculate(velocity.get(1, 0))
+        wristFeedforward.calculate(position.get(1, 0), velocity.get(1, 0))
             + motor.getVoltage(tg.get(1, 0), velocity.get(1, 0)));
   }
 
   /**
-   * @param position A vector containing the position setpoints of the elbow and the wrist, respectively
+   * @param position A vector containing the position setpoints of the elbow and the wrist,
+   *     respectively
    * @return Calculates and returns the torque applied due to gravity
    */
   private Matrix<N2, N1> Tg(Vector<N2> position) {
