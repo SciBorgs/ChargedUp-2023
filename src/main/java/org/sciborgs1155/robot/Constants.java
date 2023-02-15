@@ -225,6 +225,10 @@ public final class Constants {
     }
   }
 
+  public static final class PlacementConstants{
+    
+  }
+
   public static final class AutoConstants {
     public static final double MAX_SPEED = DriveConstants.MAX_SPEED; // m/s
     public static final double MAX_ACCEL = 4; // m/s^2
