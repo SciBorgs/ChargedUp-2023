@@ -129,9 +129,13 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
         .andThen(Commands.waitUntil(() -> elbowFeedback.atGoal() && wristFeedback.atGoal()));
   }
 
-  public double calculateElbowVoltage() {
+  // public double calculateWristVoltage() {
+  //   // return wristFeedforward.calculate
+  // }
+    
+  // public double calculateElbowVoltage() {
 
-  }
+  // }
 
   @Override
   public void periodic() {
