@@ -53,7 +53,6 @@
           "weight": 8.0,
           "width": 0.4318000078201294
         },
-        "image": "/home/asa/Projects/ChargedUp-2023/field/2023-field.png",
         "module-0": {
           "arrowColor": [
             1.0,
@@ -200,12 +199,14 @@
           "weight": 2.0
         },
         "window": {
-          "name": "todo: add among us"
+          "name": "todo: add among us",
+          "visible": true
         }
       },
       "/Shuffleboard/SillySim/mech2d": {
         "window": {
-          "name": "Silly sim"
+          "name": "Silly sim",
+          "visible": true
         }
       },
       "/Shuffleboard/Visualizer/mech": {

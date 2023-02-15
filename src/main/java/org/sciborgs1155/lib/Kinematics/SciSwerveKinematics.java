@@ -19,7 +19,7 @@ public class SciSwerveKinematics extends SwerveDriveKinematics {
   private SciSwerveModuleState[] m_moduleStates;
   private Translation2d m_prevCoR = new Translation2d();
 
-  public SciSwerveKinematics(Translation2d... wheelsMeters) {
+  public SciSwerveKinematics(Translation2d[] wheelsMeters) {
 
     if (wheelsMeters.length < 2) {
       throw new IllegalArgumentException("A swerve drive requires at least two modules");
