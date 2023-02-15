@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
+import org.sciborgs1155.lib.CustomPeriodRunnables;
 
 public class Intake extends SubsystemBase implements Loggable {
   public enum GamePieces {
@@ -31,6 +32,8 @@ public class Intake extends SubsystemBase implements Loggable {
   public Intake() {
     matcher.addColorMatch(GamePieces.CONE.color);
     matcher.addColorMatch(GamePieces.CUBE.color);
+
+    CustomPeriodRunnables.add(this::test, 0.5);
   }
 
   public GamePieces getGamePiece() {
@@ -76,9 +79,15 @@ public class Intake extends SubsystemBase implements Loggable {
     }
   }
 
-  @Override
-  public void periodic() {
+  public void test() {
     GamePieces piece = getGamePiece();
+    System.out.println(sensor.getProximity());
+    System.out.println(piece.name());
+  }
+
+  public void testMatch() {
+    GamePieces piece = getGamePieceByMatching();
+    System.out.println(sensor.getProximity());
     System.out.println(piece.name());
   }
 
