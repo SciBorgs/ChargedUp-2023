@@ -12,6 +12,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import java.util.Arrays;
 import java.util.List;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.MotorConfig;
 import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
 
@@ -65,14 +66,22 @@ public final class Constants {
     public static final String FRONT_CAMERA = "frontPhotonVision";
     public static final String BACK_CAMERA = "backPhotonVision";
 
-    public static final Translation3d CAM_TRANSLATION = new Translation3d();
-    public static final Rotation3d CAM_ROTATION = new Rotation3d();
-    public static final Transform3d ROBOT_TO_CAM = new Transform3d(CAM_TRANSLATION, CAM_ROTATION);
+    public static final Translation3d FRONT_CAM_TRANSLATION = new Translation3d();
+    public static final Rotation3d FRONT_CAM_ROTATION = new Rotation3d();
+    public static final Transform3d ROBOT_TO_FRONT_CAM =
+        new Transform3d(FRONT_CAM_TRANSLATION, FRONT_CAM_ROTATION);
+
+    public static final Translation3d BACK_CAM_TRANSLATION =
+        new Translation3d(); // Units.degreesToRadians(-180)
+    public static final Rotation3d BACK_CAM_ROTATION =
+        new Rotation3d(0, 0, Units.degreesToRadians(-180));
+    public static final Transform3d ROBOT_TO_BACK_CAM =
+        new Transform3d(BACK_CAM_TRANSLATION, BACK_CAM_ROTATION);
 
     public static final double FIELD_LENGTH = 16.54175; // meters
     public static final double FIELD_WIDTH = 8.0137;
 
-    public static final String SECONDARY_POSE_STRATEGY = "LOWEST_AMBIGUITY";
+    public static final PoseStrategy SECONDARY_POSE_STRATEGY = PoseStrategy.LOWEST_AMBIGUITY;
 
     public static final class AprilTagPose {
       public static final Pose3d APRIL_TAG_1_POSE =

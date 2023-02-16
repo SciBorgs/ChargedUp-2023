@@ -56,7 +56,6 @@ public class VisionWrapper {
     double camTwoDiff = Math.abs(calculateDifference(backVisionPose.estimatedPose, referencePose));
     return (camOneDiff < camTwoDiff) ? frontVisionPose : backVisionPose;
   }
-
   /* Gets the true best target from both camera's inputs USING LOWEST_AMBIGUITY strategy */
   private EstimatedRobotPose getLowestAmbiguityTarget(
       PhotonPipelineResult frontCamResult, PhotonPipelineResult backCamResult) {
@@ -76,8 +75,10 @@ public class VisionWrapper {
     } else {
       fiducialId = backCamBestTarget.getFiducialId();
       bestTagPose = tagLayout.getTagPose(fiducialId).get();
+
       return new EstimatedRobotPose(
-          bestTagPose.transformBy(backCamBestTarget.getBestCameraToTarget().inverse()),
+          bestTagPose.transformBy(
+              backCamBestTarget.getBestCameraToTarget().inverse().plus(Vision.ROBOT_TO_BACK_CAM)),
           // .transformBy(Vision.ROBOT_TO_CAM.inverse()),
           backCamResult.getTimestampSeconds());
     }
@@ -91,7 +92,6 @@ public class VisionWrapper {
     return visionEstimate;
   }
 
-  /* Updates SwerveDrivePoseEstimator with vision measurements based on pose strategy */
   public void updateVisionOdometry(
       PhotonPoseEstimator frontVisionOdometry,
       PhotonPoseEstimator backVisionOdometry,
@@ -101,30 +101,41 @@ public class VisionWrapper {
     EstimatedRobotPose frontVisionPose;
     EstimatedRobotPose backVisionPose;
     Pose2d bestTargetPose;
-
-    EstimatedRobotPose bestPoseEstimate = new EstimatedRobotPose(new Pose3d(), 0);
+    EstimatedRobotPose bestPoseEstimate;
+    Pose3d backPoseTransform;
+    EstimatedRobotPose transformedBackVisionPose;
 
     if (hasTargets()) {
       frontVisionPose = getVisionEstimate(frontVisionOdometry, driveOdometry).get();
       backVisionPose = getVisionEstimate(backVisionOdometry, driveOdometry).get();
+      backPoseTransform = backVisionPose.estimatedPose.transformBy(Vision.ROBOT_TO_BACK_CAM);
+      transformedBackVisionPose =
+          new EstimatedRobotPose(backPoseTransform, backVisionPose.timestampSeconds);
+      // System.out.println("Front Pose: " + frontVisionPose.estimatedPose.toPose2d());
+      // System.out.println("Back Pose: " + backVisionPose.estimatedPose.toPose2d());
+      // System.out.println("Back Transformed Pose " + backVisionPose.estimatedPose.toPose2d());
       switch (Vision.SECONDARY_POSE_STRATEGY) {
-        case "CLOSEST_REFERENCE_POSE":
+        case CLOSEST_TO_REFERENCE_POSE:
           {
             bestPoseEstimate =
                 getBestReferenceTarget(
                     frontVisionPose,
-                    backVisionPose,
+                    transformedBackVisionPose,
                     new Pose3d(driveOdometry.getEstimatedPosition()));
             break;
           }
-        case "LOWEST_AMBIGUITY":
+        case LOWEST_AMBIGUITY:
           {
             bestPoseEstimate =
                 getLowestAmbiguityTarget(frontCam.getLatestResult(), backCam.getLatestResult());
             break;
           }
+        default:
+          throw new UnsupportedOperationException(
+              "Check the enum; only CLOSEST_TO_REFERENCE_POSE and LOWEST_AMBIGUITY can be used");
       }
       bestTargetPose = bestPoseEstimate.estimatedPose.toPose2d();
+      // System.out.println("Best Pose: " + bestTargetPose);
       driveOdometry.addVisionMeasurement(bestTargetPose, bestPoseEstimate.timestampSeconds);
       field.getObject("Cam Est Pose").setPose(bestTargetPose);
     } else {

@@ -19,38 +19,14 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/LiveWindow/Ungrouped/PIDController[10]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[11]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[5]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[6]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[7]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
       "/LiveWindow/Ungrouped/Pigeon IMU [2]": "Gyro",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/Shuffleboard/Drive/field2d": "Field2d",
       "/Shuffleboard/Drive/gyro": "Gyro",
-      "/Shuffleboard/DriveSubsystem/field2d": "Field2d",
-      "/Shuffleboard/Drivetrain/field2d": "Field2d",
-      "/Shuffleboard/Drivetrain/frontLeft": "PIDController",
-      "/Shuffleboard/Drivetrain/frontRight": "PIDController",
       "/Shuffleboard/Drivetrain/gyro": "Gyro",
-      "/Shuffleboard/Drivetrain/rearLeft": "PIDController",
-      "/Shuffleboard/Drivetrain/rearRight": "PIDController",
       "/Shuffleboard/RobotContainer/autos": "String Chooser",
-      "/Shuffleboard/SillySim/elbowPID": "PIDController",
-      "/Shuffleboard/SillySim/mech2d": "Mechanism2d",
-      "/Shuffleboard/SillySim/wristPID": "PIDController",
-      "/Shuffleboard/Visualizer/mech": "Mechanism2d",
-      "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/backPhotonVision Sim Field": "Field2d",
-      "/SmartDashboard/frontPhotonVision Sim Field": "Field2d",
-      "/SmartDashboard/photonVision Sim Field": "Field2d",
-      "/SmartDashboard/photonvision Sim Field": "Field2d"
+      "/SmartDashboard/frontPhotonVision Sim Field": "Field2d"
     },
     "windows": {
       "/Shuffleboard/Drive/field2d": {
@@ -224,24 +200,48 @@
           "visible": true
         }
       },
-      "/Shuffleboard/SillySim/mech2d": {
-        "window": {
-          "name": "Silly sim",
-          "visible": true
-        }
-      },
-      "/Shuffleboard/Visualizer/mech": {
-        "window": {
-          "name": "visualizer",
-          "visible": true
-        }
-      },
       "/SmartDashboard/backPhotonVision Sim Field": {
+        "backPhotonVision Camera": {
+          "arrowColor": [
+            0.9746835231781006,
+            0.46472251415252686,
+            0.46472251415252686,
+            255.0
+          ],
+          "arrowSize": 100,
+          "arrowWeight": 10.0,
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            255.0
+          ],
+          "length": 0.4099999964237213,
+          "width": 0.30000001192092896
+        },
         "window": {
           "visible": true
         }
       },
       "/SmartDashboard/frontPhotonVision Sim Field": {
+        "frontPhotonVision Camera": {
+          "arrowColor": [
+            0.9071729779243469,
+            0.4325339198112488,
+            0.4325339198112488,
+            255.0
+          ],
+          "arrowSize": 100,
+          "arrowWeight": 10.0,
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            255.0
+          ],
+          "length": 0.4099999964237213,
+          "width": 0.30000001192092896
+        },
         "window": {
           "visible": true
         }
@@ -257,61 +257,31 @@
         "Drive": {
           "field2d": {
             "open": true
-          },
-          "open": true
-        },
-        "DriveSubsystem": {
-          "field2d": {
-            "open": true
-          },
-          "open": true
-        },
-        "Drivetrain": {
-          "field2d": {
-            "open": true
-          },
-          "frontLeft": {
-            "open": true
-          },
-          "frontRight": {
-            "open": true
-          },
-          "rearLeft": {
-            "open": true
-          },
-          "rearRight": {
-            "open": true
           }
         },
         "RobotContainer": {
           "autos": {
             "open": true
           }
-        }
+        },
+        "open": true
       },
       "SmartDashboard": {
+        "backPhotonVision Sim Field": {
+          "open": true
+        },
         "frontPhotonVision Sim Field": {
-          "open": true
-        },
-        "open": true,
-        "photonVision Sim Field": {
-          "open": true
-        },
-        "photonvision Sim Field": {
           "open": true
         }
       },
       "photonvision": {
+        "backPhotonVision": {
+          "open": true
+        },
         "frontPhotonVision": {
           "open": true
         },
-        "open": true,
-        "photonVision": {
-          "open": true
-        },
-        "photonvision": {
-          "open": true
-        }
+        "open": true
       }
     }
   },

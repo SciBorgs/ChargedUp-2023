@@ -85,15 +85,21 @@ public class Drive extends SubsystemBase implements Loggable {
             new Pose2d()); // TODO change to initial pose
     frontVisionOdometry =
         new PhotonPoseEstimator(
-            vision.tagLayout, PoseStrategy.LOWEST_AMBIGUITY, vision.frontCam, Vision.ROBOT_TO_CAM);
+            vision.tagLayout,
+            PoseStrategy.LOWEST_AMBIGUITY,
+            vision.frontCam,
+            Vision.ROBOT_TO_FRONT_CAM);
     backVisionOdometry =
         new PhotonPoseEstimator(
-            vision.tagLayout, PoseStrategy.LOWEST_AMBIGUITY, vision.backCam, Vision.ROBOT_TO_CAM);
+            vision.tagLayout,
+            PoseStrategy.LOWEST_AMBIGUITY,
+            vision.backCam,
+            Vision.ROBOT_TO_FRONT_CAM);
     simFront =
         new SimVisionSystem(
             Vision.FRONT_CAMERA,
             VisionSim.camDiagFOVDegrees,
-            Vision.ROBOT_TO_CAM,
+            Vision.ROBOT_TO_FRONT_CAM,
             VisionSim.maxLEDRangeMeters,
             VisionSim.CAMERA_RES_WIDTH,
             VisionSim.CAMERA_RES_HEIGHT,
@@ -102,7 +108,7 @@ public class Drive extends SubsystemBase implements Loggable {
         new SimVisionSystem(
             Vision.BACK_CAMERA,
             VisionSim.camDiagFOVDegrees,
-            Vision.ROBOT_TO_CAM,
+            Vision.ROBOT_TO_BACK_CAM,
             VisionSim.maxLEDRangeMeters,
             VisionSim.CAMERA_RES_WIDTH,
             VisionSim.CAMERA_RES_HEIGHT,
