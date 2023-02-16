@@ -19,6 +19,17 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/Ungrouped/PIDController[10]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[11]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[5]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[6]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[7]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
       "/LiveWindow/Ungrouped/Pigeon IMU [2]": "Gyro",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/Shuffleboard/Drive/field2d": "Field2d",
@@ -224,6 +235,30 @@
         }
       },
       "/SmartDashboard/frontPhotonVision Sim Field": {
+        "Target 1": {
+          "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\redTag.png"
+        },
+        "Target 2": {
+          "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\redTag.png"
+        },
+        "Target 3": {
+          "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\redTag.png"
+        },
+        "Target 4": {
+          "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\redTag.png"
+        },
+        "Target 5": {
+          "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\blueTag.png"
+        },
+        "Target 6": {
+          "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\blueTag.png"
+        },
+        "Target 7": {
+          "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\blueTag.png"
+        },
+        "Target 8": {
+          "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\blueTag.png"
+        },
         "frontPhotonVision Camera": {
           "arrowColor": [
             0.9071729779243469,
@@ -242,6 +277,7 @@
           "length": 0.4099999964237213,
           "width": 0.30000001192092896
         },
+        "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\2023-field.png",
         "window": {
           "visible": true
         }
@@ -263,8 +299,7 @@
           "autos": {
             "open": true
           }
-        },
-        "open": true
+        }
       },
       "SmartDashboard": {
         "backPhotonVision Sim Field": {

@@ -29,7 +29,6 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 // import org.sciborgs1155.lib.Camera;
 import org.photonvision.SimVisionSystem;
 import org.sciborgs1155.lib.ControllerOutputFunction;
@@ -86,13 +85,13 @@ public class Drive extends SubsystemBase implements Loggable {
     frontVisionOdometry =
         new PhotonPoseEstimator(
             vision.tagLayout,
-            PoseStrategy.LOWEST_AMBIGUITY,
+            Vision.PRIMARY_POSE_STRATEGY,
             vision.frontCam,
             Vision.ROBOT_TO_FRONT_CAM);
     backVisionOdometry =
         new PhotonPoseEstimator(
             vision.tagLayout,
-            PoseStrategy.LOWEST_AMBIGUITY,
+            Vision.PRIMARY_POSE_STRATEGY,
             vision.backCam,
             Vision.ROBOT_TO_FRONT_CAM);
     simFront =

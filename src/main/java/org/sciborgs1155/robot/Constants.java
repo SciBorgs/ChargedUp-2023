@@ -81,6 +81,7 @@ public final class Constants {
     public static final double FIELD_LENGTH = 16.54175; // meters
     public static final double FIELD_WIDTH = 8.0137;
 
+    public static final PoseStrategy PRIMARY_POSE_STRATEGY = PoseStrategy.LOWEST_AMBIGUITY;
     public static final PoseStrategy SECONDARY_POSE_STRATEGY = PoseStrategy.LOWEST_AMBIGUITY;
 
     public static final class AprilTagPose {

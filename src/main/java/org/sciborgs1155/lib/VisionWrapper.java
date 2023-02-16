@@ -14,9 +14,9 @@ import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
-import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Vision;
 
 public class VisionWrapper {
@@ -34,9 +34,7 @@ public class VisionWrapper {
     backCam = new PhotonCamera(Vision.BACK_CAMERA);
     tagLayout =
         new AprilTagFieldLayout(
-            Constants.Vision.AprilTagPose.APRIL_TAGS,
-            Constants.Vision.FIELD_LENGTH,
-            Constants.Vision.FIELD_WIDTH);
+            Vision.AprilTagPose.APRIL_TAGS, Vision.FIELD_LENGTH, Vision.FIELD_WIDTH);
   }
 
   public boolean hasTargets() {
@@ -69,18 +67,20 @@ public class VisionWrapper {
       fiducialId = frontCamBestTarget.getFiducialId();
       bestTagPose = tagLayout.getTagPose(fiducialId).get();
       return new EstimatedRobotPose(
-          bestTagPose.transformBy(frontCamBestTarget.getBestCameraToTarget().inverse()),
-          // .transformBy(Vision.ROBOT_TO_CAM.inverse()),
-          frontCamResult.getTimestampSeconds());
+          bestTagPose
+              .transformBy(frontCamBestTarget.getBestCameraToTarget().inverse())
+              .transformBy(Vision.ROBOT_TO_FRONT_CAM.inverse()),
+          frontCamResult.getTimestampSeconds(),
+          backCamResult.getTargets());
     } else {
       fiducialId = backCamBestTarget.getFiducialId();
       bestTagPose = tagLayout.getTagPose(fiducialId).get();
-
       return new EstimatedRobotPose(
-          bestTagPose.transformBy(
-              backCamBestTarget.getBestCameraToTarget().inverse().plus(Vision.ROBOT_TO_BACK_CAM)),
-          // .transformBy(Vision.ROBOT_TO_CAM.inverse()),
-          backCamResult.getTimestampSeconds());
+          bestTagPose
+              .transformBy(backCamBestTarget.getBestCameraToTarget().inverse())
+              .transformBy(Vision.ROBOT_TO_BACK_CAM.inverse()),
+          backCamResult.getTimestampSeconds(),
+          backCamResult.getTargets());
     }
   }
 
@@ -88,6 +88,7 @@ public class VisionWrapper {
   private Optional<EstimatedRobotPose> getVisionEstimate(
       PhotonPoseEstimator visionOdometry, SwerveDrivePoseEstimator odometry) {
     visionOdometry.setReferencePose(odometry.getEstimatedPosition());
+    visionOdometry.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
     Optional<EstimatedRobotPose> visionEstimate = visionOdometry.update();
     return visionEstimate;
   }
@@ -110,10 +111,9 @@ public class VisionWrapper {
       backVisionPose = getVisionEstimate(backVisionOdometry, driveOdometry).get();
       backPoseTransform = backVisionPose.estimatedPose.transformBy(Vision.ROBOT_TO_BACK_CAM);
       transformedBackVisionPose =
-          new EstimatedRobotPose(backPoseTransform, backVisionPose.timestampSeconds);
-      // System.out.println("Front Pose: " + frontVisionPose.estimatedPose.toPose2d());
-      // System.out.println("Back Pose: " + backVisionPose.estimatedPose.toPose2d());
-      // System.out.println("Back Transformed Pose " + backVisionPose.estimatedPose.toPose2d());
+          new EstimatedRobotPose(
+              backPoseTransform, backVisionPose.timestampSeconds, backVisionPose.targetsUsed);
+
       switch (Vision.SECONDARY_POSE_STRATEGY) {
         case CLOSEST_TO_REFERENCE_POSE:
           {
