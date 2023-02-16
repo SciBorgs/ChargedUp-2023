@@ -6,13 +6,16 @@ import static org.sciborgs1155.robot.Ports.Elevator.*;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.simulation.DIOSim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
@@ -22,7 +25,7 @@ import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
 
-public class Elevator extends SubsystemBase implements Loggable {
+public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log(name = "applied output", methodName = "getAppliedOutput")
   private final CANSparkMax lead = Motors.ELEVATOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
@@ -31,17 +34,16 @@ public class Elevator extends SubsystemBase implements Loggable {
   private final CANSparkMax right = Motors.ELEVATOR.build(MotorType.kBrushless, RIGHT_MOTOR);
 
   @Log(name = "velocity", methodName = "getVelocity")
-  private final RelativeEncoder encoder = lead.getEncoder();
+  private final RelativeEncoder encoder = lead.getAlternateEncoder(Constants.THROUGH_BORE_CPR);
 
   private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
   @Log private final ProfiledPIDController pid = new ProfiledPIDController(kP, kI, kD, CONSTRAINTS);
 
-  // digital input
-  @Log private final DigitalInput beambreak = new DigitalInput(BEAM_BREAK_PORTS[0]);
-  @Log private final DigitalInput beambreakTwo = new DigitalInput(BEAM_BREAK_PORTS[1]);
-
   @Log private final DigitalInput limitSwitchOne = new DigitalInput(LIMIT_SWITCH_PORTS[0]);
   @Log private final DigitalInput limitSwitchTwo = new DigitalInput(LIMIT_SWITCH_PORTS[1]);
+
+  private final DIOSim limitOneSim = new DIOSim(limitSwitchOne);
+  private final DIOSim limitTwoSim = new DIOSim(limitSwitchTwo);
 
   @Log(name = "acceleration", methodName = "getLastOutput")
   private final Derivative accel = new Derivative();
@@ -57,9 +59,19 @@ public class Elevator extends SubsystemBase implements Loggable {
           Dimensions.ELEVATOR_MAX_HEIGHT,
           true);
 
-  public Elevator() {
+  private final Visualizer visualizer;
+
+  public Elevator(Visualizer visualizer) {
     left.follow(lead);
     right.follow(lead);
+
+    this.visualizer = visualizer;
+  }
+
+  /** Elevator is at goal */
+  @Log(name = "at goal")
+  public boolean atGoal() {
+    return pid.atGoal();
   }
 
   /** Elevator height from the base, in meters */
@@ -77,13 +89,21 @@ public class Elevator extends SubsystemBase implements Loggable {
   /** If a limit switch is triggered */
   @Log(name = "hitting")
   public boolean isHitting() {
-    // return beambreak.get() || beambreakTwo.get() || limitSwitchOne.get() || limitSwitchOne.get();
-    return false;
+    return limitSwitchOne.get() || limitSwitchOne.get();
   }
 
   /** Elevator goal from the base, in meters */
   public Command setGoal(double height) {
-    return runOnce(() -> pid.setGoal(height));
+    return runOnce(
+        () ->
+            pid.setGoal(
+                MathUtil.clamp(
+                    height, Dimensions.ELEVATOR_MIN_HEIGHT, Dimensions.ELEVATOR_MAX_HEIGHT)));
+  }
+
+  /** Runs elevator to goal height, from the base in meters */
+  public Command runToGoal(double height) {
+    return setGoal(height).andThen(Commands.waitUntil(this::atGoal));
   }
 
   @Override
@@ -94,7 +114,7 @@ public class Elevator extends SubsystemBase implements Loggable {
 
     lead.setVoltage(isHitting() ? 0 : pidOutput + ffOutput);
 
-    Visualizer.getInstance().setElevatorHeight(encoder.getPosition());
+    visualizer.setElevatorHeight(encoder.getPosition());
   }
 
   @Override
@@ -102,5 +122,18 @@ public class Elevator extends SubsystemBase implements Loggable {
     sim.setInputVoltage(lead.getAppliedOutput());
     sim.update(Constants.RATE);
     encoder.setPosition(sim.getPositionMeters());
+
+    limitOneSim.setValue(false);
+    limitTwoSim.setValue(false);
+  }
+
+  @Override
+  public void close() {
+    lead.close();
+    left.close();
+    right.close();
+
+    limitSwitchOne.close();
+    limitSwitchTwo.close();
   }
 }

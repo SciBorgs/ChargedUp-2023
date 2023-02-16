@@ -25,7 +25,12 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
  * var drive = new DifferentialDrive(leftMotor, rightGroup);
  * </pre></code>
  */
-public final class MotorConfig {
+public record MotorConfig(
+    boolean inverted,
+    NeutralBehavior neutralBehavior,
+    double openLoopRampRate,
+    int currentLimit,
+    boolean burnFlash) {
 
   public enum NeutralBehavior {
     COAST(true),
@@ -40,25 +45,6 @@ public final class MotorConfig {
     public CANSparkMax.IdleMode getREV() {
       return coast ? CANSparkMax.IdleMode.kCoast : CANSparkMax.IdleMode.kBrake;
     }
-  }
-
-  private final boolean inverted;
-  private final NeutralBehavior neutralBehavior;
-  private final double openLoopRampRate;
-  private final int currentLimit;
-  private final boolean burnFlash;
-
-  public MotorConfig(
-      boolean inverted,
-      NeutralBehavior neutralBehavior,
-      double openLoopRampRate,
-      int currentLimit,
-      boolean burnFlash) {
-    this.inverted = inverted;
-    this.neutralBehavior = neutralBehavior;
-    this.openLoopRampRate = openLoopRampRate;
-    this.currentLimit = currentLimit;
-    this.burnFlash = burnFlash;
   }
 
   public static MotorConfig base() {
@@ -106,40 +92,20 @@ public final class MotorConfig {
     return res;
   }
 
-  public boolean isInverted() {
-    return inverted;
-  }
-
   public MotorConfig withInvert(boolean inverted) {
     return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
-  }
-
-  public NeutralBehavior getNeutralBehavior() {
-    return neutralBehavior;
   }
 
   public MotorConfig withNeutralBehavior(NeutralBehavior neutralBehavior) {
     return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
   }
 
-  public double getOpenLoopRampRate() {
-    return openLoopRampRate;
-  }
-
   public MotorConfig withOpenLoopRampRate(double openLoopRampRate) {
     return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
   }
 
-  public int getCurrentLimit() {
-    return currentLimit;
-  }
-
   public MotorConfig withCurrentLimit(int currentLimit) {
     return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
-  }
-
-  public boolean getBurnFlash() {
-    return burnFlash;
   }
 
   public MotorConfig withBurnFlash(boolean burnFlash) {
