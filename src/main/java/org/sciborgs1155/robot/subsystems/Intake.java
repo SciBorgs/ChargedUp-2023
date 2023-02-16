@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.subsystems;
 
 import static org.sciborgs1155.robot.Constants.Intake.*;
+import static org.sciborgs1155.robot.Constants.Intake.ColorSensors.*;
 import static org.sciborgs1155.robot.Ports.Intake.*;
 
 import com.revrobotics.ColorMatch;
@@ -28,39 +29,6 @@ public class Intake extends SubsystemBase implements Loggable {
   private final ColorSensorV3 sensor = new ColorSensorV3(i2cPort);
   private final ColorMatch matcher = new ColorMatch();
 
-  private boolean led = true;
-
-  // 8.5
-  // 3 - 2
-
-  private final double MIN_R_CONE = 91;
-  private final double MAX_R_CONE = 108;
-  private final double MIN_G_CONE = 113;
-  private final double MAX_G_CONE = 125;
-  private final double MIN_B_CONE = 28;
-  private final double MAX_B_CONE = 45;
-
-  private final double LED_MIN_R_CONE = 79;
-  private final double LED_MAX_R_CONE = 91;
-  private final double LED_MIN_G_CONE = 120;
-  private final double LED_MAX_G_CONE = 133;
-  private final double LED_MIN_B_CONE = 23;
-  private final double LED_MAX_B_CONE = 51;
-
-  private final double MIN_R_CUBE = 71;
-  private final double MAX_R_CUBE = 81;
-  private final double MIN_G_CUBE = 115;
-  private final double MAX_G_CUBE = 125;
-  private final double MIN_B_CUBE = 54;
-  private final double MAX_B_CUBE = 65;
-
-  private final double LED_MIN_R_CUBE = 65;
-  private final double LED_MAX_R_CUBE = 70;
-  private final double LED_MIN_G_CUBE = 115;
-  private final double LED_MAX_G_CUBE = 125;
-  private final double LED_MIN_B_CUBE = 65;
-  private final double LED_MAX_B_CUBE = 70;
-
   public Intake() {
     matcher.addColorMatch(GamePieces.CONE.color);
     matcher.addColorMatch(GamePieces.CUBE.color);
@@ -77,7 +45,7 @@ public class Intake extends SubsystemBase implements Loggable {
 
     System.out.println(r + " " + g + " " + b);
 
-    if (led) {
+    if (LED) {
       if (r >= LED_MIN_R_CONE
           && r <= LED_MAX_R_CONE
           && g >= LED_MIN_G_CONE

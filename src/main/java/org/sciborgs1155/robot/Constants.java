@@ -131,6 +131,41 @@ public final class Constants {
 
   public static final class Intake {
     public static final double WHEEL_SPEED = 0.6;
+
+    public static final class ColorSensors {
+      // without LEDs
+      public static final double MIN_R_CONE = 91;
+      public static final double MAX_R_CONE = 108;
+      public static final double MIN_G_CONE = 113;
+      public static final double MAX_G_CONE = 125;
+      public static final double MIN_B_CONE = 28;
+      public static final double MAX_B_CONE = 45;
+
+      public static final double MIN_R_CUBE = 71;
+      public static final double MAX_R_CUBE = 81;
+      public static final double MIN_G_CUBE = 115;
+      public static final double MAX_G_CUBE = 125;
+      public static final double MIN_B_CUBE = 54;
+      public static final double MAX_B_CUBE = 65;
+
+      // with LEDs
+      public static final double LED_MIN_R_CONE = 79;
+      public static final double LED_MAX_R_CONE = 91;
+      public static final double LED_MIN_G_CONE = 120;
+      public static final double LED_MAX_G_CONE = 133;
+      public static final double LED_MIN_B_CONE = 23;
+      public static final double LED_MAX_B_CONE = 51;
+
+      public static final double LED_MIN_R_CUBE = 65;
+      public static final double LED_MAX_R_CUBE = 75;
+      public static final double LED_MIN_G_CUBE = 115;
+      public static final double LED_MAX_G_CUBE = 125;
+      public static final double LED_MIN_B_CUBE = 60;
+      public static final double LED_MAX_B_CUBE = 75;
+
+      public static final boolean LED = true;
+      // Once we have access to the claw, test the color sensor values.
+    }
   }
 
   public static final class Elevator {
