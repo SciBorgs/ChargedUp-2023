@@ -13,12 +13,10 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import org.sciborgs1155.robot.Constants.Motors;
 
 /** Class to encapsulate a rev max swerve module */
-public class MAXSwerveModule implements SwerveModule, Sendable {
+public class MAXSwerveModule implements SwerveModule {
   private final CANSparkMax driveMotor; // Regular Neo
   private final CANSparkMax turnMotor; // Neo 550
 
@@ -88,12 +86,14 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
    *
    * @return The current state of the module.
    */
+  @Override
   public SwerveModuleState getState() {
     return new SwerveModuleState(
         driveEncoder.getVelocity(),
         Rotation2d.fromRadians(turningEncoder.getPosition()).minus(angularOffset));
   }
 
+  @Override
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(
         driveEncoder.getPosition(),
@@ -105,6 +105,7 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
    *
    * @param desiredState Desired state with speed and angle.
    */
+  @Override
   public void setDesiredState(SwerveModuleState desiredState) {
     SwerveModuleState correctedDesiredState = new SwerveModuleState();
     correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
@@ -120,18 +121,14 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
     turnFeedback.setReference(setpoint.angle.getRadians(), ControlType.kPosition);
   }
 
-  /** Zeroes all the SwerveModule encoders. */
-  public void resetEncoders() {
-    driveEncoder.setPosition(0);
+  @Override
+  public SwerveModuleState getDesiredState() {
+    return setpoint;
   }
 
+  /** Zeroes all the SwerveModule encoders. */
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.addDoubleProperty("current velocity", driveEncoder::getVelocity, null);
-    // builder.addDoubleProperty("current angle", () -> this.getPosition().angle.getRadians(),
-    // null);
-    builder.addDoubleProperty("current angle", turningEncoder::getPosition, null);
-    builder.addDoubleProperty("target angle", () -> setpoint.angle.getRadians(), null);
-    builder.addDoubleProperty("target velocity", () -> setpoint.speedMetersPerSecond, null);
+  public void resetEncoders() {
+    driveEncoder.setPosition(0);
   }
 }

@@ -300,13 +300,18 @@
         "Drive": {
           "field2d": {
             "open": true
-          }
+          },
+          "frontRight": {
+            "open": true
+          },
+          "open": true
         },
         "RobotContainer": {
           "autos": {
             "open": true
           }
-        }
+        },
+        "open": true
       },
       "SmartDashboard": {
         "backPhotonVision Sim Field": {
