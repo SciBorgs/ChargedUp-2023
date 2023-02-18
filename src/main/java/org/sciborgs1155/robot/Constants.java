@@ -75,8 +75,8 @@ public final class Constants {
     public static final double WRIST_MIN_ANGLE = -Math.PI;
     public static final double WRIST_MAX_ANGLE = Math.PI;
 
-    public static final double CLAW_MASS = 0;
-    public static final double FOREARM_MASS = 0;
+    public static final double CLAW_MASS = 4.4;
+    public static final double FOREARM_MASS = 4.2;
     public static final double R1 = 0; // Distance from base pivot to center of gravity of elbow
     public static final double R2 =
         0; // Distance from the first joint to center of mass of the claw
