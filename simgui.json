@@ -19,6 +19,7 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/Drive": "Subsystem",
       "/LiveWindow/Ungrouped/PIDController[10]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[11]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
@@ -230,6 +231,7 @@
           "length": 0.4099999964237213,
           "width": 0.30000001192092896
         },
+        "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\2023-field.png",
         "window": {
           "visible": true
         }

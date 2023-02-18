@@ -28,15 +28,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
-import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.EstimatedRobotPose;
 // import org.sciborgs1155.lib.Camera;
-import org.photonvision.SimVisionSystem;
 import org.sciborgs1155.lib.ControllerOutputFunction;
 import org.sciborgs1155.lib.VisionWrapper;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Auto;
-import org.sciborgs1155.robot.Constants.Vision;
-import org.sciborgs1155.robot.Constants.Vision.VisionSim;
 import org.sciborgs1155.robot.Ports.Sensors;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 
@@ -66,10 +63,6 @@ public class Drive extends SubsystemBase implements Loggable {
   // Odometry and pose estimation
   private final VisionWrapper vision;
   private final SwerveDrivePoseEstimator odometry;
-  private final PhotonPoseEstimator frontVisionOdometry;
-  private final PhotonPoseEstimator backVisionOdometry;
-  private final SimVisionSystem simFront;
-  private final SimVisionSystem simBack;
   @Log public final Field2d field2d = new Field2d();
 
   private final FieldObject2d[] modules2d = new FieldObject2d[modules.length];
@@ -82,41 +75,8 @@ public class Drive extends SubsystemBase implements Loggable {
             getHeading(),
             getModulePositions(),
             new Pose2d()); // TODO change to initial pose
-    frontVisionOdometry =
-        new PhotonPoseEstimator(
-            vision.tagLayout,
-            Vision.PRIMARY_POSE_STRATEGY,
-            vision.frontCam,
-            Vision.ROBOT_TO_FRONT_CAM);
-    backVisionOdometry =
-        new PhotonPoseEstimator(
-            vision.tagLayout,
-            Vision.PRIMARY_POSE_STRATEGY,
-            vision.backCam,
-            Vision.ROBOT_TO_FRONT_CAM);
-    simFront =
-        new SimVisionSystem(
-            Vision.FRONT_CAMERA,
-            VisionSim.camDiagFOVDegrees,
-            Vision.ROBOT_TO_FRONT_CAM,
-            VisionSim.maxLEDRangeMeters,
-            VisionSim.CAMERA_RES_WIDTH,
-            VisionSim.CAMERA_RES_HEIGHT,
-            VisionSim.minTargetArea);
-    simBack =
-        new SimVisionSystem(
-            Vision.BACK_CAMERA,
-            VisionSim.camDiagFOVDegrees,
-            Vision.ROBOT_TO_BACK_CAM,
-            VisionSim.maxLEDRangeMeters,
-            VisionSim.CAMERA_RES_WIDTH,
-            VisionSim.CAMERA_RES_HEIGHT,
-            VisionSim.minTargetArea);
 
     for (int i = 0; i < modules2d.length; i++) modules2d[i] = field2d.getObject("module-" + i);
-
-    simFront.addVisionTargets(vision.tagLayout);
-    simBack.addVisionTargets(vision.tagLayout);
   }
 
   /**
@@ -230,9 +190,11 @@ public class Drive extends SubsystemBase implements Loggable {
   @Override
   public void periodic() {
     odometry.update(getHeading(), getModulePositions());
-    if (vision.hasTargets()) {
-      vision.updateVisionOdometry(frontVisionOdometry, backVisionOdometry, odometry, field2d);
-      vision.updateVisionOdometry(frontVisionOdometry, backVisionOdometry, odometry, field2d);
+    
+    EstimatedRobotPose[] poses = vision.getPoseEstimates(getPose());
+    for (int i = 0; i < poses.length; i++) {
+      odometry.addVisionMeasurement(poses[i].estimatedPose.toPose2d(), poses[i].timestampSeconds);
+      field2d.getObject("Cam Est Pose " + i).setPose(poses[i].estimatedPose.toPose2d());
     }
     field2d.getObject("Actual Pose").setPose(getPose());
 
@@ -244,9 +206,6 @@ public class Drive extends SubsystemBase implements Loggable {
 
   @Override
   public void simulationPeriodic() {
-    simFront.processFrame(getPose());
-    simBack.processFrame(getPose());
-
     gyro.getSimCollection()
         .addHeading(
             Units.radiansToDegrees(
