@@ -30,7 +30,8 @@ public class Visualizer implements Sendable {
   }
 
   public void setArmPositions(Rotation2d elbowAngle, Rotation2d wristAngle) {
-    forearm.setAngle(elbowAngle.minus(Rotation2d.fromRadians(Math.PI / 2.0)));
+    // forearm.setAngle(elbowAngle.minus(Rotation2d.fromRadians(Math.PI / 2.0)));
+    forearm.setAngle(elbowAngle);
     claw.setAngle(wristAngle);
   }
 

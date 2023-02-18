@@ -1,175 +1,16 @@
 {
-  "HALProvider": {
-    "Other Devices": {
-      "SPARK MAX [0]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [11]": {
-        "header": {
-          "open": true
-        }
-      }
-    }
-  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/LiveWindow/Elevator": "Subsystem",
-      "/LiveWindow/Ungrouped/DigitalInput[5]": "Digital Input",
-      "/LiveWindow/Ungrouped/DigitalInput[6]": "Digital Input",
-      "/LiveWindow/Ungrouped/DigitalInput[7]": "Digital Input",
-      "/LiveWindow/Ungrouped/DigitalInput[8]": "Digital Input",
-      "/LiveWindow/Ungrouped/PIDController[10]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[11]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[12]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[13]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[14]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[15]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[16]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[17]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[5]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[6]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[7]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
-      "/LiveWindow/Ungrouped/Pigeon IMU [2]": "Gyro",
-      "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
-      "/Shuffleboard/DriveSubsystem/field2d": "Field2d",
       "/Shuffleboard/Drivetrain/field2d": "Field2d",
-      "/Shuffleboard/Drivetrain/frontLeft": "PIDController",
-      "/Shuffleboard/Drivetrain/frontRight": "PIDController",
       "/Shuffleboard/Drivetrain/gyro": "Gyro",
-      "/Shuffleboard/Drivetrain/rearLeft": "PIDController",
-      "/Shuffleboard/Drivetrain/rearRight": "PIDController",
-      "/Shuffleboard/Elevator/Visualizer/mech": "Mechanism2d",
-      "/Shuffleboard/Elevator/beambreak": "Digital Input",
-      "/Shuffleboard/Elevator/beambreakTwo": "Digital Input",
       "/Shuffleboard/Elevator/limitSwitchOne": "Digital Input",
       "/Shuffleboard/Elevator/limitSwitchTwo": "Digital Input",
-      "/Shuffleboard/RobotContainer/visualizer": "Mechanism2d",
-      "/Shuffleboard/SillySim/elbowPID": "PIDController",
-      "/Shuffleboard/SillySim/mech2d": "Mechanism2d",
-      "/Shuffleboard/SillySim/wristPID": "PIDController",
-      "/Shuffleboard/Visualizer/mech": "Mechanism2d"
+      "/Shuffleboard/RobotContainer/visualizer": "Mechanism2d"
     },
     "windows": {
-      "/Shuffleboard/Drivetrain/field2d": {
-        "Robot": {
-          "arrows": false,
-          "length": 0.2800000011920929,
-          "width": 0.2800000011920929
-        },
-        "SimSwerveModule": {
-          "arrowSize": 0,
-          "arrowWeight": 1.0,
-          "color": [
-            0.0,
-            82.50001525878906,
-            255.0,
-            255.0
-          ],
-          "length": 0.10000000149011612,
-          "style": "Box/Image",
-          "width": 0.20000000298023224
-        },
-        "module-0": {
-          "arrowSize": 33,
-          "arrowWeight": 3.0,
-          "style": "Hidden"
-        },
-        "module-1": {
-          "arrowSize": 33,
-          "arrowWeight": 3.0,
-          "style": "Hidden"
-        },
-        "module-2": {
-          "arrowSize": 33,
-          "arrowWeight": 3.0,
-          "style": "Hidden"
-        },
-        "module-3": {
-          "arrowSize": 33,
-          "arrowWeight": 3.0,
-          "style": "Hidden"
-        },
-        "org.sciborgs1155.robot.subsystems.modules.SimSwerveModule@27f843b": {
-          "arrowColor": [
-            0.0,
-            1.0,
-            1.0,
-            255.0
-          ],
-          "arrowWeight": 2.0,
-          "color": [
-            0.0,
-            119.99999237060547,
-            255.0,
-            255.0
-          ],
-          "selectable": false,
-          "style": "Line",
-          "weight": 2.0
-        },
-        "org.sciborgs1155.robot.subsystems.modules.SimSwerveModule@4354e572": {
-          "arrowColor": [
-            0.0,
-            1.0,
-            1.0,
-            255.0
-          ],
-          "arrowWeight": 2.0,
-          "selectable": false,
-          "style": "Line",
-          "weight": 2.0
-        },
-        "org.sciborgs1155.robot.subsystems.modules.SimSwerveModule@59bbac13": {
-          "arrowColor": [
-            0.0,
-            1.0,
-            1.0,
-            255.0
-          ],
-          "arrowWeight": 2.0,
-          "selectable": false,
-          "style": "Line",
-          "weight": 2.0
-        },
-        "org.sciborgs1155.robot.subsystems.modules.SimSwerveModule@ee7bcb8": {
-          "arrowColor": [
-            0.0,
-            1.0,
-            1.0,
-            255.0
-          ],
-          "arrowWeight": 2.0,
-          "selectable": false,
-          "style": "Line",
-          "weight": 2.0
-        },
-        "window": {
-          "name": "todo: add among us",
-          "visible": true
-        }
-      },
-      "/Shuffleboard/Elevator/beambreak": {
-        "window": {
-          "visible": true
-        }
-      },
       "/Shuffleboard/RobotContainer/visualizer": {
         "window": {
-          "visible": true
-        }
-      },
-      "/Shuffleboard/SillySim/mech2d": {
-        "window": {
-          "name": "Silly sim",
           "visible": true
         }
       }
@@ -179,112 +20,18 @@
     "transitory": {
       "Shuffleboard": {
         "Arm": {
-          "elbow": {
-            "open": true
-          },
           "elbowFeedback": {
             "open": true
           },
-<<<<<<< HEAD
-=======
-          "funny": {
-            "open": true
-          },
-          "goal": {
-            "open": true
-          },
           "open": true,
-          "relative state": {
-            "open": true
-          },
-          "state": {
-            "open": true
-          },
           "wrist": {
             "open": true
           },
->>>>>>> c42e20984fcaa2626ce8d94cbd07a0f5cc67f4d6
           "wristFeedback": {
             "open": true
           }
         },
-        "DriveSubsystem": {
-          "field2d": {
-            "open": true
-          },
-          "open": true
-        },
-        "Drivetrain": {
-          "field2d": {
-            "open": true
-          },
-          "frontLeft": {
-            "open": true
-          },
-          "frontRight": {
-            "open": true
-          },
-          "rearLeft": {
-            "open": true
-          },
-          "rearRight": {
-            "open": true
-          }
-        },
-        "Elevator": {
-          "Visualizer": {
-            "open": true
-          },
-<<<<<<< HEAD
-          "limitSwitchOne": {
-            "open": true
-          },
-          "limitSwitchTwo": {
-            "open": true
-          },
-=======
->>>>>>> c42e20984fcaa2626ce8d94cbd07a0f5cc67f4d6
-          "open": true,
-          "pid": {
-            "open": true
-          }
-        },
-        "RobotContainer": {
-          "visualizer": {
-            "Chassis": {
-              "Elevator": {
-                "Forearm": {
-                  "Wrist": {
-                    "open": true
-                  }
-                }
-              },
-              "Superstructure": {
-                "open": true
-              },
-              "open": true
-            },
-            "open": true
-          }
-        },
-        "Visualizer": {
-          "mech": {
-            "open": true
-          },
-          "open": true
-        },
         "open": true
-      },
-      "SmartDashboard": {
-        "goal": {
-          "open": true
-        },
-        "open": true
-      },
-      "photonvision": {
-        "photonvision": {
-          "open": true
-        }
       }
     }
   }

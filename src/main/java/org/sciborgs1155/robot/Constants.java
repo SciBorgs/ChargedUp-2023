@@ -100,13 +100,13 @@ public final class Constants {
 
   public static final class ArmConstants {
     public static final class WristConstants {
-      public static final double kP = 5;
+      public static final double kP = 50;
       public static final double kI = 0;
-      public static final double kD = 1;
+      public static final double kD = 10;
 
       public static final double kS = 0;
-      public static final double kG = 5;
-      public static final double kV = 0;
+      public static final double kG = 11;
+      public static final double kV = 2;
       public static final double kA = 0;
 
       public static final double MAX_VELOCITY = 3; // radians / s
@@ -118,11 +118,11 @@ public final class Constants {
     public static final class ElbowConstants {
       public static final double kP = 10;
       public static final double kI = 0;
-      public static final double kD = 2;
+      public static final double kD = 5;
 
       public static final double kS = 0;
-      public static final double kG = 4.5;
-      public static final double kV = 0;
+      public static final double kG = 8;
+      public static final double kV = 2;
       public static final double kA = 0;
 
       public static final double MAX_VELOCITY = 3; // radians / s
