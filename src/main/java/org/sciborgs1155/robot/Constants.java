@@ -107,45 +107,6 @@ public final class Constants {
     public static final PoseStrategy PRIMARY_POSE_STRATEGY = PoseStrategy.LOWEST_AMBIGUITY;
     public static final PoseStrategy SECONDARY_POSE_STRATEGY = PoseStrategy.LOWEST_AMBIGUITY;
 
-    // public static final class AprilTagPose {
-    //   public static final Pose3d APRIL_TAG_1_POSE =
-    //       new Pose3d(
-    //           15.513558, 1.071626, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(180)));
-
-    //   public static final Pose3d APRIL_TAG_2_POSE =
-    //       new Pose3d(
-    //           15.513558, 2.748026, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(180)));
-
-    //   public static final Pose3d APRIL_TAG_3_POSE =
-    //       new Pose3d(
-    //           15.513558, 4.424426, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(180)));
-
-    //   public static final Pose3d APRIL_TAG_4_POSE =
-    //       new Pose3d(
-    //           16.178784, 6.749796, 0.695452, new Rotation3d(0, 0, Units.degreesToRadians(180)));
-
-    //   public static final Pose3d APRIL_TAG_5_POSE =
-    //       new Pose3d(0.36195, 6.749796, 0.695452, new Rotation3d(0, 0,
-    // Units.degreesToRadians(0)));
-
-    //   public static final Pose3d APRIL_TAG_6_POSE =
-    //       new Pose3d(1.02743, 4.424426, 0.462788, new Rotation3d(0, 0,
-    // Units.degreesToRadians(0)));
-
-    //   public static final Pose3d APRIL_TAG_7_POSE =
-    //       new Pose3d(1.02743, 2.748026, 0.462788, new Rotation3d(0, 0,
-    // Units.degreesToRadians(0)));
-    //   // Distance between centers of right and left wheels on robot
-    //   public static final double WHEEL_BASE = Units.inchesToMeters(17);
-    //   // Distance between front and back wheels on robot
-
-    //   public static final Pose3d APRIL_TAG_8_POSE =
-    //       new Pose3d(1.02743, 1.071626, 0.462788, new Rotation3d(0, 0,
-    // Units.degreesToRadians(0)));
-
-    //   public static final double FIELD_LENGTH = Units.feetToMeters(54);
-    //   public static final double FIELD_WIDTH = Units.feetToMeters(27);
-
     public static final class VisionSim {
       public static final double maxLEDRangeMeters = 9000;
       public static final double camDiagFOVDegrees = 68.5;
@@ -153,7 +114,6 @@ public final class Constants {
       public static final int CAMERA_RES_WIDTH = 960;
       public static final int CAMERA_RES_HEIGHT = 544;
     }
-    // }
   }
 
   public static final class Arm {

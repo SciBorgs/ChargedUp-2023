@@ -35,9 +35,13 @@
       "/Shuffleboard/Drive/field2d": "Field2d",
       "/Shuffleboard/Drive/gyro": "Gyro",
       "/Shuffleboard/Drivetrain/gyro": "Gyro",
+      "/Shuffleboard/Elevator/limitSwitchOne": "Digital Input",
+      "/Shuffleboard/Elevator/limitSwitchTwo": "Digital Input",
       "/Shuffleboard/RobotContainer/autos": "String Chooser",
+      "/Shuffleboard/RobotContainer/visualizer": "Mechanism2d",
       "/SmartDashboard/backPhotonVision Sim Field": "Field2d",
-      "/SmartDashboard/frontPhotonVision Sim Field": "Field2d"
+      "/SmartDashboard/frontPhotonVision Sim Field": "Field2d",
+      "/SmartDashboard/photonvision Sim Field": "Field2d"
     },
     "windows": {
       "/Shuffleboard/Drive/field2d": {
@@ -61,7 +65,6 @@
           "weight": 8.0,
           "width": 0.4318000078201294
         },
-        "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\2023-field.png",
         "module-0": {
           "arrowColor": [
             1.0,
@@ -277,7 +280,11 @@
           "length": 0.4099999964237213,
           "width": 0.30000001192092896
         },
-        "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\2023-field.png",
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/photonvision Sim Field": {
         "window": {
           "visible": true
         }

@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package org.sciborgs1155.lib;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -26,23 +22,20 @@ public class VisionWrapper {
   /** Dimensions wrapper for mechanisms */
 
   // Pose Estimation & Alignment
-  public final PhotonCamera frontCam;
+  public final PhotonCamera frontCam = new PhotonCamera(Constants.FRONT_CAM);
+  ;
 
-  public final PhotonCamera backCam;
+  public final PhotonCamera backCam = new PhotonCamera(Constants.BACK_CAM);
+  ;
   public AprilTagFieldLayout tagLayout;
 
   /** Creates a new Dimensions. */
   public VisionWrapper() {
-    frontCam = new PhotonCamera(Constants.FRONT_CAM);
-    backCam = new PhotonCamera(Constants.BACK_CAM);
     try {
       tagLayout = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    // new AprilTagFieldLayout(
-    //   Dimensions.AprilTagPose.APRIL_TAGS, Dimensions.FIELD_LENGTH, Dimensions.FIELD_WIDTH);
   }
 
   public boolean hasTargets() {
