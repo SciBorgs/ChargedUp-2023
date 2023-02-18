@@ -11,8 +11,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import java.util.List;
 import org.sciborgs1155.lib.MotorConfig;
-import org.sciborgs1155.lib.State;
 import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
+import org.sciborgs1155.lib.State;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -232,7 +232,7 @@ public final class Constants {
     }
   }
 
-  public static final class PlacementConstants{
+  public static final class PlacementConstants {
     public static final State FRONT_MID_CONE = State.fromAbsolute(0, 0.2, 0.6);
     public static final State FRONT_HIGH_CONE = State.fromAbsolute(0, 1, 1.1);
     public static final State BACK_LOW_CONE = State.fromAbsolute(0, 0.1, 0);
