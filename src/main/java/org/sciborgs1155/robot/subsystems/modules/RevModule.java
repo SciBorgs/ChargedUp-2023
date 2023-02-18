@@ -28,12 +28,11 @@ public class RevModule implements SwerveModule, Sendable {
   private final SparkMaxPIDController driveFeedback;
   private final SparkMaxPIDController turnFeedback;
 
-  private final SimpleMotorFeedforward driveFeedforward =
-      new SimpleMotorFeedforward(Driving.S, Driving.V, Driving.A);
+  private final SimpleMotorFeedforward driveFeedforward;
 
   private final Rotation2d angularOffset;
 
-  private SwerveModuleState setpoint = new SwerveModuleState();
+  private SwerveModuleState setpoint;
 
   /**
    * Constructs a SwerveModule for rev's product.
@@ -52,6 +51,8 @@ public class RevModule implements SwerveModule, Sendable {
     turnFeedback = turnMotor.getPIDController();
     driveFeedback.setFeedbackDevice(driveEncoder);
     turnFeedback.setFeedbackDevice(turningEncoder);
+
+    driveFeedforward = new SimpleMotorFeedforward(Driving.S, Driving.V, Driving.A);
 
     turningEncoder.setInverted(Turning.ENCODER_INVERTED);
 
@@ -81,7 +82,7 @@ public class RevModule implements SwerveModule, Sendable {
 
     driveEncoder.setPosition(0);
     this.angularOffset = Rotation2d.fromRadians(angularOffset);
-    setpoint.angle = Rotation2d.fromRadians(turningEncoder.getPosition());
+    setpoint = new SwerveModuleState(0, Rotation2d.fromRadians(turningEncoder.getPosition()));
   }
 
   /**

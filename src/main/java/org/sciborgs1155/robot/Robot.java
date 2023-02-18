@@ -1,6 +1,5 @@
 package org.sciborgs1155.robot;
 
-import com.revrobotics.REVPhysicsSim;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -100,7 +99,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    CommandScheduler.getInstance().run();
+  }
 
   /** This function is called once when the robot is first started up. */
   @Override
@@ -108,7 +109,5 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {
-    REVPhysicsSim.getInstance().run();
-  }
+  public void simulationPeriodic() {}
 }
