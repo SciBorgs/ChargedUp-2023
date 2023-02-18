@@ -89,6 +89,13 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
    *
    * @return The current state of the module.
    */
+  @Override
+  public SwerveModuleState getAutoState() {
+    return new SwerveModuleState(
+        driveEncoder.getVelocity(),
+        Rotation2d.fromRadians(turningEncoder.getPosition()).minus(angularOffset));
+  }
+
   public SciSwerveModuleState getState() {
     return new SciSwerveModuleState(
         0,
@@ -147,6 +154,7 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.addDoubleProperty("current velocity", driveEncoder::getVelocity, null);
+    builder.addDoubleProperty("currnt acceleration", () -> setpoint.moduleAcceleration, null);
     // builder.addDoubleProperty("current angle", () -> this.getPosition().angle.getRadians(),
     // null);
     builder.addDoubleProperty("current angle", turningEncoder::getPosition, null);

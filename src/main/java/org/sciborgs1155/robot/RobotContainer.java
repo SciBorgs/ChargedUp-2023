@@ -52,7 +52,7 @@ public class RobotContainer {
   }
 
   private void configureSubsystemDefaults() {
-    drive.setDefaultCommand(drive.drive(xbox, true));
+    drive.setDefaultCommand(drive.drive(xbox, false));
   }
 
   /**

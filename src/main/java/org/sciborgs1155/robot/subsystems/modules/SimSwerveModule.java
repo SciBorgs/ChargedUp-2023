@@ -43,7 +43,7 @@ public class SimSwerveModule implements SwerveModule, Sendable {
    */
   public SciSwerveModuleState getState() {
     return new SciSwerveModuleState(
-        0,
+        accelerationState.calculate(drive.getAngularVelocityRadPerSec()),
         drive.getAngularVelocityRadPerSec(),
         Rotation2d.fromRadians(turn.getAngularVelocityRadPerSec()));
   }
@@ -109,5 +109,15 @@ public class SimSwerveModule implements SwerveModule, Sendable {
   public void initSendable(SendableBuilder builder) {
     builder.addDoubleProperty("velocity", drive::getAngularVelocityRadPerSec, null);
     builder.addDoubleProperty("angle", turn::getAngularPositionRad, null);
+    builder.addDoubleProperty(
+        "acceleration",
+        () -> accelerationState.calculate(drive.getAngularVelocityRadPerSec()),
+        null);
+  }
+
+  @Override
+  public SciSwerveModuleState getAutoState() {
+    return new SciSwerveModuleState(
+        drive.getAngularVelocityRadPerSec(), Rotation2d.fromRadians(turn.getAngularPositionRad()));
   }
 }

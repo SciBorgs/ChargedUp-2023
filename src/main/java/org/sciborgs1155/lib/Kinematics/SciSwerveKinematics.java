@@ -5,7 +5,6 @@ import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import java.util.Arrays;
 import org.ejml.simple.SimpleMatrix;
 
@@ -27,8 +26,8 @@ public class SciSwerveKinematics extends SwerveDriveKinematics {
     m_numModules = wheelsMeters.length;
     m_modules = Arrays.copyOf(wheelsMeters, m_numModules);
     m_moduleStates = new SciSwerveModuleState[m_numModules];
-    Arrays.fill(m_moduleStates, new SwerveModuleState());
-    m_inverseKinematics = new SimpleMatrix(m_numModules * 2, 3);
+    Arrays.fill(m_moduleStates, new SciSwerveModuleState());
+    m_inverseKinematics = new SimpleMatrix(m_numModules * 2, 4);
 
     for (int i = 0; i < m_numModules; i++) {
       m_inverseKinematics.setRow(

@@ -15,6 +15,8 @@ public interface SwerveModule {
 
   public SciSwerveModuleState getState();
 
+  public SwerveModuleState getAutoState();
+
   public SwerveModulePosition getPosition();
 
   public void setDesiredState(SciSwerveModuleState desiredStates);

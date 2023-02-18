@@ -224,7 +224,22 @@
           "field2d": {
             "open": true
           },
-          "open": true
+          "frontLeft": {
+            "open": true
+          },
+          "frontRight": {
+            "open": true
+          },
+          "gyro": {
+            "open": true
+          },
+          "open": true,
+          "rearLeft": {
+            "open": true
+          },
+          "rearRight": {
+            "open": true
+          }
         },
         "DriveSubsystem": {
           "field2d": {

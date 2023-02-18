@@ -14,7 +14,9 @@ public class ChassisState extends ChassisSpeeds {
   public double alphaRadiansPerSecondSquared;
 
   /** Constructs a ChassisState with zeros for dx, dy, and theta. */
-  public ChassisState() {}
+  public ChassisState() {
+    this(0, 0, 0);
+  }
 
   /**
    * Constructs a ChassisSpeeds object.
@@ -64,6 +66,14 @@ public class ChassisState extends ChassisSpeeds {
         fieldRelativeSpeeds.ayMetersPerSecondSquared,
         fieldRelativeSpeeds.alphaRadiansPerSecondSquared,
         robotAngle);
+  }
+
+  public static boolean CompareChassisSpeeds(
+      ChassisSpeeds chassisSpeeds, ChassisSpeeds other, double equalityFactor) {
+    return Math.abs(chassisSpeeds.vxMetersPerSecond - other.vxMetersPerSecond) < equalityFactor
+        && Math.abs(chassisSpeeds.vyMetersPerSecond - other.vyMetersPerSecond) < equalityFactor
+        && Math.abs(chassisSpeeds.omegaRadiansPerSecond - other.omegaRadiansPerSecond)
+            < equalityFactor;
   }
 
   @Override

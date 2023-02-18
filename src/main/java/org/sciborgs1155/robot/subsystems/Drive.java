@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -134,19 +135,26 @@ public class Drive extends SubsystemBase implements Loggable {
     ySpeed *= MAX_SPEED;
     rot *= MAX_ANGULAR_SPEED;
 
-    xSpeed = accelX.calculate(xSpeed);
-    ySpeed = accelY.calculate(ySpeed);
-    rot = rotAccel.calculate(rot);
+    double xAccel = accelX.calculate(xSpeed);
+    double yAccel = accelY.calculate(ySpeed);
+    double rotAlpha = rotAccel.calculate(rot);
 
     var states =
         DRIVERKINEMATICS.toSwerveModuleStates(
             fieldRelative
-                ? ChassisState.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getHeading())
-                : new ChassisState(xSpeed, ySpeed, rot),
+                ? ChassisState.fromFieldRelativeSpeeds(xAccel, yAccel, rotAlpha, getHeading())
+                : new ChassisState(xAccel, yAccel, rotAlpha),
             new Translation2d());
+    if (ChassisState.CompareChassisSpeeds(
+        AUTOKINEMATICS.toChassisSpeeds(getAutoModuleStates()),
+        new ChassisSpeeds(xSpeed, ySpeed, rot),
+        0.5)) {
+      states = DRIVERKINEMATICS.toSwerveModuleStates(new ChassisState());
+    }
 
     setModuleStates(states);
   }
+
   // angery
   // reeeeeeeeeeeeeeeeeeeeeeeeeeee
   /**
@@ -188,6 +196,10 @@ public class Drive extends SubsystemBase implements Loggable {
 
   private SciSwerveModuleState[] getModuleStates() {
     return Arrays.stream(modules).map(SwerveModule::getState).toArray(SciSwerveModuleState[]::new);
+  }
+
+  private SwerveModuleState[] getAutoModuleStates() {
+    return Arrays.stream(modules).map(SwerveModule::getAutoState).toArray(SwerveModuleState[]::new);
   }
 
   private SwerveModulePosition[] getModulePositions() {
@@ -282,7 +294,8 @@ public class Drive extends SubsystemBase implements Loggable {
 
   // TODO replace
   private static final ControllerOutputFunction mapper =
-      ControllerOutputFunction.powerExp(Math.E, Math.PI);
+      // ControllerOutputFunction.powerExp(Math.E, Math.PI);
+      ControllerOutputFunction.power(1);
   /** Drive based on joysticks */
   public Command drive(CommandJoystick left, CommandJoystick right, boolean fieldRelative) {
     return run(
