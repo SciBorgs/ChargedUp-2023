@@ -43,8 +43,8 @@ public class RevModule implements SwerveModule, Sendable {
    * @param angularOffset offset from drivetrain
    */
   public RevModule(int drivePort, int turnPort, double angularOffset) {
-    driveMotor = Motors.DRIVE.buildCanSparkMax(MotorType.kBrushless, drivePort);
-    turnMotor = Motors.TURN.buildCanSparkMax(MotorType.kBrushless, turnPort);
+    driveMotor = Motors.DRIVE.build(MotorType.kBrushless, drivePort);
+    turnMotor = Motors.TURN.build(MotorType.kBrushless, turnPort);
 
     driveEncoder = driveMotor.getEncoder();
     turningEncoder = turnMotor.getAbsoluteEncoder(Type.kDutyCycle);
