@@ -190,7 +190,7 @@ public class Drive extends SubsystemBase implements Loggable {
   @Override
   public void periodic() {
     odometry.update(getHeading(), getModulePositions());
-    
+
     EstimatedRobotPose[] poses = vision.getPoseEstimates(getPose());
     for (int i = 0; i < poses.length; i++) {
       odometry.addVisionMeasurement(poses[i].estimatedPose.toPose2d(), poses[i].timestampSeconds);

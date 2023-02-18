@@ -1,11 +1,11 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package org.sciborgs1155.lib;
 
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.photonvision.EstimatedRobotPose;
@@ -13,19 +13,18 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.SimVisionSystem;
-import org.sciborgs1155.robot.Constants.Vision;
-import org.sciborgs1155.robot.Constants.Vision.VisionSim;
+import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.Constants.Dimensions;
+import org.sciborgs1155.robot.Constants.Dimensions.VisionSim;
 import org.sciborgs1155.robot.Robot;
 
 public class VisionWrapper {
-  /** Vision wrapper for mechanisms */
+  /** Dimensions wrapper for mechanisms */
 
   // Pose Estimation & Alignment
   public final PhotonCamera frontCam;
 
   public final PhotonCamera backCam;
-
-  public final AprilTagFieldLayout tagLayout;
 
   public final PhotonPoseEstimator frontVisionOdometry;
   public final PhotonPoseEstimator backVisionOdometry;
@@ -33,40 +32,45 @@ public class VisionWrapper {
   public final SimVisionSystem simFront;
   public final SimVisionSystem simBack;
 
-  /** Creates a new Vision. */
+  /** Creates a new Constants. */
   public VisionWrapper() {
-    frontCam = new PhotonCamera(Vision.FRONT_CAMERA);
-    backCam = new PhotonCamera(Vision.BACK_CAMERA);
-    tagLayout =
-        new AprilTagFieldLayout(
-            Vision.AprilTagPose.APRIL_TAGS, Vision.FIELD_LENGTH, Vision.FIELD_WIDTH);
+    frontCam = new PhotonCamera(Constants.FRONT_CAM);
+    backCam = new PhotonCamera(Constants.BACK_CAM);
+
+    AprilTagFieldLayout layout;
+    try {
+      layout = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
+    } catch (Exception e) {
+      layout = new AprilTagFieldLayout(new ArrayList<AprilTag>(), 0, 0);
+      DriverStation.reportError("Failed to load AprilTagFieldLayout", e.getStackTrace());
+    }
     frontVisionOdometry =
         new PhotonPoseEstimator(
-            tagLayout, Vision.PRIMARY_POSE_STRATEGY, frontCam, Vision.ROBOT_TO_FRONT_CAM);
+            layout, Dimensions.PRIMARY_POSE_STRATEGY, frontCam, Dimensions.ROBOT_TO_FRONT_CAM);
     backVisionOdometry =
         new PhotonPoseEstimator(
-            tagLayout, Vision.PRIMARY_POSE_STRATEGY, backCam, Vision.ROBOT_TO_BACK_CAM);
+            layout, Dimensions.PRIMARY_POSE_STRATEGY, backCam, Dimensions.ROBOT_TO_BACK_CAM);
     simFront =
         new SimVisionSystem(
-            Vision.FRONT_CAMERA,
+            Constants.FRONT_CAM,
             VisionSim.camDiagFOVDegrees,
-            Vision.ROBOT_TO_FRONT_CAM,
+            Dimensions.ROBOT_TO_FRONT_CAM,
             VisionSim.maxLEDRangeMeters,
             VisionSim.CAMERA_RES_WIDTH,
             VisionSim.CAMERA_RES_HEIGHT,
             VisionSim.minTargetArea);
     simBack =
         new SimVisionSystem(
-            Vision.BACK_CAMERA,
+            Constants.BACK_CAM,
             VisionSim.camDiagFOVDegrees,
-            Vision.ROBOT_TO_BACK_CAM,
+            Dimensions.ROBOT_TO_BACK_CAM,
             VisionSim.maxLEDRangeMeters,
             VisionSim.CAMERA_RES_WIDTH,
             VisionSim.CAMERA_RES_HEIGHT,
             VisionSim.minTargetArea);
-             
-    simFront.addVisionTargets(tagLayout);
-    simBack.addVisionTargets(tagLayout);
+
+    simFront.addVisionTargets(layout);
+    simBack.addVisionTargets(layout);
 
     frontVisionOdometry.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
     backVisionOdometry.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);

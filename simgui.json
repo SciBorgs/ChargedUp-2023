@@ -36,9 +36,13 @@
       "/Shuffleboard/Drive/field2d": "Field2d",
       "/Shuffleboard/Drive/gyro": "Gyro",
       "/Shuffleboard/Drivetrain/gyro": "Gyro",
+      "/Shuffleboard/Elevator/limitSwitchOne": "Digital Input",
+      "/Shuffleboard/Elevator/limitSwitchTwo": "Digital Input",
       "/Shuffleboard/RobotContainer/autos": "String Chooser",
+      "/Shuffleboard/RobotContainer/visualizer": "Mechanism2d",
       "/SmartDashboard/backPhotonVision Sim Field": "Field2d",
-      "/SmartDashboard/frontPhotonVision Sim Field": "Field2d"
+      "/SmartDashboard/frontPhotonVision Sim Field": "Field2d",
+      "/SmartDashboard/photonvision Sim Field": "Field2d"
     },
     "windows": {
       "/Shuffleboard/Drive/field2d": {
@@ -47,6 +51,22 @@
             0.10318857431411743,
             0.2006860375404358,
             0.8734177350997925,
+            255.0
+          ]
+        },
+        "Cam Est Pose 0": {
+          "color": [
+            129.1139373779297,
+            255.0,
+            0.0,
+            255.0
+          ]
+        },
+        "Cam Est Pose 1": {
+          "color": [
+            0.0,
+            12.91140365600586,
+            255.0,
             255.0
           ]
         },
