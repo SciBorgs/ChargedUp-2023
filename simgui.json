@@ -19,6 +19,7 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/Drive": "Subsystem",
       "/LiveWindow/Ungrouped/PIDController[10]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[11]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
@@ -53,6 +54,22 @@
             255.0
           ]
         },
+        "Cam Est Pose 0": {
+          "color": [
+            129.1139373779297,
+            255.0,
+            0.0,
+            255.0
+          ]
+        },
+        "Cam Est Pose 1": {
+          "color": [
+            0.0,
+            12.91140365600586,
+            255.0,
+            255.0
+          ]
+        },
         "Robot": {
           "arrows": false,
           "color": [
@@ -65,6 +82,7 @@
           "weight": 8.0,
           "width": 0.4318000078201294
         },
+        "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\2023-field.png",
         "module-0": {
           "arrowColor": [
             1.0,
@@ -233,6 +251,7 @@
           "length": 0.4099999964237213,
           "width": 0.30000001192092896
         },
+        "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\2023-field.png",
         "window": {
           "visible": true
         }
@@ -280,11 +299,7 @@
           "length": 0.4099999964237213,
           "width": 0.30000001192092896
         },
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/photonvision Sim Field": {
+        "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\2023-field.png",
         "window": {
           "visible": true
         }

@@ -1,146 +1,93 @@
 package org.sciborgs1155.lib;
 
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import java.io.IOException;
+import edu.wpi.first.wpilibj.DriverStation;
+import java.util.ArrayList;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.SimVisionSystem;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
+import org.sciborgs1155.robot.Constants.Dimensions.VisionSim;
+import org.sciborgs1155.robot.Robot;
 
 public class VisionWrapper {
   /** Dimensions wrapper for mechanisms */
 
   // Pose Estimation & Alignment
-  public final PhotonCamera frontCam = new PhotonCamera(Constants.FRONT_CAM);
-  ;
+  public final PhotonCamera frontCam;
 
-  public final PhotonCamera backCam = new PhotonCamera(Constants.BACK_CAM);
-  ;
-  public AprilTagFieldLayout tagLayout;
+  public final PhotonCamera backCam;
 
-  /** Creates a new Dimensions. */
+  public final PhotonPoseEstimator frontVisionOdometry;
+  public final PhotonPoseEstimator backVisionOdometry;
+
+  public final SimVisionSystem simFront;
+  public final SimVisionSystem simBack;
+
+  /** Creates a new Constants. */
   public VisionWrapper() {
+    frontCam = new PhotonCamera(Constants.FRONT_CAM);
+    backCam = new PhotonCamera(Constants.BACK_CAM);
+
+    AprilTagFieldLayout layout;
     try {
-      tagLayout = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
-    } catch (IOException e) {
-      e.printStackTrace();
+      layout = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
+    } catch (Exception e) {
+      layout = new AprilTagFieldLayout(new ArrayList<AprilTag>(), 0, 0);
+      DriverStation.reportError("Failed to load AprilTagFieldLayout", e.getStackTrace());
     }
-  }
+    frontVisionOdometry =
+        new PhotonPoseEstimator(
+            layout, Dimensions.PRIMARY_POSE_STRATEGY, frontCam, Dimensions.ROBOT_TO_FRONT_CAM);
+    backVisionOdometry =
+        new PhotonPoseEstimator(
+            layout, Dimensions.PRIMARY_POSE_STRATEGY, backCam, Dimensions.ROBOT_TO_BACK_CAM);
+    simFront =
+        new SimVisionSystem(
+            Constants.FRONT_CAM,
+            VisionSim.camDiagFOVDegrees,
+            Dimensions.ROBOT_TO_FRONT_CAM,
+            VisionSim.maxLEDRangeMeters,
+            VisionSim.CAMERA_RES_WIDTH,
+            VisionSim.CAMERA_RES_HEIGHT,
+            VisionSim.minTargetArea);
+    simBack =
+        new SimVisionSystem(
+            Constants.BACK_CAM,
+            VisionSim.camDiagFOVDegrees,
+            Dimensions.ROBOT_TO_BACK_CAM,
+            VisionSim.maxLEDRangeMeters,
+            VisionSim.CAMERA_RES_WIDTH,
+            VisionSim.CAMERA_RES_HEIGHT,
+            VisionSim.minTargetArea);
 
-  public boolean hasTargets() {
-    return frontCam.getLatestResult().hasTargets() && backCam.getLatestResult().hasTargets();
-  }
+    simFront.addVisionTargets(layout);
+    simBack.addVisionTargets(layout);
 
-  /* POSE ESTIMATION */
-  private double calculateDifference(Pose3d x, Pose3d y) {
-    return x.getTranslation().getDistance(y.getTranslation());
-  }
-
-  /* Gets the true best target from both camera's inputs USING CLOSEST_REFERENCE_POSE strategy */
-  private EstimatedRobotPose getBestReferenceTarget(
-      EstimatedRobotPose frontVisionPose, EstimatedRobotPose backVisionPose, Pose3d referencePose) {
-
-    double camOneDiff = Math.abs(calculateDifference(frontVisionPose.estimatedPose, referencePose));
-    double camTwoDiff = Math.abs(calculateDifference(backVisionPose.estimatedPose, referencePose));
-    return (camOneDiff < camTwoDiff) ? frontVisionPose : backVisionPose;
-  }
-  /* Gets the true best target from both camera's inputs USING LOWEST_AMBIGUITY strategy */
-  private EstimatedRobotPose getLowestAmbiguityTarget(
-      PhotonPipelineResult frontCamResult, PhotonPipelineResult backCamResult) {
-
-    PhotonTrackedTarget frontCamBestTarget = frontCamResult.getBestTarget();
-    PhotonTrackedTarget backCamBestTarget = backCamResult.getBestTarget();
-    int fiducialId;
-    Pose3d bestTagPose;
-
-    if (frontCamBestTarget.getPoseAmbiguity() < backCamBestTarget.getPoseAmbiguity()) {
-      fiducialId = frontCamBestTarget.getFiducialId();
-      bestTagPose = tagLayout.getTagPose(fiducialId).get();
-      return new EstimatedRobotPose(
-          bestTagPose
-              .transformBy(frontCamBestTarget.getBestCameraToTarget().inverse())
-              .transformBy(Dimensions.ROBOT_TO_FRONT_CAM.inverse()),
-          frontCamResult.getTimestampSeconds(),
-          backCamResult.getTargets());
-    } else {
-      fiducialId = backCamBestTarget.getFiducialId();
-      bestTagPose = tagLayout.getTagPose(fiducialId).get();
-      return new EstimatedRobotPose(
-          bestTagPose
-              .transformBy(backCamBestTarget.getBestCameraToTarget().inverse())
-              .transformBy(Dimensions.ROBOT_TO_BACK_CAM.inverse()),
-          backCamResult.getTimestampSeconds(),
-          backCamResult.getTargets());
-    }
+    frontVisionOdometry.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+    backVisionOdometry.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
   }
 
   /* Gets estimated pose from vision measurements */
-  private Optional<EstimatedRobotPose> getVisionEstimate(
-      PhotonPoseEstimator visionOdometry, SwerveDrivePoseEstimator odometry) {
-    visionOdometry.setReferencePose(odometry.getEstimatedPosition());
-    visionOdometry.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-    Optional<EstimatedRobotPose> visionEstimate = visionOdometry.update();
-    return visionEstimate;
-  }
-
-  public void updateVisionOdometry(
-      PhotonPoseEstimator frontVisionOdometry,
-      PhotonPoseEstimator backVisionOdometry,
-      SwerveDrivePoseEstimator driveOdometry,
-      Field2d field) {
-
-    EstimatedRobotPose frontVisionPose;
-    EstimatedRobotPose backVisionPose;
-    Pose2d bestTargetPose;
-    EstimatedRobotPose bestPoseEstimate;
-    Pose3d backPoseTransform;
-    EstimatedRobotPose transformedBackVisionPose;
-
-    if (hasTargets()) {
-      frontVisionPose = getVisionEstimate(frontVisionOdometry, driveOdometry).get();
-      backVisionPose = getVisionEstimate(backVisionOdometry, driveOdometry).get();
-      backPoseTransform = backVisionPose.estimatedPose.transformBy(Dimensions.ROBOT_TO_BACK_CAM);
-      transformedBackVisionPose =
-          new EstimatedRobotPose(
-              backPoseTransform, backVisionPose.timestampSeconds, backVisionPose.targetsUsed);
-
-      switch (Dimensions.SECONDARY_POSE_STRATEGY) {
-        case CLOSEST_TO_REFERENCE_POSE:
-          {
-            bestPoseEstimate =
-                getBestReferenceTarget(
-                    frontVisionPose,
-                    transformedBackVisionPose,
-                    new Pose3d(driveOdometry.getEstimatedPosition()));
-            break;
-          }
-        case LOWEST_AMBIGUITY:
-          {
-            bestPoseEstimate =
-                getLowestAmbiguityTarget(frontCam.getLatestResult(), backCam.getLatestResult());
-            break;
-          }
-        default:
-          throw new UnsupportedOperationException(
-              "Check the enum; only CLOSEST_TO_REFERENCE_POSE and LOWEST_AMBIGUITY can be used");
-      }
-      bestTargetPose = bestPoseEstimate.estimatedPose.toPose2d();
-      // System.out.println("Best Pose: " + bestTargetPose);
-      driveOdometry.addVisionMeasurement(bestTargetPose, bestPoseEstimate.timestampSeconds);
-      field.getObject("Cam Est Pose").setPose(bestTargetPose);
-    } else {
-      field.getObject("Cam Est Pose").setPose(new Pose2d(-100, -100, new Rotation2d()));
+  public EstimatedRobotPose[] getPoseEstimates(Pose2d lastPose) {
+    frontVisionOdometry.setReferencePose(lastPose);
+    backVisionOdometry.setReferencePose(lastPose);
+    if (Robot.isSimulation()) {
+      simFront.processFrame(lastPose);
+      simBack.processFrame(lastPose);
     }
+    return Stream.of(frontVisionOdometry, backVisionOdometry)
+        .map(PhotonPoseEstimator::update)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toArray(EstimatedRobotPose[]::new);
   }
 }
