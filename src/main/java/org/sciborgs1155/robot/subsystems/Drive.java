@@ -35,8 +35,8 @@ import org.sciborgs1155.lib.ControllerOutputFunction;
 import org.sciborgs1155.lib.VisionWrapper;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Auto;
-import org.sciborgs1155.robot.Constants.Vision;
-import org.sciborgs1155.robot.Constants.Vision.VisionSim;
+import org.sciborgs1155.robot.Constants.Dimensions;
+import org.sciborgs1155.robot.Constants.Dimensions.VisionSim;
 import org.sciborgs1155.robot.Ports.Sensors;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 
@@ -85,29 +85,29 @@ public class Drive extends SubsystemBase implements Loggable {
     frontVisionOdometry =
         new PhotonPoseEstimator(
             vision.tagLayout,
-            Vision.PRIMARY_POSE_STRATEGY,
+            Dimensions.PRIMARY_POSE_STRATEGY,
             vision.frontCam,
-            Vision.ROBOT_TO_FRONT_CAM);
+            Dimensions.ROBOT_TO_FRONT_CAM);
     backVisionOdometry =
         new PhotonPoseEstimator(
             vision.tagLayout,
-            Vision.PRIMARY_POSE_STRATEGY,
+            Dimensions.PRIMARY_POSE_STRATEGY,
             vision.backCam,
-            Vision.ROBOT_TO_FRONT_CAM);
+            Dimensions.ROBOT_TO_FRONT_CAM);
     simFront =
         new SimVisionSystem(
-            Vision.FRONT_CAMERA,
+            Constants.FRONT_CAM,
             VisionSim.camDiagFOVDegrees,
-            Vision.ROBOT_TO_FRONT_CAM,
+            Dimensions.ROBOT_TO_FRONT_CAM,
             VisionSim.maxLEDRangeMeters,
             VisionSim.CAMERA_RES_WIDTH,
             VisionSim.CAMERA_RES_HEIGHT,
             VisionSim.minTargetArea);
     simBack =
         new SimVisionSystem(
-            Vision.BACK_CAMERA,
+            Constants.BACK_CAM,
             VisionSim.camDiagFOVDegrees,
-            Vision.ROBOT_TO_BACK_CAM,
+            Dimensions.ROBOT_TO_BACK_CAM,
             VisionSim.maxLEDRangeMeters,
             VisionSim.CAMERA_RES_WIDTH,
             VisionSim.CAMERA_RES_HEIGHT,

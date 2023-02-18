@@ -1,8 +1,6 @@
 package org.sciborgs1155.robot;
 
 import com.pathplanner.lib.PathConstraints;
-import edu.wpi.first.apriltag.AprilTag;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -10,11 +8,10 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import java.util.Arrays;
-import java.util.List;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.MotorConfig;
 import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
+import org.sciborgs1155.lib.State;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -35,6 +32,10 @@ public final class Constants {
   public static final double RATE = 0.02; // roborio tickrate
   public static final double CONTROLLER_RATE = 0.015; // controller tickrate
   public static final double DEADBAND = 0.06;
+  public static final int THROUGH_BORE_CPR = 8192;
+
+  public static final String FRONT_CAM = "photonvision";
+  public static final String BACK_CAM = "photonvision";
 
   public static final class Motors {
     public static final MotorConfig DRIVE =
@@ -62,9 +63,34 @@ public final class Constants {
         MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
   }
 
-  public static final class Vision {
-    public static final String FRONT_CAMERA = "frontPhotonVision";
-    public static final String BACK_CAMERA = "backPhotonVision";
+  public static final class Dimensions {
+    public static final double ELEVATOR_MIN_HEIGHT = 0;
+    public static final double ELEVATOR_MAX_HEIGHT = Units.inchesToMeters(49.3);
+    public static final double FOREARM_LENGTH = Units.inchesToMeters(41);
+    public static final double CLAW_LENGTH = Units.inchesToMeters(20);
+
+    public static final double ELBOW_MIN_ANGLE = -Math.PI / 2.0;
+    public static final double ELBOW_MAX_ANGLE = 3.0 * Math.PI / 2.0;
+    public static final double WRIST_MIN_ANGLE = -Math.PI;
+    public static final double WRIST_MAX_ANGLE = Math.PI;
+
+    public static final double CLAW_MASS = 4.4;
+    public static final double FOREARM_MASS = 4.2;
+    public static final double R1 = 0; // Distance from base pivot to center of gravity of elbow
+    public static final double R2 =
+        0; // Distance from the first joint to center of mass of the claw
+
+    public static final double TRACK_WIDTH = Units.inchesToMeters(17);
+    // Distance between centers of right and left wheels on robot
+    public static final double WHEEL_BASE = Units.inchesToMeters(17);
+    // Distance between front and back wheels on robot
+
+    public static final Translation3d CAM_TRANSLATION = new Translation3d();
+    public static final Rotation3d CAM_ROTATION = new Rotation3d();
+    public static final Transform3d ROBOT_TO_CAM = new Transform3d(CAM_TRANSLATION, CAM_ROTATION);
+
+    public static final double FIELD_LENGTH = Units.feetToMeters(54);
+    public static final double FIELD_WIDTH = Units.feetToMeters(27);
 
     public static final Translation3d FRONT_CAM_TRANSLATION = new Translation3d();
     public static final Rotation3d FRONT_CAM_ROTATION = new Rotation3d();
@@ -78,52 +104,47 @@ public final class Constants {
     public static final Transform3d ROBOT_TO_BACK_CAM =
         new Transform3d(BACK_CAM_TRANSLATION, BACK_CAM_ROTATION);
 
-    public static final double FIELD_LENGTH = 16.54175; // meters
-    public static final double FIELD_WIDTH = 8.0137;
-
     public static final PoseStrategy PRIMARY_POSE_STRATEGY = PoseStrategy.LOWEST_AMBIGUITY;
     public static final PoseStrategy SECONDARY_POSE_STRATEGY = PoseStrategy.LOWEST_AMBIGUITY;
 
-    public static final class AprilTagPose {
-      public static final Pose3d APRIL_TAG_1_POSE =
-          new Pose3d(
-              15.513558, 1.071626, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(180)));
+    // public static final class AprilTagPose {
+    //   public static final Pose3d APRIL_TAG_1_POSE =
+    //       new Pose3d(
+    //           15.513558, 1.071626, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(180)));
 
-      public static final Pose3d APRIL_TAG_2_POSE =
-          new Pose3d(
-              15.513558, 2.748026, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(180)));
+    //   public static final Pose3d APRIL_TAG_2_POSE =
+    //       new Pose3d(
+    //           15.513558, 2.748026, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(180)));
 
-      public static final Pose3d APRIL_TAG_3_POSE =
-          new Pose3d(
-              15.513558, 4.424426, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(180)));
+    //   public static final Pose3d APRIL_TAG_3_POSE =
+    //       new Pose3d(
+    //           15.513558, 4.424426, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(180)));
 
-      public static final Pose3d APRIL_TAG_4_POSE =
-          new Pose3d(
-              16.178784, 6.749796, 0.695452, new Rotation3d(0, 0, Units.degreesToRadians(180)));
+    //   public static final Pose3d APRIL_TAG_4_POSE =
+    //       new Pose3d(
+    //           16.178784, 6.749796, 0.695452, new Rotation3d(0, 0, Units.degreesToRadians(180)));
 
-      public static final Pose3d APRIL_TAG_5_POSE =
-          new Pose3d(0.36195, 6.749796, 0.695452, new Rotation3d(0, 0, Units.degreesToRadians(0)));
+    //   public static final Pose3d APRIL_TAG_5_POSE =
+    //       new Pose3d(0.36195, 6.749796, 0.695452, new Rotation3d(0, 0,
+    // Units.degreesToRadians(0)));
 
-      public static final Pose3d APRIL_TAG_6_POSE =
-          new Pose3d(1.02743, 4.424426, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(0)));
+    //   public static final Pose3d APRIL_TAG_6_POSE =
+    //       new Pose3d(1.02743, 4.424426, 0.462788, new Rotation3d(0, 0,
+    // Units.degreesToRadians(0)));
 
-      public static final Pose3d APRIL_TAG_7_POSE =
-          new Pose3d(1.02743, 2.748026, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(0)));
+    //   public static final Pose3d APRIL_TAG_7_POSE =
+    //       new Pose3d(1.02743, 2.748026, 0.462788, new Rotation3d(0, 0,
+    // Units.degreesToRadians(0)));
+    //   // Distance between centers of right and left wheels on robot
+    //   public static final double WHEEL_BASE = Units.inchesToMeters(17);
+    //   // Distance between front and back wheels on robot
 
-      public static final Pose3d APRIL_TAG_8_POSE =
-          new Pose3d(1.02743, 1.071626, 0.462788, new Rotation3d(0, 0, Units.degreesToRadians(0)));
+    //   public static final Pose3d APRIL_TAG_8_POSE =
+    //       new Pose3d(1.02743, 1.071626, 0.462788, new Rotation3d(0, 0,
+    // Units.degreesToRadians(0)));
 
-      public static final List<AprilTag> APRIL_TAGS =
-          Arrays.asList(
-              new AprilTag(1, APRIL_TAG_1_POSE),
-              new AprilTag(2, APRIL_TAG_2_POSE),
-              new AprilTag(3, APRIL_TAG_3_POSE),
-              new AprilTag(4, APRIL_TAG_4_POSE),
-              new AprilTag(5, APRIL_TAG_5_POSE),
-              new AprilTag(6, APRIL_TAG_6_POSE),
-              new AprilTag(7, APRIL_TAG_7_POSE),
-              new AprilTag(8, APRIL_TAG_8_POSE));
-    }
+    //   public static final double FIELD_LENGTH = Units.feetToMeters(54);
+    //   public static final double FIELD_WIDTH = Units.feetToMeters(27);
 
     public static final class VisionSim {
       public static final double maxLEDRangeMeters = 9000;
@@ -132,72 +153,77 @@ public final class Constants {
       public static final int CAMERA_RES_WIDTH = 960;
       public static final int CAMERA_RES_HEIGHT = 544;
     }
+    // }
   }
 
-  public static final class PlacementConstants {
-    public static final class Wrist {
-      // not actual values
-      public static final double kP = 0.3;
-      public static final double kI = 0.08;
-      public static final double kD = 0.5;
-    }
-
-    public static final class Elbow {
-      public static final double kP = 0.01;
+  public static final class Arm {
+    public static final class WristConstants {
+      public static final double kP = 50;
       public static final double kI = 0;
-      public static final double kD = 0;
+      public static final double kD = 10;
 
       public static final double kS = 0;
-      public static final double kG = 0;
-      public static final double kV = 0;
+      public static final double kG = 11;
+      public static final double kV = 2;
       public static final double kA = 0;
 
-      public static final double MAX_VELOCITY = 0.3; // radians / s
-      public static final double MAX_ACCEL = 0.3; // radians / s^2
+      public static final double MAX_VELOCITY = 3; // radians / s
+      public static final double MAX_ACCEL = 3; // radians / s^2
+      public static final TrapezoidProfile.Constraints CONSTRAINTS =
+          new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
+    }
+
+    public static final class ElbowConstants {
+      public static final double kP = 10;
+      public static final double kI = 0;
+      public static final double kD = 5;
+
+      public static final double kS = 0;
+      public static final double kG = 8;
+      public static final double kV = 2;
+      public static final double kA = 0;
+
+      public static final double MAX_VELOCITY = 3; // radians / s
+      public static final double MAX_ACCEL = 3; // radians / s^2
       public static final TrapezoidProfile.Constraints CONSTRAINTS =
           new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
 
       public static final double GEAR_RATIO = 1 / 6.0;
-      public static final double MOVEMENTPERSPIN = (1.5 * Math.PI); // radians
-    }
-
-    public static final class Intake {
-      public static final double WHEEL_SPEED = 0.6;
-    }
-
-    public static final class Elevator {
-      public static final double maxVelocity = 0.3; // m/s
-      public static final double maxAcceleration = 0.3; // m/s^2
-      public static final double P = 0.01;
-      public static final double I = 0;
-      public static final double D = 0;
-
-      public static final double kS = 0;
-      public static final double kG = 0;
-      public static final double kV = 0;
-      public static final double kA = 0;
-      public static final TrapezoidProfile.Constraints CONSTRAINTS =
-          new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration);
-      public static final double GEAR_RATIO = 1.0;
-      public static final double MOVEMENTPERSPIN = 1.1938 / 6.0; // m/ (50 rotations of motor)
+      public static final double MOVEMENT_PER_SPIN = (1.5 * Math.PI);
     }
   }
 
-  public static final class Drive {
+  public static final class Intake {
+    public static final double WHEEL_SPEED = 0.6;
+  }
 
+  public static final class Elevator {
+    public static final double MAX_SPEED = 4; // m/s
+    public static final double MAX_ACCEL = 3; // m/s^2
+    public static final double kP = 5;
+    public static final double kI = 0;
+    public static final double kD = 0.1;
+
+    public static final double kS = 0;
+    public static final double kG = 0.762;
+    public static final double kV = 0.762;
+    public static final double kA = 0;
+    public static final TrapezoidProfile.Constraints CONSTRAINTS =
+        new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ACCEL);
+    public static final double GEAR_RATIO = 1.0;
+    public static final double MOVEMENTPERSPIN =
+        1.1938 / 6.0; // m / (50 rotations of motor) wtf is this
+  }
+
+  public static final class Drive {
     public static final double MAX_SPEED = 7; // m / s
     public static final double MAX_ANGULAR_SPEED = 4 * Math.PI; // rad / s
 
-    public static final double TRACK_WIDTH = Units.inchesToMeters(17);
-    // Distance between centers of right and left wheels on robot
-    public static final double WHEEL_BASE = Units.inchesToMeters(17);
-    // Distance between front and back wheels on robot
-
     public static final Translation2d[] MODULE_OFFSET = {
-      new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), // front left
-      new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), // front right
-      new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), // rear left
-      new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2) // rear right
+      new Translation2d(Dimensions.WHEEL_BASE / 2, Dimensions.TRACK_WIDTH / 2), // front left
+      new Translation2d(Dimensions.WHEEL_BASE / 2, -Dimensions.TRACK_WIDTH / 2), // front right
+      new Translation2d(-Dimensions.WHEEL_BASE / 2, Dimensions.TRACK_WIDTH / 2), // rear left
+      new Translation2d(-Dimensions.WHEEL_BASE / 2, -Dimensions.TRACK_WIDTH / 2) // rear right
     };
 
     public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(MODULE_OFFSET);
@@ -215,7 +241,6 @@ public final class Constants {
   }
 
   public static final class SwerveModule {
-
     // we use a 14T pinion
     public static final int PINION_TEETH = 14;
 
@@ -262,6 +287,19 @@ public final class Constants {
       public static final double MIN_INPUT = 0;
       public static final double MAX_INPUT = ENCODER_POSITION_FACTOR;
     }
+  }
+
+  public static final class Placement {
+    public static final State FRONT_MID_CONE = State.fromAbsolute(0, 0.2, 0.6);
+    public static final State FRONT_HIGH_CONE = State.fromAbsolute(0, 1, 1.1);
+    public static final State BACK_LOW_CONE = State.fromAbsolute(0, 0.1, 0);
+    public static final State BACK_MID_CONE = State.fromAbsolute(0, 0.2, 0.6);
+    public static final State BACK_HIGH_CONE = State.fromAbsolute(0, 1, 1.1);
+    public static final State FRONT_MID_CUBE = State.fromAbsolute(0, 0.2, 0.6);
+    public static final State FRONT_HIGH_CUBE = State.fromAbsolute(0, 1, 1.1);
+    public static final State BACK_LOW_CUBE = State.fromAbsolute(0, 0.1, 0);
+    public static final State BACK_MID_CUBE = State.fromAbsolute(0, 0.2, 0.6);
+    public static final State BACK_HIGH_CUBE = State.fromAbsolute(0, 1, 1.1);
   }
 
   public static final class Auto {

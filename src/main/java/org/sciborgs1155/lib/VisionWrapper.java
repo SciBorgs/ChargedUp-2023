@@ -5,11 +5,13 @@
 package org.sciborgs1155.lib;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import java.io.IOException;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -17,24 +19,30 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
-import org.sciborgs1155.robot.Constants.Vision;
+import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.Constants.Dimensions;
 
 public class VisionWrapper {
-  /** Vision wrapper for mechanisms */
+  /** Dimensions wrapper for mechanisms */
 
   // Pose Estimation & Alignment
   public final PhotonCamera frontCam;
 
   public final PhotonCamera backCam;
-  public final AprilTagFieldLayout tagLayout;
+  public AprilTagFieldLayout tagLayout;
 
-  /** Creates a new Vision. */
+  /** Creates a new Dimensions. */
   public VisionWrapper() {
-    frontCam = new PhotonCamera(Vision.FRONT_CAMERA);
-    backCam = new PhotonCamera(Vision.BACK_CAMERA);
-    tagLayout =
-        new AprilTagFieldLayout(
-            Vision.AprilTagPose.APRIL_TAGS, Vision.FIELD_LENGTH, Vision.FIELD_WIDTH);
+    frontCam = new PhotonCamera(Constants.FRONT_CAM);
+    backCam = new PhotonCamera(Constants.BACK_CAM);
+    try {
+      tagLayout = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    // new AprilTagFieldLayout(
+    //   Dimensions.AprilTagPose.APRIL_TAGS, Dimensions.FIELD_LENGTH, Dimensions.FIELD_WIDTH);
   }
 
   public boolean hasTargets() {
@@ -69,7 +77,7 @@ public class VisionWrapper {
       return new EstimatedRobotPose(
           bestTagPose
               .transformBy(frontCamBestTarget.getBestCameraToTarget().inverse())
-              .transformBy(Vision.ROBOT_TO_FRONT_CAM.inverse()),
+              .transformBy(Dimensions.ROBOT_TO_FRONT_CAM.inverse()),
           frontCamResult.getTimestampSeconds(),
           backCamResult.getTargets());
     } else {
@@ -78,7 +86,7 @@ public class VisionWrapper {
       return new EstimatedRobotPose(
           bestTagPose
               .transformBy(backCamBestTarget.getBestCameraToTarget().inverse())
-              .transformBy(Vision.ROBOT_TO_BACK_CAM.inverse()),
+              .transformBy(Dimensions.ROBOT_TO_BACK_CAM.inverse()),
           backCamResult.getTimestampSeconds(),
           backCamResult.getTargets());
     }
@@ -109,12 +117,12 @@ public class VisionWrapper {
     if (hasTargets()) {
       frontVisionPose = getVisionEstimate(frontVisionOdometry, driveOdometry).get();
       backVisionPose = getVisionEstimate(backVisionOdometry, driveOdometry).get();
-      backPoseTransform = backVisionPose.estimatedPose.transformBy(Vision.ROBOT_TO_BACK_CAM);
+      backPoseTransform = backVisionPose.estimatedPose.transformBy(Dimensions.ROBOT_TO_BACK_CAM);
       transformedBackVisionPose =
           new EstimatedRobotPose(
               backPoseTransform, backVisionPose.timestampSeconds, backVisionPose.targetsUsed);
 
-      switch (Vision.SECONDARY_POSE_STRATEGY) {
+      switch (Dimensions.SECONDARY_POSE_STRATEGY) {
         case CLOSEST_TO_REFERENCE_POSE:
           {
             bestPoseEstimate =
