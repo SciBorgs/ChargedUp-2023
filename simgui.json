@@ -348,6 +348,9 @@
           }
         },
         "Drive": {
+          "field2d": {
+            "open": true
+          },
           "gyro": {
             "open": true
           },

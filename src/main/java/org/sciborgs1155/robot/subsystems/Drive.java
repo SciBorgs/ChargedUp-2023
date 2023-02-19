@@ -3,7 +3,6 @@ package org.sciborgs1155.robot.subsystems;
 import static org.sciborgs1155.robot.Constants.Drive.*;
 import static org.sciborgs1155.robot.Ports.Drive.*;
 
-import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -18,7 +17,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -32,7 +30,6 @@ import org.sciborgs1155.lib.ControllerOutputFunction;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Auto;
-import org.sciborgs1155.robot.Ports.Sensors;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 
 public class Drive extends SubsystemBase implements Loggable {
@@ -55,7 +52,7 @@ public class Drive extends SubsystemBase implements Loggable {
   private final SwerveModule[] modules = {frontLeft, frontRight, rearLeft, rearRight};
 
   // The gyro sensor
-  @Log private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Sensors.PIGEON);
+  // @Log private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Sensors.PIGEON);
   private final AHRS imu = new AHRS();
 
   // Odometry and pose estimation
@@ -89,7 +86,7 @@ public class Drive extends SubsystemBase implements Loggable {
    * @return A Rotation2d of our angle
    */
   public Rotation2d getHeading() {
-    return gyro.getRotation2d();
+    return imu.getRotation2d();
   }
 
   /**
@@ -147,7 +144,7 @@ public class Drive extends SubsystemBase implements Loggable {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    gyro.reset();
+    imu.reset();
   }
 
   private SwerveModuleState[] getModuleStates() {
@@ -167,7 +164,7 @@ public class Drive extends SubsystemBase implements Loggable {
    */
   @Log
   public double getTurnRate() {
-    return gyro.getRate() * (GYRO_REVERSED ? -1.0 : 1.0);
+    return imu.getRate() * (GYRO_REVERSED ? -1.0 : 1.0);
   }
 
   /**
@@ -177,7 +174,7 @@ public class Drive extends SubsystemBase implements Loggable {
    */
   @Log
   public double getPitch() {
-    return gyro.getPitch();
+    return imu.getPitch();
   }
 
   @Override
@@ -195,15 +192,6 @@ public class Drive extends SubsystemBase implements Loggable {
       var transform = new Transform2d(MODULE_OFFSET[i], modules[i].getPosition().angle);
       modules2d[i].setPose(getPose().transformBy(transform));
     }
-  }
-
-  @Override
-  public void simulationPeriodic() {
-    gyro.getSimCollection()
-        .addHeading(
-            Units.radiansToDegrees(
-                KINEMATICS.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
-                    * Constants.RATE));
   }
 
   /**
