@@ -151,7 +151,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() {
     wrist.close();
     elbow.close();
   }
