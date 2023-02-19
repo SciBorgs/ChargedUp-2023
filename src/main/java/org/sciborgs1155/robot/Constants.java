@@ -90,8 +90,8 @@ public final class Constants {
 
   public static final class Vision {
     // Camera names
-    public static final String FRONT_CAM = "frontCam";
-    public static final String BACK_CAM = "backCam";
+    public static final String FRONT_CAM = "frontPhotonVision";
+    public static final String BACK_CAM = "backPhotonVision";
 
     // Robot to camera translations
     public static final Translation3d FRONT_CAM_TRANSLATION = new Translation3d();

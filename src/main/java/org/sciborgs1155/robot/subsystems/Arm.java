@@ -42,12 +42,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
       new ArmFeedforward(
           ElbowConstants.kS, ElbowConstants.kG, ElbowConstants.kV, ElbowConstants.kA);
 
-  // private final SimpleMotorFeedforward wristFeedforward = new
-  // SimpleMotorFeedforward(WristConstants.kS, WristConstants.kV, WristConstants.kA);
-
-  // private final SimpleMotorFeedforward elbowFeedforward = new
-  // SimpleMotorFeedforward(ElbowConstants.kS, ElbowConstants.kV, ElbowConstants.kA);
-
   @Log(name = "wrist acceleration", methodName = "getLastOutput")
   private final Derivative wristAccel = new Derivative();
 
@@ -157,8 +151,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   @Override
-  public void close() {
-    // wrist.close();
-    // elbow.close();
+  public void close() throws Exception {
+    wrist.close();
+    elbow.close();
   }
 }

@@ -22,7 +22,7 @@ public class ArmTest {
   }
 
   @AfterEach
-  void reset() {
+  void reset() throws Exception {
     arm.close();
   }
 
