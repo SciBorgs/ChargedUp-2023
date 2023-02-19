@@ -13,11 +13,8 @@ import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 // import org.sciborgs1155.robot.subsystems.Arm;
-import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 // import org.sciborgs1155.robot.subsystems.Elevator;
-import org.sciborgs1155.robot.subsystems.Elevator;
-import org.sciborgs1155.robot.subsystems.Intake;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -32,9 +29,9 @@ public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
   private final Drive drive = new Drive(vision);
-  private final Arm arm = new Arm(visualizer);
-  private final Elevator elevator = new Elevator(visualizer);
-  private final Intake intake = new Intake();
+  // private final Arm arm = new Arm(visualizer);
+  // private final Elevator elevator = new Elevator(visualizer);
+  // private final Intake intake = new Intake();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController xbox = new CommandXboxController(OI.XBOX);
@@ -55,7 +52,7 @@ public class RobotContainer {
   }
 
   private void configureSubsystemDefaults() {
-    drive.setDefaultCommand(drive.drive(leftJoystick, rightJoystick, true));
+    drive.setDefaultCommand(drive.drive(xbox, true));
   }
 
   /**

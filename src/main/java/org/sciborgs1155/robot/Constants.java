@@ -78,9 +78,9 @@ public final class Constants {
     public static final double R2 = 0;
     // Distance from the first joint to center of mass of the claw
 
-    public static final double TRACK_WIDTH = Units.inchesToMeters(17);
+    public static final double TRACK_WIDTH = 64;
     // Distance between centers of right and left wheels on robot
-    public static final double WHEEL_BASE = Units.inchesToMeters(17);
+    public static final double WHEEL_BASE = 64;
     // Distance between front and back wheels on robot
 
     // Field dimensions

@@ -4,6 +4,7 @@ import static org.sciborgs1155.robot.Constants.Drive.*;
 import static org.sciborgs1155.robot.Ports.Drive.*;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
+import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
@@ -55,6 +56,7 @@ public class Drive extends SubsystemBase implements Loggable {
 
   // The gyro sensor
   @Log private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Sensors.PIGEON);
+  private final AHRS imu = new AHRS();
 
   // Odometry and pose estimation
   private final Vision vision;
