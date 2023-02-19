@@ -63,7 +63,7 @@ public class Drive extends SubsystemBase implements Loggable {
   private final SwerveDrivePoseEstimator odometry =
       new SwerveDrivePoseEstimator(KINEMATICS, getHeading(), getModulePositions(), new Pose2d());
 
-  @Log public final Field2d field2d = new Field2d();
+  @Log private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d = new FieldObject2d[modules.length];
 
   public Drive(Vision vision) {
@@ -190,8 +190,7 @@ public class Drive extends SubsystemBase implements Loggable {
 
     var poses = vision.getPoseEstimates(getPose());
     for (int i = 0; i < poses.length; i++) {
-      // odometry.addVisionMeasurement(poses[i].estimatedPose.toPose2d(),
-      // poses[i].timestampSeconds);
+      odometry.addVisionMeasurement(poses[i].estimatedPose.toPose2d(), poses[i].timestampSeconds);
       field2d.getObject("Cam-" + i + " Est Pose").setPose(poses[i].estimatedPose.toPose2d());
     }
     field2d.setRobotPose(getPose());

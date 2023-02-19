@@ -261,6 +261,11 @@
           "visible": true
         }
       },
+      "/Shuffleboard/RobotContainer/visualizer": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/backCam Sim Field": {
         "window": {
           "visible": true
@@ -330,14 +335,29 @@
     },
     "transitory": {
       "Shuffleboard": {
-        "Drive": {
-          "frontLeft": {
+        "Arm": {
+          "elbow": {
             "open": true
           },
+          "elbowFeedback": {
+            "open": true
+          },
+          "open": true,
+          "wristFeedback": {
+            "open": true
+          }
+        },
+        "Drive": {
           "gyro": {
             "open": true
           },
           "open": true
+        },
+        "Elevator": {
+          "open": true,
+          "pid": {
+            "open": true
+          }
         },
         "RobotContainer": {
           "autos": {
@@ -360,8 +380,7 @@
         },
         "frontPhotonVision": {
           "open": true
-        },
-        "open": true
+        }
       }
     }
   },
