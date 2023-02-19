@@ -34,9 +34,6 @@ public final class Constants {
   public static final double DEADBAND = 0.06;
   public static final int THROUGH_BORE_CPR = 8192;
 
-  public static final String FRONT_CAM = "photonvision";
-  public static final String BACK_CAM = "photonvision";
-
   public static final class Motors {
     public static final MotorConfig DRIVE =
         MotorConfig.base()
@@ -76,22 +73,27 @@ public final class Constants {
 
     public static final double CLAW_MASS = 4.4;
     public static final double FOREARM_MASS = 4.2;
-    public static final double R1 = 0; // Distance from base pivot to center of gravity of elbow
-    public static final double R2 =
-        0; // Distance from the first joint to center of mass of the claw
+    public static final double R1 = 0;
+    // Distance from base pivot to center of mass of the elbow
+    public static final double R2 = 0;
+    // Distance from the first joint to center of mass of the claw
 
     public static final double TRACK_WIDTH = Units.inchesToMeters(17);
     // Distance between centers of right and left wheels on robot
     public static final double WHEEL_BASE = Units.inchesToMeters(17);
     // Distance between front and back wheels on robot
 
-    public static final Translation3d CAM_TRANSLATION = new Translation3d();
-    public static final Rotation3d CAM_ROTATION = new Rotation3d();
-    public static final Transform3d ROBOT_TO_CAM = new Transform3d(CAM_TRANSLATION, CAM_ROTATION);
-
+    // Field dimensions
     public static final double FIELD_LENGTH = Units.feetToMeters(54);
     public static final double FIELD_WIDTH = Units.feetToMeters(27);
+  }
 
+  public static final class Vision {
+    // Camera names
+    public static final String FRONT_CAM = "frontCam";
+    public static final String BACK_CAM = "backCam";
+
+    // Robot to camera translations
     public static final Translation3d FRONT_CAM_TRANSLATION = new Translation3d();
     public static final Rotation3d FRONT_CAM_ROTATION = new Rotation3d();
     public static final Transform3d ROBOT_TO_FRONT_CAM =
@@ -107,13 +109,11 @@ public final class Constants {
     public static final PoseStrategy PRIMARY_POSE_STRATEGY = PoseStrategy.LOWEST_AMBIGUITY;
     public static final PoseStrategy SECONDARY_POSE_STRATEGY = PoseStrategy.LOWEST_AMBIGUITY;
 
-    public static final class VisionSim {
-      public static final double maxLEDRangeMeters = 9000;
-      public static final double camDiagFOVDegrees = 68.5;
-      public static final double minTargetArea = 90;
-      public static final int CAMERA_RES_WIDTH = 960;
-      public static final int CAMERA_RES_HEIGHT = 544;
-    }
+    public static final double LED_RANGE = 9000;
+    public static final double CAM_FOV = 68.5;
+    public static final double MIN_TARGET_AREA = 90;
+    public static final int CAMERA_RES_WIDTH = 960;
+    public static final int CAMERA_RES_HEIGHT = 544;
   }
 
   public static final class Arm {

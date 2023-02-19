@@ -28,10 +28,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
-import org.photonvision.EstimatedRobotPose;
 // import org.sciborgs1155.lib.Camera;
 import org.sciborgs1155.lib.ControllerOutputFunction;
-import org.sciborgs1155.lib.VisionWrapper;
+import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Auto;
 import org.sciborgs1155.robot.Ports.Sensors;
@@ -61,22 +60,19 @@ public class Drive extends SubsystemBase implements Loggable {
   private final ADIS16470_IMU imu = new ADIS16470_IMU();
 
   // Odometry and pose estimation
-  private final VisionWrapper vision;
-  private final SwerveDrivePoseEstimator odometry;
-  @Log public final Field2d field2d = new Field2d();
+  private final Vision vision;
+  private final SwerveDrivePoseEstimator odometry =
+      new SwerveDrivePoseEstimator(KINEMATICS, getHeading(), getModulePositions(), new Pose2d());
 
+  @Log public final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d = new FieldObject2d[modules.length];
 
-  public Drive() {
-    vision = new VisionWrapper();
-    odometry =
-        new SwerveDrivePoseEstimator(
-            KINEMATICS,
-            getHeading(),
-            getModulePositions(),
-            new Pose2d()); // TODO change to initial pose
+  public Drive(Vision vision) {
+    this.vision = vision;
 
-    for (int i = 0; i < modules2d.length; i++) modules2d[i] = field2d.getObject("module-" + i);
+    for (int i = 0; i < modules2d.length; i++) {
+      modules2d[i] = field2d.getObject("module-" + i);
+    }
   }
 
   /**
@@ -191,12 +187,12 @@ public class Drive extends SubsystemBase implements Loggable {
   public void periodic() {
     odometry.update(getHeading(), getModulePositions());
 
-    EstimatedRobotPose[] poses = vision.getPoseEstimates(getPose());
+    var poses = vision.getPoseEstimates(getPose());
     for (int i = 0; i < poses.length; i++) {
       odometry.addVisionMeasurement(poses[i].estimatedPose.toPose2d(), poses[i].timestampSeconds);
-      field2d.getObject("Cam Est Pose " + i).setPose(poses[i].estimatedPose.toPose2d());
+      field2d.getObject("Cam-" + i + " Est Pose").setPose(poses[i].estimatedPose.toPose2d());
     }
-    field2d.getObject("Actual Pose").setPose(getPose());
+    field2d.getObject("Robot").setPose(getPose());
 
     for (int i = 0; i < modules2d.length; i++) {
       var transform = new Transform2d(MODULE_OFFSET[i], modules[i].getPosition().angle);
@@ -272,19 +268,26 @@ public class Drive extends SubsystemBase implements Loggable {
 
   /** Drive based on joysticks */
   public Command drive(CommandJoystick left, CommandJoystick right, boolean fieldRelative) {
-    return run(
-        () -> {
-          double rawX = -left.getY();
-          double rawY = -left.getX();
-          double rawSpeed = Math.sqrt(rawX * rawX + rawY * rawY);
-          double speedFactor = mapper.map(rawSpeed) / rawSpeed;
-          double rawOmega = -right.getX();
-          drive(
-              MathUtil.applyDeadband(speedFactor * rawX, Constants.DEADBAND),
-              MathUtil.applyDeadband(speedFactor * rawY, Constants.DEADBAND),
-              MathUtil.applyDeadband(mapper.map(rawOmega), Constants.DEADBAND),
-              fieldRelative);
-        });
+    // return run(
+    //     () -> {
+    //       double rawX = -left.getY();
+    //       double rawY = -left.getX();
+    //       double rawSpeed = Math.sqrt(rawX * rawX + rawY * rawY);
+    //       double speedFactor = mapper.map(rawSpeed) / rawSpeed;
+    //       double rawOmega = -right.getX();
+    //       drive(
+    //           MathUtil.applyDeadband(speedFactor * rawX, Constants.DEADBAND),
+    //           MathUtil.applyDeadband(speedFactor * rawY, Constants.DEADBAND),
+    //           MathUtil.applyDeadband(mapper.map(rawOmega), Constants.DEADBAND),
+    //           fieldRelative);
+    //     });
+
+    return run(() -> drive(
+      -MathUtil.applyDeadband(left.getX(), Constants.DEADBAND),
+      -MathUtil.applyDeadband(left.getY(), Constants.DEADBAND),
+      -MathUtil.applyDeadband(right.getX(), Constants.DEADBAND),
+      fieldRelative
+    ));
   }
 
   /** Stops drivetrain */

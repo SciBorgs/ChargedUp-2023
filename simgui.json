@@ -40,7 +40,9 @@
       "/Shuffleboard/Elevator/limitSwitchTwo": "Digital Input",
       "/Shuffleboard/RobotContainer/autos": "String Chooser",
       "/Shuffleboard/RobotContainer/visualizer": "Mechanism2d",
+      "/SmartDashboard/backCam Sim Field": "Field2d",
       "/SmartDashboard/backPhotonVision Sim Field": "Field2d",
+      "/SmartDashboard/frontCam Sim Field": "Field2d",
       "/SmartDashboard/frontPhotonVision Sim Field": "Field2d",
       "/SmartDashboard/photonvision Sim Field": "Field2d"
     },
@@ -82,7 +84,7 @@
           "weight": 8.0,
           "width": 0.4318000078201294
         },
-        "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\2023-field.png",
+        "image": "/home/asa/Projects/ChargedUp-2023/field/2023-field.png",
         "module-0": {
           "arrowColor": [
             1.0,
@@ -232,6 +234,16 @@
           "visible": true
         }
       },
+      "/Shuffleboard/RobotContainer/autos": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/backCam Sim Field": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/backPhotonVision Sim Field": {
         "backPhotonVision Camera": {
           "arrowColor": [
@@ -251,7 +263,11 @@
           "length": 0.4099999964237213,
           "width": 0.30000001192092896
         },
-        "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\2023-field.png",
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/frontCam Sim Field": {
         "window": {
           "visible": true
         }
@@ -299,7 +315,11 @@
           "length": 0.4099999964237213,
           "width": 0.30000001192092896
         },
-        "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\2023-field.png",
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/photonvision Sim Field": {
         "window": {
           "visible": true
         }
@@ -313,7 +333,7 @@
     "transitory": {
       "Shuffleboard": {
         "Drive": {
-          "field2d": {
+          "frontLeft": {
             "open": true
           },
           "frontRight": {

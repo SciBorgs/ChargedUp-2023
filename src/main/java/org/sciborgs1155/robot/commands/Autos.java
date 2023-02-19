@@ -13,18 +13,18 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.ArrayList;
 import java.util.List;
-import org.sciborgs1155.lib.VisionWrapper;
+import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.Drive;
 
 public final class Autos implements Sendable {
 
-  private final VisionWrapper vision;
+  private final Vision vision;
   private final Drive drive;
   private final SendableChooser<Command> chooser;
 
   public Autos(Drive drive) {
-    vision = new VisionWrapper();
+    vision = new Vision();
     this.drive = drive;
     chooser = new SendableChooser<>();
     chooser.setDefaultOption("mobility", mobility());
