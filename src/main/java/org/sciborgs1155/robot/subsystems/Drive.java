@@ -18,7 +18,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -57,7 +56,7 @@ public class Drive extends SubsystemBase implements Loggable {
 
   // The gyro sensor
   @Log private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Sensors.PIGEON);
-  private final ADIS16470_IMU imu = new ADIS16470_IMU();
+  // private final ADIS16470_IMU imu = new ADIS16470_IMU();
 
   // Odometry and pose estimation
   private final Vision vision;
@@ -92,7 +91,9 @@ public class Drive extends SubsystemBase implements Loggable {
    * @return A Rotation2d of our angle
    */
   public Rotation2d getHeading() {
-    return Rotation2d.fromDegrees(imu.getAngle());
+    // return Rotation2d.fromDegrees(gyro.getAngle());
+    return gyro.getRotation2d();
+    // return Rotation2d.fromRadians(angle);
   }
 
   /**
@@ -189,10 +190,11 @@ public class Drive extends SubsystemBase implements Loggable {
 
     var poses = vision.getPoseEstimates(getPose());
     for (int i = 0; i < poses.length; i++) {
-      odometry.addVisionMeasurement(poses[i].estimatedPose.toPose2d(), poses[i].timestampSeconds);
+      // odometry.addVisionMeasurement(poses[i].estimatedPose.toPose2d(),
+      // poses[i].timestampSeconds);
       field2d.getObject("Cam-" + i + " Est Pose").setPose(poses[i].estimatedPose.toPose2d());
     }
-    field2d.getObject("Robot").setPose(getPose());
+    field2d.setRobotPose(getPose());
 
     for (int i = 0; i < modules2d.length; i++) {
       var transform = new Transform2d(MODULE_OFFSET[i], modules[i].getPosition().angle);
@@ -282,12 +284,13 @@ public class Drive extends SubsystemBase implements Loggable {
     //           fieldRelative);
     //     });
 
-    return run(() -> drive(
-      -MathUtil.applyDeadband(left.getX(), Constants.DEADBAND),
-      -MathUtil.applyDeadband(left.getY(), Constants.DEADBAND),
-      -MathUtil.applyDeadband(right.getX(), Constants.DEADBAND),
-      fieldRelative
-    ));
+    return run(
+        () ->
+            drive(
+                -MathUtil.applyDeadband(left.getX(), Constants.DEADBAND),
+                -MathUtil.applyDeadband(left.getY(), Constants.DEADBAND),
+                MathUtil.applyDeadband(right.getX(), Constants.DEADBAND),
+                fieldRelative));
   }
 
   /** Stops drivetrain */

@@ -177,7 +177,7 @@ public final class Constants {
 
   public static final class Drive {
     public static final double MAX_SPEED = 7; // m / s
-    public static final double MAX_ANGULAR_SPEED = 4 * Math.PI; // rad / s
+    public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
 
     public static final Translation2d[] MODULE_OFFSET = {
       new Translation2d(Dimensions.WHEEL_BASE / 2, Dimensions.TRACK_WIDTH / 2), // front left
@@ -216,12 +216,12 @@ public final class Constants {
           (WHEEL_DIAMETER * Math.PI) / DRIVING_MOTOR_REDUCTION; // m
       public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0; // m/s
 
-      public static final double kP = 0.07;
+      public static final double kP = 2.5;
       public static final double kI = 0;
-      public static final double kD = 0.06;
+      public static final double kD = 0.1;
 
       public static final double kS = 0.27;
-      public static final double kV = 0.4;
+      public static final double kV = 1;
       public static final double kA = 0.2;
     }
 
@@ -236,12 +236,12 @@ public final class Constants {
 
       public static final double kP = 1.7;
       public static final double kI = 0;
-      public static final double kD = 0.02;
+      public static final double kD = 0.1;
 
       // feedforward constants for simulation
-      public static final double kS = 0.1;
-      public static final double kV = 0.1;
-      public static final double kA = 0.1;
+      public static final double kS = 0;
+      public static final double kV = 0.25;
+      public static final double kA = 0.015;
 
       // pid wrapping
       public static final double MIN_INPUT = 0;
