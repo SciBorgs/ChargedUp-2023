@@ -6,6 +6,7 @@ import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -17,6 +18,14 @@ import org.photonvision.SimVisionSystem;
 import org.sciborgs1155.robot.Robot;
 
 public class Vision {
+
+  public enum Mode {
+    REAL,
+    SIM,
+    SIM_WITH_CAM;
+  }
+
+  private final Mode mode;
 
   private final PhotonCamera frontCam = new PhotonCamera(FRONT_CAM);
   private final PhotonCamera backCam = new PhotonCamera(BACK_CAM);
@@ -44,6 +53,10 @@ public class Vision {
           MIN_TARGET_AREA);
 
   public Vision() {
+    this(Robot.isReal() ? Mode.REAL : Mode.SIM);
+  }
+
+  public Vision(Mode mode) {
     AprilTagFieldLayout layout;
     try {
       layout = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
@@ -64,6 +77,20 @@ public class Vision {
 
     frontEstimator.setMultiTagFallbackStrategy(SECONDARY_POSE_STRATEGY);
     backEstimator.setMultiTagFallbackStrategy(SECONDARY_POSE_STRATEGY);
+
+    this.mode = mode;
+
+    // set up networktables if we are in hardware sim mode
+    if (mode == Mode.SIM_WITH_CAM) {
+      if (Robot.isReal()) {
+        throw new IllegalStateException(
+            "The robot is real and cannot be used in mode SIM_WITH_CAM");
+      }
+      var inst = NetworkTableInstance.getDefault();
+      inst.stopServer();
+      inst.setServer("photonvision.local");
+      inst.startClient4("Robot Simulation");
+    }
   }
 
   /* Gets estimated pose from vision measurements */
@@ -71,7 +98,7 @@ public class Vision {
     frontEstimator.setReferencePose(lastPose);
     backEstimator.setReferencePose(lastPose);
 
-    if (Robot.isSimulation()) {
+    if (mode == Mode.SIM) {
       simFront.processFrame(lastPose);
       simBack.processFrame(lastPose);
     }

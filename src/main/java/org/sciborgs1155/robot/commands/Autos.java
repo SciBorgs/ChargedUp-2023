@@ -19,13 +19,13 @@ import org.sciborgs1155.robot.subsystems.Drive;
 
 public final class Autos implements Sendable {
 
-  private final Vision vision;
   private final Drive drive;
+  private final Vision vision;
   private final SendableChooser<Command> chooser;
 
-  public Autos(Drive drive) {
-    vision = new Vision();
+  public Autos(Drive drive, Vision vision) {
     this.drive = drive;
+    this.vision = vision;
     chooser = new SendableChooser<>();
     chooser.setDefaultOption("mobility", mobility());
     chooser.addOption("other", drive.follow("New Path", true, false));
@@ -43,6 +43,7 @@ public final class Autos implements Sendable {
   public void initSendable(SendableBuilder builder) {
     chooser.initSendable(builder);
   }
+
   // public Command cameraAlignment() {
 
   //   var result = cam.getLatestResult();

@@ -27,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
-// import org.sciborgs1155.lib.Camera;
 import org.sciborgs1155.lib.ControllerOutputFunction;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
@@ -56,7 +55,6 @@ public class Drive extends SubsystemBase implements Loggable {
 
   // The gyro sensor
   @Log private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Sensors.PIGEON);
-  // private final ADIS16470_IMU imu = new ADIS16470_IMU();
 
   // Odometry and pose estimation
   private final Vision vision;
@@ -84,16 +82,12 @@ public class Drive extends SubsystemBase implements Loggable {
   }
 
   /**
-   * Returns the heading of the robot, based on our imu
-   *
-   * <p>The imu is ccw positive, but mounted upside down
+   * Returns the heading of the robot, based on our pigeon
    *
    * @return A Rotation2d of our angle
    */
   public Rotation2d getHeading() {
-    // return Rotation2d.fromDegrees(gyro.getAngle());
     return gyro.getRotation2d();
-    // return Rotation2d.fromRadians(angle);
   }
 
   /**
