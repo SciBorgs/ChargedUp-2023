@@ -34,8 +34,11 @@ public final class Constants {
   public static final double DEADBAND = 0.06;
   public static final int THROUGH_BORE_CPR = 8192;
 
-  public static final String FRONT_CAM = "photonvision";
-  public static final String BACK_CAM = "photonvision";
+  public static final String FRONT_CAM = "frontPhotonVision";
+  public static final String BACK_CAM = "backPhotonVision";
+
+  public static final PoseStrategy PRIMARY_POSE_STRATEGY = PoseStrategy.LOWEST_AMBIGUITY;
+  public static final PoseStrategy SECONDARY_POSE_STRATEGY = PoseStrategy.LOWEST_AMBIGUITY;
 
   public static final class Motors {
     public static final MotorConfig DRIVE =
@@ -103,9 +106,6 @@ public final class Constants {
         new Rotation3d(0, 0, Units.degreesToRadians(-180));
     public static final Transform3d ROBOT_TO_BACK_CAM =
         new Transform3d(BACK_CAM_TRANSLATION, BACK_CAM_ROTATION);
-
-    public static final PoseStrategy PRIMARY_POSE_STRATEGY = PoseStrategy.LOWEST_AMBIGUITY;
-    public static final PoseStrategy SECONDARY_POSE_STRATEGY = PoseStrategy.LOWEST_AMBIGUITY;
 
     public static final class VisionSim {
       public static final double maxLEDRangeMeters = 9000;

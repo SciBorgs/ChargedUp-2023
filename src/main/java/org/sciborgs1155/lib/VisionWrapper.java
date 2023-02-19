@@ -46,10 +46,10 @@ public class VisionWrapper {
     }
     frontVisionOdometry =
         new PhotonPoseEstimator(
-            layout, Dimensions.PRIMARY_POSE_STRATEGY, frontCam, Dimensions.ROBOT_TO_FRONT_CAM);
+            layout, Constants.PRIMARY_POSE_STRATEGY, frontCam, Dimensions.ROBOT_TO_FRONT_CAM);
     backVisionOdometry =
         new PhotonPoseEstimator(
-            layout, Dimensions.PRIMARY_POSE_STRATEGY, backCam, Dimensions.ROBOT_TO_BACK_CAM);
+            layout, Constants.PRIMARY_POSE_STRATEGY, backCam, Dimensions.ROBOT_TO_BACK_CAM);
     simFront =
         new SimVisionSystem(
             Constants.FRONT_CAM,

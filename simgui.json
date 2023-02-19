@@ -82,7 +82,7 @@
           "weight": 8.0,
           "width": 0.4318000078201294
         },
-        "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\2023-field.png",
+        "image": "C:\\Users\\Ivan\\Code\\ChargedUp-2023\\field\\2023-field.png",
         "module-0": {
           "arrowColor": [
             1.0,
@@ -251,36 +251,11 @@
           "length": 0.4099999964237213,
           "width": 0.30000001192092896
         },
-        "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\2023-field.png",
         "window": {
           "visible": true
         }
       },
       "/SmartDashboard/frontPhotonVision Sim Field": {
-        "Target 1": {
-          "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\redTag.png"
-        },
-        "Target 2": {
-          "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\redTag.png"
-        },
-        "Target 3": {
-          "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\redTag.png"
-        },
-        "Target 4": {
-          "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\redTag.png"
-        },
-        "Target 5": {
-          "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\blueTag.png"
-        },
-        "Target 6": {
-          "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\blueTag.png"
-        },
-        "Target 7": {
-          "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\blueTag.png"
-        },
-        "Target 8": {
-          "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\blueTag.png"
-        },
         "frontPhotonVision Camera": {
           "arrowColor": [
             0.9071729779243469,
@@ -299,7 +274,6 @@
           "length": 0.4099999964237213,
           "width": 0.30000001192092896
         },
-        "image": "C:\\Users\\Ivan\\Code\\2022-23 Repos\\Robotics\\ChargedUp-2023\\field\\2023-field.png",
         "window": {
           "visible": true
         }
@@ -360,5 +334,8 @@
       },
       "open": true
     }
+  },
+  "NetworkTables View": {
+    "visible": false
   }
 }
