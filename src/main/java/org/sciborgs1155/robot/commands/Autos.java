@@ -15,13 +15,36 @@ import java.util.ArrayList;
 import java.util.List;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.Constants.Auto;
 import org.sciborgs1155.robot.subsystems.Drive;
 
 public final class Autos implements Sendable {
+  private final ArrayList<PathPoint> PathPointsArray =
+      new ArrayList<PathPoint>(
+          List.of(
+              new PathPoint(
+                  new Translation2d(2.02, 0.49), new Rotation2d(-18), new Rotation2d(180)),
+              new PathPoint(
+                  new Translation2d(2.02, 1.08), new Rotation2d(-18), new Rotation2d(180)),
+              new PathPoint(
+                  new Translation2d(2.02, 1.63), new Rotation2d(-18), new Rotation2d(180)),
+              new PathPoint(
+                  new Translation2d(2.02, 2.21), new Rotation2d(-18), new Rotation2d(180)),
+              new PathPoint(
+                  new Translation2d(2.02, 2.74), new Rotation2d(-18), new Rotation2d(180)),
+              new PathPoint(
+                  new Translation2d(2.02, 3.30), new Rotation2d(-18), new Rotation2d(180)),
+              new PathPoint(
+                  new Translation2d(2.02, 3.86), new Rotation2d(-18), new Rotation2d(180)),
+              new PathPoint(
+                  new Translation2d(2.02, 4.40), new Rotation2d(-18), new Rotation2d(180)),
+              new PathPoint(
+                  new Translation2d(2.02, 4.91), new Rotation2d(-18), new Rotation2d(180))));
 
   private final Drive drive;
   private final Vision vision;
   private final SendableChooser<Command> chooser;
+  private PathPlannerTrajectory trajectory;
 
   public Autos(Drive drive, Vision vision) {
     this.drive = drive;
@@ -42,6 +65,10 @@ public final class Autos implements Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     chooser.initSendable(builder);
+
+    this.trajectory =
+        PathPlanner.generatePath(
+            Auto.CONSTRAINTS, this.PathPointsArray.get(0), this.PathPointsArray.get(1));
   }
 
   // public Command cameraAlignment() {
