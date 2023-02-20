@@ -47,11 +47,17 @@ public class ChassisState extends ChassisSpeeds {
   }
 
   public static ChassisState fromFieldRelativeSpeeds(
+      double vxMetersPerSecond,
+      double vyMetersPerSecond,
+      double omegaRadiansPerSecond,
       double axMetersPerSecondSquared,
       double ayMetersPerSecondSquared,
       double alphaRadiansPerSecondSquared,
       Rotation2d robotAngle) {
     return new ChassisState(
+      vxMetersPerSecond,
+      vyMetersPerSecond,
+      omegaRadiansPerSecond,
         axMetersPerSecondSquared * robotAngle.getCos()
             + ayMetersPerSecondSquared * robotAngle.getSin(),
         -axMetersPerSecondSquared * robotAngle.getSin()
@@ -62,6 +68,9 @@ public class ChassisState extends ChassisSpeeds {
   public static ChassisState fromFieldRelativeSpeeds(
       ChassisState fieldRelativeSpeeds, Rotation2d robotAngle) {
     return fromFieldRelativeSpeeds(
+        fieldRelativeSpeeds.vxMetersPerSecond,
+        fieldRelativeSpeeds.vyMetersPerSecond,
+        fieldRelativeSpeeds.omegaRadiansPerSecond,
         fieldRelativeSpeeds.axMetersPerSecondSquared,
         fieldRelativeSpeeds.ayMetersPerSecondSquared,
         fieldRelativeSpeeds.alphaRadiansPerSecondSquared,

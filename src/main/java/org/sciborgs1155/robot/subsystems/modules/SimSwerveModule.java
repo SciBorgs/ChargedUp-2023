@@ -30,7 +30,8 @@ public class SimSwerveModule implements SwerveModule, Sendable {
 
   private final SimpleMotorFeedforward driveFeedforward =
       new SimpleMotorFeedforward(Driving.kS, Driving.kV, Driving.kA);
-
+  private final SimpleMotorFeedforward turnFeedforward =
+      new SimpleMotorFeedforward(Turning.kS, Turning.kV, Turning.kA);
   public SimSwerveModule() {
     // set up continuous input for turning
     turnFeedback.enableContinuousInput(Turning.MIN_INPUT, Turning.MAX_INPUT);
@@ -66,17 +67,19 @@ public class SimSwerveModule implements SwerveModule, Sendable {
 
     final double driveFB =
         driveFeedback.calculate(
-            accelerationState.calculate(drive.getAngularVelocityRadPerSec()),
-            state.moduleAcceleration);
+            drive.getAngularVelocityRadPerSec(),
+            state.speedMetersPerSecond);
     final double driveFF =
         driveFeedforward.calculate(state.speedMetersPerSecond, state.moduleAcceleration);
 
     final double turnFB =
         turnFeedback.calculate(turn.getAngularPositionRad(), state.angle.getRadians());
+    final double turnFF =
+        turnFeedforward.calculate(turn.getAngularVelocityRadPerSec());
 
     drive.setInput(driveFB + driveFF);
     drive.update(Constants.RATE);
-    turn.setInput(turnFB);
+    turn.setInput(turnFB + turnFF);
     turn.update(Constants.RATE);
   }
 

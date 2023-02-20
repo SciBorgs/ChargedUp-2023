@@ -134,23 +134,25 @@ public class Drive extends SubsystemBase implements Loggable {
     xSpeed *= MAX_SPEED;
     ySpeed *= MAX_SPEED;
     rot *= MAX_ANGULAR_SPEED;
+    SciSwerveModuleState[] states = new SciSwerveModuleState[4];
+    
+      double xAccel = accelX.calculate(xSpeed);
+      double yAccel = accelY.calculate(ySpeed);
+      double rotAlpha = rotAccel.calculate(rot);
 
-    double xAccel = accelX.calculate(xSpeed);
-    double yAccel = accelY.calculate(ySpeed);
-    double rotAlpha = rotAccel.calculate(rot);
-
-    var states =
+      states =
         DRIVERKINEMATICS.toSwerveModuleStates(
             fieldRelative
-                ? ChassisState.fromFieldRelativeSpeeds(xAccel, yAccel, rotAlpha, getHeading())
-                : new ChassisState(xAccel, yAccel, rotAlpha),
+                ? ChassisState.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, xAccel, yAccel, rotAlpha, getHeading())
+                : new ChassisState(xSpeed, ySpeed, rot, xAccel, yAccel, rotAlpha),
             new Translation2d());
-    if (ChassisState.CompareChassisSpeeds(
+      if (ChassisState.CompareChassisSpeeds(
         AUTOKINEMATICS.toChassisSpeeds(getAutoModuleStates()),
         new ChassisSpeeds(xSpeed, ySpeed, rot),
         0.5)) {
       states = DRIVERKINEMATICS.toSwerveModuleStates(new ChassisState());
-    }
+    
+      }
 
     setModuleStates(states);
   }

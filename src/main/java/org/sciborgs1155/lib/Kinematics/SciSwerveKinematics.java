@@ -87,7 +87,7 @@ public class SciSwerveKinematics extends SwerveDriveKinematics {
       double acceleration = Math.hypot(x, y);
       Rotation2d angle = new Rotation2d(x, y);
 
-      m_moduleStates[i] = new SciSwerveModuleState(acceleration, angle);
+      m_moduleStates[i] = new SciSwerveModuleState(acceleration, Math.hypot(chassisState.vxMetersPerSecond, chassisState.vyMetersPerSecond), angle);
     }
 
     return m_moduleStates;
