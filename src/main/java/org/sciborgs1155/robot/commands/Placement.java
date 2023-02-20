@@ -3,7 +3,7 @@ package org.sciborgs1155.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.photonvision.PhotonCamera;
-import org.sciborgs1155.lib.State;
+import org.sciborgs1155.lib.PlacementState;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Elevator;
 
@@ -15,7 +15,7 @@ public final class Placement {
         goToState(
             arm,
             elevator,
-            State.fromIK(
+            PlacementState.fromIK(
                 cam.getLatestResult().getBestTarget().getBestCameraToTarget().getTranslation(),
                 elevator.getHeight())),
         Commands.none(),
@@ -26,16 +26,18 @@ public final class Placement {
   // 1. sets wrist to 0 and runs elevator to set height
   // 2. runs to goal state
 
-  /** Runs arm and elevator to setpoints, specified in a {@link org.sciborgs1155.lib.State} */
-  public static Command goToState(Arm arm, Elevator elevator, State state) {
+  /**
+   * Runs arm and elevator to setpoints, specified in a {@link org.sciborgs1155.lib.PlacementState}
+   */
+  public static Command goToState(Arm arm, Elevator elevator, PlacementState state) {
     return Commands.parallel(
         elevator.runToGoal(state.elevatorHeight()),
         arm.runToGoals(state.elbowAngle(), state.wristAngle()));
   }
 
-  public static Command goToState(Arm arm, Elevator elevator, State... states) {
+  public static Command goToState(Arm arm, Elevator elevator, PlacementState... states) {
     Command cmd = Commands.none();
-    for (State state : states) {
+    for (PlacementState state : states) {
       cmd = cmd.andThen(goToState(arm, elevator, state));
     }
     return cmd;
