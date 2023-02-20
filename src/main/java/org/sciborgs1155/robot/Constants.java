@@ -250,16 +250,16 @@ public final class Constants {
   }
 
   public static final class Placement {
-    public static final State FRONT_MID_CONE = State.fromAbsolute(0, 0.2, 0.6);
-    public static final State FRONT_HIGH_CONE = State.fromAbsolute(0, 1, 1.1);
+    public static final State FRONT_MID_CONE = State.fromAbsolute(0.6, 0.2, 0);
+    public static final State FRONT_HIGH_CONE = State.fromAbsolute(1.1, 1, 0);
     public static final State BACK_LOW_CONE = State.fromAbsolute(0, 0.1, 0);
-    public static final State BACK_MID_CONE = State.fromAbsolute(0, 0.2, 0.6);
-    public static final State BACK_HIGH_CONE = State.fromAbsolute(0, 1, 1.1);
-    public static final State FRONT_MID_CUBE = State.fromAbsolute(0, 0.2, 0.6);
-    public static final State FRONT_HIGH_CUBE = State.fromAbsolute(0, 1, 1.1);
+    public static final State BACK_MID_CONE = State.fromAbsolute(0.6, 0.2, 0);
+    public static final State BACK_HIGH_CONE = State.fromAbsolute(1.1, 1, 0);
+    public static final State FRONT_MID_CUBE = State.fromAbsolute(0.6, 0.2, 0);
+    public static final State FRONT_HIGH_CUBE = State.fromAbsolute(1.1, 1, 0);
     public static final State BACK_LOW_CUBE = State.fromAbsolute(0, 0.1, 0);
-    public static final State BACK_MID_CUBE = State.fromAbsolute(0, 0.2, 0.6);
-    public static final State BACK_HIGH_CUBE = State.fromAbsolute(0, 1, 1.1);
+    public static final State BACK_MID_CUBE = State.fromAbsolute(0.6, 0.2, 0);
+    public static final State BACK_HIGH_CUBE = State.fromAbsolute(1.1, 1, 0);
   }
 
   public static final class Auto {

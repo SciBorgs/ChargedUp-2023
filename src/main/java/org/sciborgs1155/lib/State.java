@@ -1,13 +1,16 @@
 package org.sciborgs1155.lib;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import org.sciborgs1155.robot.Constants.Dimensions;
 
 /** ArmState class to store relative angles for the arm. */
-public record State(Rotation2d elbowAngle, Rotation2d wristAngle, double elevatorHeight)
+public record State(double elevatorHeight, Rotation2d elbowAngle, Rotation2d wristAngle)
     implements Sendable {
 
   /** Represents the side of the robot the arm is on */
@@ -20,20 +23,20 @@ public record State(Rotation2d elbowAngle, Rotation2d wristAngle, double elevato
    * Returns a new {@link State} from angles in radians, with the wrist state relative to the
    * chassis
    */
-  public static State fromAbsolute(double elbowAngle, double wristAngle, double elevatorHeight) {
+  public static State fromAbsolute(double elevatorHeight, double elbowAngle, double wristAngle) {
     return new State(
+      elevatorHeight,
         Rotation2d.fromRadians(elbowAngle),
-        Rotation2d.fromRadians(wristAngle - elbowAngle),
-        elevatorHeight);
+        Rotation2d.fromRadians(wristAngle - elbowAngle));
   }
 
   /**
    * Returns a new {@link State} from angles in radians, with the wrist state relative to the
    * forearm
    */
-  public static State fromRelative(double elbowAngle, double wristAngle, double elevatorHeight) {
+  public static State fromRelative(double elevatorHeight, double elbowAngle, double wristAngle) {
     return new State(
-        Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle), elevatorHeight);
+      elevatorHeight, Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle));
   }
 
   /** The side of the robot the arm is on */
@@ -63,12 +66,8 @@ public record State(Rotation2d elbowAngle, Rotation2d wristAngle, double elevato
     return fromAbsolute(elbowAngle, wristAngle, 0);
   }
 
-  public double elbowAngleRadians() {
-    return elbowAngle().getRadians();
-  }
-
-  public double wristAngleRadians() {
-    return wristAngle().getRadians();
+  public Vector<N3> toVec() {
+    return VecBuilder.fill(elevatorHeight, elbowAngle.getRadians(), wristAngle.getRadians());
   }
 
   @Override
