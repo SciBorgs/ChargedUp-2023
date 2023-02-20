@@ -2,6 +2,12 @@
   "NetworkTables": {
     "transitory": {
       "Shuffleboard": {
+        "Drive": {
+          "frontLeft": {
+            "open": true
+          },
+          "open": true
+        },
         "Drivetrain": {
           "frontLeft": {
             "open": true
@@ -28,12 +34,51 @@
     },
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Drive/field2d": "Field2d",
       "/Shuffleboard/Drivetrain/field2d": "Field2d",
-      "/Shuffleboard/Drivetrain/gyro": "Gyro"
+      "/Shuffleboard/Drivetrain/gyro": "Gyro",
+      "/Shuffleboard/RobotContainer/autos": "String Chooser",
+      "/Shuffleboard/RobotContainer/visualizer": "Mechanism2d",
+      "/SmartDashboard/backPhotonVision Sim Field": "Field2d",
+      "/SmartDashboard/frontPhotonVision Sim Field": "Field2d"
     }
   },
   "NetworkTables Settings": {
     "mode": "Client (NT4)",
     "serverTeam": "1155"
+  },
+  "Plots": {
+    "Plot <0>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 338,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Drive/frontLeft/current velocity"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Drive/frontLeft/target velocity"
+            }
+          ]
+        }
+      ]
+    }
   }
 }
