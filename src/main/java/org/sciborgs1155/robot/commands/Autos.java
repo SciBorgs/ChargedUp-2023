@@ -44,7 +44,7 @@ public final class Autos implements Sendable {
   private final Drive drive;
   private final Vision vision;
   private final SendableChooser<Command> chooser;
-  private PathPlannerTrajectory trajectory;
+  public PathPlannerTrajectory trajectory;
 
   public Autos(Drive drive, Vision vision) {
     this.drive = drive;
@@ -65,10 +65,6 @@ public final class Autos implements Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     chooser.initSendable(builder);
-
-    this.trajectory =
-        PathPlanner.generatePath(
-            Auto.CONSTRAINTS, this.PathPointsArray.get(0), this.PathPointsArray.get(1));
   }
 
   // public Command cameraAlignment() {
@@ -108,6 +104,18 @@ public final class Autos implements Sendable {
 
   public Command align(double xpole, double ypole) {
     PathPlannerTrajectory trajectory = generateTrajectory(xpole, ypole);
+    return drive.follow(trajectory, false, false);
+  }
+
+  public PathPlannerTrajectory generateOdTrajectory() {
+    this.trajectory =
+        PathPlanner.generatePath(
+            Auto.CONSTRAINTS, this.PathPointsArray.get(0), this.PathPointsArray.get(1));
+    return trajectory;
+  }
+
+  public Command Odalign() {
+    PathPlannerTrajectory trajectory = generateOdTrajectory();
     return drive.follow(trajectory, false, false);
   }
 }
