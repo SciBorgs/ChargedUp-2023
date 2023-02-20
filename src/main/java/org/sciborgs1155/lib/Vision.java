@@ -105,8 +105,7 @@ public class Vision {
 
     return Stream.of(frontEstimator, backEstimator)
         .map(PhotonPoseEstimator::update)
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .toArray(EstimatedRobotPose[]::new);
   }
 }
