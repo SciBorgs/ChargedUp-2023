@@ -115,6 +115,8 @@ spotless {
         toggleOffOn()
         googleJavaFormat()
         removeUnusedImports()
+        indentWithTabs(2)
+        indentWithSpaces(4)
         trimTrailingWhitespace()
         endWithNewline()
     }
@@ -144,7 +146,7 @@ spotless {
             exclude '**/build/**', '**/build-*/**'
         }
         trimTrailingWhitespace()
-        indentWithSpaces(2)
+        indentWithSpaces(4)
         endWithNewline()
     }
 }

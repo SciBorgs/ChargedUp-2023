@@ -8,29 +8,29 @@ import org.sciborgs1155.robot.Robot;
 
 public interface SwerveModule extends Sendable {
 
-  public static SwerveModule create(int drivePort, int turnPort, double angularOffset) {
-    return Robot.isReal()
-        ? new MAXSwerveModule(drivePort, turnPort, angularOffset)
-        : new GoalSwerveModule();
-  }
+    public static SwerveModule create(int drivePort, int turnPort, double angularOffset) {
+        return Robot.isReal()
+                ? new MAXSwerveModule(drivePort, turnPort, angularOffset)
+                : new GoalSwerveModule();
+    }
 
-  public SwerveModuleState getState();
+    public SwerveModuleState getState();
 
-  public SwerveModulePosition getPosition();
+    public SwerveModulePosition getPosition();
 
-  public void setDesiredState(SwerveModuleState desiredState);
+    public void setDesiredState(SwerveModuleState desiredState);
 
-  public SwerveModuleState getDesiredState();
+    public SwerveModuleState getDesiredState();
 
-  public void resetEncoders();
+    public void resetEncoders();
 
-  @Override
-  default void initSendable(SendableBuilder builder) {
-    builder.addDoubleProperty("current velocity", () -> getState().speedMetersPerSecond, null);
-    builder.addDoubleProperty("current angle", () -> getPosition().angle.getRadians(), null);
-    builder.addDoubleProperty("current position", () -> getPosition().distanceMeters, null);
-    builder.addDoubleProperty(
-        "target velocity", () -> getDesiredState().speedMetersPerSecond, null);
-    builder.addDoubleProperty("target angle", () -> getDesiredState().angle.getRadians(), null);
-  }
+    @Override
+    default void initSendable(SendableBuilder builder) {
+        builder.addDoubleProperty("current velocity", () -> getState().speedMetersPerSecond, null);
+        builder.addDoubleProperty("current angle", () -> getPosition().angle.getRadians(), null);
+        builder.addDoubleProperty("current position", () -> getPosition().distanceMeters, null);
+        builder.addDoubleProperty(
+                "target velocity", () -> getDesiredState().speedMetersPerSecond, null);
+        builder.addDoubleProperty("target angle", () -> getDesiredState().angle.getRadians(), null);
+    }
 }
