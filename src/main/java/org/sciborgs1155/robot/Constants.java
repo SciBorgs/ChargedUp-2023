@@ -11,7 +11,7 @@ import edu.wpi.first.math.util.Units;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.MotorConfig;
 import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
-import org.sciborgs1155.lib.State;
+import org.sciborgs1155.robot.util.State;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean

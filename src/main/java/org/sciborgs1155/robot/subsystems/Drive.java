@@ -28,11 +28,11 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
 import org.sciborgs1155.lib.ControllerOutputFunction;
-import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Auto;
 import org.sciborgs1155.robot.Ports.Sensors;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
+import org.sciborgs1155.robot.util.Vision;
 
 public class Drive extends SubsystemBase implements Loggable {
   @Log

@@ -3,9 +3,9 @@ package org.sciborgs1155.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.photonvision.PhotonCamera;
-import org.sciborgs1155.lib.State;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Elevator;
+import org.sciborgs1155.robot.util.State;
 
 /** Trajectory for elevator and arm, without respect for time */
 public final class Placement {
@@ -26,7 +26,7 @@ public final class Placement {
   // 1. sets wrist to 0 and runs elevator to set height
   // 2. runs to goal state
 
-  /** Runs arm and elevator to setpoints, specified in a {@link org.sciborgs1155.lib.State} */
+  /** Runs arm and elevator to setpoints, specified in a {@link org.sciborgs1155.robot.util.State} */
   public static Command goToState(Arm arm, Elevator elevator, State state) {
     return Commands.parallel(
         elevator.runToGoal(state.elevatorHeight()),

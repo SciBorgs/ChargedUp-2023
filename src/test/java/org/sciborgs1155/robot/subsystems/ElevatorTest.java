@@ -6,8 +6,8 @@ import edu.wpi.first.hal.HAL;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants.Dimensions;
+import org.sciborgs1155.robot.util.Visualizer;
 
 public class ElevatorTest {
 

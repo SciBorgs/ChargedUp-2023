@@ -13,10 +13,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Derivative;
-import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.subsystems.joints.Elbow;
 import org.sciborgs1155.robot.subsystems.joints.Wrist;
+import org.sciborgs1155.robot.util.Visualizer;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
