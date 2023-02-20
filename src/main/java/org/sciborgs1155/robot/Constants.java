@@ -11,7 +11,7 @@ import edu.wpi.first.math.util.Units;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.MotorConfig;
 import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
-import org.sciborgs1155.lib.State;
+import org.sciborgs1155.lib.PlacementState;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -250,16 +250,16 @@ public final class Constants {
   }
 
   public static final class Placement {
-    public static final State FRONT_MID_CONE = State.fromAbsolute(0.6, 0.2, 0);
-    public static final State FRONT_HIGH_CONE = State.fromAbsolute(1.1, 1, 0);
-    public static final State BACK_LOW_CONE = State.fromAbsolute(0, 0.1, 0);
-    public static final State BACK_MID_CONE = State.fromAbsolute(0.6, 0.2, 0);
-    public static final State BACK_HIGH_CONE = State.fromAbsolute(1.1, 1, 0);
-    public static final State FRONT_MID_CUBE = State.fromAbsolute(0.6, 0.2, 0);
-    public static final State FRONT_HIGH_CUBE = State.fromAbsolute(1.1, 1, 0);
-    public static final State BACK_LOW_CUBE = State.fromAbsolute(0, 0.1, 0);
-    public static final State BACK_MID_CUBE = State.fromAbsolute(0.6, 0.2, 0);
-    public static final State BACK_HIGH_CUBE = State.fromAbsolute(1.1, 1, 0);
+    public static final PlacementState FRONT_MID_CONE = PlacementState.fromAbsolute(0.6, 0.2, 0);
+    public static final PlacementState FRONT_HIGH_CONE = PlacementState.fromAbsolute(1.1, 1, 0);
+    public static final PlacementState BACK_LOW_CONE = PlacementState.fromAbsolute(0, 0.1, 0);
+    public static final PlacementState BACK_MID_CONE = PlacementState.fromAbsolute(0.6, 0.2, 0);
+    public static final PlacementState BACK_HIGH_CONE = PlacementState.fromAbsolute(1.1, 1, 0);
+    public static final PlacementState FRONT_MID_CUBE = PlacementState.fromAbsolute(0.6, 0.2, 0);
+    public static final PlacementState FRONT_HIGH_CUBE = PlacementState.fromAbsolute(1.1, 1, 0);
+    public static final PlacementState BACK_LOW_CUBE = PlacementState.fromAbsolute(0, 0.1, 0);
+    public static final PlacementState BACK_MID_CUBE = PlacementState.fromAbsolute(0.6, 0.2, 0);
+    public static final PlacementState BACK_HIGH_CUBE = PlacementState.fromAbsolute(1.1, 1, 0);
   }
 
   public static final class Auto {
