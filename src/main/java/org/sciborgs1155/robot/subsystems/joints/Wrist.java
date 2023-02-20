@@ -29,6 +29,9 @@ public interface Wrist extends Sendable, AutoCloseable {
   public double getCurrentDrawn();
 
   @Override
+  public void close();
+
+  @Override
   default void initSendable(SendableBuilder builder) {
     builder.addDoubleProperty("position", () -> getPosition().getDegrees(), null);
     builder.addDoubleProperty("velocity", this::getVelocity, null);

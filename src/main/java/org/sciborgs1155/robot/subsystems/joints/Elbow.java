@@ -9,7 +9,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Constants.ArmConstants.ElbowConstants;
+import org.sciborgs1155.robot.Constants.Arm.ElbowConstants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Robot;
@@ -26,6 +26,9 @@ public interface Elbow extends Sendable, AutoCloseable {
   public void setVoltage(double voltage);
 
   public double getCurrentDrawn();
+
+  @Override
+  public void close();
 
   @Override
   default void initSendable(SendableBuilder builder) {

@@ -1,15 +1,328 @@
 {
+  "HALProvider": {
+    "Other Devices": {
+      "Pigeon IMU[2]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK MAX [0]": {
+        "header": {
+          "open": true
+        }
+      },
+      "window": {
+        "visible": false
+      }
+    }
+  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/Shuffleboard/Drivetrain/field2d": "Field2d",
+      "/LiveWindow/Drive": "Subsystem",
+      "/LiveWindow/Ungrouped/PIDController[10]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[11]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[5]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[6]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[7]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
+      "/LiveWindow/Ungrouped/Pigeon IMU [2]": "Gyro",
+      "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
+      "/Shuffleboard/Drive/field2d": "Field2d",
+      "/Shuffleboard/Drive/gyro": "Gyro",
       "/Shuffleboard/Drivetrain/gyro": "Gyro",
       "/Shuffleboard/Elevator/limitSwitchOne": "Digital Input",
       "/Shuffleboard/Elevator/limitSwitchTwo": "Digital Input",
-      "/Shuffleboard/RobotContainer/visualizer": "Mechanism2d"
+      "/Shuffleboard/RobotContainer/autos": "String Chooser",
+      "/Shuffleboard/RobotContainer/visualizer": "Mechanism2d",
+      "/SmartDashboard/backCam Sim Field": "Field2d",
+      "/SmartDashboard/backPhotonVision Sim Field": "Field2d",
+      "/SmartDashboard/frontCam Sim Field": "Field2d",
+      "/SmartDashboard/frontPhotonVision Sim Field": "Field2d",
+      "/SmartDashboard/photonvision Sim Field": "Field2d"
     },
     "windows": {
+      "/Shuffleboard/Drive/field2d": {
+        "Cam Est Pose": {
+          "color": [
+            0.10318857431411743,
+            0.2006860375404358,
+            0.8734177350997925,
+            255.0
+          ]
+        },
+        "Cam Est Pose 0": {
+          "color": [
+            129.1139373779297,
+            255.0,
+            0.0,
+            255.0
+          ]
+        },
+        "Cam Est Pose 1": {
+          "color": [
+            0.0,
+            12.91140365600586,
+            255.0,
+            255.0
+          ]
+        },
+        "Cam-0 Est Pose": {
+          "arrows": false,
+          "color": [
+            0.0,
+            59.999996185302734,
+            255.0,
+            255.0
+          ],
+          "length": 0.800000011920929,
+          "width": 0.800000011920929
+        },
+        "Cam-1 Est Pose": {
+          "arrows": false,
+          "color": [
+            0.3088517487049103,
+            0.7009804248809814,
+            0.03436180576682091,
+            255.0
+          ],
+          "length": 0.800000011920929,
+          "width": 0.800000011920929
+        },
+        "Robot": {
+          "arrows": false,
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            255.0
+          ],
+          "length": 0.4318000078201294,
+          "weight": 8.0,
+          "width": 0.4318000078201294
+        },
+        "image": "field/2023-field.png",
+        "module-0": {
+          "arrowColor": [
+            1.0,
+            1.0,
+            0.0,
+            255.0
+          ],
+          "arrowSize": 11,
+          "style": "Line",
+          "weight": 0.0
+        },
+        "module-1": {
+          "arrowColor": [
+            1.0,
+            1.0,
+            0.0,
+            255.0
+          ],
+          "arrowSize": 11,
+          "selectable": false,
+          "style": "Line",
+          "weight": 0.0
+        },
+        "module-2": {
+          "arrowColor": [
+            1.0,
+            1.0,
+            0.0,
+            255.0
+          ],
+          "arrowSize": 11,
+          "selectable": false,
+          "style": "Line",
+          "weight": 0.0
+        },
+        "module-3": {
+          "arrowColor": [
+            1.0,
+            1.0,
+            0.0,
+            255.0
+          ],
+          "arrowSize": 11,
+          "selectable": false,
+          "style": "Line",
+          "weight": 0.0
+        },
+        "window": {
+          "name": "field",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Drivetrain/field2d": {
+        "Robot": {
+          "arrows": false,
+          "length": 0.2800000011920929,
+          "width": 0.2800000011920929
+        },
+        "SimSwerveModule": {
+          "arrowSize": 0,
+          "arrowWeight": 1.0,
+          "color": [
+            0.0,
+            82.50001525878906,
+            255.0,
+            255.0
+          ],
+          "length": 0.10000000149011612,
+          "style": "Box/Image",
+          "width": 0.20000000298023224
+        },
+        "module-0": {
+          "arrowSize": 33,
+          "arrowWeight": 3.0,
+          "style": "Hidden"
+        },
+        "module-1": {
+          "arrowSize": 33,
+          "arrowWeight": 3.0,
+          "style": "Hidden"
+        },
+        "module-2": {
+          "arrowSize": 33,
+          "arrowWeight": 3.0,
+          "style": "Hidden"
+        },
+        "module-3": {
+          "arrowSize": 33,
+          "arrowWeight": 3.0,
+          "style": "Hidden"
+        },
+        "org.sciborgs1155.robot.subsystems.modules.SimSwerveModule@27f843b": {
+          "arrowColor": [
+            0.0,
+            1.0,
+            1.0,
+            255.0
+          ],
+          "arrowWeight": 2.0,
+          "color": [
+            0.0,
+            119.99999237060547,
+            255.0,
+            255.0
+          ],
+          "selectable": false,
+          "style": "Line",
+          "weight": 2.0
+        },
+        "org.sciborgs1155.robot.subsystems.modules.SimSwerveModule@4354e572": {
+          "arrowColor": [
+            0.0,
+            1.0,
+            1.0,
+            255.0
+          ],
+          "arrowWeight": 2.0,
+          "selectable": false,
+          "style": "Line",
+          "weight": 2.0
+        },
+        "org.sciborgs1155.robot.subsystems.modules.SimSwerveModule@59bbac13": {
+          "arrowColor": [
+            0.0,
+            1.0,
+            1.0,
+            255.0
+          ],
+          "arrowWeight": 2.0,
+          "selectable": false,
+          "style": "Line",
+          "weight": 2.0
+        },
+        "org.sciborgs1155.robot.subsystems.modules.SimSwerveModule@ee7bcb8": {
+          "arrowColor": [
+            0.0,
+            1.0,
+            1.0,
+            255.0
+          ],
+          "arrowWeight": 2.0,
+          "selectable": false,
+          "style": "Line",
+          "weight": 2.0
+        },
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/RobotContainer/autos": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Shuffleboard/RobotContainer/visualizer": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/backCam Sim Field": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/backPhotonVision Sim Field": {
+        "backPhotonVision Camera": {
+          "arrowColor": [
+            0.9746835231781006,
+            0.46472251415252686,
+            0.46472251415252686,
+            255.0
+          ],
+          "arrowSize": 100,
+          "arrowWeight": 10.0,
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            255.0
+          ],
+          "length": 0.4099999964237213,
+          "width": 0.30000001192092896
+        },
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/frontCam Sim Field": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/frontPhotonVision Sim Field": {
+        "frontPhotonVision Camera": {
+          "arrowColor": [
+            0.9071729779243469,
+            0.4325339198112488,
+            0.4325339198112488,
+            255.0
+          ],
+          "arrowSize": 100,
+          "arrowWeight": 10.0,
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            255.0
+          ],
+          "length": 0.4099999964237213,
+          "width": 0.30000001192092896
+        },
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/photonvision Sim Field": {
         "window": {
           "visible": true
         }
@@ -17,21 +330,143 @@
     }
   },
   "NetworkTables": {
+    "Retained Values": {
+      "open": false
+    },
     "transitory": {
       "Shuffleboard": {
         "Arm": {
+          "elbow": {
+            "open": true
+          },
           "elbowFeedback": {
             "open": true
           },
           "open": true,
-          "wrist": {
-            "open": true
-          },
           "wristFeedback": {
             "open": true
           }
         },
+        "Drive": {
+          "gyro": {
+            "open": true
+          },
+          "open": true
+        },
+        "Elevator": {
+          "open": true,
+          "pid": {
+            "open": true
+          }
+        },
+        "RobotContainer": {
+          "autos": {
+            "open": true
+          }
+        },
         "open": true
+      },
+      "SmartDashboard": {
+        "backPhotonVision Sim Field": {
+          "open": true
+        },
+        "frontPhotonVision Sim Field": {
+          "open": true
+        }
+      },
+      "photonvision": {
+        "backPhotonVision": {
+          "open": true
+        },
+        "frontPhotonVision": {
+          "open": true
+        }
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "Clients": {
+      "open": true
+    },
+    "Connections": {
+      "open": true
+    },
+    "Server": {
+      "Publishers": {
+        "open": true
+      },
+      "open": true
+    }
+  },
+  "Plot": {
+    "Plot <0>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 295,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Drive/frontLeft/current angle"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Drive/frontLeft/target angle"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "name": "angle"
+      }
+    },
+    "Plot <1>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 295,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Drive/frontLeft/current velocity"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Drive/frontLeft/target velocity"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "name": "velocity"
       }
     }
   }

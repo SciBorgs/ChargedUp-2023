@@ -6,7 +6,7 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.numbers.*;
 import edu.wpi.first.math.system.plant.DCMotor;
-import org.sciborgs1155.robot.Constants.ArmConstants.*;
+import org.sciborgs1155.robot.Constants.Arm.*;
 import org.sciborgs1155.robot.Constants.Dimensions;
 
 public class Dynamics {

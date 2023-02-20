@@ -1,5 +1,7 @@
 package org.sciborgs1155.robot.subsystems.modules;
 
+import static org.sciborgs1155.robot.Constants.SwerveModule.*;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
@@ -11,14 +13,10 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import org.sciborgs1155.robot.Constants.ModuleConstants.Driving;
-import org.sciborgs1155.robot.Constants.ModuleConstants.Turning;
 import org.sciborgs1155.robot.Constants.Motors;
 
 /** Class to encapsulate a rev max swerve module */
-public class RevModule implements SwerveModule, Sendable {
+public class MAXSwerveModule implements SwerveModule {
   private final CANSparkMax driveMotor; // Regular Neo
   private final CANSparkMax turnMotor; // Neo 550
 
@@ -28,20 +26,21 @@ public class RevModule implements SwerveModule, Sendable {
   private final SparkMaxPIDController driveFeedback;
   private final SparkMaxPIDController turnFeedback;
 
-  private final SimpleMotorFeedforward driveFeedforward;
+  private final SimpleMotorFeedforward driveFeedforward =
+      new SimpleMotorFeedforward(Driving.kS, Driving.kV, Driving.kA);
 
   private final Rotation2d angularOffset;
 
   private SwerveModuleState setpoint;
 
   /**
-   * Constructs a SwerveModule for rev's product.
+   * Constructs a SwerveModule for rev's MAX Swerve.
    *
    * @param drivePort drive motor port
    * @param turnPort turning motor port
    * @param angularOffset offset from drivetrain
    */
-  public RevModule(int drivePort, int turnPort, double angularOffset) {
+  public MAXSwerveModule(int drivePort, int turnPort, double angularOffset) {
     driveMotor = Motors.DRIVE.build(MotorType.kBrushless, drivePort);
     turnMotor = Motors.TURN.build(MotorType.kBrushless, turnPort);
 
@@ -52,17 +51,15 @@ public class RevModule implements SwerveModule, Sendable {
     driveFeedback.setFeedbackDevice(driveEncoder);
     turnFeedback.setFeedbackDevice(turningEncoder);
 
-    driveFeedforward = new SimpleMotorFeedforward(Driving.S, Driving.V, Driving.A);
-
     turningEncoder.setInverted(Turning.ENCODER_INVERTED);
 
     // encoder ratios
     driveEncoder.setPositionConversionFactor(Driving.ENCODER_POSITION_FACTOR);
     driveEncoder.setVelocityConversionFactor(Driving.ENCODER_VELOCITY_FACTOR);
 
-    driveFeedback.setP(Driving.P);
-    driveFeedback.setI(Driving.I);
-    driveFeedback.setD(Driving.D);
+    driveFeedback.setP(Driving.kP);
+    driveFeedback.setI(Driving.kI);
+    driveFeedback.setD(Driving.kD);
 
     turningEncoder.setPositionConversionFactor(Turning.ENCODER_POSITION_FACTOR);
     turningEncoder.setVelocityConversionFactor(Turning.ENCODER_VELOCITY_FACTOR);
@@ -72,11 +69,10 @@ public class RevModule implements SwerveModule, Sendable {
     turnFeedback.setPositionPIDWrappingMinInput(Turning.MIN_INPUT);
     turnFeedback.setPositionPIDWrappingMaxInput(Turning.MAX_INPUT);
 
-    turnFeedback.setP(Turning.P);
-    turnFeedback.setI(Turning.I);
-    turnFeedback.setD(Turning.D);
+    turnFeedback.setP(Turning.kP);
+    turnFeedback.setI(Turning.kI);
+    turnFeedback.setD(Turning.kD);
 
-    // burning to flash again (already done in motor config, there's probably a nicer way)
     driveMotor.burnFlash();
     turnMotor.burnFlash();
 
@@ -90,12 +86,14 @@ public class RevModule implements SwerveModule, Sendable {
    *
    * @return The current state of the module.
    */
+  @Override
   public SwerveModuleState getState() {
     return new SwerveModuleState(
         driveEncoder.getVelocity(),
         Rotation2d.fromRadians(turningEncoder.getPosition()).minus(angularOffset));
   }
 
+  @Override
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(
         driveEncoder.getPosition(),
@@ -107,6 +105,7 @@ public class RevModule implements SwerveModule, Sendable {
    *
    * @param desiredState Desired state with speed and angle.
    */
+  @Override
   public void setDesiredState(SwerveModuleState desiredState) {
     SwerveModuleState correctedDesiredState = new SwerveModuleState();
     correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
@@ -122,18 +121,14 @@ public class RevModule implements SwerveModule, Sendable {
     turnFeedback.setReference(setpoint.angle.getRadians(), ControlType.kPosition);
   }
 
-  /** Zeroes all the SwerveModule encoders. */
-  public void resetEncoders() {
-    driveEncoder.setPosition(0);
+  @Override
+  public SwerveModuleState getDesiredState() {
+    return setpoint;
   }
 
+  /** Zeroes all the SwerveModule encoders. */
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.addDoubleProperty("current velocity", driveEncoder::getVelocity, null);
-    // builder.addDoubleProperty("current angle", () -> this.getPosition().angle.getRadians(),
-    // null);
-    builder.addDoubleProperty("current angle", turningEncoder::getPosition, null);
-    builder.addDoubleProperty("target angle", () -> setpoint.angle.getRadians(), null);
-    builder.addDoubleProperty("target velocity", () -> setpoint.speedMetersPerSecond, null);
+  public void resetEncoders() {
+    driveEncoder.setPosition(0);
   }
 }

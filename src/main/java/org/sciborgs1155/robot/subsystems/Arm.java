@@ -1,6 +1,6 @@
 package org.sciborgs1155.robot.subsystems;
 
-import static org.sciborgs1155.robot.Constants.ArmConstants.*;
+import static org.sciborgs1155.robot.Constants.Arm.*;
 import static org.sciborgs1155.robot.Ports.Arm.*;
 
 import edu.wpi.first.math.MathUtil;
@@ -41,12 +41,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   private final ArmFeedforward elbowFeedforward =
       new ArmFeedforward(
           ElbowConstants.kS, ElbowConstants.kG, ElbowConstants.kV, ElbowConstants.kA);
-
-  // private final SimpleMotorFeedforward wristFeedforward = new
-  // SimpleMotorFeedforward(WristConstants.kS, WristConstants.kV, WristConstants.kA);
-
-  // private final SimpleMotorFeedforward elbowFeedforward = new
-  // SimpleMotorFeedforward(ElbowConstants.kS, ElbowConstants.kV, ElbowConstants.kA);
 
   @Log(name = "wrist acceleration", methodName = "getLastOutput")
   private final Derivative wristAccel = new Derivative();
@@ -158,7 +152,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Override
   public void close() {
-    // wrist.close();
-    // elbow.close();
+    wrist.close();
+    elbow.close();
   }
 }

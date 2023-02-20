@@ -1,24 +1,24 @@
 {
-  "Keyboard 0 Settings": {
+  "FMS": {
     "window": {
-      "visible": true
+      "visible": false
     }
   },
-  "Keyboard 1 Settings": {
+  "System Joysticks": {
     "window": {
-      "visible": true
+      "visible": false
     }
   },
   "keyboardJoysticks": [
     {
       "axisConfig": [
         {
-          "decKey": 65,
-          "incKey": 68
+          "decKey": 68,
+          "incKey": 65
         },
         {
-          "decKey": 83,
-          "incKey": 87
+          "decKey": 87,
+          "incKey": 83
         },
         {
           "decKey": 69,
@@ -47,20 +47,16 @@
           "key90": 326
         }
       ],
-      "povCount": 1
+      "povCount": 0
     },
     {
       "axisConfig": [
         {
           "decKey": 76,
           "incKey": 74
-        },
-        {
-          "decKey": 73,
-          "incKey": 75
         }
       ],
-      "axisCount": 2,
+      "axisCount": 1,
       "buttonCount": 4,
       "buttonKeys": [
         77,
@@ -102,10 +98,12 @@
   "robotJoysticks": [
     {},
     {
-      "guid": "Keyboard0"
+      "guid": "Keyboard0",
+      "name": "Movement"
     },
     {
-      "guid": "Keyboard1"
+      "guid": "Keyboard1",
+      "name": "Rotation"
     }
   ]
 }
