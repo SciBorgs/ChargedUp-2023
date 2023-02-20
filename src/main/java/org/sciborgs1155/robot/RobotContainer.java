@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
-
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.subsystems.Arm;

@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.util.Vision;

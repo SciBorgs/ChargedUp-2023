@@ -78,6 +78,8 @@ public final class Constants {
     public static final double R2 = 0;
     // Distance from the first joint to center of mass of the claw
 
+    public static final double offset = 9; // centimeters, difference between arm and claw in height
+
     public static final double TRACK_WIDTH = Units.inchesToMeters(17);
     // Distance between centers of right and left wheels on robot
     public static final double WHEEL_BASE = Units.inchesToMeters(17);

@@ -26,7 +26,9 @@ public final class Placement {
   // 1. sets wrist to 0 and runs elevator to set height
   // 2. runs to goal state
 
-  /** Runs arm and elevator to setpoints, specified in a {@link org.sciborgs1155.robot.util.State} */
+  /**
+   * Runs arm and elevator to setpoints, specified in a {@link org.sciborgs1155.robot.util.State}
+   */
   public static Command goToState(Arm arm, Elevator elevator, State state) {
     return Commands.parallel(
         elevator.runToGoal(state.elevatorHeight()),
