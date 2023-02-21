@@ -80,7 +80,7 @@ public interface Wrist extends Sendable, AutoCloseable {
         new SingleJointedArmSim(
             DCMotor.getNeo550(1),
             1,
-            SingleJointedArmSim.estimateMOI(Dimensions.CLAW_LENGTH, 1),
+            SingleJointedArmSim.estimateMOI(Dimensions.CLAW_LENGTH, Dimensions.CLAW_MASS),
             Dimensions.CLAW_LENGTH,
             Dimensions.WRIST_MIN_ANGLE,
             Dimensions.WRIST_MAX_ANGLE,

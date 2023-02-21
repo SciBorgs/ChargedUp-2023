@@ -90,9 +90,9 @@ public interface Elbow extends Sendable, AutoCloseable {
 
     private final SingleJointedArmSim elbowSim =
         new SingleJointedArmSim(
-            DCMotor.getNEO(2),
-            ElbowConstants.GEAR_RATIO,
-            SingleJointedArmSim.estimateMOI(Dimensions.FOREARM_LENGTH, 2),
+            DCMotor.getNEO(3),
+            1 / ElbowConstants.ENCODER_POSITION_FACTOR,
+            SingleJointedArmSim.estimateMOI(Dimensions.FOREARM_LENGTH, Dimensions.FOREARM_MASS),
             Dimensions.FOREARM_LENGTH,
             Dimensions.ELBOW_MIN_ANGLE,
             Dimensions.ELBOW_MAX_ANGLE,

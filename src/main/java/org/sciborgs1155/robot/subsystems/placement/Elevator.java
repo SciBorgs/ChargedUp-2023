@@ -108,7 +108,7 @@ public interface Elevator extends Sendable, AutoCloseable {
     private final ElevatorSim sim =
         new ElevatorSim(
             DCMotor.getNEO(3),
-            10,
+            1 / ElevatorConstants.ENCODER_POSITION_FACTOR,
             4,
             Units.inchesToMeters(2),
             Dimensions.ELEVATOR_MIN_HEIGHT,

@@ -363,10 +363,16 @@
           "Elbow Feedback": {
             "open": true
           },
+          "Elevator Feedback": {
+            "open": true
+          },
           "Wrist Feedback": {
             "open": true
           },
           "elbow": {
+            "open": true
+          },
+          "elevator": {
             "open": true
           },
           "open": true,
