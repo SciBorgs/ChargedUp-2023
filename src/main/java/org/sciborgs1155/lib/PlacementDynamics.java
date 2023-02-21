@@ -1,7 +1,9 @@
 package org.sciborgs1155.lib;
 
+import edu.wpi.first.math.Vector;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.simple.SimpleMatrix;
 
 /**
  * Kinematic model for a double-jointed arm on an elevator.
@@ -70,7 +72,36 @@ public class PlacementDynamics {
     }
   }
 
-  public record State(Configuration pos, Configuration vel) {}
+  private record State(Configuration pos, Configuration vel) {
+    public static State fromPlacementState(PlacementState state) {
+      return new State(
+          new Configuration(
+              state.elbowAngle().getRadians(),
+              state.elbowAngle().getRadians() + state.wristAngle().getRadians(),
+              state.elevatorHeight()),
+          new Configuration(
+              state.elbowAngularVelocity(),
+              state.elbowAngularVelocity() + state.wristAngularVelocity(),
+              state.elevatorVelocity()));
+    }
+
+    public PlacementState toPlacementState() {
+      return PlacementState.fromVec(
+          new Vector<>(
+              new SimpleMatrix(
+                  6,
+                  1,
+                  true,
+                  new double[] {
+                    pos.height,
+                    pos.angleArm,
+                    pos.angleClaw - pos.angleArm,
+                    vel.height,
+                    vel.angleArm,
+                    vel.angleClaw - vel.angleArm
+                  })));
+    }
+  }
 
   public DMatrixRMaj M(Configuration pos) {
     DMatrixRMaj M = new DMatrixRMaj(3, 3);
@@ -125,7 +156,7 @@ public class PlacementDynamics {
     return C;
   }
 
-  private DMatrixRMaj gravity(Configuration pos) {
+  public DMatrixRMaj gravity(Configuration pos) {
     return new DMatrixRMaj(
         3,
         1,
@@ -148,15 +179,19 @@ public class PlacementDynamics {
   class Feedforward {
     private Feedforward() {}
 
-    public MotorOutputs calculate(State state, Configuration desiredAcceleration) {
+    public MotorOutputs calculate(State state, Configuration acceleration) {
       DMatrixRMaj applied = gravity(state.pos); // equilibrium torques/forces
-      CommonOps_DDRM.multAdd(M(state.pos), desiredAcceleration.toVector(), applied);
+      CommonOps_DDRM.multAdd(M(state.pos), acceleration.toVector(), applied);
       CommonOps_DDRM.multAdd(C(state), state.vel.toVector(), applied);
       CommonOps_DDRM.multAdd(K_resistive, state.vel.toVector(), applied);
 
       DMatrixRMaj voltages = new DMatrixRMaj(3, 1);
       CommonOps_DDRM.mult(B_inv, applied, voltages);
       return MotorOutputs.fromVector(voltages);
+    }
+
+    public MotorOutputs calculate(PlacementState state, Configuration acceleration) {
+      return this.calculate(State.fromPlacementState(state), acceleration);
     }
   }
 
@@ -169,12 +204,12 @@ public class PlacementDynamics {
 
     private Simulation() {}
 
-    public void setState(State state) {
-      this.state = state;
+    public void setState(PlacementState state) {
+      this.state = State.fromPlacementState(state);
     }
 
-    public State getState() {
-      return this.state;
+    public PlacementState getState() {
+      return this.state.toPlacementState();
     }
 
     void update(MotorOutputs inputs, double dt) {

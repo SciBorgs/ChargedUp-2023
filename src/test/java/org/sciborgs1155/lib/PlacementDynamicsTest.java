@@ -55,13 +55,13 @@ public class PlacementDynamicsTest {
   @ValueSource(doubles = {0, 0.2, 0.4, 0.6, 0.8, 1.0, 2.0, 4.0})
   public void feedforwardAtEquilibrium(double initialArm) {
     Simulation sim = model.getSimulation();
-    sim.setState(new State(new Configuration(initialArm, 0, 5), new Configuration(0, 0, 0)));
+    sim.setState(PlacementState.fromAbsolute(5, initialArm, 0));
     Feedforward ff = model.getFeedforward();
     for (int i = 0; i < 100; i++) {
       sim.update(ff.calculate(sim.getState(), new Configuration(0, 0, 0)), 0.1);
     }
-    DMatrixRMaj finalVelocities = sim.getState().vel().toVector();
-    for (int i = 0; i < 3; i++) {
+    DMatrixRMaj finalVelocities = sim.getState().toVec().getStorage().getDDRM();
+    for (int i = 3; i < 6; i++) {
       assertTrue(Math.abs(finalVelocities.get(i)) < 1E-6);
     }
   }
