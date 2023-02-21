@@ -6,36 +6,36 @@ import java.util.function.DoubleUnaryOperator;
 /** A derivative with respect to system time. */
 public class Derivative implements DoubleUnaryOperator {
 
-    private double lastValue;
-    private double lastTime;
-    private double out;
+  private double lastValue;
+  private double lastTime;
+  private double out;
 
-    /** Creates a derivative with initial value 0. */
-    public Derivative() {
-        lastValue = 0;
-        lastTime = Timer.getFPGATimestamp();
-    }
+  /** Creates a derivative with initial value 0. */
+  public Derivative() {
+    lastValue = 0;
+    lastTime = Timer.getFPGATimestamp();
+  }
 
-    /**
-     * Finds the slope between the current and previous inputted value.
-     *
-     * @param value x
-     * @return dx/dt
-     */
-    public double calculate(double value) {
-        out = (value - lastValue) / (Timer.getFPGATimestamp() - lastTime);
-        lastValue = value;
-        lastTime = Timer.getFPGATimestamp();
-        return out;
-    }
+  /**
+   * Finds the slope between the current and previous inputted value.
+   *
+   * @param value x
+   * @return dx/dt
+   */
+  public double calculate(double value) {
+    out = (value - lastValue) / (Timer.getFPGATimestamp() - lastTime);
+    lastValue = value;
+    lastTime = Timer.getFPGATimestamp();
+    return out;
+  }
 
-    /** Returns the last calculated value. */
-    public double getLastOutput() {
-        return out;
-    }
+  /** Returns the last calculated value. */
+  public double getLastOutput() {
+    return out;
+  }
 
-    @Override
-    public double applyAsDouble(double value) {
-        return calculate(value);
-    }
+  @Override
+  public double applyAsDouble(double value) {
+    return calculate(value);
+  }
 }

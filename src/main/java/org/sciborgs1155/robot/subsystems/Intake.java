@@ -14,21 +14,21 @@ import org.sciborgs1155.robot.Constants.Motors;
 
 public class Intake extends SubsystemBase implements Loggable {
 
-    @Log(name = "applied output", methodName = "getAppliedOutput")
-    private final CANSparkMax wheels = Motors.INTAKE.build(MotorType.kBrushless, WHEEL_MOTOR);
+  @Log(name = "applied output", methodName = "getAppliedOutput")
+  private final CANSparkMax wheels = Motors.INTAKE.build(MotorType.kBrushless, WHEEL_MOTOR);
 
-    @Log(name = "velocity", methodName = "getVelocity")
-    private final RelativeEncoder encoder = wheels.getEncoder();
+  @Log(name = "velocity", methodName = "getVelocity")
+  private final RelativeEncoder encoder = wheels.getEncoder();
 
-    public Command start() {
-        return runOnce(() -> wheels.set(WHEEL_SPEED));
-    }
+  public Command start() {
+    return runOnce(() -> wheels.set(WHEEL_SPEED));
+  }
 
-    public Command stop() {
-        return runOnce(wheels::stopMotor);
-    }
+  public Command stop() {
+    return runOnce(wheels::stopMotor);
+  }
 
-    public Command run() {
-        return startEnd(() -> wheels.set(WHEEL_SPEED), wheels::stopMotor);
-    }
+  public Command run() {
+    return startEnd(() -> wheels.set(WHEEL_SPEED), wheels::stopMotor);
+  }
 }

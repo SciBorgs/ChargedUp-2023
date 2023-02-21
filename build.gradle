@@ -116,7 +116,7 @@ spotless {
         googleJavaFormat()
         removeUnusedImports()
         indentWithTabs(2)
-        indentWithSpaces(4)
+        indentWithSpaces(2)
         trimTrailingWhitespace()
         endWithNewline()
     }

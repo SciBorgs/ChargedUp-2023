@@ -19,68 +19,68 @@ import org.sciborgs1155.robot.subsystems.Drive;
 
 public final class Autos implements Sendable {
 
-    private final Drive drive;
-    private final Vision vision;
-    private final SendableChooser<Command> chooser;
+  private final Drive drive;
+  private final Vision vision;
+  private final SendableChooser<Command> chooser;
 
-    public Autos(Drive drive, Vision vision) {
-        this.drive = drive;
-        this.vision = vision;
-        chooser = new SendableChooser<>();
-        chooser.setDefaultOption("mobility", mobility());
-        chooser.addOption("other", drive.follow("New Path", true, false));
-    }
+  public Autos(Drive drive, Vision vision) {
+    this.drive = drive;
+    this.vision = vision;
+    chooser = new SendableChooser<>();
+    chooser.setDefaultOption("mobility", mobility());
+    chooser.addOption("other", drive.follow("New Path", true, false));
+  }
 
-    public Command get() {
-        return chooser.getSelected();
-    }
+  public Command get() {
+    return chooser.getSelected();
+  }
 
-    private Command mobility() {
-        return Commands.run(() -> drive.drive(0.5, 0, 0, false), drive).withTimeout(5);
-    }
+  private Command mobility() {
+    return Commands.run(() -> drive.drive(0.5, 0, 0, false), drive).withTimeout(5);
+  }
 
-    @Override
-    public void initSendable(SendableBuilder builder) {
-        chooser.initSendable(builder);
-    }
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    chooser.initSendable(builder);
+  }
 
-    // public Command cameraAlignment() {
+  // public Command cameraAlignment() {
 
-    //   var result = cam.getLatestResult();
-    //   PhotonTrackedTarget target = result.getBestTarget();
-    //   Transform3d bestCameraToTarget = target.getBestCameraToTarget();
-    //   double xp = bestCameraToTarget.getX();
-    //   double yp = bestCameraToTarget.getY();
-    //   double currentX = odometry.getEstimatedPosition().getX();
-    //   double currentY = odometry.getEstimatedPosition().getY();
-    //   double xpole = xp + currentX;
-    //   double ypole = yp + currentY;
-    //   return align(xpole, ypole);
-    // }
-    // public Command align(double xpole, double ypole) {
-    //   PathPlannerTrajectory trajectory;
-    //   return Commands.run(
-    //     () -> drive.follow(PathPlannerTrajectory trajectory));
-    // }
+  //   var result = cam.getLatestResult();
+  //   PhotonTrackedTarget target = result.getBestTarget();
+  //   Transform3d bestCameraToTarget = target.getBestCameraToTarget();
+  //   double xp = bestCameraToTarget.getX();
+  //   double yp = bestCameraToTarget.getY();
+  //   double currentX = odometry.getEstimatedPosition().getX();
+  //   double currentY = odometry.getEstimatedPosition().getY();
+  //   double xpole = xp + currentX;
+  //   double ypole = yp + currentY;
+  //   return align(xpole, ypole);
+  // }
+  // public Command align(double xpole, double ypole) {
+  //   PathPlannerTrajectory trajectory;
+  //   return Commands.run(
+  //     () -> drive.follow(PathPlannerTrajectory trajectory));
+  // }
 
-    public List<PathPoint> generatePointList(double xpole, double ypole) {
-        Translation2d pointPosition = new Translation2d(xpole, ypole);
-        PathPoint polePoint = new PathPoint(pointPosition, new Rotation2d(0), new Rotation2d(0), 0);
-        List<PathPoint> pointList = new ArrayList<PathPoint>();
-        pointList.add(polePoint);
-        return pointList;
-    }
+  public List<PathPoint> generatePointList(double xpole, double ypole) {
+    Translation2d pointPosition = new Translation2d(xpole, ypole);
+    PathPoint polePoint = new PathPoint(pointPosition, new Rotation2d(0), new Rotation2d(0), 0);
+    List<PathPoint> pointList = new ArrayList<PathPoint>();
+    pointList.add(polePoint);
+    return pointList;
+  }
 
-    public PathPlannerTrajectory generateTrajectory(double xpole, double ypole) {
-        PathConstraints trajectoryConstraints =
-                new PathConstraints(Constants.Auto.MAX_SPEED, Constants.Auto.MAX_ACCEL);
-        PathPlannerTrajectory trajectory =
-                PathPlanner.generatePath(trajectoryConstraints, generatePointList(xpole, ypole));
-        return trajectory;
-    }
+  public PathPlannerTrajectory generateTrajectory(double xpole, double ypole) {
+    PathConstraints trajectoryConstraints =
+        new PathConstraints(Constants.Auto.MAX_SPEED, Constants.Auto.MAX_ACCEL);
+    PathPlannerTrajectory trajectory =
+        PathPlanner.generatePath(trajectoryConstraints, generatePointList(xpole, ypole));
+    return trajectory;
+  }
 
-    public Command align(double xpole, double ypole) {
-        PathPlannerTrajectory trajectory = generateTrajectory(xpole, ypole);
-        return drive.follow(trajectory, false, false);
-    }
+  public Command align(double xpole, double ypole) {
+    PathPlannerTrajectory trajectory = generateTrajectory(xpole, ypole);
+    return drive.follow(trajectory, false, false);
+  }
 }

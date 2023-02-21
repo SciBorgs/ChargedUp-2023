@@ -23,63 +23,63 @@ import org.sciborgs1155.robot.subsystems.Intake;
  */
 public class RobotContainer {
 
-    @Log private final Visualizer visualizer = new Visualizer();
-    private final Vision vision = new Vision();
+  @Log private final Visualizer visualizer = new Visualizer();
+  private final Vision vision = new Vision();
 
-    // The robot's subsystems and commands are defined here...
-    private final Drive drive = new Drive(vision);
-    private final Arm arm = new Arm(visualizer);
-    private final Elevator elevator = new Elevator(visualizer);
-    private final Intake intake = new Intake();
+  // The robot's subsystems and commands are defined here...
+  private final Drive drive = new Drive(vision);
+  private final Arm arm = new Arm(visualizer);
+  private final Elevator elevator = new Elevator(visualizer);
+  private final Intake intake = new Intake();
 
-    // Replace with CommandPS4Controller or CommandJoystick if needed
-    private final CommandXboxController xbox = new CommandXboxController(OI.XBOX);
-    private final CommandJoystick leftJoystick = new CommandJoystick(OI.LEFT_STICK);
-    private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
+  // Replace with CommandPS4Controller or CommandJoystick if needed
+  private final CommandXboxController xbox = new CommandXboxController(OI.XBOX);
+  private final CommandJoystick leftJoystick = new CommandJoystick(OI.LEFT_STICK);
+  private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
 
-    // Autos
-    @Log private final Autos autos = new Autos(drive, vision);
+  // Autos
+  @Log private final Autos autos = new Autos(drive, vision);
 
-    /** The container for the robot. Contains subsystems, OI devices, and commands. */
-    public RobotContainer() {
-        // Configure the oblog logger
-        Logger.configureLoggingAndConfig(this, false);
-        // Configure the trigger bindings
-        configureBindings();
-        // Configure subsystem default commands
-        configureSubsystemDefaults();
-    }
+  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  public RobotContainer() {
+    // Configure the oblog logger
+    Logger.configureLoggingAndConfig(this, false);
+    // Configure the trigger bindings
+    configureBindings();
+    // Configure subsystem default commands
+    configureSubsystemDefaults();
+  }
 
-    private void configureSubsystemDefaults() {
-        drive.setDefaultCommand(drive.drive(leftJoystick, rightJoystick, true));
-    }
+  private void configureSubsystemDefaults() {
+    drive.setDefaultCommand(drive.drive(leftJoystick, rightJoystick, true));
+  }
 
-    /**
-     * Use this method to define your trigger->command mappings. Triggers can be created via the
-     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-     * predicate, or via the named factories in {@link
-     * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-     * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-     * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-     * joysticks}.
-     */
-    private void configureBindings() {
-        // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-        // new Trigger(m_exampleSubsystem::exampleCondition)
-        // .onTrue(new ExampleCommand(m_exampleSubsystem));
+  /**
+   * Use this method to define your trigger->command mappings. Triggers can be created via the
+   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
+   * predicate, or via the named factories in {@link
+   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
+   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
+   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
+   * joysticks}.
+   */
+  private void configureBindings() {
+    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+    // new Trigger(m_exampleSubsystem::exampleCondition)
+    // .onTrue(new ExampleCommand(m_exampleSubsystem));
 
-        // Schedule `exampleMethodCommand` when the Xbox controller's B button is
-        // pressed,
-        // cancelling on release.
-        // xbox.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
-    }
+    // Schedule `exampleMethodCommand` when the Xbox controller's B button is
+    // pressed,
+    // cancelling on release.
+    // xbox.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+  }
 
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
-    public Command getAutonomousCommand() {
-        return autos.get();
-    }
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
+  public Command getAutonomousCommand() {
+    return autos.get();
+  }
 }

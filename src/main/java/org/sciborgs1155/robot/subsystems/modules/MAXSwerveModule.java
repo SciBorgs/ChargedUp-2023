@@ -17,118 +17,118 @@ import org.sciborgs1155.robot.Constants.Motors;
 
 /** Class to encapsulate a rev max swerve module */
 public class MAXSwerveModule implements SwerveModule {
-    private final CANSparkMax driveMotor; // Regular Neo
-    private final CANSparkMax turnMotor; // Neo 550
+  private final CANSparkMax driveMotor; // Regular Neo
+  private final CANSparkMax turnMotor; // Neo 550
 
-    private final RelativeEncoder driveEncoder;
-    private final AbsoluteEncoder turningEncoder;
+  private final RelativeEncoder driveEncoder;
+  private final AbsoluteEncoder turningEncoder;
 
-    private final SparkMaxPIDController driveFeedback;
-    private final SparkMaxPIDController turnFeedback;
+  private final SparkMaxPIDController driveFeedback;
+  private final SparkMaxPIDController turnFeedback;
 
-    private final SimpleMotorFeedforward driveFeedforward =
-            new SimpleMotorFeedforward(Driving.kS, Driving.kV, Driving.kA);
+  private final SimpleMotorFeedforward driveFeedforward =
+      new SimpleMotorFeedforward(Driving.kS, Driving.kV, Driving.kA);
 
-    private final Rotation2d angularOffset;
+  private final Rotation2d angularOffset;
 
-    private SwerveModuleState setpoint;
+  private SwerveModuleState setpoint;
 
-    /**
-     * Constructs a SwerveModule for rev's MAX Swerve.
-     *
-     * @param drivePort drive motor port
-     * @param turnPort turning motor port
-     * @param angularOffset offset from drivetrain
-     */
-    public MAXSwerveModule(int drivePort, int turnPort, double angularOffset) {
-        driveMotor = Motors.DRIVE.build(MotorType.kBrushless, drivePort);
-        turnMotor = Motors.TURN.build(MotorType.kBrushless, turnPort);
+  /**
+   * Constructs a SwerveModule for rev's MAX Swerve.
+   *
+   * @param drivePort drive motor port
+   * @param turnPort turning motor port
+   * @param angularOffset offset from drivetrain
+   */
+  public MAXSwerveModule(int drivePort, int turnPort, double angularOffset) {
+    driveMotor = Motors.DRIVE.build(MotorType.kBrushless, drivePort);
+    turnMotor = Motors.TURN.build(MotorType.kBrushless, turnPort);
 
-        driveEncoder = driveMotor.getEncoder();
-        turningEncoder = turnMotor.getAbsoluteEncoder(Type.kDutyCycle);
-        driveFeedback = driveMotor.getPIDController();
-        turnFeedback = turnMotor.getPIDController();
-        driveFeedback.setFeedbackDevice(driveEncoder);
-        turnFeedback.setFeedbackDevice(turningEncoder);
+    driveEncoder = driveMotor.getEncoder();
+    turningEncoder = turnMotor.getAbsoluteEncoder(Type.kDutyCycle);
+    driveFeedback = driveMotor.getPIDController();
+    turnFeedback = turnMotor.getPIDController();
+    driveFeedback.setFeedbackDevice(driveEncoder);
+    turnFeedback.setFeedbackDevice(turningEncoder);
 
-        turningEncoder.setInverted(Turning.ENCODER_INVERTED);
+    turningEncoder.setInverted(Turning.ENCODER_INVERTED);
 
-        // encoder ratios
-        driveEncoder.setPositionConversionFactor(Driving.ENCODER_POSITION_FACTOR);
-        driveEncoder.setVelocityConversionFactor(Driving.ENCODER_VELOCITY_FACTOR);
+    // encoder ratios
+    driveEncoder.setPositionConversionFactor(Driving.ENCODER_POSITION_FACTOR);
+    driveEncoder.setVelocityConversionFactor(Driving.ENCODER_VELOCITY_FACTOR);
 
-        driveFeedback.setP(Driving.kP);
-        driveFeedback.setI(Driving.kI);
-        driveFeedback.setD(Driving.kD);
+    driveFeedback.setP(Driving.kP);
+    driveFeedback.setI(Driving.kI);
+    driveFeedback.setD(Driving.kD);
 
-        turningEncoder.setPositionConversionFactor(Turning.ENCODER_POSITION_FACTOR);
-        turningEncoder.setVelocityConversionFactor(Turning.ENCODER_VELOCITY_FACTOR);
+    turningEncoder.setPositionConversionFactor(Turning.ENCODER_POSITION_FACTOR);
+    turningEncoder.setVelocityConversionFactor(Turning.ENCODER_VELOCITY_FACTOR);
 
-        // set up continuous input for turning
-        turnFeedback.setPositionPIDWrappingEnabled(true);
-        turnFeedback.setPositionPIDWrappingMinInput(Turning.MIN_INPUT);
-        turnFeedback.setPositionPIDWrappingMaxInput(Turning.MAX_INPUT);
+    // set up continuous input for turning
+    turnFeedback.setPositionPIDWrappingEnabled(true);
+    turnFeedback.setPositionPIDWrappingMinInput(Turning.MIN_INPUT);
+    turnFeedback.setPositionPIDWrappingMaxInput(Turning.MAX_INPUT);
 
-        turnFeedback.setP(Turning.kP);
-        turnFeedback.setI(Turning.kI);
-        turnFeedback.setD(Turning.kD);
+    turnFeedback.setP(Turning.kP);
+    turnFeedback.setI(Turning.kI);
+    turnFeedback.setD(Turning.kD);
 
-        driveMotor.burnFlash();
-        turnMotor.burnFlash();
+    driveMotor.burnFlash();
+    turnMotor.burnFlash();
 
-        driveEncoder.setPosition(0);
-        this.angularOffset = Rotation2d.fromRadians(angularOffset);
-        setpoint = new SwerveModuleState(0, Rotation2d.fromRadians(turningEncoder.getPosition()));
-    }
+    driveEncoder.setPosition(0);
+    this.angularOffset = Rotation2d.fromRadians(angularOffset);
+    setpoint = new SwerveModuleState(0, Rotation2d.fromRadians(turningEncoder.getPosition()));
+  }
 
-    /**
-     * Returns the current state of the module.
-     *
-     * @return The current state of the module.
-     */
-    @Override
-    public SwerveModuleState getState() {
-        return new SwerveModuleState(
-                driveEncoder.getVelocity(),
-                Rotation2d.fromRadians(turningEncoder.getPosition()).minus(angularOffset));
-    }
+  /**
+   * Returns the current state of the module.
+   *
+   * @return The current state of the module.
+   */
+  @Override
+  public SwerveModuleState getState() {
+    return new SwerveModuleState(
+        driveEncoder.getVelocity(),
+        Rotation2d.fromRadians(turningEncoder.getPosition()).minus(angularOffset));
+  }
 
-    @Override
-    public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(
-                driveEncoder.getPosition(),
-                Rotation2d.fromRadians(turningEncoder.getPosition()).minus(angularOffset));
-    }
+  @Override
+  public SwerveModulePosition getPosition() {
+    return new SwerveModulePosition(
+        driveEncoder.getPosition(),
+        Rotation2d.fromRadians(turningEncoder.getPosition()).minus(angularOffset));
+  }
 
-    /**
-     * Sets the desired state for the module.
-     *
-     * @param desiredState Desired state with speed and angle.
-     */
-    @Override
-    public void setDesiredState(SwerveModuleState desiredState) {
-        SwerveModuleState correctedDesiredState = new SwerveModuleState();
-        correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
-        correctedDesiredState.angle = desiredState.angle.plus(angularOffset);
-        // Optimize the reference state to avoid spinning further than 90 degrees
-        setpoint =
-                SwerveModuleState.optimize(
-                        correctedDesiredState, Rotation2d.fromRadians(turningEncoder.getPosition()));
+  /**
+   * Sets the desired state for the module.
+   *
+   * @param desiredState Desired state with speed and angle.
+   */
+  @Override
+  public void setDesiredState(SwerveModuleState desiredState) {
+    SwerveModuleState correctedDesiredState = new SwerveModuleState();
+    correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
+    correctedDesiredState.angle = desiredState.angle.plus(angularOffset);
+    // Optimize the reference state to avoid spinning further than 90 degrees
+    setpoint =
+        SwerveModuleState.optimize(
+            correctedDesiredState, Rotation2d.fromRadians(turningEncoder.getPosition()));
 
-        // setpoint = desiredState;
-        double driveFF = driveFeedforward.calculate(setpoint.speedMetersPerSecond);
-        driveFeedback.setReference(setpoint.speedMetersPerSecond, ControlType.kVelocity, 0, driveFF);
-        turnFeedback.setReference(setpoint.angle.getRadians(), ControlType.kPosition);
-    }
+    // setpoint = desiredState;
+    double driveFF = driveFeedforward.calculate(setpoint.speedMetersPerSecond);
+    driveFeedback.setReference(setpoint.speedMetersPerSecond, ControlType.kVelocity, 0, driveFF);
+    turnFeedback.setReference(setpoint.angle.getRadians(), ControlType.kPosition);
+  }
 
-    @Override
-    public SwerveModuleState getDesiredState() {
-        return setpoint;
-    }
+  @Override
+  public SwerveModuleState getDesiredState() {
+    return setpoint;
+  }
 
-    /** Zeroes all the SwerveModule encoders. */
-    @Override
-    public void resetEncoders() {
-        driveEncoder.setPosition(0);
-    }
+  /** Zeroes all the SwerveModule encoders. */
+  @Override
+  public void resetEncoders() {
+    driveEncoder.setPosition(0);
+  }
 }
