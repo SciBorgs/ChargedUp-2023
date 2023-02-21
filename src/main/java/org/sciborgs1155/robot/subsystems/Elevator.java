@@ -27,113 +27,113 @@ import org.sciborgs1155.robot.Constants.Motors;
 
 public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
-  @Log(name = "applied output", methodName = "getAppliedOutput")
-  private final CANSparkMax lead = Motors.ELEVATOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
+    @Log(name = "applied output", methodName = "getAppliedOutput")
+    private final CANSparkMax lead = Motors.ELEVATOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
 
-  private final CANSparkMax left = Motors.ELEVATOR.build(MotorType.kBrushless, LEFT_MOTOR);
-  private final CANSparkMax right = Motors.ELEVATOR.build(MotorType.kBrushless, RIGHT_MOTOR);
+    private final CANSparkMax left = Motors.ELEVATOR.build(MotorType.kBrushless, LEFT_MOTOR);
+    private final CANSparkMax right = Motors.ELEVATOR.build(MotorType.kBrushless, RIGHT_MOTOR);
 
-  @Log(name = "velocity", methodName = "getVelocity")
-  private final RelativeEncoder encoder = lead.getAlternateEncoder(Constants.THROUGH_BORE_CPR);
+    @Log(name = "velocity", methodName = "getVelocity")
+    private final RelativeEncoder encoder = lead.getAlternateEncoder(Constants.THROUGH_BORE_CPR);
 
-  private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
-  @Log private final ProfiledPIDController pid = new ProfiledPIDController(kP, kI, kD, CONSTRAINTS);
+    private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
+    @Log private final ProfiledPIDController pid = new ProfiledPIDController(kP, kI, kD, CONSTRAINTS);
 
-  @Log private final DigitalInput limitSwitchOne = new DigitalInput(LIMIT_SWITCH_PORTS[0]);
-  @Log private final DigitalInput limitSwitchTwo = new DigitalInput(LIMIT_SWITCH_PORTS[1]);
+    @Log private final DigitalInput limitSwitchOne = new DigitalInput(LIMIT_SWITCH_PORTS[0]);
+    @Log private final DigitalInput limitSwitchTwo = new DigitalInput(LIMIT_SWITCH_PORTS[1]);
 
-  private final DIOSim limitOneSim = new DIOSim(limitSwitchOne);
-  private final DIOSim limitTwoSim = new DIOSim(limitSwitchTwo);
+    private final DIOSim limitOneSim = new DIOSim(limitSwitchOne);
+    private final DIOSim limitTwoSim = new DIOSim(limitSwitchTwo);
 
-  @Log(name = "acceleration", methodName = "getLastOutput")
-  private final Derivative accel = new Derivative();
+    @Log(name = "acceleration", methodName = "getLastOutput")
+    private final Derivative accel = new Derivative();
 
-  // simulation
-  private final ElevatorSim sim =
-      new ElevatorSim(
-          DCMotor.getNEO(3),
-          10,
-          4,
-          Units.inchesToMeters(2),
-          Dimensions.ELEVATOR_MIN_HEIGHT,
-          Dimensions.ELEVATOR_MAX_HEIGHT,
-          true);
+    // simulation
+    private final ElevatorSim sim =
+            new ElevatorSim(
+                    DCMotor.getNEO(3),
+                    10,
+                    4,
+                    Units.inchesToMeters(2),
+                    Dimensions.ELEVATOR_MIN_HEIGHT,
+                    Dimensions.ELEVATOR_MAX_HEIGHT,
+                    true);
 
-  private final Visualizer visualizer;
+    private final Visualizer visualizer;
 
-  public Elevator(Visualizer visualizer) {
-    left.follow(lead);
-    right.follow(lead);
+    public Elevator(Visualizer visualizer) {
+        left.follow(lead);
+        right.follow(lead);
 
-    this.visualizer = visualizer;
-  }
+        this.visualizer = visualizer;
+    }
 
-  /** Elevator is at goal */
-  @Log(name = "at goal")
-  public boolean atGoal() {
-    return pid.atGoal();
-  }
+    /** Elevator is at goal */
+    @Log(name = "at goal")
+    public boolean atGoal() {
+        return pid.atGoal();
+    }
 
-  /** Elevator height from the base, in meters */
-  @Log(name = "current height")
-  public double getHeight() {
-    return encoder.getPosition();
-  }
+    /** Elevator height from the base, in meters */
+    @Log(name = "current height")
+    public double getHeight() {
+        return encoder.getPosition();
+    }
 
-  /** Elevator goal from the base, in meters */
-  @Log(name = "goal height")
-  public double getGoal() {
-    return pid.getGoal().position;
-  }
+    /** Elevator goal from the base, in meters */
+    @Log(name = "goal height")
+    public double getGoal() {
+        return pid.getGoal().position;
+    }
 
-  /** If a limit switch is triggered */
-  @Log(name = "hitting")
-  public boolean isHitting() {
-    return limitSwitchOne.get() || limitSwitchOne.get();
-  }
+    /** If a limit switch is triggered */
+    @Log(name = "hitting")
+    public boolean isHitting() {
+        return limitSwitchOne.get() || limitSwitchOne.get();
+    }
 
-  /** Elevator goal from the base, in meters */
-  public Command setGoal(double height) {
-    return runOnce(
-        () ->
-            pid.setGoal(
-                MathUtil.clamp(
-                    height, Dimensions.ELEVATOR_MIN_HEIGHT, Dimensions.ELEVATOR_MAX_HEIGHT)));
-  }
+    /** Elevator goal from the base, in meters */
+    public Command setGoal(double height) {
+        return runOnce(
+                () ->
+                        pid.setGoal(
+                                MathUtil.clamp(
+                                        height, Dimensions.ELEVATOR_MIN_HEIGHT, Dimensions.ELEVATOR_MAX_HEIGHT)));
+    }
 
-  /** Runs elevator to goal height, from the base in meters */
-  public Command runToGoal(double height) {
-    return setGoal(height).andThen(Commands.waitUntil(this::atGoal));
-  }
+    /** Runs elevator to goal height, from the base in meters */
+    public Command runToGoal(double height) {
+        return setGoal(height).andThen(Commands.waitUntil(this::atGoal));
+    }
 
-  @Override
-  public void periodic() {
-    double pidOutput = pid.calculate(encoder.getPosition());
-    double ffOutput =
-        ff.calculate(pid.getSetpoint().velocity, accel.calculate(pid.getSetpoint().velocity));
+    @Override
+    public void periodic() {
+        double pidOutput = pid.calculate(encoder.getPosition());
+        double ffOutput =
+                ff.calculate(pid.getSetpoint().velocity, accel.calculate(pid.getSetpoint().velocity));
 
-    lead.setVoltage(isHitting() ? 0 : pidOutput + ffOutput);
+        lead.setVoltage(isHitting() ? 0 : pidOutput + ffOutput);
 
-    visualizer.setElevatorHeight(encoder.getPosition());
-  }
+        visualizer.setElevatorHeight(encoder.getPosition());
+    }
 
-  @Override
-  public void simulationPeriodic() {
-    sim.setInputVoltage(lead.getAppliedOutput());
-    sim.update(Constants.RATE);
-    encoder.setPosition(sim.getPositionMeters());
+    @Override
+    public void simulationPeriodic() {
+        sim.setInputVoltage(lead.getAppliedOutput());
+        sim.update(Constants.RATE);
+        encoder.setPosition(sim.getPositionMeters());
 
-    limitOneSim.setValue(false);
-    limitTwoSim.setValue(false);
-  }
+        limitOneSim.setValue(false);
+        limitTwoSim.setValue(false);
+    }
 
-  @Override
-  public void close() {
-    lead.close();
-    left.close();
-    right.close();
+    @Override
+    public void close() {
+        lead.close();
+        left.close();
+        right.close();
 
-    limitSwitchOne.close();
-    limitSwitchTwo.close();
-  }
+        limitSwitchOne.close();
+        limitSwitchTwo.close();
+    }
 }
