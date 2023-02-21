@@ -58,9 +58,8 @@ public interface Elevator extends Sendable, AutoCloseable {
 
       encoder = lead.getAlternateEncoder(Constants.THROUGH_BORE_CPR);
 
-      encoder.setPositionConversionFactor(
-          ElevatorConstants.GEAR_RATIO * ElevatorConstants.MOVEMENTPERSPIN);
-      encoder.setVelocityConversionFactor(1); // TODO f
+      encoder.setPositionConversionFactor(ElevatorConstants.ENCODER_POSITION_FACTOR);
+      encoder.setVelocityConversionFactor(ElevatorConstants.ENCODER_VELOCITY_FACTOR);
 
       lead.burnFlash();
       left.burnFlash();

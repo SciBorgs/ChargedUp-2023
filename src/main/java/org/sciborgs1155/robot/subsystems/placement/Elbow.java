@@ -51,9 +51,8 @@ public interface Elbow extends Sendable, AutoCloseable {
 
       encoder = lead.getAlternateEncoder(Constants.THROUGH_BORE_CPR);
 
-      encoder.setPositionConversionFactor(
-          ElbowConstants.GEAR_RATIO * ElbowConstants.MOVEMENT_PER_SPIN);
-      encoder.setVelocityConversionFactor(ElbowConstants.GEAR_RATIO);
+      encoder.setPositionConversionFactor(ElbowConstants.ENCODER_POSITION_FACTOR);
+      encoder.setVelocityConversionFactor(ElbowConstants.ENCODER_VELOCITY_FACTOR);
 
       lead.burnFlash();
       left.burnFlash();

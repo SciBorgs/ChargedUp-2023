@@ -141,12 +141,13 @@ public final class Constants {
       public static final double MAX_ACCEL = 3; // radians / s^2
       public static final TrapezoidProfile.Constraints CONSTRAINTS =
           new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
-
-      // TODO replace with physically correct values
-      public static final double GEAR_RATIO = 1.0;
     }
 
     public static final class ElbowConstants {
+      public static final double GEARING = 1.0;
+      public static final double ENCODER_POSITION_FACTOR = GEARING * 2.0 * Math.PI;
+      public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0;
+
       public static final double kP = 10;
       public static final double kI = 0;
       public static final double kD = 5;
@@ -166,6 +167,11 @@ public final class Constants {
     }
 
     public static final class ElevatorConstants {
+      public static final double GEARING = 1.0 / 6.0; // rot
+      public static final double RADIUS = 1;
+      public static final double ENCODER_POSITION_FACTOR = GEARING * 2.0 * Math.PI * RADIUS; // m
+      public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0; // m/s
+
       public static final double MAX_SPEED = 4; // m/s
       public static final double MAX_ACCEL = 3; // m/s^2
       public static final double kP = 5;
@@ -178,9 +184,6 @@ public final class Constants {
       public static final double kA = 0;
       public static final TrapezoidProfile.Constraints CONSTRAINTS =
           new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ACCEL);
-      public static final double GEAR_RATIO = 1.0;
-      public static final double MOVEMENTPERSPIN =
-          1.1938 / 6.0; // m / (50 rotations of motor) wtf is this
     }
   }
 
