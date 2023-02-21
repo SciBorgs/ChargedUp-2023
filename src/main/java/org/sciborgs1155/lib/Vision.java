@@ -120,11 +120,8 @@ public class Vision {
     return data;
   }
 
-  /* TODO refactor
-   * Determines if and which tags are in view (AdvantageScope sim)
-   ** When we get cam positions, cam override allows rays to originate from their real positions, not just center (nvm it cant even do this as it is)
-   */
-  public AprilTag[] determineSeenTags(PhotonCamera cam, AprilTagFieldLayout layout) {
+  // Determines which tags are in view, if any (for advantagescope)
+  private AprilTag[] determineSeenTags(PhotonCamera cam, AprilTagFieldLayout layout) {
     ArrayList<AprilTag> tags = new ArrayList<>();
 
     if (cam.getLatestResult().hasTargets()) {
@@ -145,6 +142,7 @@ public class Vision {
     SmartDashboard.putNumberArray(
         "visible back tags", createObjects(determineSeenTags(backCam, layout)));
   }
+
   /* Gets estimated pose from vision measurements */
   public EstimatedRobotPose[] getPoseEstimates(Pose2d lastPose) {
     frontEstimator.setReferencePose(lastPose);
