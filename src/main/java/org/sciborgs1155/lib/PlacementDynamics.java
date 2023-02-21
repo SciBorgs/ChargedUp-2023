@@ -8,7 +8,7 @@ import org.ejml.dense.row.CommonOps_DDRM;
  *
  * <p>Motor model is from Team 449.
  */
-public class PlacementKinematics {
+public class PlacementDynamics {
 
   private static final double g = 9.80665;
 
@@ -21,7 +21,7 @@ public class PlacementKinematics {
 
   record MotorConstants(double G, double N, double K_f) {}
 
-  public PlacementKinematics(
+  public PlacementDynamics(
       ArmConstants arm,
       ArmConstants claw,
       double cascMass,
@@ -149,17 +149,10 @@ public class PlacementKinematics {
     private Feedforward() {}
 
     public MotorOutputs calculate(State state, Configuration desiredAcceleration) {
-      DMatrixRMaj inertial = new DMatrixRMaj(3, 1),
-          coriolis = new DMatrixRMaj(3, 1),
-          resistive = new DMatrixRMaj(3, 1);
-      CommonOps_DDRM.mult(M(state.pos), desiredAcceleration.toVector(), inertial);
-      CommonOps_DDRM.mult(C(state), state.vel.toVector(), coriolis);
-      CommonOps_DDRM.mult(K_resistive, state.vel.toVector(), resistive);
-
       DMatrixRMaj applied = gravity(state.pos); // equilibrium torques/forces
-      CommonOps_DDRM.addEquals(applied, inertial);
-      CommonOps_DDRM.addEquals(applied, coriolis);
-      CommonOps_DDRM.addEquals(applied, resistive);
+      CommonOps_DDRM.multAdd(M(state.pos), desiredAcceleration.toVector(), applied);
+      CommonOps_DDRM.multAdd(C(state), state.vel.toVector(), applied);
+      CommonOps_DDRM.multAdd(K_resistive, state.vel.toVector(), applied);
 
       DMatrixRMaj voltages = new DMatrixRMaj(3, 1);
       CommonOps_DDRM.mult(B_inv, applied, voltages);
@@ -180,25 +173,22 @@ public class PlacementKinematics {
       this.state = state;
     }
 
+    public State getState() {
+      return this.state;
+    }
+
     void update(MotorOutputs inputs, double dt) {
-      DMatrixRMaj dVelocity = new DMatrixRMaj(3, 1);
-
-      DMatrixRMaj coriolis = new DMatrixRMaj(3, 1), resistive = new DMatrixRMaj(3, 1);
-      CommonOps_DDRM.mult(C(state), state.vel.toVector(), coriolis);
-      CommonOps_DDRM.mult(K_resistive, state.vel.toVector(), resistive);
-
-      DMatrixRMaj inertia = gravity(state.pos); // equilibrium torques/forces
-      CommonOps_DDRM.addEquals(inertia, coriolis);
-      CommonOps_DDRM.addEquals(inertia, resistive);
-
+      // Mq.. = Bu - Text - Cq. - Tg
       DMatrixRMaj force = new DMatrixRMaj(3, 1);
-      CommonOps_DDRM.mult(B, inputs.toVector(), force);
-      CommonOps_DDRM.subtractEquals(force, inertia);
+      CommonOps_DDRM.multAdd(B, inputs.toVector(), force);
+      CommonOps_DDRM.subtractEquals(force, gravity(state.pos));
+      CommonOps_DDRM.multAdd(-1, C(state), state.vel.toVector(), force);
+      CommonOps_DDRM.multAdd(-1, K_resistive, state.vel.toVector(), force);
 
-      DMatrixRMaj M_inv = M(state.pos);
-      CommonOps_DDRM.invert(M_inv, M_inv);
-      CommonOps_DDRM.mult(M_inv, force, dVelocity);
-      CommonOps_DDRM.scale(dt, dVelocity);
+      DMatrixRMaj velocity = state.vel.toVector();
+      DMatrixRMaj M_inv = new DMatrixRMaj(3, 3);
+      CommonOps_DDRM.invertSPD(M(state.pos), M_inv);
+      CommonOps_DDRM.multAdd(dt, M_inv, force, velocity);
 
       state =
           new State(
@@ -206,14 +196,7 @@ public class PlacementKinematics {
                   state.pos.angleArm + dt * state.vel.angleArm,
                   state.pos.angleClaw + dt * state.vel.angleClaw,
                   state.pos.height + dt * state.vel.height),
-              new Configuration(
-                  dVelocity.get(0, 0) + state.vel.angleArm,
-                  dVelocity.get(1, 0) + state.vel.angleClaw,
-                  dVelocity.get(2, 0) + state.vel.height));
-    }
-
-    public State getState() {
-      return this.state;
+              Configuration.fromVector(velocity));
     }
   }
 

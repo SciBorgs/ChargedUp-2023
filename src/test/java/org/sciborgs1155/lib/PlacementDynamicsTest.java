@@ -10,16 +10,16 @@ import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.sciborgs1155.lib.PlacementKinematics.*;
+import org.sciborgs1155.lib.PlacementDynamics.*;
 import org.sciborgs1155.robot.Constants.Arm.ElbowConstants;
 import org.sciborgs1155.robot.Constants.Arm.WristConstants;
 import org.sciborgs1155.robot.Constants.Elevator;
 
-public class PlacementKinematicsTest {
+public class PlacementDynamicsTest {
 
   public static final DCMotor base = DCMotor.getNeo550(1);
-  public static final PlacementKinematics model =
-      new PlacementKinematics(
+  public static final PlacementDynamics model =
+      new PlacementDynamics(
           new ArmConstants(
               Dimensions.FOREARM_MASS,
               Dimensions.FOREARM_MOI,
