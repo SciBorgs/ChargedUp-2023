@@ -73,10 +73,19 @@ public final class Constants {
 
     public static final double CLAW_MASS = 4.4;
     public static final double FOREARM_MASS = 4.2;
-    public static final double R1 = 0;
+
+    // TODO made up value
+    public static final double ELEVATOR_MASS = 0.5;
+
+    // TODO measure these to physically correct values
+    public static final double FOREARM_RADIUS = FOREARM_LENGTH / 2;
     // Distance from base pivot to center of mass of the elbow
-    public static final double R2 = 0;
+    public static final double CLAW_RADIUS = CLAW_LENGTH / 2;
     // Distance from the first joint to center of mass of the claw
+
+    public static final double FOREARM_MOI =
+        1. / 12 * FOREARM_MASS * FOREARM_LENGTH * FOREARM_LENGTH;
+    public static final double CLAW_MOI = 1. / 12 * CLAW_MASS * CLAW_LENGTH * CLAW_LENGTH;
 
     public static final double TRACK_WIDTH = Units.inchesToMeters(17);
     // Distance between centers of right and left wheels on robot
@@ -131,6 +140,9 @@ public final class Constants {
       public static final double MAX_ACCEL = 3; // radians / s^2
       public static final TrapezoidProfile.Constraints CONSTRAINTS =
           new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
+
+      // TODO replace with physically correct values
+      public static final double GEAR_RATIO = 1.0;
     }
 
     public static final class ElbowConstants {

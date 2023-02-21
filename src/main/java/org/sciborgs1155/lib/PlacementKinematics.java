@@ -1,8 +1,7 @@
 package org.sciborgs1155.lib;
 
-import org.ejml.data.DMatrix3;
-import org.ejml.data.DMatrix3x3;
-import org.ejml.dense.fixed.CommonOps_DDF3;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
  * Kinematic model for a double-jointed arm on an elevator.
@@ -16,7 +15,7 @@ public class PlacementKinematics {
   private final ArmConstants arm, claw;
   private final double cascMass;
 
-  private final DMatrix3x3 B, B_inv, K_resistive, M_diag;
+  private final DMatrixRMaj B, B_inv, K_resistive, M_diag;
 
   record ArmConstants(double mass, double moi, double length, double radius) {}
 
@@ -37,44 +36,50 @@ public class PlacementKinematics {
     this.cascMass = cascMass;
 
     // Feedthrough
-    B = new DMatrix3x3();
-    CommonOps_DDF3.mult(
-        diag(armMotor.G, clawMotor.G, cascMotor.G), diag(armMotor.N, clawMotor.N, cascMotor.N), B);
-    CommonOps_DDF3.scale(K_t / R, B);
+    B = new DMatrixRMaj(3, 3);
+    CommonOps_DDRM.mult(
+        CommonOps_DDRM.diag(armMotor.G, clawMotor.G, cascMotor.G),
+        CommonOps_DDRM.diag(armMotor.N, clawMotor.N, cascMotor.N),
+        B);
+    CommonOps_DDRM.scale(K_t / R, B);
 
-    B_inv = new DMatrix3x3();
-    CommonOps_DDF3.invert(B, B_inv);
+    B_inv = B.createLike();
+    CommonOps_DDRM.invert(B, B_inv);
 
     // backemf + friction
-    K_resistive = new DMatrix3x3();
-    CommonOps_DDF3.mult(diag(armMotor.G, clawMotor.G, cascMotor.G), B, K_resistive);
-    CommonOps_DDF3.scale(1 / K_v, K_resistive);
-    CommonOps_DDF3.addEquals(K_resistive, diag(armMotor.K_f, clawMotor.K_f, cascMotor.K_f));
+    K_resistive = new DMatrixRMaj(3, 3);
+    CommonOps_DDRM.mult(CommonOps_DDRM.diag(armMotor.G, clawMotor.G, cascMotor.G), B, K_resistive);
+    CommonOps_DDRM.scale(1 / K_v, K_resistive);
+    CommonOps_DDRM.addEquals(
+        K_resistive, CommonOps_DDRM.diag(armMotor.K_f, clawMotor.K_f, cascMotor.K_f));
 
     M_diag =
-        diag(
+        CommonOps_DDRM.diag(
             arm.moi + arm.mass * arm.radius * arm.radius + claw.mass * arm.length * arm.length,
             claw.moi + claw.mass * claw.radius * claw.radius,
             arm.mass + claw.mass + cascMass);
   }
 
   public record Configuration(double angleArm, double angleClaw, double height) {
-    DMatrix3 toVector() {
-      return new DMatrix3(angleArm, angleClaw, height);
+    DMatrixRMaj toVector() {
+      return new DMatrixRMaj(new double[] {angleArm, angleClaw, height});
     }
 
-    static Configuration fromVector(DMatrix3 vector) {
-      return new Configuration(vector.a1, vector.a2, vector.a3);
+    static Configuration fromVector(DMatrixRMaj vector) {
+      return new Configuration(vector.get(0, 0), vector.get(1, 0), vector.get(2, 0));
     }
   }
 
   public record State(Configuration pos, Configuration vel) {}
 
-  private DMatrix3x3 M(Configuration pos) {
-    DMatrix3x3 M = new DMatrix3x3();
+  public DMatrixRMaj M(Configuration pos) {
+    DMatrixRMaj M = new DMatrixRMaj(3, 3);
 
-    DMatrix3x3 M_LU =
-        new DMatrix3x3(
+    DMatrixRMaj M_LU =
+        new DMatrixRMaj(
+            3,
+            3,
+            true,
             0,
             0,
             0,
@@ -85,15 +90,15 @@ public class PlacementKinematics {
             claw.radius * claw.mass * Math.cos(pos.angleClaw),
             0);
 
-    CommonOps_DDF3.transpose(M_LU, M);
-    CommonOps_DDF3.addEquals(M, M_LU);
-    CommonOps_DDF3.addEquals(M, M_diag);
+    CommonOps_DDRM.transpose(M_LU, M);
+    CommonOps_DDRM.addEquals(M, M_LU);
+    CommonOps_DDRM.addEquals(M, M_diag);
 
     return M;
   }
 
-  private DMatrix3x3 C(State state) {
-    DMatrix3x3 C = new DMatrix3x3();
+  public DMatrixRMaj C(State state) {
+    DMatrixRMaj C = new DMatrixRMaj(3, 3);
     C.set(
         0,
         1,
@@ -120,32 +125,23 @@ public class PlacementKinematics {
     return C;
   }
 
-  private DMatrix3 gravity(State state) {
-    return new DMatrix3(
-        g * Math.cos(state.pos.angleArm) * (arm.length * claw.mass + arm.radius * arm.mass),
-        g * claw.radius * claw.mass * Math.cos(state.pos.angleClaw),
-        g * (arm.mass + claw.mass + cascMass));
-  }
-
-  // TODO move out to matrix util
-  private static DMatrix3x3 diag(double a11, double a22, double a33) {
-    return new DMatrix3x3(a11, 0, 0, 0, a22, 0, 0, 0, a33);
-  }
-
-  private DMatrix3 gravity(Configuration pos) {
-    return new DMatrix3(
+  private DMatrixRMaj gravity(Configuration pos) {
+    return new DMatrixRMaj(
+        3,
+        1,
+        true,
         g * Math.cos(pos.angleArm) * (arm.length * claw.mass + arm.radius * arm.mass),
         g * claw.radius * claw.mass * Math.cos(pos.angleClaw),
         g * (arm.mass + claw.mass + cascMass));
   }
 
   public record MotorOutputs(double voltageElevator, double voltageArm, double voltageClaw) {
-    public static MotorOutputs fromVector(DMatrix3 voltages) {
+    public static MotorOutputs fromVector(DMatrixRMaj voltages) {
       return new MotorOutputs(voltages.get(0, 0), voltages.get(1, 0), voltages.get(2, 0));
     }
 
-    public DMatrix3 toVector() {
-      return new DMatrix3(voltageElevator, voltageArm, voltageClaw);
+    public DMatrixRMaj toVector() {
+      return new DMatrixRMaj(new double[] {voltageElevator, voltageArm, voltageClaw});
     }
   }
 
@@ -153,18 +149,20 @@ public class PlacementKinematics {
     private Feedforward() {}
 
     public MotorOutputs calculate(State state, Configuration desiredAcceleration) {
-      DMatrix3 inertial = new DMatrix3(), coriolis = new DMatrix3(), resistive = new DMatrix3();
-      CommonOps_DDF3.mult(M(state.pos), desiredAcceleration.toVector(), inertial);
-      CommonOps_DDF3.mult(C(state), state.vel.toVector(), coriolis);
-      CommonOps_DDF3.mult(K_resistive, state.vel.toVector(), resistive);
+      DMatrixRMaj inertial = new DMatrixRMaj(3, 1),
+          coriolis = new DMatrixRMaj(3, 1),
+          resistive = new DMatrixRMaj(3, 1);
+      CommonOps_DDRM.mult(M(state.pos), desiredAcceleration.toVector(), inertial);
+      CommonOps_DDRM.mult(C(state), state.vel.toVector(), coriolis);
+      CommonOps_DDRM.mult(K_resistive, state.vel.toVector(), resistive);
 
-      DMatrix3 applied = gravity(state.pos); // equilibrium torques/forces
-      CommonOps_DDF3.addEquals(applied, inertial);
-      CommonOps_DDF3.addEquals(applied, coriolis);
-      CommonOps_DDF3.addEquals(applied, resistive);
+      DMatrixRMaj applied = gravity(state.pos); // equilibrium torques/forces
+      CommonOps_DDRM.addEquals(applied, inertial);
+      CommonOps_DDRM.addEquals(applied, coriolis);
+      CommonOps_DDRM.addEquals(applied, resistive);
 
-      DMatrix3 voltages = new DMatrix3();
-      CommonOps_DDF3.mult(B_inv, applied, voltages);
+      DMatrixRMaj voltages = new DMatrixRMaj(3, 1);
+      CommonOps_DDRM.mult(B_inv, applied, voltages);
       return MotorOutputs.fromVector(voltages);
     }
   }
@@ -174,7 +172,7 @@ public class PlacementKinematics {
   }
 
   class Simulation {
-    private State state;
+    private State state = new State(new Configuration(0, 0, 0), new Configuration(0, 0, 0));
 
     private Simulation() {}
 
@@ -183,24 +181,24 @@ public class PlacementKinematics {
     }
 
     void update(MotorOutputs inputs, double dt) {
-      DMatrix3 dVelocity = new DMatrix3();
+      DMatrixRMaj dVelocity = new DMatrixRMaj(3, 1);
 
-      DMatrix3 coriolis = new DMatrix3(), resistive = new DMatrix3();
-      CommonOps_DDF3.mult(C(state), state.vel.toVector(), coriolis);
-      CommonOps_DDF3.mult(K_resistive, state.vel.toVector(), resistive);
+      DMatrixRMaj coriolis = new DMatrixRMaj(3, 1), resistive = new DMatrixRMaj(3, 1);
+      CommonOps_DDRM.mult(C(state), state.vel.toVector(), coriolis);
+      CommonOps_DDRM.mult(K_resistive, state.vel.toVector(), resistive);
 
-      DMatrix3 inertia = gravity(state); // equilibrium torques/forces
-      CommonOps_DDF3.addEquals(inertia, coriolis);
-      CommonOps_DDF3.addEquals(inertia, resistive);
+      DMatrixRMaj inertia = gravity(state.pos); // equilibrium torques/forces
+      CommonOps_DDRM.addEquals(inertia, coriolis);
+      CommonOps_DDRM.addEquals(inertia, resistive);
 
-      DMatrix3 force = new DMatrix3();
-      CommonOps_DDF3.mult(B, inputs.toVector(), force);
-      CommonOps_DDF3.subtractEquals(force, inertia);
+      DMatrixRMaj force = new DMatrixRMaj(3, 1);
+      CommonOps_DDRM.mult(B, inputs.toVector(), force);
+      CommonOps_DDRM.subtractEquals(force, inertia);
 
-      DMatrix3x3 M_inv = M(state.pos);
-      CommonOps_DDF3.invert(M_inv, M_inv);
-      CommonOps_DDF3.mult(M_inv, force, dVelocity);
-      CommonOps_DDF3.scale(dt, dVelocity);
+      DMatrixRMaj M_inv = M(state.pos);
+      CommonOps_DDRM.invert(M_inv, M_inv);
+      CommonOps_DDRM.mult(M_inv, force, dVelocity);
+      CommonOps_DDRM.scale(dt, dVelocity);
 
       state =
           new State(
@@ -210,8 +208,12 @@ public class PlacementKinematics {
                   state.pos.height + dt * state.vel.height),
               new Configuration(
                   dVelocity.get(0, 0) + state.vel.angleArm,
-                  dVelocity.get(0, 0) + state.vel.angleClaw,
-                  dVelocity.get(0, 0) + state.vel.height));
+                  dVelocity.get(1, 0) + state.vel.angleClaw,
+                  dVelocity.get(2, 0) + state.vel.height));
+    }
+
+    public State getState() {
+      return this.state;
     }
   }
 

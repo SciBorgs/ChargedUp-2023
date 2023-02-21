@@ -43,12 +43,12 @@ public class Dynamics {
     tg.set(
         0,
         0,
-        ((Dimensions.FOREARM_MASS * Dimensions.R1
+        ((Dimensions.FOREARM_MASS * Dimensions.FOREARM_RADIUS
                     + Dimensions.CLAW_MASS * Dimensions.FOREARM_LENGTH)
                 * 9.81
                 * Math.cos(position.get(0, 0)))
             + Dimensions.CLAW_MASS
-                * Dimensions.R2
+                * Dimensions.CLAW_RADIUS
                 * 9.81
                 * Math.cos(position.get(0, 0) + position.get(0, 1)));
 
@@ -57,7 +57,7 @@ public class Dynamics {
         1,
         0,
         Dimensions.CLAW_MASS
-            * Dimensions.R2
+            * Dimensions.CLAW_RADIUS
             * 9.81
             * Math.cos(position.get(0, 0) + position.get(0, 1)));
 
