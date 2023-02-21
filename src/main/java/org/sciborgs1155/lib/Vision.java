@@ -17,8 +17,12 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.SimVisionSystem;
 import org.sciborgs1155.robot.Robot;
 
+/** Wrapper class for photonvision */
 public class Vision {
 
+    /**
+     * Mode of the camera, not the same as {@link Robot#isReal()}, so we can run sim with a real camera
+     */
     public enum Mode {
         REAL,
         SIM,

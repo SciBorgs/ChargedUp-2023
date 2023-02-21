@@ -39,27 +39,27 @@ public class Dynamics {
     private Matrix<N2, N1> Tg(Vector<N2> position) {
         Matrix<N2, N1> tg = new Matrix<>(N2.instance, N1.instance);
 
-    // Forearm
-    tg.set(
-        0,
-        0,
-        ((Dimensions.FOREARM_MASS * Dimensions.FOREARM_RADIUS
-                    + Dimensions.CLAW_MASS * Dimensions.FOREARM_LENGTH)
-                * 9.81
-                * Math.cos(position.get(0, 0)))
-            + Dimensions.CLAW_MASS
-                * Dimensions.CLAW_RADIUS
-                * 9.81
-                * Math.cos(position.get(0, 0) + position.get(0, 1)));
+        // Forearm
+        tg.set(
+                0,
+                0,
+                ((Dimensions.FOREARM_MASS * Dimensions.FOREARM_RADIUS
+                                        + Dimensions.CLAW_MASS * Dimensions.FOREARM_LENGTH)
+                                * 9.81
+                                * Math.cos(position.get(0, 0)))
+                        + Dimensions.CLAW_MASS
+                                * Dimensions.CLAW_RADIUS
+                                * 9.81
+                                * Math.cos(position.get(0, 0) + position.get(0, 1)));
 
-    // Claw
-    tg.set(
-        1,
-        0,
-        Dimensions.CLAW_MASS
-            * Dimensions.CLAW_RADIUS
-            * 9.81
-            * Math.cos(position.get(0, 0) + position.get(0, 1)));
+        // Claw
+        tg.set(
+                1,
+                0,
+                Dimensions.CLAW_MASS
+                        * Dimensions.CLAW_RADIUS
+                        * 9.81
+                        * Math.cos(position.get(0, 0) + position.get(0, 1)));
 
         return tg;
     }
