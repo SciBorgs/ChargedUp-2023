@@ -8,11 +8,11 @@ import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.Visualizer;
-import org.sciborgs1155.robot.Constants.Placement;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
+import org.sciborgs1155.robot.subsystems.Placement;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -49,7 +49,8 @@ public class RobotContainer {
   }
 
   private void configureSubsystemDefaults() {
-    drive.setDefaultCommand(drive.drive(leftJoystick, rightJoystick, true));
+    drive.setDefaultCommand(drive.drive(xbox, true));
+    placement.setDefaultCommand(placement.drive(leftJoystick, rightJoystick));
   }
 
   /**
