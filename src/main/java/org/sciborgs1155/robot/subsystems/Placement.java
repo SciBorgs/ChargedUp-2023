@@ -13,6 +13,7 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.PlacementState;
+import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants.Arm.ElbowConstants;
 import org.sciborgs1155.robot.Constants.Arm.ElevatorConstants;
 import org.sciborgs1155.robot.Constants.Arm.WristConstants;
@@ -21,14 +22,14 @@ import org.sciborgs1155.robot.subsystems.placement.Elevator;
 import org.sciborgs1155.robot.subsystems.placement.Wrist;
 
 public class Placement extends SubsystemBase implements Loggable, AutoCloseable {
-  @Log private final Wrist wrist = Wrist.create(WRIST_MOTOR);
+  @Log
+  private final Elevator elevator =
+      Elevator.create(MIDDLE_ELEVATOR_MOTOR, LEFT_ELEVATOR_MOTOR, RIGHT_ELEVATOR_MOTOR);
 
   @Log
   private final Elbow elbow = Elbow.create(MIDDLE_ELBOW_MOTOR, LEFT_ELBOW_MOTOR, RIGHT_ELBOW_MOTOR);
 
-  @Log
-  private final Elevator elevator =
-      Elevator.create(MIDDLE_ELEVATOR_MOTOR, LEFT_ELEVATOR_MOTOR, RIGHT_ELEVATOR_MOTOR);
+  @Log private final Wrist wrist = Wrist.create(WRIST_MOTOR);
 
   @Log(name = "Elevator Feedback")
   private final ProfiledPIDController elevatorFeedback =
@@ -69,8 +70,10 @@ public class Placement extends SubsystemBase implements Loggable, AutoCloseable 
   @Log(name = "Elbow Acceleration", methodName = "getLastOutput")
   private final Derivative elbowAccel = new Derivative();
 
+  @Log private final Visualizer visualizer = new Visualizer();
+
   /** Get current position as a {@link PlacementState} */
-  public PlacementState getState() {
+  public PlacementState getPosition() {
     return new PlacementState(
         elevator.getPosition(),
         elbow.getPosition(),
@@ -93,7 +96,7 @@ public class Placement extends SubsystemBase implements Loggable, AutoCloseable 
 
   @Log(name = "At Goal")
   public boolean atGoal() {
-    return getState().roughlyEquals(getGoal(), 0.02);
+    return getPosition().roughlyEquals(getGoal(), 0.02);
   }
 
   /**
@@ -117,8 +120,23 @@ public class Placement extends SubsystemBase implements Loggable, AutoCloseable 
     return setGoal(goal).andThen(Commands.waitUntil(this::atGoal));
   }
 
+  /**
+   * Runs elevator, elbow, and wrist to their goals based on a {@link PlacementState}, with the
+   * wrist goal relative to the forearm
+   */
+  public Command runToGoal(PlacementState... goals) {
+    Command cmd = Commands.none();
+    for (var goal : goals) {
+      cmd = cmd.andThen(runToGoal(goal));
+    }
+    return cmd;
+  }
+
   @Override
   public void periodic() {
+    // for now we are using standard feedforward, but as soon as we can test, we will use a
+    // feedforward model based on PlacementDynamics
+
     double elevatorFB = elevatorFeedback.calculate(elevator.getPosition());
     double elevatorFF =
         elevatorFeedforward.calculate(
@@ -147,6 +165,9 @@ public class Placement extends SubsystemBase implements Loggable, AutoCloseable 
             wristFeedback.getSetpoint().velocity,
             wristAccel.calculate(wristFeedback.getSetpoint().velocity));
     wrist.setVoltage(wristFB + wristFF);
+
+    visualizer.setPositions(getPosition());
+    visualizer.setSetpoints(getGoal());
   }
 
   @Override

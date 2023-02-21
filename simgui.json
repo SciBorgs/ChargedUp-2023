@@ -38,6 +38,7 @@
       "/Shuffleboard/Drivetrain/gyro": "Gyro",
       "/Shuffleboard/Elevator/limitSwitchOne": "Digital Input",
       "/Shuffleboard/Elevator/limitSwitchTwo": "Digital Input",
+      "/Shuffleboard/Placement/visualizer": "Mechanism2d",
       "/Shuffleboard/RobotContainer/autos": "String Chooser",
       "/Shuffleboard/RobotContainer/visualizer": "Mechanism2d",
       "/SmartDashboard/backCam Sim Field": "Field2d",
@@ -256,12 +257,12 @@
           "visible": true
         }
       },
-      "/Shuffleboard/RobotContainer/autos": {
+      "/Shuffleboard/Placement/visualizer": {
         "window": {
           "visible": true
         }
       },
-      "/Shuffleboard/RobotContainer/visualizer": {
+      "/Shuffleboard/RobotContainer/autos": {
         "window": {
           "visible": true
         }
@@ -350,12 +351,26 @@
         "Drive": {
           "gyro": {
             "open": true
-          },
-          "open": true
+          }
         },
         "Elevator": {
           "open": true,
           "pid": {
+            "open": true
+          }
+        },
+        "Placement": {
+          "Elbow Feedback": {
+            "open": true
+          },
+          "Wrist Feedback": {
+            "open": true
+          },
+          "elbow": {
+            "open": true
+          },
+          "open": true,
+          "wrist": {
             "open": true
           }
         },
