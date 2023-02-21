@@ -203,9 +203,8 @@ public class Drive extends SubsystemBase implements Loggable {
             Units.radiansToDegrees(
                 KINEMATICS.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
                     * Constants.RATE));
-
     SmartDashboard.putNumberArray(
-        "seenTags", vision.createObjects(vision.determineSeenTags(vision.getLayout())));
+      "seenTags", vision.createObjects(vision.determineSeenTags(vision.getLayout())));
   }
 
   /**

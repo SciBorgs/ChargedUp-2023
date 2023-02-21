@@ -25,7 +25,7 @@ import org.sciborgs1155.robot.subsystems.Intake;
 public class RobotContainer {
 
   @Log private final Visualizer visualizer = new Visualizer();
-  private final Vision vision = new Vision(Mode.SIM);
+  private final Vision vision = new Vision();
 
   // The robot's subsystems and commands are defined here...
   private final Drive drive = new Drive(vision);

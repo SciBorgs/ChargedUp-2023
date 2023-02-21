@@ -125,13 +125,16 @@ public class Vision {
     return data;
   }
 
-  // TODO refactor
+  /* TODO refactor 
+   * Determines if and which tags are in view (AdvantageScope sim)
+   ** When we get cam positions, cam override allows rays to originate from their real positions, not just center
+  */
   public AprilTag[] determineSeenTags(AprilTagFieldLayout layout) {
     ArrayList<Integer> frontTagIds = new ArrayList<Integer>();
-    ArrayList<Integer> backTagIds = new ArrayList<Integer>();
+    // ArrayList<Integer> backTagIds = new ArrayList<Integer>();
 
     ArrayList<AprilTag> frontTags = new ArrayList<>();
-    ArrayList<AprilTag> backTags = new ArrayList<>();
+    // ArrayList<AprilTag> backTags = new ArrayList<>();
 
     if (frontCam.getLatestResult().hasTargets()) {
       var targets = frontCam.getLatestResult().getTargets();
@@ -145,7 +148,8 @@ public class Vision {
       var targets = backCam.getLatestResult().getTargets();
       for (PhotonTrackedTarget tag : targets) {
         if (tag.getFiducialId() != -1) {
-          backTagIds.add(tag.getFiducialId());
+          // backTagIds.add(tag.getFiducialId());
+          frontTagIds.add(tag.getFiducialId());
         }
       }
     }
@@ -155,11 +159,12 @@ public class Vision {
       frontTags.add(new AprilTag(id, tagPose));
     }
 
-    for (int id : backTagIds) {
-      Pose3d tagPose = layout.getTagPose(id).get();
-      backTags.add(new AprilTag(id, tagPose));
-    }
-    frontTags.addAll(backTags);
+    // for (int id : backTagIds) {
+    //   Pose3d tagPose = layout.getTagPose(id).get();
+    //   backTags.add(new AprilTag(id, tagPose));
+    //   frontTags.add(new AprilTag(id, tagPose));
+    // }
+    // frontTags.addAll(backTags);
     return frontTags.toArray(new AprilTag[] {});
   }
 
