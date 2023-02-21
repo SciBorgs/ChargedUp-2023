@@ -69,6 +69,8 @@ public class RobotContainer {
     // pressed,
     // cancelling on release.
     // xbox.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+    rightJoystick.trigger().onTrue(intake.start(false)).onFalse(intake.stop());
+    rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
   }
 
   /**
