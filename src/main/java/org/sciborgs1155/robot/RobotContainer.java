@@ -47,7 +47,8 @@ public class RobotContainer {
   }
 
   private void configureSubsystemDefaults() {
-    drive.setDefaultCommand(drive.drive(leftJoystick, rightJoystick, true));
+    drive.setDefaultCommand(drive.drive(xbox, true));
+    placement.setDefaultCommand(placement.drive(leftJoystick, rightJoystick));
   }
 
   /**

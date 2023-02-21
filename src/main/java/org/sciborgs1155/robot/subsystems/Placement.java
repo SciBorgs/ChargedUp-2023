@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.subsystems;
 
 import static org.sciborgs1155.robot.Ports.Placement.*;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -9,11 +10,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.PlacementState;
 import org.sciborgs1155.lib.Visualizer;
+import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Arm.ElbowConstants;
 import org.sciborgs1155.robot.Constants.Arm.ElevatorConstants;
 import org.sciborgs1155.robot.Constants.Arm.WristConstants;
@@ -168,6 +171,33 @@ public class Placement extends SubsystemBase implements Loggable, AutoCloseable 
 
     visualizer.setPositions(getPosition());
     visualizer.setSetpoints(getGoal());
+  }
+
+  public Command drive(CommandJoystick left, CommandJoystick right) {
+    return run(
+        () -> {
+          double height =
+              MathUtil.interpolate(
+                  Constants.Dimensions.ELEVATOR_MIN_HEIGHT,
+                  Constants.Dimensions.ELEVATOR_MAX_HEIGHT,
+                  (left.getZ() - right.getZ()) / 2);
+          double elbowAngle =
+              MathUtil.interpolate(
+                  Constants.Dimensions.ELBOW_MIN_ANGLE,
+                  Constants.Dimensions.ELBOW_MAX_ANGLE,
+                  (1 - left.getY()) / 2);
+          double wristAngle =
+              MathUtil.interpolate(
+                  Constants.Dimensions.WRIST_MIN_ANGLE,
+                  Constants.Dimensions.WRIST_MAX_ANGLE,
+                  (1 - right.getY()) / 2);
+
+          elevatorFeedback.setGoal(height);
+          elbowFeedback.setGoal(elbowAngle);
+          wristFeedback.setGoal(wristAngle);
+
+          System.out.println(elevatorFeedback.getGoal().position);
+        });
   }
 
   @Override
