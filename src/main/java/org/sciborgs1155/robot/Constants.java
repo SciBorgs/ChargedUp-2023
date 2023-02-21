@@ -63,24 +63,25 @@ public final class Constants {
     public static final class Dimensions {
         public static final double ELEVATOR_MIN_HEIGHT = 0;
         public static final double ELEVATOR_MAX_HEIGHT = Units.inchesToMeters(49.3);
-        
+
         public static final double ELBOW_MIN_ANGLE = -Math.PI / 2.0;
         public static final double ELBOW_MAX_ANGLE = 3.0 * Math.PI / 2.0;
         public static final double WRIST_MIN_ANGLE = -Math.PI;
         public static final double WRIST_MAX_ANGLE = Math.PI;
-        
+
         public static final double CLAW_LENGTH = Units.inchesToMeters(20);
         public static final double CLAW_MASS = 4.4;
-        public static final double CLAW_MOI = 1./12 * CLAW_MASS * CLAW_LENGTH * CLAW_LENGTH;
+        public static final double CLAW_MOI = 1. / 12 * CLAW_MASS * CLAW_LENGTH * CLAW_LENGTH;
         public static final double CLAW_RADIUS = CLAW_LENGTH / 2;
-        
+
         public static final double FOREARM_LENGTH = Units.inchesToMeters(41);
         public static final double FOREARM_MASS = 4.2;
-        public static final double FOREARM_MOI = 1./12 * FOREARM_MASS * FOREARM_LENGTH * FOREARM_LENGTH;
+        public static final double FOREARM_MOI =
+                1. / 12 * FOREARM_MASS * FOREARM_LENGTH * FOREARM_LENGTH;
         public static final double FOREARM_RADIUS = FOREARM_LENGTH / 2;
-        
+
         public static final double ELEVATOR_MASS = 0;
-        
+
         public static final double TRACK_WIDTH = Units.inchesToMeters(17);
         // Distance between centers of right and left wheels on robot
         public static final double WHEEL_BASE = Units.inchesToMeters(17);
@@ -124,17 +125,17 @@ public final class Constants {
             public static final double kP = 50;
             public static final double kI = 0;
             public static final double kD = 10;
-      
+
             public static final double kS = 0;
             public static final double kG = 11;
             public static final double kV = 2;
             public static final double kA = 0;
-      
+
             public static final double MAX_VELOCITY = 3; // radians / s
             public static final double MAX_ACCEL = 3; // radians / s^2
             public static final TrapezoidProfile.Constraints CONSTRAINTS =
-                new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
-      
+                    new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
+
             // TODO replace with physically correct values
             public static final double GEAR_RATIO = 1.0;
         }
@@ -143,17 +144,17 @@ public final class Constants {
             public static final double kP = 10;
             public static final double kI = 0;
             public static final double kD = 5;
-      
+
             public static final double kS = 0;
             public static final double kG = 8;
             public static final double kV = 2;
             public static final double kA = 0;
-      
+
             public static final double MAX_VELOCITY = 3; // radians / s
             public static final double MAX_ACCEL = 3; // radians / s^2
             public static final TrapezoidProfile.Constraints CONSTRAINTS =
-                new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
-      
+                    new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
+
             public static final double GEAR_RATIO = 1 / 6.0;
             public static final double MOVEMENT_PER_SPIN = (1.5 * Math.PI);
         }
