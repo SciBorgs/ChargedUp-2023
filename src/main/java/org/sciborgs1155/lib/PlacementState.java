@@ -5,6 +5,7 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N6;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import org.sciborgs1155.robot.Constants.Dimensions;
@@ -74,6 +75,21 @@ public record PlacementState(
         wristAngularVelocity);
   }
 
+  /** Returns an elevator state for use with trapezoid profiles */
+  public TrapezoidProfile.State elevatorState() {
+    return new TrapezoidProfile.State(elevatorHeight, elevatorVelocity);
+  }
+
+  /** Returns an elbow state for use with trapezoid profiles */
+  public TrapezoidProfile.State elbowState() {
+    return new TrapezoidProfile.State(elbowAngle.getRadians(), elbowAngularVelocity);
+  }
+
+  /** Returns an wrist state for use with trapezoid profiles */
+  public TrapezoidProfile.State wristState() {
+    return new TrapezoidProfile.State(wristAngle.getRadians(), wristAngularVelocity);
+  }
+
   /** The side of the robot the arm is on */
   public Side side() {
     return elbowAngle.getCos() > 0 ? Side.FRONT : Side.BACK;
@@ -99,6 +115,17 @@ public record PlacementState(
                 Dimensions.CLAW_LENGTH * Math.sin(wristAngle),
                 Dimensions.FOREARM_LENGTH + Dimensions.CLAW_LENGTH * Math.cos(wristAngle));
     return fromAbsolute(elbowAngle, wristAngle, 0);
+  }
+
+  public boolean roughlyEquals(PlacementState other, double margin) {
+    var v1 = this.toVec();
+    var v2 = other.toVec();
+    for (int i = 0; i < v1.getNumCols(); i++) {
+      if (Math.abs(v1.get(i, 0) - v2.get(i, 0)) < margin) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override

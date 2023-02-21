@@ -2,8 +2,6 @@ package org.sciborgs1155.robot.subsystems;
 
 import static org.sciborgs1155.robot.Ports.Placement.*;
 
-import org.sciborgs1155.lib.PlacementState;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
@@ -14,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
+import org.sciborgs1155.lib.PlacementState;
 import org.sciborgs1155.robot.Constants.Arm.ElbowConstants;
 import org.sciborgs1155.robot.Constants.Arm.ElevatorConstants;
 import org.sciborgs1155.robot.Constants.Arm.WristConstants;
@@ -71,92 +70,50 @@ public class Placement extends SubsystemBase implements Loggable, AutoCloseable 
   @Log(name = "Last Wrist Velocity")
   private double lastWristVelocity;
 
-  /** Get current state */
+  /** Get current position as a {@link PlacementState} */
   public PlacementState getState() {
-    return new PlacementState(elevator.getPosition(), elbow.getPosition(), wrist.getPosition(), elevator.getVelocity(), elbow.getVelocity(), wrist.getVelocity());
+    return new PlacementState(
+        elevator.getPosition(),
+        elbow.getPosition(),
+        wrist.getPosition(),
+        elevator.getVelocity(),
+        elbow.getVelocity(),
+        wrist.getVelocity());
   }
 
-  /** Get current setpoint */
-  public PlacementState getSetpoint() {
-    return new PlacementState(elevatorFeedback.getGoal().position, elbowFeedback.getGoal(), getAbsoluteWristGoal(), MIDDLE_ELBOW_MOTOR, LEFT_ELEVATOR_MOTOR, LEFT_ELBOW_MOTOR);
+  /** Get current goal as a {@link PlacementState} */
+  public PlacementState getGoal() {
+    return new PlacementState(
+        elevatorFeedback.getGoal().position,
+        Rotation2d.fromRadians(elbowFeedback.getGoal().position),
+        Rotation2d.fromRadians(wristFeedback.getGoal().position),
+        elevatorFeedback.getGoal().velocity,
+        elbowFeedback.getGoal().velocity,
+        wristFeedback.getGoal().velocity);
   }
 
-  /** Elbow position relative to the chassis */
-  public Rotation2d getElbowPosition() {
-    return elbow.getPosition();
-  }
-
-  /** Wrist position relative to the forearm */
-  public Rotation2d getRelativeWristPosition() {
-    return wrist.getPosition();
-  }
-
-  /** Wrist position relative to chassis */
-  @Log(name = "wrist absolute positon", methodName = "getDegrees")
-  public Rotation2d getAbsoluteWristPosition() {
-    return getRelativeWristPosition().plus(getElbowPosition());
-  }
-
-  /** Elbow goal relative to the chassis */
-  public Rotation2d getElbowGoal() {
-    return Rotation2d.fromRadians(elbowFeedback.getGoal().position);
-  }
-
-  /** Wrist goal relative to forearm */
-  public Rotation2d getRelativeWristGoal() {
-    return Rotation2d.fromRadians(wristFeedback.getGoal().position);
-  }
-
-  /** Wrist goal relative to the chassis */
-  public Rotation2d getAbsoluteWristGoal() {
-    return getRelativeWristGoal().plus(getElbowGoal());
-  }
-
-  /** Elevator goal from the base, in meters */
-  public Command setGoal(double height) {
-    return runOnce(
-        () ->
-            elevatorFeedback.setGoal(
-                MathUtil.clamp(
-                    height, Dimensions.ELEVATOR_MIN_HEIGHT, Dimensions.ELEVATOR_MAX_HEIGHT)));
-  }
-
-  /** Sets elbow goal relative to the chassis */
-  public Command setElbowGoal(Rotation2d goal) {
-    return runOnce(
-        () ->
-            elbowFeedback.setGoal(
-                MathUtil.clamp(
-                    goal.getRadians(), Dimensions.ELBOW_MIN_ANGLE, Dimensions.ELBOW_MAX_ANGLE)));
-  }
-
-  /** Sets wrist goal relative to the forearm */
-  public Command setWristGoal(Rotation2d goal) {
-    return runOnce(
-        () ->
-            wristFeedback.setGoal(
-                MathUtil.clamp(
-                    goal.getRadians(), Dimensions.WRIST_MIN_ANGLE, Dimensions.WRIST_MAX_ANGLE)));
+  @Log(name = "At Goal")
+  public boolean atGoal() {
+    return getState().roughlyEquals(getGoal(), 0.02);
   }
 
   /** Sets elbow and wrist goals, with the wrist goal relative to the forearm */
-  public Command setGoals(Rotation2d elbowGoal, Rotation2d wristGoal) {
-    return setElbowGoal(elbowGoal).andThen(setWristGoal(wristGoal));
+  public Command setGoal(PlacementState goal) {
+    return runOnce(
+        () -> {
+          elevatorFeedback.setGoal(goal.elevatorState());
+          elbowFeedback.setGoal(goal.elbowState());
+          wristFeedback.setGoal(goal.wristState());
+        });
   }
 
-  /** Runs elbow to goal relative to the chassis */
-  public Command runElbowToGoal(Rotation2d goal) {
-    return setElbowGoal(goal).andThen(Commands.waitUntil(elbowFeedback::atGoal));
+  public Command runToGoal(PlacementState goal) {
+    return setGoal(goal).andThen(Commands.waitUntil(this::atGoal));
   }
 
-  /** Runs wrist to goal relative to the forearm */
-  public Command runWristToGoal(Rotation2d goal) {
-    return setWristGoal(goal).andThen(Commands.waitUntil(wristFeedback::atGoal));
-  }
-
-  /** Runs elbow and wrist go provided goals, with the wrist goal relative to the forearm */
-  public Command runToGoals(Rotation2d elbowGoal, Rotation2d wristGoal) {
-    return setGoals(elbowGoal, wristGoal)
-        .andThen(Commands.waitUntil(() -> elbowFeedback.atGoal() && wristFeedback.atGoal()));
+  @Override
+  public void periodic() {
+      // TODO Auto-generated method stub
+      super.periodic();
   }
 }
