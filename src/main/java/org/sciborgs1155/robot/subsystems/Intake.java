@@ -20,8 +20,8 @@ public class Intake extends SubsystemBase implements Loggable {
   @Log(name = "velocity", methodName = "getVelocity")
   private final RelativeEncoder encoder = wheels.getEncoder();
 
-  public Command start() {
-    return runOnce(() -> wheels.set(WHEEL_SPEED));
+  public Command start(boolean reversed) {
+    return runOnce(() -> wheels.set(reversed ? -WHEEL_SPEED : WHEEL_SPEED));
   }
 
   public Command stop() {
