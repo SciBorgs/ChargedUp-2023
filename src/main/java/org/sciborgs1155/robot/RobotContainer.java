@@ -8,11 +8,10 @@ import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.Visualizer;
+import org.sciborgs1155.robot.Constants.Placement;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
-import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
-import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
 
 /**
@@ -28,8 +27,7 @@ public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
   private final Drive drive = new Drive(vision);
-  private final Arm arm = new Arm(visualizer);
-  private final Elevator elevator = new Elevator(visualizer);
+  private final Placement placement = new Placement();
   private final Intake intake = new Intake();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
