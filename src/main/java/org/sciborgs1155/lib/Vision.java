@@ -6,8 +6,10 @@ import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -15,6 +17,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.SimVisionSystem;
+import org.photonvision.targeting.PhotonTrackedTarget;
 import org.sciborgs1155.robot.Robot;
 
 public class Vision {
@@ -32,6 +35,8 @@ public class Vision {
 
   private final PhotonPoseEstimator frontEstimator;
   private final PhotonPoseEstimator backEstimator;
+
+  private AprilTagFieldLayout layout;
 
   private final SimVisionSystem simFront =
       new SimVisionSystem(
@@ -57,9 +62,18 @@ public class Vision {
   }
 
   public Vision(Mode mode) {
-    AprilTagFieldLayout layout;
     try {
       layout = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
+
+      // Load tags in AdvantageScope
+      if (mode == Mode.SIM) {
+        AprilTag[] allTags = layout.getTags().toArray(new AprilTag[] {});
+        SmartDashboard.putNumberArray("tagposes", createObjects(allTags));
+
+        double[] list = new double[allTags.length];
+        for (int i = 0; i < allTags.length; i++) list[i] = (double) i;
+        SmartDashboard.putNumberArray("tag IDs", list);
+      }
     } catch (Exception e) {
       layout = new AprilTagFieldLayout(new ArrayList<AprilTag>(), 0, 0);
       DriverStation.reportError(
@@ -91,6 +105,62 @@ public class Vision {
       inst.setServer("photonvision.local");
       inst.startClient4("Robot Simulation");
     }
+  }
+
+  public AprilTagFieldLayout getLayout() {
+    return layout;
+  }
+
+  public double[] createObjects(AprilTag[] scopeTags) {
+    double[] data = new double[scopeTags.length * 7];
+    for (int i = 0; i < scopeTags.length; i++) {
+      data[i * 7] = scopeTags[i].pose.getX();
+      data[i * 7 + 1] = scopeTags[i].pose.getY();
+      data[i * 7 + 2] = scopeTags[i].pose.getZ();
+      data[i * 7 + 3] = scopeTags[i].pose.getRotation().getQuaternion().getW();
+      data[i * 7 + 4] = scopeTags[i].pose.getRotation().getQuaternion().getX();
+      data[i * 7 + 5] = scopeTags[i].pose.getRotation().getQuaternion().getY();
+      data[i * 7 + 6] = scopeTags[i].pose.getRotation().getQuaternion().getZ();
+    }
+    return data;
+  }
+
+  // TODO refactor
+  public AprilTag[] determineSeenTags(AprilTagFieldLayout layout) {
+    ArrayList<Integer> frontTagIds = new ArrayList<Integer>();
+    ArrayList<Integer> backTagIds = new ArrayList<Integer>();
+
+    ArrayList<AprilTag> frontTags = new ArrayList<>();
+    ArrayList<AprilTag> backTags = new ArrayList<>();
+
+    if (frontCam.getLatestResult().hasTargets()) {
+      var targets = frontCam.getLatestResult().getTargets();
+      for (PhotonTrackedTarget tag : targets) {
+        if (tag.getFiducialId() != -1) {
+          frontTagIds.add(tag.getFiducialId());
+        }
+      }
+    }
+    if (backCam.getLatestResult().hasTargets()) {
+      var targets = backCam.getLatestResult().getTargets();
+      for (PhotonTrackedTarget tag : targets) {
+        if (tag.getFiducialId() != -1) {
+          backTagIds.add(tag.getFiducialId());
+        }
+      }
+    }
+
+    for (int id : frontTagIds) {
+      Pose3d tagPose = layout.getTagPose(id).get();
+      frontTags.add(new AprilTag(id, tagPose));
+    }
+
+    for (int id : backTagIds) {
+      Pose3d tagPose = layout.getTagPose(id).get();
+      backTags.add(new AprilTag(id, tagPose));
+    }
+    frontTags.addAll(backTags);
+    return frontTags.toArray(new AprilTag[] {});
   }
 
   /* Gets estimated pose from vision measurements */

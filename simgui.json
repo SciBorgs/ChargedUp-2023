@@ -256,21 +256,6 @@
           "visible": true
         }
       },
-      "/Shuffleboard/RobotContainer/autos": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/Shuffleboard/RobotContainer/visualizer": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/backCam Sim Field": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/backPhotonVision Sim Field": {
         "backPhotonVision Camera": {
           "arrowColor": [
@@ -294,11 +279,6 @@
           "visible": true
         }
       },
-      "/SmartDashboard/frontCam Sim Field": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/frontPhotonVision Sim Field": {
         "frontPhotonVision Camera": {
           "arrowColor": [
@@ -318,11 +298,6 @@
           "length": 0.4099999964237213,
           "width": 0.30000001192092896
         },
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/photonvision Sim Field": {
         "window": {
           "visible": true
         }
@@ -398,6 +373,9 @@
       "open": true
     }
   },
+  "NetworkTables View": {
+    "visible": false
+  },
   "Plot": {
     "Plot <0>": {
       "plots": [
@@ -407,7 +385,7 @@
               "autoFit": true
             }
           ],
-          "height": 295,
+          "height": 0,
           "series": [
             {
               "color": [
@@ -442,7 +420,7 @@
               "autoFit": true
             }
           ],
-          "height": 295,
+          "height": 0,
           "series": [
             {
               "color": [

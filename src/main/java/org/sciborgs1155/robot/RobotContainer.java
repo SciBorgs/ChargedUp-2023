@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Vision;
+import org.sciborgs1155.lib.Vision.Mode;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
@@ -24,7 +25,7 @@ import org.sciborgs1155.robot.subsystems.Intake;
 public class RobotContainer {
 
   @Log private final Visualizer visualizer = new Visualizer();
-  private final Vision vision = new Vision();
+  private final Vision vision = new Vision(Mode.SIM);
 
   // The robot's subsystems and commands are defined here...
   private final Drive drive = new Drive(vision);
