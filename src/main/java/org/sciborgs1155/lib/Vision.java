@@ -6,7 +6,6 @@ import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -107,11 +106,7 @@ public class Vision {
     }
   }
 
-  public AprilTagFieldLayout getLayout() {
-    return layout;
-  }
-
-  public double[] createObjects(AprilTag[] scopeTags) {
+  private double[] createObjects(AprilTag[] scopeTags) {
     double[] data = new double[scopeTags.length * 7];
     for (int i = 0; i < scopeTags.length; i++) {
       data[i * 7] = scopeTags[i].pose.getX();
@@ -125,49 +120,31 @@ public class Vision {
     return data;
   }
 
-  /* TODO refactor 
+  /* TODO refactor
    * Determines if and which tags are in view (AdvantageScope sim)
-   ** When we get cam positions, cam override allows rays to originate from their real positions, not just center
-  */
-  public AprilTag[] determineSeenTags(AprilTagFieldLayout layout) {
-    ArrayList<Integer> frontTagIds = new ArrayList<Integer>();
-    // ArrayList<Integer> backTagIds = new ArrayList<Integer>();
+   ** When we get cam positions, cam override allows rays to originate from their real positions, not just center (nvm it cant even do this as it is)
+   */
+  public AprilTag[] determineSeenTags(PhotonCamera cam, AprilTagFieldLayout layout) {
+    ArrayList<AprilTag> tags = new ArrayList<>();
 
-    ArrayList<AprilTag> frontTags = new ArrayList<>();
-    // ArrayList<AprilTag> backTags = new ArrayList<>();
-
-    if (frontCam.getLatestResult().hasTargets()) {
-      var targets = frontCam.getLatestResult().getTargets();
+    if (cam.getLatestResult().hasTargets()) {
+      var targets = cam.getLatestResult().getTargets();
       for (PhotonTrackedTarget tag : targets) {
         if (tag.getFiducialId() != -1) {
-          frontTagIds.add(tag.getFiducialId());
+          int id = tag.getFiducialId();
+          tags.add(new AprilTag(id, layout.getTagPose(id).get()));
         }
       }
     }
-    if (backCam.getLatestResult().hasTargets()) {
-      var targets = backCam.getLatestResult().getTargets();
-      for (PhotonTrackedTarget tag : targets) {
-        if (tag.getFiducialId() != -1) {
-          // backTagIds.add(tag.getFiducialId());
-          frontTagIds.add(tag.getFiducialId());
-        }
-      }
-    }
-
-    for (int id : frontTagIds) {
-      Pose3d tagPose = layout.getTagPose(id).get();
-      frontTags.add(new AprilTag(id, tagPose));
-    }
-
-    // for (int id : backTagIds) {
-    //   Pose3d tagPose = layout.getTagPose(id).get();
-    //   backTags.add(new AprilTag(id, tagPose));
-    //   frontTags.add(new AprilTag(id, tagPose));
-    // }
-    // frontTags.addAll(backTags);
-    return frontTags.toArray(new AprilTag[] {});
+    return tags.toArray(new AprilTag[] {});
   }
 
+  public void updateSeenTags() {
+    SmartDashboard.putNumberArray(
+        "visible front tags", createObjects(determineSeenTags(frontCam, layout)));
+    SmartDashboard.putNumberArray(
+        "visible back tags", createObjects(determineSeenTags(backCam, layout)));
+  }
   /* Gets estimated pose from vision measurements */
   public EstimatedRobotPose[] getPoseEstimates(Pose2d lastPose) {
     frontEstimator.setReferencePose(lastPose);
