@@ -6,6 +6,7 @@ import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -66,12 +67,13 @@ public class Vision {
 
       // Load tags in AdvantageScope
       if (mode == Mode.SIM) {
-        AprilTag[] allTags = layout.getTags().toArray(new AprilTag[] {});
-        SmartDashboard.putNumberArray("tagposes", createObjects(allTags));
+        // TODO not sure what this was for
+        // AprilTag[] allTags = layout.getTags().toArray(new AprilTag[] {});
+        // SmartDashboard.putNumberArray("tagposes", createObjects(allTags));
 
-        double[] list = new double[allTags.length];
-        for (int i = 0; i < allTags.length; i++) list[i] = (double) i;
-        SmartDashboard.putNumberArray("tag IDs", list);
+        // double[] list = new double[allTags.length];
+        // for (int i = 0; i < allTags.length; i++) list[i] = (double) i;
+        // SmartDashboard.putNumberArray("tag IDs", list);
       }
     } catch (Exception e) {
       layout = new AprilTagFieldLayout(new ArrayList<AprilTag>(), 0, 0);
@@ -106,34 +108,29 @@ public class Vision {
     }
   }
 
-  private double[] createObjects(AprilTag[] scopeTags) {
+  // TODO clean up, i'm not sure how advantagescope deals with 3d poses, but this works
+  private double[] createObjects(Pose3d[] scopeTags) {
     double[] data = new double[scopeTags.length * 7];
     for (int i = 0; i < scopeTags.length; i++) {
-      data[i * 7] = scopeTags[i].pose.getX();
-      data[i * 7 + 1] = scopeTags[i].pose.getY();
-      data[i * 7 + 2] = scopeTags[i].pose.getZ();
-      data[i * 7 + 3] = scopeTags[i].pose.getRotation().getQuaternion().getW();
-      data[i * 7 + 4] = scopeTags[i].pose.getRotation().getQuaternion().getX();
-      data[i * 7 + 5] = scopeTags[i].pose.getRotation().getQuaternion().getY();
-      data[i * 7 + 6] = scopeTags[i].pose.getRotation().getQuaternion().getZ();
+      data[i * 7] = scopeTags[i].getX();
+      data[i * 7 + 1] = scopeTags[i].getY();
+      data[i * 7 + 2] = scopeTags[i].getZ();
+      data[i * 7 + 3] = scopeTags[i].getRotation().getQuaternion().getW();
+      data[i * 7 + 4] = scopeTags[i].getRotation().getQuaternion().getX();
+      data[i * 7 + 5] = scopeTags[i].getRotation().getQuaternion().getY();
+      data[i * 7 + 6] = scopeTags[i].getRotation().getQuaternion().getZ();
     }
     return data;
   }
 
-  // Determines which tags are in view, if any (for advantagescope)
-  private AprilTag[] determineSeenTags(PhotonCamera cam, AprilTagFieldLayout layout) {
-    ArrayList<AprilTag> tags = new ArrayList<>();
-
-    if (cam.getLatestResult().hasTargets()) {
-      var targets = cam.getLatestResult().getTargets();
-      for (PhotonTrackedTarget tag : targets) {
-        if (tag.getFiducialId() != -1) {
-          int id = tag.getFiducialId();
-          tags.add(new AprilTag(id, layout.getTagPose(id).get()));
-        }
-      }
-    }
-    return tags.toArray(new AprilTag[] {});
+  /** Determines which tags are in view, if any (for advantagescope) */
+  private Pose3d[] determineSeenTags(PhotonCamera cam, AprilTagFieldLayout layout) {
+    return cam.getLatestResult().getTargets().stream()
+        .filter(target -> target.getFiducialId() != -1)
+        .map(PhotonTrackedTarget::getFiducialId)
+        .map(layout::getTagPose)
+        .map(Optional::get)
+        .toArray(Pose3d[]::new);
   }
 
   public void updateSeenTags() {

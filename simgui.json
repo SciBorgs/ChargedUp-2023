@@ -338,16 +338,10 @@
           "autos": {
             "open": true
           }
-        },
-        "open": true
+        }
       },
       "SmartDashboard": {
-        "backPhotonVision Sim Field": {
-          "open": true
-        },
-        "frontPhotonVision Sim Field": {
-          "open": true
-        }
+        "open": true
       },
       "photonvision": {
         "backPhotonVision": {
@@ -355,7 +349,8 @@
         },
         "frontPhotonVision": {
           "open": true
-        }
+        },
+        "open": true
       }
     }
   },
@@ -371,10 +366,8 @@
         "open": true
       },
       "open": true
-    }
-  },
-  "NetworkTables View": {
-    "visible": false
+    },
+    "visible": true
   },
   "Plot": {
     "Plot <0>": {
@@ -385,7 +378,7 @@
               "autoFit": true
             }
           ],
-          "height": 0,
+          "height": 295,
           "series": [
             {
               "color": [
@@ -420,7 +413,7 @@
               "autoFit": true
             }
           ],
-          "height": 0,
+          "height": 295,
           "series": [
             {
               "color": [
