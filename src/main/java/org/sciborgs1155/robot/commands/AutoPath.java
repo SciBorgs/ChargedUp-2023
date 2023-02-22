@@ -47,21 +47,7 @@ public class AutoPath implements Sendable {
         chooser.initSendable(builder);
     }
 
-    public final class AutoCommands {
-
-        public Command goToPoint(PathPoint endPoint) {
-            Pose2d pose = drive.getPose();
-            PathPoint currentPoint = new PathPoint(pose.getTranslation(), pose.getRotation(), pose.getRotation());
-            PathConstraints constraints = new PathConstraints(Constants.Auto.MAX_SPEED, Constants.Auto.MAX_ACCEL);
-            List<PathPoint> points = new ArrayList<PathPoint>(List.of(currentPoint, endPoint));
-            PathPlannerTrajectory trajectory = PathPlanner.generatePath(constraints, points);
-            return drive.follow(trajectory, false, false); // should it be using alliance color?
-        }
-
-        public Command intake(GamePiece gamePiece) {
-            return PlaceHolderCommands.intake(intake, arm, elevator, gamePiece);
-        }
-    }
+    public Command get();
 
     public final class PlaceHolderCommands {
         public static Command score(Intake intake, Drive drive, Elevator elevator,

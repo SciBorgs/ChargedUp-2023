@@ -16,6 +16,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 public interface AutoStep extends Sendable {
 
@@ -34,7 +35,7 @@ public interface AutoStep extends Sendable {
         private final Vision vision;
         private final Intake intake;
         private final Arm arm;
-        private final Elevator elevator; 
+        private final Elevator elevator;
 
         public Score(Pose2d scoringPose, Drive drive, Vision vision, Intake intake, Arm arm, Elevator elevator) {
             gamePieceChooser = new SendableChooser<GamePiece>();
@@ -64,16 +65,21 @@ public interface AutoStep extends Sendable {
         public Command get() {
             GamePiece gamePiece = gamePieceChooser.getSelected();
             State scoringState = scoringHeightChooser.getSelected().scoringState(gamePiece);
-            return PlaceHolderCommands.score(intake, drive, elevator, arm, vision, 
-                                             gamePieceChooser.getSelected(), scoringState);
+            return drive.driveToPose(scoringPose).
+                   andThen(PlaceHolderCommands.score(intake, drive, elevator, arm, vision, gamePiece, scoringState));
         }
     }
 
-    public final class Intake implements AutoStep {
+    public final class IntakePiece implements AutoStep {
         private final SendableChooser<GamePiece> gamePieceChooser;
         private final SendableChooser<Pose2d> intakePoseChooser;
 
-        public Intake() {
+        private final Drive drive;
+        private final Intake intake;
+        private final Elevator elevator;
+        private final Arm arm;
+
+        public IntakePiece(Drive drive, Intake intake, Elevator elevator, Arm arm) {
             gamePieceChooser = new SendableChooser<GamePiece>();
             gamePieceChooser.setDefaultOption("cube", GamePiece.CUBE);
             gamePieceChooser.addOption("cone", GamePiece.CONE);
@@ -87,6 +93,11 @@ public interface AutoStep extends Sendable {
             intakePoseChooser.addOption("blue 2", Constants.Field.IntakePoints.BLUE_TWO);
             intakePoseChooser.addOption("blue 3", Constants.Field.IntakePoints.BLUE_THREE);
             intakePoseChooser.addOption("blue 4", Constants.Field.IntakePoints.BLUE_FOUR);
+
+            this.drive = drive;
+            this.intake = intake;
+            this.elevator = elevator;
+            this.arm = arm;
         }
 
         @Override
@@ -97,6 +108,8 @@ public interface AutoStep extends Sendable {
 
         @Override
         public Command get() {
+            return drive.driveToPose(intakePoseChooser.getSelected())
+                   .andThen(PlaceHolderCommands.intake(intake, null, null, null));
         }
     }
 }
