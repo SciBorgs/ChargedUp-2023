@@ -17,7 +17,7 @@ import org.sciborgs1155.robot.subsystems.Intake;
 public class Autos implements Sendable {
     private final SendableChooser<AutoPath> pathChooser;
 
-    private Autos(Drive drive, Intake intake, Vision vision, Arm arm, Elevator elevator) {
+    public Autos(Drive drive, Intake intake, Vision vision, Arm arm, Elevator elevator) {
         pathChooser = new SendableChooser<AutoPath>();
         pathChooser.setDefaultOption("ex", AutoPath.examplePath(drive, vision, intake, arm, elevator));
     }
