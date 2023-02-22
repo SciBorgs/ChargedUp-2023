@@ -148,9 +148,8 @@ public final class Constants {
 
     public static final class Elbow {
       public static final double GEARING = 12.0 / 72.0; // rot
-      public static final double ENCODER_POSITION_FACTOR = GEARING * 2.0 * Math.PI; // rad
-      public static final double ENCODER_VELOCITY_FACTOR =
-          ENCODER_POSITION_FACTOR / 60.0; // rad / s
+      public static final double CONVERSION = GEARING * 2.0 * Math.PI; // rad
+      public static final double ENCODER_FACTOR = CONVERSION / Constants.THROUGH_BORE_CPR;
 
       public static final double kP = 10;
       public static final double kI = 0;
@@ -170,8 +169,7 @@ public final class Constants {
 
   public static final class Elevator {
     public static final double SPROCKET_RADIUS = Units.inchesToMeters(0.716);
-    public static final double CONVERSION =
-        2.0 * Math.PI * SPROCKET_RADIUS; // m
+    public static final double CONVERSION = 2.0 * Math.PI * SPROCKET_RADIUS; // m
     public static final double ENCODER_FACTOR = CONVERSION / Constants.THROUGH_BORE_CPR;
 
     public static final double MAX_SPEED = 4; // m/s

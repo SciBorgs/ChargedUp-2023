@@ -25,6 +25,8 @@ public final class Ports {
     public static final int MIDDLE_ELBOW_MOTOR = 15;
     public static final int RIGHT_ELBOW_MOTOR = 16;
 
+    public static final int[] ELBOW_ENCODER = {8, 9};
+
     public static final int WRIST_MOTOR = 8;
   }
 
@@ -33,7 +35,7 @@ public final class Ports {
     public static final int RIGHT_MOTOR = 25;
     public static final int MIDDLE_MOTOR = 26;
 
-    public static final int[] DIO = {6, 7};
+    public static final int[] ENCODER = {6, 7};
   }
 
   public static final class Sensors {

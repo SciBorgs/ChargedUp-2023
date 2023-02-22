@@ -5,7 +5,6 @@ import static org.sciborgs1155.robot.Ports.Arm.*;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -13,6 +12,8 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -40,9 +41,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log(name = "wrist applied output", methodName = "getAppliedOutput")
   private final CANSparkMax wrist = Motors.WRIST.build(MotorType.kBrushless, WRIST_MOTOR);
 
-  @Log(name = "elbow velocity", methodName = "getVelocity")
-  private final RelativeEncoder elbowEncoder =
-      elbow.getAlternateEncoder(Constants.THROUGH_BORE_CPR);
+  @Log private final Encoder elbowEncoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
+  private final EncoderSim elbowEncoderSim = new EncoderSim(elbowEncoder);
 
   @Log(name = "wrist velocity", methodName = "getVelocity")
   private final AbsoluteEncoder wristEncoder = wrist.getAbsoluteEncoder(Type.kDutyCycle);
@@ -69,7 +69,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   private final SingleJointedArmSim elbowSim =
       new SingleJointedArmSim(
           DCMotor.getNEO(3),
-          1 / Elbow.ENCODER_POSITION_FACTOR,
+          1 / Elbow.CONVERSION,
           SingleJointedArmSim.estimateMOI(Dimensions.FOREARM_LENGTH, Dimensions.FOREARM_MASS),
           Dimensions.FOREARM_LENGTH,
           Dimensions.ELBOW_MIN_ANGLE,
@@ -91,8 +91,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowLeft.follow(elbow);
     elbowRight.follow(elbow);
 
-    elbowEncoder.setPositionConversionFactor(Elbow.ENCODER_POSITION_FACTOR);
-    elbowEncoder.setVelocityConversionFactor(Elbow.ENCODER_VELOCITY_FACTOR);
+    elbowEncoder.setDistancePerPulse(Elbow.ENCODER_FACTOR);
 
     elbow.burnFlash();
     elbowLeft.burnFlash();
@@ -104,8 +103,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   /** Elbow position relative to the chassis */
   public Rotation2d getElbowPosition() {
-    return Rotation2d.fromRadians(
-        Robot.isReal() ? elbowEncoder.getPosition() : elbowSim.getAngleRads());
+    return Rotation2d.fromRadians(elbowEncoder.getDistance());
   }
 
   /** Wrist position relative to the forearm */
@@ -200,6 +198,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   public void simulationPeriodic() {
     elbowSim.setInputVoltage(elbow.getAppliedOutput());
     elbowSim.update(Constants.RATE);
+    elbowEncoderSim.setDistance(elbowSim.getAngleRads());
+    elbowEncoderSim.setRate(elbowSim.getVelocityRadPerSec());
 
     wristSim.setInputVoltage(wrist.getAppliedOutput());
     wristSim.update(Constants.RATE);

@@ -32,7 +32,8 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   private final CANSparkMax left = Motors.ELEVATOR.build(MotorType.kBrushless, LEFT_MOTOR);
   private final CANSparkMax right = Motors.ELEVATOR.build(MotorType.kBrushless, RIGHT_MOTOR);
 
-  @Log private final Encoder encoder = new Encoder(DIO[0], DIO[1]);
+  @Log private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1]);
+  private final EncoderSim simEncoder = new EncoderSim(encoder);
 
   private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
 
@@ -50,8 +51,6 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
           Dimensions.ELEVATOR_MIN_HEIGHT,
           Dimensions.ELEVATOR_MAX_HEIGHT,
           true);
-
-  private final EncoderSim simEncoder = new EncoderSim(encoder);
 
   private final Visualizer visualizer;
 
@@ -114,6 +113,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     sim.setInputVoltage(lead.getAppliedOutput());
     sim.update(Constants.RATE);
     simEncoder.setDistance(sim.getPositionMeters());
+    simEncoder.setRate(sim.getVelocityMetersPerSecond());
   }
 
   @Override
