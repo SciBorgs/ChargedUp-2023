@@ -20,9 +20,7 @@ import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Arm.ElbowConstants;
 import org.sciborgs1155.robot.Constants.Arm.ElevatorConstants;
 import org.sciborgs1155.robot.Constants.Arm.WristConstants;
-import org.sciborgs1155.robot.subsystems.placement.Elbow;
 import org.sciborgs1155.robot.subsystems.placement.Elevator;
-import org.sciborgs1155.robot.subsystems.placement.Wrist;
 
 public class Placement extends SubsystemBase implements Loggable, AutoCloseable {
   @Log
