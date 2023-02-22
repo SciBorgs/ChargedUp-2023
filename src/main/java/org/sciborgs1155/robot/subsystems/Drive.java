@@ -146,13 +146,8 @@ public class Drive extends SubsystemBase implements Loggable {
                 ? ChassisState.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, xAccel, yAccel, rotAlpha, getHeading())
                 : new ChassisState(xSpeed, ySpeed, rot, xAccel, yAccel, rotAlpha),
             new Translation2d());
-      if (ChassisState.CompareChassisSpeeds(
-        AUTOKINEMATICS.toChassisSpeeds(getAutoModuleStates()),
-        new ChassisSpeeds(xSpeed, ySpeed, rot),
-        0.5)) {
-      states = DRIVERKINEMATICS.toSwerveModuleStates(new ChassisState());
-    
-      }
+      
+      
 
     setModuleStates(states);
   }

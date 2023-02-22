@@ -79,7 +79,7 @@ public class SimSwerveModule implements SwerveModule, Sendable {
 
     drive.setInput(driveFB + driveFF);
     drive.update(Constants.RATE);
-    turn.setInput(turnFB + turnFF);
+    turn.setInput(turnFB);
     turn.update(Constants.RATE);
   }
 
