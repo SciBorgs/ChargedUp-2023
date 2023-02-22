@@ -170,8 +170,8 @@ public final class Constants {
 
   public static final class Elevator {
     public static final double SPROCKET_RADIUS = Units.inchesToMeters(0.716);
-    public static final double ENCODER_POSITION_FACTOR = 2.0 * Math.PI * SPROCKET_RADIUS; // m
-    public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0; // m/s
+    public static final double ENCODER_FACTOR =
+        2.0 * Math.PI * SPROCKET_RADIUS / THROUGH_BORE_CPR; // m / pulse
 
     public static final double MAX_SPEED = 4; // m/s
     public static final double MAX_ACCEL = 3; // m/s^2

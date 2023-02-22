@@ -17,10 +17,14 @@ public class Placement {
     this.elevator = elevator;
   }
 
+  /** Runs elevator and arm to a state, which can include velocity */
   public Command toState(PlacementState state) {
-    return Commands.parallel(elevator.runToGoal(state.elevatorState()));
+    return Commands.parallel(
+        elevator.runToGoal(state.elevatorState()),
+        arm.runToGoals(state.elbowState(), state.wristState()));
   }
 
+  /** Runs elevator and arm between multiple states, uses {@link #toState(PlacementState)} */
   public Command toState(PlacementState... states) {
     Command cmd = Commands.none();
     for (var state : states) cmd = cmd.andThen(toState(state));

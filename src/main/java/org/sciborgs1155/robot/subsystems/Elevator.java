@@ -5,13 +5,14 @@ import static org.sciborgs1155.robot.Ports.Elevator.*;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -31,8 +32,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   private final CANSparkMax left = Motors.ELEVATOR.build(MotorType.kBrushless, LEFT_MOTOR);
   private final CANSparkMax right = Motors.ELEVATOR.build(MotorType.kBrushless, RIGHT_MOTOR);
 
-  @Log(name = "velocity", methodName = "getVelocity")
-  private final RelativeEncoder encoder = lead.getAlternateEncoder(Constants.THROUGH_BORE_CPR);
+  @Log private final Encoder encoder = new Encoder(DIO[0], DIO[1]);
 
   private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
 
@@ -44,12 +44,14 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   private final ElevatorSim sim =
       new ElevatorSim(
           DCMotor.getNEO(3),
-          1 / ENCODER_POSITION_FACTOR,
+          1 / ENCODER_FACTOR,
           Dimensions.ELEVATOR_MASS,
           SPROCKET_RADIUS,
           Dimensions.ELEVATOR_MIN_HEIGHT,
           Dimensions.ELEVATOR_MAX_HEIGHT,
           true);
+
+  private final EncoderSim simEncoder = new EncoderSim(encoder);
 
   private final Visualizer visualizer;
 
@@ -57,8 +59,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     left.follow(lead);
     right.follow(lead);
 
-    encoder.setPositionConversionFactor(ENCODER_POSITION_FACTOR);
-    encoder.setVelocityConversionFactor(ENCODER_VELOCITY_FACTOR);
+    encoder.setDistancePerPulse(ENCODER_FACTOR);
 
     lead.burnFlash();
     left.burnFlash();
@@ -70,7 +71,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   /** Returns the height of the elevator, in meters */
   @Log(name = "position")
   public double getPosition() {
-    return encoder.getPosition();
+    return encoder.getDistance();
   }
 
   /** Returns the goal of the elevator, in meters */
@@ -112,7 +113,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   public void simulationPeriodic() {
     sim.setInputVoltage(lead.getAppliedOutput());
     sim.update(Constants.RATE);
-    encoder.setPosition(sim.getPositionMeters());
+    simEncoder.setDistance(sim.getPositionMeters());
   }
 
   @Override

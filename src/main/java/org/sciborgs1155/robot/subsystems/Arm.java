@@ -22,20 +22,20 @@ import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.Constants.Arm.Elbow;
 import org.sciborgs1155.robot.Constants.Arm.Wrist;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
+import org.sciborgs1155.robot.Robot;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log(name = "elbow applied output", methodName = "getAppliedOutput")
   private final CANSparkMax elbow = Motors.ELBOW.build(MotorType.kBrushless, MIDDLE_ELBOW_MOTOR);
 
-  private final CANSparkMax elbowLeft =
-      Motors.ELBOW.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
-  private final CANSparkMax elbowRight = Motors.ELBOW.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
+  private final CANSparkMax elbowLeft = Motors.ELBOW.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
+  private final CANSparkMax elbowRight =
+      Motors.ELBOW.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
 
   @Log(name = "wrist applied output", methodName = "getAppliedOutput")
   private final CANSparkMax wrist = Motors.WRIST.build(MotorType.kBrushless, WRIST_MOTOR);
@@ -104,12 +104,14 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   /** Elbow position relative to the chassis */
   public Rotation2d getElbowPosition() {
-    return Rotation2d.fromRadians(Robot.isReal() ? elbowEncoder.getPosition() : elbowSim.getAngleRads());
+    return Rotation2d.fromRadians(
+        Robot.isReal() ? elbowEncoder.getPosition() : elbowSim.getAngleRads());
   }
 
   /** Wrist position relative to the forearm */
   public Rotation2d getRelativeWristPosition() {
-    return Rotation2d.fromRadians(Robot.isReal() ? wristEncoder.getPosition() : wristSim.getAngleRads());
+    return Rotation2d.fromRadians(
+        Robot.isReal() ? wristEncoder.getPosition() : wristSim.getAngleRads());
   }
 
   /** Wrist position relative to chassis */
