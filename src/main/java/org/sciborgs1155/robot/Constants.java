@@ -131,6 +131,8 @@ public final class Constants {
 
   public static final class Arm {
     public static final class WristConstants {
+      public static final double MECHANISM_GEAR_RATIO = 1.0;
+
       public static final double kP = 50;
       public static final double kI = 0;
       public static final double kD = 10;
@@ -147,6 +149,7 @@ public final class Constants {
     }
 
     public static final class ElbowConstants {
+      public static final double MECHANISM_GEAR_RATIO = 1.0;
       public static final double GEARING = 12.0 / 72.0; // rot
       public static final double ENCODER_POSITION_FACTOR = GEARING * 2.0 * Math.PI; // rad
       public static final double ENCODER_VELOCITY_FACTOR =
@@ -168,6 +171,8 @@ public final class Constants {
     }
 
     public static final class ElevatorConstants {
+      public static final double MECHANISM_GEAR_RATIO = 1.0;
+
       public static final double SPROCKET_RADIUS = Units.inchesToMeters(0.716);
       public static final double ENCODER_POSITION_FACTOR = 2.0 * Math.PI * SPROCKET_RADIUS; // m
       public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0; // m/s
