@@ -8,8 +8,11 @@ import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.Visualizer;
+import org.sciborgs1155.robot.Constants.Positions;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.Placement;
+import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
@@ -28,6 +31,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Drive drive = new Drive(vision);
   private final Elevator elevator = new Elevator(visualizer);
+  private final Arm arm = new Arm(visualizer);
   private final Intake intake = new Intake();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -35,8 +39,9 @@ public class RobotContainer {
   private final CommandJoystick leftJoystick = new CommandJoystick(OI.LEFT_STICK);
   private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
 
-  // Autos
+  // command factories
   @Log private final Autos autos = new Autos(drive, vision);
+  private final Placement placement = new Placement(arm, elevator);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -50,7 +55,6 @@ public class RobotContainer {
 
   private void configureSubsystemDefaults() {
     drive.setDefaultCommand(drive.drive(xbox, true));
-    // placement.setDefaultCommand(placement.drive(leftJoystick, rightJoystick));
   }
 
   /**
@@ -73,6 +77,8 @@ public class RobotContainer {
     // xbox.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
     rightJoystick.trigger().onTrue(intake.start(false)).onFalse(intake.stop());
     rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
+
+    xbox.a().onTrue(placement.toState(Positions.SAFE));
   }
 
   /**

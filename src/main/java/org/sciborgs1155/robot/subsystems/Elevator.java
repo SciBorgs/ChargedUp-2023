@@ -67,14 +67,14 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     this.visualizer = visualizer;
   }
 
-  @Log(name = "position")
   /** Returns the height of the elevator, in meters */
+  @Log(name = "position")
   public double getPosition() {
     return encoder.getPosition();
   }
 
-  @Log(name = "at goal")
   /** Returns the goal of the elevator, in meters */
+  @Log(name = "at goal")
   public boolean atGoal() {
     return pid.atGoal();
   }
