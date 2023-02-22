@@ -9,7 +9,7 @@ import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Ports.OI;
-import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.badAuto;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
@@ -38,7 +38,7 @@ public class RobotContainer {
   private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
 
   // Autos
-  @Log private final Autos autos = new Autos(drive, vision);
+  @Log private final badAuto autos = new badAuto(drive, vision);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

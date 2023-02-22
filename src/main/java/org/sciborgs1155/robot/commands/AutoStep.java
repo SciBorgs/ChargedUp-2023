@@ -3,20 +3,19 @@ package org.sciborgs1155.robot.commands;
 import org.sciborgs1155.lib.State;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.commands.AutoPath.*;
+import org.sciborgs1155.robot.commands.Autos.PlaceHolderCommands;
+import org.sciborgs1155.robot.commands.Autos.ShouldBeInDiffFile;
+import org.sciborgs1155.robot.commands.Autos.ShouldBeInDiffFile.*;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
-
-import com.pathplanner.lib.PathPoint;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 
 public interface AutoStep extends Sendable {
 
@@ -64,7 +63,7 @@ public interface AutoStep extends Sendable {
         @Override
         public Command get() {
             GamePiece gamePiece = gamePieceChooser.getSelected();
-            State scoringState = scoringHeightChooser.getSelected().scoringState(gamePiece);
+            State scoringState = ShouldBeInDiffFile.scoringState(gamePiece, scoringHeightChooser.getSelected());
             return drive.driveToPose(scoringPose).
                    andThen(PlaceHolderCommands.score(intake, drive, elevator, arm, vision, gamePiece, scoringState));
         }
