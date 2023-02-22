@@ -257,12 +257,12 @@
           "visible": true
         }
       },
-      "/Shuffleboard/Placement/visualizer": {
+      "/Shuffleboard/RobotContainer/autos": {
         "window": {
           "visible": true
         }
       },
-      "/Shuffleboard/RobotContainer/autos": {
+      "/Shuffleboard/RobotContainer/visualizer": {
         "window": {
           "visible": true
         }
@@ -340,10 +340,16 @@
           "elbow": {
             "open": true
           },
+          "elbow feedback": {
+            "open": true
+          },
           "elbowFeedback": {
             "open": true
           },
           "open": true,
+          "wrist feedback": {
+            "open": true
+          },
           "wristFeedback": {
             "open": true
           }

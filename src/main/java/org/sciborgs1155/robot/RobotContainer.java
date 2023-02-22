@@ -8,7 +8,6 @@ import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.Visualizer;
-import org.sciborgs1155.robot.Constants.Positions;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Placement;
@@ -77,8 +76,6 @@ public class RobotContainer {
     // xbox.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
     rightJoystick.trigger().onTrue(intake.start(false)).onFalse(intake.stop());
     rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
-
-    xbox.a().onTrue(placement.toState(Positions.SAFE));
   }
 
   /**
