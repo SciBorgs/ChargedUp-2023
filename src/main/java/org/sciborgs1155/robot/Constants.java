@@ -151,17 +151,18 @@ public final class Constants {
       public static final double CONVERSION = GEARING * 2.0 * Math.PI; // rad
       public static final double ENCODER_FACTOR = CONVERSION / Constants.THROUGH_BORE_CPP;
 
-      public static final double kP = 0;
+      // public static final double kP = 8.0252;
+      public static final double kP = 1.4;
       public static final double kI = 0;
-      public static final double kD = 0;
+      public static final double kD = 0.5;
 
-      public static final double kS = 0;
-      public static final double kG = 0;
-      public static final double kV = 0;
-      public static final double kA = 0;
+      public static final double kS = 0.12117;
+      public static final double kG = 0.48397;
+      public static final double kV = 1.1967;
+      public static final double kA = 0.23693;
 
-      public static final double MAX_VELOCITY = 3; // rad / s
-      public static final double MAX_ACCEL = 3; // rad / s^2
+      public static final double MAX_VELOCITY = 1; // rad / s
+      public static final double MAX_ACCEL = 0.5; // rad / s^2
       public static final TrapezoidProfile.Constraints CONSTRAINTS =
           new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
     }

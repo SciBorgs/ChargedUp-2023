@@ -2,14 +2,14 @@
   "canivore names": [
     "rio",
     "rio",
-    ""
+    "rio"
   ],
   "counts per rotation": 2048.0,
   "encoder canivore name": "rio",
   "encoder type": "roboRIO quadrature",
-  "encoding": false,
-  "gearing denominator": 12.0,
-  "gearing numerator": 72.0,
+  "encoding": true,
+  "gearing denominator": 72.0,
+  "gearing numerator": 12.0,
   "gyro": "Analog Gyro",
   "gyro canivore name": "rio",
   "gyro ctor": "0",

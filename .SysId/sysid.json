@@ -4,6 +4,7 @@
     "NetworkTables Settings": {
       "serverTeam": "1155"
     },
-    "mode": "Client (NT4)"
+    "mode": "Client (NT4)",
+    "serverTeam": "1155"
   }
 }
