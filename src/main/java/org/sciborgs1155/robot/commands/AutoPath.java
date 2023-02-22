@@ -48,9 +48,6 @@ public class AutoPath implements Sendable {
     }
 
     public final class AutoCommands {
-        public Command score(GamePiece gamePiece, ScoringHeight height) {
-            return placeHolderCommands.score(intake, drive, elevator, arm, vision, gamePiece, height.scoringState(gamePiece));
-        }
 
         public Command goToPoint(PathPoint endPoint) {
             Pose2d pose = drive.getPose();
@@ -62,11 +59,11 @@ public class AutoPath implements Sendable {
         }
 
         public Command intake(GamePiece gamePiece) {
-            return placeHolderCommands.intake(intake, arm, elevator, gamePiece);
+            return PlaceHolderCommands.intake(intake, arm, elevator, gamePiece);
         }
     }
 
-    public final class placeHolderCommands {
+    public final class PlaceHolderCommands {
         public static Command score(Intake intake, Drive drive, Elevator elevator,
                              Arm arm, Vision vision, GamePiece gamePiece,
                              State scoringState) {

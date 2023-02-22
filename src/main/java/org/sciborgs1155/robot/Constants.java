@@ -1,6 +1,9 @@
 package org.sciborgs1155.robot;
 
 import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPoint;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -274,5 +277,44 @@ public final class Constants {
     public static final double MAX_SPEED = Drive.MAX_SPEED; // m/s
     public static final double MAX_ACCEL = 4; // m/s^2
     public static final PathConstraints CONSTRAINTS = new PathConstraints(RATE, RATE);
+  }
+
+  public static final class Field {
+    // these are completely made up
+    public static final class IntakePoints {
+      // blue
+      public static final Pose2d BLUE_ONE = new Pose2d();
+      public static final Pose2d BLUE_TWO = new Pose2d();
+      public static final Pose2d BLUE_THREE = new Pose2d();
+      public static final Pose2d BLUE_FOUR = new Pose2d();
+      // red
+      public static final Pose2d RED_ONE = new Pose2d();
+      public static final Pose2d RED_TWO = new Pose2d();
+      public static final Pose2d RED_THREE = new Pose2d();
+      public static final Pose2d RED_FOUR = new Pose2d();
+    }
+
+    public static final class ScoringPoints {
+      // blue
+      public static final Pose2d BLUE_ONE = new Pose2d();
+      public static final Pose2d BLUE_TWO = new Pose2d();
+      public static final Pose2d BLUE_THREE = new Pose2d();
+      public static final Pose2d BLUE_FOUR = new Pose2d();
+      public static final Pose2d BLUE_FIVE = new Pose2d();
+      public static final Pose2d BLUE_SIX = new Pose2d();
+      public static final Pose2d BLUE_SEVEN = new Pose2d();
+      public static final Pose2d BLUE_EIGHT = new Pose2d();
+      public static final Pose2d BLUE_NINE = new Pose2d();
+      // red
+      public static final Pose2d RED_ONE = new Pose2d();
+      public static final Pose2d RED_TWO = new Pose2d();
+      public static final Pose2d RED_THREE = new Pose2d();
+      public static final Pose2d RED_FOUR = new Pose2d();
+      public static final Pose2d RED_FIVE = new Pose2d();
+      public static final Pose2d RED_SIX = new Pose2d();
+      public static final Pose2d RED_SEVEN = new Pose2d();
+      public static final Pose2d RED_EIGHT = new Pose2d();
+      public static final Pose2d RED_NINE = new Pose2d();
+    }
   }
 }
