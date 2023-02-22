@@ -5,9 +5,14 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
@@ -15,6 +20,7 @@ import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Arm.Elbow;
 import org.sciborgs1155.robot.Constants.Arm.Wrist;
+import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Ports;
 
@@ -93,6 +99,40 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   public Rotation2d getAbsoluteWristGoal() {
     return getRelativeWristGoal().plus(getElbowGoal());
   }
+    
+  /** Sets elbow goal relative to the chassis */
+  public Command setElbowGoal(TrapezoidProfile.State goal) {
+    return runOnce(
+        () -> elbowFeedback.setGoal(MathUtil.clamp(goal.position, Dimensions.ELBOW_MIN_ANGLE, Dimensions.ELBOW_MAX_ANGLE))
+    );
+  }
+
+  /** Sets wrist goal relative to the forearm */
+  public Command setWristGoal(TrapezoidProfile.State goal) {
+    return runOnce(
+        () -> wristFeedback.setGoal(MathUtil.clamp(goal.position, Dimensions.WRIST_MIN_ANGLE, Dimensions.WRIST_MAX_ANGLE))
+    );
+  }
+
+  public Command setGoals(TrapezoidProfile.State elbowGoal, TrapezoidProfile.State wristGoal) {
+    return setElbowGoal(elbowGoal).andThen(setWristGoal(wristGoal));
+  }
+
+      /** Runs elbow to goal relative to the chassis */
+      public Command runElbowToGoal(TrapezoidProfile.State goal) {
+        return setElbowGoal(goal).andThen(Commands.waitUntil(elbowFeedback::atGoal));
+    }
+
+    /** Runs wrist to goal relative to the forearm */
+    public Command runWristToGoal(TrapezoidProfile.State goal) {
+        return setWristGoal(goal).andThen(Commands.waitUntil(wristFeedback::atGoal));
+    }
+
+    /** Runs elbow and wrist go provided goals, with the wrist goal relative to the forearm */
+    public Command runToGoals(TrapezoidProfile.State elbowGoal, TrapezoidProfile.State wristGoal) {
+        return setGoals(elbowGoal, wristGoal)
+                .andThen(Commands.waitUntil(() -> elbowFeedback.atGoal() && wristFeedback.atGoal()));
+    }
 
   @Override
   public void periodic() {
