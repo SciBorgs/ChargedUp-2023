@@ -15,7 +15,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -135,19 +134,18 @@ public class Drive extends SubsystemBase implements Loggable {
     ySpeed *= MAX_SPEED;
     rot *= MAX_ANGULAR_SPEED;
     SciSwerveModuleState[] states = new SciSwerveModuleState[4];
-    
-      double xAccel = accelX.calculate(xSpeed);
-      double yAccel = accelY.calculate(ySpeed);
-      double rotAlpha = rotAccel.calculate(rot);
 
-      states =
+    double xAccel = accelX.calculate(xSpeed);
+    double yAccel = accelY.calculate(ySpeed);
+    double rotAlpha = rotAccel.calculate(rot);
+
+    states =
         DRIVERKINEMATICS.toSwerveModuleStates(
             fieldRelative
-                ? ChassisState.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, xAccel, yAccel, rotAlpha, getHeading())
+                ? ChassisState.fromFieldRelativeSpeeds(
+                    xSpeed, ySpeed, rot, xAccel, yAccel, rotAlpha, getHeading())
                 : new ChassisState(xSpeed, ySpeed, rot, xAccel, yAccel, rotAlpha),
             new Translation2d());
-      
-      
 
     setModuleStates(states);
   }

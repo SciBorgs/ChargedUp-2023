@@ -55,9 +55,9 @@ public class ChassisState extends ChassisSpeeds {
       double alphaRadiansPerSecondSquared,
       Rotation2d robotAngle) {
     return new ChassisState(
-      vxMetersPerSecond,
-      vyMetersPerSecond,
-      omegaRadiansPerSecond,
+        vxMetersPerSecond,
+        vyMetersPerSecond,
+        omegaRadiansPerSecond,
         axMetersPerSecondSquared * robotAngle.getCos()
             + ayMetersPerSecondSquared * robotAngle.getSin(),
         -axMetersPerSecondSquared * robotAngle.getSin()
