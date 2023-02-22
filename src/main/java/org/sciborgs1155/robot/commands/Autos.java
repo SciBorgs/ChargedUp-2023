@@ -86,8 +86,8 @@ public final class Autos implements Sendable {
   }
 
   public Command balance() {
-    BangBangController balance = new BangBangController(5);
-    return Commands.run(
-      () -> drive.drive(balance.calculate(drive.getPitch(), 0), 0, 0, true));
+    double tolerance = 5;
+    BangBangController balance = new BangBangController(tolerance);
+    return Commands.run(() -> drive.drive(balance.calculate(drive.getPitch(), 0), 0, 0, true));
   }
 }
