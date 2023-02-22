@@ -32,7 +32,9 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   private final CANSparkMax left = Motors.ELEVATOR.build(MotorType.kBrushless, LEFT_MOTOR);
   private final CANSparkMax right = Motors.ELEVATOR.build(MotorType.kBrushless, RIGHT_MOTOR);
 
-  @Log private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1]);
+  // @Log(name = "distance", methodName = "getDistance")
+  @Log
+  private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1]);
   private final EncoderSim simEncoder = new EncoderSim(encoder);
 
   private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
@@ -68,13 +70,11 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Returns the height of the elevator, in meters */
-  @Log(name = "position")
   public double getPosition() {
     return encoder.getDistance();
   }
 
   /** Returns the goal of the elevator, in meters */
-  @Log(name = "at goal")
   public boolean atGoal() {
     return pid.atGoal();
   }

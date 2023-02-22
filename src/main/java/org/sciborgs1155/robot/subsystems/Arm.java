@@ -4,6 +4,7 @@ import static org.sciborgs1155.robot.Ports.Arm.*;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.MathUtil;
@@ -45,7 +46,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   private final EncoderSim elbowEncoderSim = new EncoderSim(elbowEncoder);
 
   @Log(name = "wrist velocity", methodName = "getVelocity")
-  private final AbsoluteEncoder wristEncoder = wrist.getAbsoluteEncoder(Type.kDutyCycle);
+  @Log(name = "Wrist Position!!!", methodName = "getPosition")
+  private final RelativeEncoder wristEncoder = wrist.getEncoder();
 
   private final ArmFeedforward elbowFeedforward =
       new ArmFeedforward(Elbow.kS, Elbow.kG, Elbow.kV, Elbow.kA);
@@ -92,6 +94,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowRight.follow(elbow);
 
     elbowEncoder.setDistancePerPulse(Elbow.ENCODER_FACTOR);
+    wristEncoder.setPositionConversionFactor(1/47.2);
 
     elbow.burnFlash();
     elbowLeft.burnFlash();
@@ -118,7 +121,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Elbow and wrist at goals */
-  @Log(name = "at goal")
   public boolean atGoal() {
     return elbowFeedback.atGoal() && wristFeedback.atGoal();
   }
