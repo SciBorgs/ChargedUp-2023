@@ -6,10 +6,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
+import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
@@ -28,6 +30,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Drive drive = new Drive(vision);
   private final Elevator elevator = new Elevator(visualizer);
+  private final Arm arm = new Arm();
   private final Intake intake = new Intake();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -73,6 +76,9 @@ public class RobotContainer {
     // xbox.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
     rightJoystick.trigger().onTrue(intake.start(false)).onFalse(intake.stop());
     rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
+    
+    xbox.a().onTrue(elevator.setGoal(Constants.Placement.BACK_HIGH_CONE.elevatorState()));
+    xbox.b().onTrue(arm.setGoals(Constants.Placement.BACK_HIGH_CONE.elbowState(), Constants.Placement.BACK_HIGH_CONE.wristState()));
   }
 
   /**
