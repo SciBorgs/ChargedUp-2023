@@ -29,11 +29,6 @@ public class Placement extends SubsystemBase implements Loggable, AutoCloseable 
   private final Elevator elevator =
       Elevator.create(MIDDLE_ELEVATOR_MOTOR, LEFT_ELEVATOR_MOTOR, RIGHT_ELEVATOR_MOTOR);
 
-  @Log
-  private final Elbow elbow = Elbow.create(MIDDLE_ELBOW_MOTOR, LEFT_ELBOW_MOTOR, RIGHT_ELBOW_MOTOR);
-
-  @Log private final Wrist wrist = Wrist.create(WRIST_MOTOR);
-
   @Log(name = "Elevator Feedback")
   private final ProfiledPIDController elevatorFeedback =
       new ProfiledPIDController(
