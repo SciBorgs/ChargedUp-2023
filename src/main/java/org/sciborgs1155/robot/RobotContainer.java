@@ -7,11 +7,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Vision;
+import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.subsystems.Drive;
+import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
-import org.sciborgs1155.robot.subsystems.Placement;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -22,10 +23,11 @@ import org.sciborgs1155.robot.subsystems.Placement;
 public class RobotContainer {
 
   private final Vision vision = new Vision();
+  @Log private final Visualizer visualizer = new Visualizer();
 
   // The robot's subsystems and commands are defined here...
   private final Drive drive = new Drive(vision);
-  private final Placement placement = new Placement();
+  private final Elevator elevator = new Elevator(visualizer);
   private final Intake intake = new Intake();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
