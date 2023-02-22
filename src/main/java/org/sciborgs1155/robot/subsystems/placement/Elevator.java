@@ -9,7 +9,6 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Constants.Arm.ElevatorConstants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Robot;

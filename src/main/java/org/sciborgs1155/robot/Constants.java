@@ -89,7 +89,7 @@ public final class Constants {
 
     public static final double ARM_LENGTH = CLAW_LENGTH + FOREARM_LENGTH;
 
-    public static final double ELEVATOR_MASS = 0;
+    public static final double ELEVATOR_MASS = 4;
 
     public static final double TRACK_WIDTH = Units.inchesToMeters(17);
     // Distance between centers of right and left wheels on robot
@@ -130,7 +130,7 @@ public final class Constants {
   }
 
   public static final class Arm {
-    public static final class WristConstants {
+    public static final class Wrist {
       public static final double kP = 50;
       public static final double kI = 0;
       public static final double kD = 10;
@@ -146,7 +146,7 @@ public final class Constants {
           new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
     }
 
-    public static final class ElbowConstants {
+    public static final class Elbow {
       public static final double GEARING = 12.0 / 72.0; // rot
       public static final double ENCODER_POSITION_FACTOR = GEARING * 2.0 * Math.PI; // rad
       public static final double ENCODER_VELOCITY_FACTOR =
@@ -166,25 +166,25 @@ public final class Constants {
       public static final TrapezoidProfile.Constraints CONSTRAINTS =
           new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
     }
+  }
 
-    public static final class ElevatorConstants {
-      public static final double SPROCKET_RADIUS = Units.inchesToMeters(0.716);
-      public static final double ENCODER_POSITION_FACTOR = 2.0 * Math.PI * SPROCKET_RADIUS; // m
-      public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0; // m/s
+  public static final class Elevator {
+    public static final double SPROCKET_RADIUS = Units.inchesToMeters(0.716);
+    public static final double ENCODER_POSITION_FACTOR = 2.0 * Math.PI * SPROCKET_RADIUS; // m
+    public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0; // m/s
 
-      public static final double MAX_SPEED = 4; // m/s
-      public static final double MAX_ACCEL = 3; // m/s^2
-      public static final double kP = 5;
-      public static final double kI = 0;
-      public static final double kD = 0.1;
+    public static final double MAX_SPEED = 4; // m/s
+    public static final double MAX_ACCEL = 3; // m/s^2
+    public static final double kP = 5;
+    public static final double kI = 0;
+    public static final double kD = 0.1;
 
-      public static final double kS = 0;
-      public static final double kG = 0.762;
-      public static final double kV = 0.762;
-      public static final double kA = 0;
-      public static final TrapezoidProfile.Constraints CONSTRAINTS =
-          new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ACCEL);
-    }
+    public static final double kS = 0;
+    public static final double kG = 0.762;
+    public static final double kV = 0.762;
+    public static final double kA = 0;
+    public static final TrapezoidProfile.Constraints CONSTRAINTS =
+        new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ACCEL);
   }
 
   public static final class Intake {

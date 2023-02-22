@@ -20,16 +20,18 @@ public final class Ports {
     public static final int REAR_RIGHT_TURNING = 3;
   }
 
-  public static final class Placement {
-    public static final int LEFT_ELEVATOR_MOTOR = 8;
-    public static final int RIGHT_ELEVATOR_MOTOR = 9;
-    public static final int MIDDLE_ELEVATOR_MOTOR = 10;
-
+  public static final class Arm {
     public static final int LEFT_ELBOW_MOTOR = 11;
     public static final int MIDDLE_ELBOW_MOTOR = 13;
     public static final int RIGHT_ELBOW_MOTOR = 12;
 
     public static final int WRIST_MOTOR = 23;
+  }
+
+  public static final class Elevator {
+    public static final int LEFT_MOTOR = 8;
+    public static final int RIGHT_MOTOR = 9;
+    public static final int MIDDLE_MOTOR = 10;
   }
 
   public static final class Sensors {
