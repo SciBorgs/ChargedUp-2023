@@ -340,9 +340,6 @@
           }
         }
       },
-      "SmartDashboard": {
-        "open": true
-      },
       "photonvision": {
         "backPhotonVision": {
           "open": true
@@ -366,8 +363,7 @@
         "open": true
       },
       "open": true
-    },
-    "visible": true
+    }
   },
   "Plot": {
     "Plot <0>": {
@@ -378,7 +374,7 @@
               "autoFit": true
             }
           ],
-          "height": 295,
+          "height": 0,
           "series": [
             {
               "color": [
@@ -413,7 +409,7 @@
               "autoFit": true
             }
           ],
-          "height": 295,
+          "height": 0,
           "series": [
             {
               "color": [

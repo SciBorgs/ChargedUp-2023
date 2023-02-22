@@ -4,6 +4,7 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
+import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.Sendable;
@@ -82,5 +83,11 @@ public final class Autos implements Sendable {
   public Command align(double xpole, double ypole) {
     PathPlannerTrajectory trajectory = generateTrajectory(xpole, ypole);
     return drive.follow(trajectory, false, false);
+  }
+
+  public Command balance() {
+    BangBangController balance = new BangBangController(5);
+    return Commands.run(
+      () -> drive.drive(balance.calculate(drive.getPitch(), 0), 0, 0, true));
   }
 }

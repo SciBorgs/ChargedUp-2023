@@ -64,17 +64,6 @@ public class Vision {
   public Vision(Mode mode) {
     try {
       layout = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
-
-      // Load tags in AdvantageScope
-      if (mode == Mode.SIM) {
-        // TODO not sure what this was for
-        // AprilTag[] allTags = layout.getTags().toArray(new AprilTag[] {});
-        // SmartDashboard.putNumberArray("tagposes", createObjects(allTags));
-
-        // double[] list = new double[allTags.length];
-        // for (int i = 0; i < allTags.length; i++) list[i] = (double) i;
-        // SmartDashboard.putNumberArray("tag IDs", list);
-      }
     } catch (Exception e) {
       layout = new AprilTagFieldLayout(new ArrayList<AprilTag>(), 0, 0);
       DriverStation.reportError(
@@ -108,7 +97,6 @@ public class Vision {
     }
   }
 
-  // TODO clean up, i'm not sure how advantagescope deals with 3d poses, but this works
   private double[] createObjects(Pose3d[] scopeTags) {
     double[] data = new double[scopeTags.length * 7];
     for (int i = 0; i < scopeTags.length; i++) {
