@@ -13,6 +13,7 @@ import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.util.PlacementState;
 import org.sciborgs1155.robot.util.Vision;
+import org.sciborgs1155.robot.util.State.Side;
 
 public class Autos implements Sendable {
   private final SendableChooser<AutoPath> pathChooser;
@@ -60,14 +61,9 @@ public class Autos implements Sendable {
       CONE,
       CUBE
     }
-
-    public enum RobotSide {
-      FRONT,
-      BACK
-    }
-
+    
     public static PlacementState scoringState(
-        GamePiece gamePiece, ScoringHeight height, RobotSide side) {
+        GamePiece gamePiece, ScoringHeight height, Side side) {
       switch (gamePiece) {
         case CONE:
           switch (height) {

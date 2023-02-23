@@ -16,6 +16,7 @@ import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.util.PlacementState;
 import org.sciborgs1155.robot.util.Vision;
+import org.sciborgs1155.robot.util.State.Side;;
 
 public interface AutoStep extends Sendable {
 
@@ -29,7 +30,7 @@ public interface AutoStep extends Sendable {
     private final SendableChooser<ScoringHeight> scoringHeightChooser;
     private final Pose2d scoringPose;
 
-    private RobotSide robotSide;
+    private Side robotSide;
 
     // subsystems
     private final Drive drive;
@@ -40,7 +41,7 @@ public interface AutoStep extends Sendable {
 
     public Score(
         Pose2d scoringPose,
-        RobotSide robotSide,
+        Side robotSide,
         Drive drive,
         Vision vision,
         Intake intake,
@@ -74,7 +75,7 @@ public interface AutoStep extends Sendable {
     public Command get() {
       // making sure we're only scoring low from the back
       robotSide =
-          scoringHeightChooser.getSelected() == ScoringHeight.LOW ? robotSide : RobotSide.BACK;
+          scoringHeightChooser.getSelected() == ScoringHeight.LOW ? robotSide : Side.BACK;
 
       GamePiece gamePiece = gamePieceChooser.getSelected();
       PlacementState scoringState =
