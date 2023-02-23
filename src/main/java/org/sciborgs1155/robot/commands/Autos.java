@@ -5,15 +5,14 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.util.PlacementState;
-import org.sciborgs1155.robot.util.Vision;
 import org.sciborgs1155.robot.util.State.Side;
+import org.sciborgs1155.robot.util.Vision;
 
 public class Autos implements Sendable {
   private final SendableChooser<AutoPath> pathChooser;
@@ -61,7 +60,7 @@ public class Autos implements Sendable {
       CONE,
       CUBE
     }
-    
+
     public static PlacementState scoringState(
         GamePiece gamePiece, ScoringHeight height, Side side) {
       switch (gamePiece) {

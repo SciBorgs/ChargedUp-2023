@@ -23,10 +23,10 @@ import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Arm.Elbow;
 import org.sciborgs1155.robot.Constants.Arm.Wrist;
-import org.sciborgs1155.robot.util.Visualizer;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Robot;
+import org.sciborgs1155.robot.util.Visualizer;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
