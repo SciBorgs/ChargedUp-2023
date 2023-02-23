@@ -9,10 +9,13 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+
+import java.util.Map;
+
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.MotorConfig;
 import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
-import org.sciborgs1155.lib.PlacementState;
+import org.sciborgs1155.robot.util.PlacementState;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -307,40 +310,39 @@ public final class Constants {
 
   public static final class Field {
     // these are completely made up
-    public static final class IntakePoints {
-      // blue
-      public static final Pose2d BLUE_ONE = new Pose2d();
-      public static final Pose2d BLUE_TWO = new Pose2d();
-      public static final Pose2d BLUE_THREE = new Pose2d();
-      public static final Pose2d BLUE_FOUR = new Pose2d();
-      // red
-      public static final Pose2d RED_ONE = new Pose2d();
-      public static final Pose2d RED_TWO = new Pose2d();
-      public static final Pose2d RED_THREE = new Pose2d();
-      public static final Pose2d RED_FOUR = new Pose2d();
-    }
 
-    public static final class ScoringPoints {
-      // blue
-      public static final Pose2d BLUE_ONE = new Pose2d();
-      public static final Pose2d BLUE_TWO = new Pose2d();
-      public static final Pose2d BLUE_THREE = new Pose2d();
-      public static final Pose2d BLUE_FOUR = new Pose2d();
-      public static final Pose2d BLUE_FIVE = new Pose2d();
-      public static final Pose2d BLUE_SIX = new Pose2d();
-      public static final Pose2d BLUE_SEVEN = new Pose2d();
-      public static final Pose2d BLUE_EIGHT = new Pose2d();
-      public static final Pose2d BLUE_NINE = new Pose2d();
-      // red
-      public static final Pose2d RED_ONE = new Pose2d();
-      public static final Pose2d RED_TWO = new Pose2d();
-      public static final Pose2d RED_THREE = new Pose2d();
-      public static final Pose2d RED_FOUR = new Pose2d();
-      public static final Pose2d RED_FIVE = new Pose2d();
-      public static final Pose2d RED_SIX = new Pose2d();
-      public static final Pose2d RED_SEVEN = new Pose2d();
-      public static final Pose2d RED_EIGHT = new Pose2d();
-      public static final Pose2d RED_NINE = new Pose2d();
-    }
+    public static final Map<String, Pose2d> INTAKE_POINTS = Map.ofEntries(
+      Map.entry("B1", new Pose2d()),
+      Map.entry("B2", new Pose2d()),
+      Map.entry("B3", new Pose2d()),
+      Map.entry("B4", new Pose2d()),
+      Map.entry("R1", new Pose2d()),
+      Map.entry("R2", new Pose2d()),
+      Map.entry("R3", new Pose2d()),
+      Map.entry("R4", new Pose2d())
+    );
+
+    public static final Map<String, Pose2d> SCORING_POINTS = Map.ofEntries(
+      Map.entry("B1", new Pose2d()),
+      Map.entry("B2", new Pose2d()),
+      Map.entry("B3", new Pose2d()),
+      Map.entry("B4", new Pose2d()),
+      Map.entry("B5", new Pose2d()),
+      Map.entry("B6", new Pose2d()),
+      Map.entry("B7", new Pose2d()),
+      Map.entry("B8", new Pose2d()),
+      Map.entry("B9", new Pose2d()),
+
+      Map.entry("R1", new Pose2d()),
+      Map.entry("R2", new Pose2d()),
+      Map.entry("R3", new Pose2d()),
+      Map.entry("R4", new Pose2d()),
+      Map.entry("R5", new Pose2d()),
+      Map.entry("R6", new Pose2d()),
+      Map.entry("R7", new Pose2d()),
+      Map.entry("R8", new Pose2d()),
+      Map.entry("R9", new Pose2d())
+    );
+
   }
 }

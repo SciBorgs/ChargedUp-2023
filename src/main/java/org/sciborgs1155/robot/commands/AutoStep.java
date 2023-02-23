@@ -5,8 +5,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import org.sciborgs1155.lib.PlacementState;
-import org.sciborgs1155.lib.Vision;
+
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.commands.Autos.PlaceHolderCommands;
 import org.sciborgs1155.robot.commands.Autos.ShouldBeInDiffFile;
@@ -15,6 +14,8 @@ import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
+import org.sciborgs1155.robot.util.PlacementState;
+import org.sciborgs1155.robot.util.Vision;
 
 public interface AutoStep extends Sendable {
 
@@ -101,7 +102,7 @@ public interface AutoStep extends Sendable {
       gamePieceChooser.addOption("cone", GamePiece.CONE);
 
       intakePoseChooser = new SendableChooser<Pose2d>();
-      intakePoseChooser.setDefaultOption("red 1", Constants.Field.IntakePoints.RED_ONE);
+      intakePoseChooser.setDefaultOption("red 1", Constants.Field.INTAKE_POINTS.get("R1"));
       intakePoseChooser.addOption("red 2", Constants.Field.IntakePoints.RED_TWO);
       intakePoseChooser.addOption("red 3", Constants.Field.IntakePoints.RED_THREE);
       intakePoseChooser.addOption("red 4", Constants.Field.IntakePoints.RED_FOUR);
