@@ -103,13 +103,13 @@ public interface AutoStep extends Sendable {
 
       intakePoseChooser = new SendableChooser<Pose2d>();
       intakePoseChooser.setDefaultOption("red 1", Constants.Field.INTAKE_POINTS.get("R1"));
-      intakePoseChooser.addOption("red 2", Constants.Field.IntakePoints.RED_TWO);
-      intakePoseChooser.addOption("red 3", Constants.Field.IntakePoints.RED_THREE);
-      intakePoseChooser.addOption("red 4", Constants.Field.IntakePoints.RED_FOUR);
-      intakePoseChooser.addOption("blue 1", Constants.Field.IntakePoints.BLUE_ONE);
-      intakePoseChooser.addOption("blue 2", Constants.Field.IntakePoints.BLUE_TWO);
-      intakePoseChooser.addOption("blue 3", Constants.Field.IntakePoints.BLUE_THREE);
-      intakePoseChooser.addOption("blue 4", Constants.Field.IntakePoints.BLUE_FOUR);
+      intakePoseChooser.addOption("red 2", Constants.Field.INTAKE_POINTS.get("R2"));
+      intakePoseChooser.addOption("red 3", Constants.Field.INTAKE_POINTS.get("R3"));
+      intakePoseChooser.addOption("red 4", Constants.Field.INTAKE_POINTS.get("R4"));
+      intakePoseChooser.addOption("blue 1", Constants.Field.INTAKE_POINTS.get("B1"));
+      intakePoseChooser.addOption("blue 2", Constants.Field.INTAKE_POINTS.get("B2"));
+      intakePoseChooser.addOption("blue 3", Constants.Field.INTAKE_POINTS.get("B3"));
+      intakePoseChooser.addOption("blue 4", Constants.Field.INTAKE_POINTS.get("B4"));
 
       this.drive = drive;
       this.intake = intake;

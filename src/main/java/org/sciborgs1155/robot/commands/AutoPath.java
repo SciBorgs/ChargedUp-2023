@@ -36,7 +36,7 @@ public class AutoPath {
     AutoPath autoPath =
         new AutoPath(drive, vision, intake, arm, elevator, new ArrayList<AutoStep>());
     autoPath.addIntakeStep();
-    autoPath.addScoreStep(Constants.Field.ScoringPoints.BLUE_EIGHT, RobotSide.FRONT);
+    autoPath.addScoreStep(Constants.Field.SCORING_POINTS.get("B8"), RobotSide.FRONT);
     return autoPath;
   }
 
