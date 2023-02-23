@@ -28,11 +28,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.sciborgs1155.lib.ControllerOutputFunction;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
@@ -312,11 +310,14 @@ public class Drive extends SubsystemBase implements Loggable {
 
   public Command driveToPose(Pose2d pose) {
     PathPoint point = PathPlannerHelpers.pose2dToPathPoint(pose);
-    PathConstraints constraints = new PathConstraints(Constants.Auto.MAX_SPEED, Constants.Auto.MAX_ACCEL);
+    PathConstraints constraints =
+        new PathConstraints(Constants.Auto.MAX_SPEED, Constants.Auto.MAX_ACCEL);
     Pose2d currentPose = getPose();
-    PathPoint currentPoint = new PathPoint(currentPose.getTranslation(), currentPose.getRotation(), currentPose.getRotation());
+    PathPoint currentPoint =
+        new PathPoint(
+            currentPose.getTranslation(), currentPose.getRotation(), currentPose.getRotation());
     List<PathPoint> points = new ArrayList<PathPoint>(List.of(currentPoint, point));
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(constraints, points);
     return follow(trajectory, false, false);
-}
+  }
 }
