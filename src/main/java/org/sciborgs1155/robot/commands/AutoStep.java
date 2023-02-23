@@ -28,6 +28,8 @@ public interface AutoStep extends Sendable {
         private final SendableChooser<GamePiece> gamePieceChooser;
         private final SendableChooser<ScoringHeight> scoringHeightChooser;
         private final Pose2d scoringPose;
+        
+        private RobotSide robotSide;
 
         // subsystems
         private final Drive drive;
@@ -35,8 +37,6 @@ public interface AutoStep extends Sendable {
         private final Intake intake;
         private final Arm arm;
         private final Elevator elevator;
-
-        private RobotSide robotSide;
 
         public Score(Pose2d scoringPose, RobotSide robotSide, Drive drive, Vision vision, Intake intake, Arm arm, Elevator elevator) {
             gamePieceChooser = new SendableChooser<GamePiece>();
@@ -66,9 +66,8 @@ public interface AutoStep extends Sendable {
         @Override
         public Command get() {
             // making sure we're only scoring low from the back
-            if (scoringHeightChooser.getSelected() == ScoringHeight.LOW) {
-                robotSide = RobotSide.BACK;
-            }
+            robotSide = scoringHeightChooser.getSelected() == ScoringHeight.LOW? robotSide : RobotSide.BACK;
+
             GamePiece gamePiece = gamePieceChooser.getSelected();
             PlacementState scoringState = ShouldBeInDiffFile.scoringState(gamePiece, scoringHeightChooser.getSelected(), robotSide);
             return drive.driveToPose(scoringPose).
