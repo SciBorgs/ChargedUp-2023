@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
-import org.sciborgs1155.lib.State;
+import org.sciborgs1155.lib.PlacementState;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.Arm;
@@ -34,7 +34,7 @@ public class Autos implements Sendable {
     public final class PlaceHolderCommands {
         public static Command score(Intake intake, Drive drive, Elevator elevator,
                              Arm arm, Vision vision, ShouldBeInDiffFile.GamePiece gamePiece,
-                             State scoringState) {
+                             PlacementState scoringState) {
             return Commands.none();
         }
 
@@ -55,22 +55,44 @@ public class Autos implements Sendable {
             CUBE
         }
 
-        public static State scoringState(GamePiece gamePiece, ScoringHeight height) {
+        public enum RobotSide {
+            FRONT,
+            BACK
+        }
+        
+        public static PlacementState scoringState(GamePiece gamePiece, ScoringHeight height, RobotSide side) {
             switch (gamePiece) {
                 case CONE:
                     switch (height) {
-                        case HIGH: return Constants.Placement.HIGH_CONE;                   
-                        case MID: return Constants.Placement.MID_CONE;
-                        case LOW: return Constants.Placement.LOW_CONE;
+                        case HIGH:
+                            switch (side) {
+                                case FRONT: return Constants.Positions.FRONT_HIGH_CONE;
+                                case BACK:  return Constants.Positions.BACK_HIGH_CONE;
+                            }               
+                        case MID:
+                            switch (side) {
+                                case FRONT: return Constants.Positions.FRONT_MID_CONE;
+                                case BACK:  return Constants.Positions.BACK_MID_CONE;
+                            }   
+                        case LOW: return Constants.Positions.BACK_LOW_CONE;
                     }
                 case CUBE:
                     switch (height) {
-                        case HIGH: return Constants.Placement.HIGH_CUBE;
-                        case MID: return Constants.Placement.MID_CUBE;
-                        case LOW: return Constants.Placement.LOW_CUBE;
+                        case HIGH:
+                            switch (side) {
+                                case FRONT: return Constants.Positions.FRONT_HIGH_CUBE;
+                                case BACK:  return Constants.Positions.BACK_HIGH_CUBE;
+                            }
+                        case MID:
+                            switch (side) {
+                                case FRONT: return Constants.Positions.FRONT_MID_CUBE;
+                                case BACK:  return Constants.Positions.BACK_MID_CUBE;
+                            }
+                        case LOW: return Constants.Positions.BACK_LOW_CUBE;
                     }
             }
-            throw new RuntimeException("scoringState was note called on valid arguments... probably...");
+            throw new RuntimeException("scoringState was not called on a valid arguments. \n" +
+                                       "gamePiece: " + gamePiece + "; height: " + height + "; side: " + side);
         }
     }
 }

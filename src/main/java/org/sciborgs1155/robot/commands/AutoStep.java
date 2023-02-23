@@ -1,6 +1,6 @@
 package org.sciborgs1155.robot.commands;
 
-import org.sciborgs1155.lib.State;
+import org.sciborgs1155.lib.PlacementState;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.commands.Autos.PlaceHolderCommands;
@@ -36,7 +36,9 @@ public interface AutoStep extends Sendable {
         private final Arm arm;
         private final Elevator elevator;
 
-        public Score(Pose2d scoringPose, Drive drive, Vision vision, Intake intake, Arm arm, Elevator elevator) {
+        private RobotSide robotSide;
+
+        public Score(Pose2d scoringPose, RobotSide robotSide, Drive drive, Vision vision, Intake intake, Arm arm, Elevator elevator) {
             gamePieceChooser = new SendableChooser<GamePiece>();
             gamePieceChooser.setDefaultOption("cube", GamePiece.CUBE);
             gamePieceChooser.addOption("cone", GamePiece.CONE);
@@ -52,6 +54,7 @@ public interface AutoStep extends Sendable {
             this.intake = intake;
             this.arm = arm;
             this.elevator = elevator;
+            this.robotSide = robotSide;
         }
 
         @Override 
@@ -62,8 +65,12 @@ public interface AutoStep extends Sendable {
 
         @Override
         public Command get() {
+            // making sure we're only scoring low from the back
+            if (scoringHeightChooser.getSelected() == ScoringHeight.LOW) {
+                robotSide = RobotSide.BACK;
+            }
             GamePiece gamePiece = gamePieceChooser.getSelected();
-            State scoringState = ShouldBeInDiffFile.scoringState(gamePiece, scoringHeightChooser.getSelected());
+            PlacementState scoringState = ShouldBeInDiffFile.scoringState(gamePiece, scoringHeightChooser.getSelected(), robotSide);
             return drive.driveToPose(scoringPose).
                    andThen(PlaceHolderCommands.score(intake, drive, elevator, arm, vision, gamePiece, scoringState));
         }
@@ -108,7 +115,7 @@ public interface AutoStep extends Sendable {
         @Override
         public Command get() {
             return drive.driveToPose(intakePoseChooser.getSelected())
-                   .andThen(PlaceHolderCommands.intake(intake, null, null, null));
+                   .andThen(PlaceHolderCommands.intake(intake, arm, elevator, gamePieceChooser.getSelected()));
         }
     }
 }

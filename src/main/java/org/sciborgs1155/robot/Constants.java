@@ -1,9 +1,7 @@
 package org.sciborgs1155.robot;
 
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPoint;
-
 import edu.wpi.first.math.geometry.Pose2d;
+import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -14,7 +12,7 @@ import edu.wpi.first.math.util.Units;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.MotorConfig;
 import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
-import org.sciborgs1155.lib.State;
+import org.sciborgs1155.lib.PlacementState;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -51,10 +49,16 @@ public final class Constants {
             .withCurrentLimit(20);
 
     public static final MotorConfig ELEVATOR =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
+        MotorConfig.base()
+            .withBurnFlash(false)
+            .withNeutralBehavior(NeutralBehavior.BRAKE)
+            .withCurrentLimit(40);
 
     public static final MotorConfig ELBOW =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
+        MotorConfig.base()
+            .withBurnFlash(false)
+            .withNeutralBehavior(NeutralBehavior.BRAKE)
+            .withCurrentLimit(50);
 
     public static final MotorConfig WRIST =
         MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
@@ -66,20 +70,27 @@ public final class Constants {
   public static final class Dimensions {
     public static final double ELEVATOR_MIN_HEIGHT = 0;
     public static final double ELEVATOR_MAX_HEIGHT = Units.inchesToMeters(49.3);
-    public static final double FOREARM_LENGTH = Units.inchesToMeters(41);
-    public static final double CLAW_LENGTH = Units.inchesToMeters(20);
 
     public static final double ELBOW_MIN_ANGLE = -Math.PI / 2.0;
     public static final double ELBOW_MAX_ANGLE = 3.0 * Math.PI / 2.0;
     public static final double WRIST_MIN_ANGLE = -Math.PI;
     public static final double WRIST_MAX_ANGLE = Math.PI;
 
-    public static final double CLAW_MASS = 4.4;
+    public static final double CLAW_LENGTH = Units.inchesToMeters(20);
+    public static final double CLAW_MASS = 3.6; // var used to say 4.4, also could be 3.62874
+    public static final double CLAW_MOI =
+        1.0 / 12.0 * CLAW_MASS * CLAW_LENGTH * CLAW_LENGTH; // moi about center point
+    public static final double CLAW_RADIUS = CLAW_LENGTH / 2.0;
+
+    public static final double FOREARM_LENGTH = Units.inchesToMeters(41);
     public static final double FOREARM_MASS = 4.2;
-    public static final double R1 = 0;
-    // Distance from base pivot to center of mass of the elbow
-    public static final double R2 = 0;
-    // Distance from the first joint to center of mass of the claw
+    public static final double FOREARM_MOI =
+        1. / 12 * FOREARM_MASS * FOREARM_LENGTH * FOREARM_LENGTH;
+    public static final double FOREARM_RADIUS = FOREARM_LENGTH / 2;
+
+    public static final double ARM_LENGTH = CLAW_LENGTH + FOREARM_LENGTH;
+
+    public static final double ELEVATOR_MASS = 4;
 
     public static final double TRACK_WIDTH = Units.inchesToMeters(17);
     // Distance between centers of right and left wheels on robot
@@ -120,7 +131,7 @@ public final class Constants {
   }
 
   public static final class Arm {
-    public static final class WristConstants {
+    public static final class Wrist {
       public static final double kP = 50;
       public static final double kI = 0;
       public static final double kD = 10;
@@ -136,7 +147,12 @@ public final class Constants {
           new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
     }
 
-    public static final class ElbowConstants {
+    public static final class Elbow {
+      public static final double GEARING = 12.0 / 72.0; // rot
+      public static final double ENCODER_POSITION_FACTOR = GEARING * 2.0 * Math.PI; // rad
+      public static final double ENCODER_VELOCITY_FACTOR =
+          ENCODER_POSITION_FACTOR / 60.0; // rad / s
+
       public static final double kP = 10;
       public static final double kI = 0;
       public static final double kD = 5;
@@ -146,21 +162,18 @@ public final class Constants {
       public static final double kV = 2;
       public static final double kA = 0;
 
-      public static final double MAX_VELOCITY = 3; // radians / s
-      public static final double MAX_ACCEL = 3; // radians / s^2
+      public static final double MAX_VELOCITY = 3; // rad / s
+      public static final double MAX_ACCEL = 3; // rad / s^2
       public static final TrapezoidProfile.Constraints CONSTRAINTS =
           new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
-
-      public static final double GEAR_RATIO = 1 / 6.0;
-      public static final double MOVEMENT_PER_SPIN = (1.5 * Math.PI);
     }
   }
 
-  public static final class Intake {
-    public static final double WHEEL_SPEED = 0.6;
-  }
-
   public static final class Elevator {
+    public static final double SPROCKET_RADIUS = Units.inchesToMeters(0.716);
+    public static final double ENCODER_FACTOR =
+        2.0 * Math.PI * SPROCKET_RADIUS / THROUGH_BORE_CPR; // m / pulse
+
     public static final double MAX_SPEED = 4; // m/s
     public static final double MAX_ACCEL = 3; // m/s^2
     public static final double kP = 5;
@@ -173,9 +186,10 @@ public final class Constants {
     public static final double kA = 0;
     public static final TrapezoidProfile.Constraints CONSTRAINTS =
         new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ACCEL);
-    public static final double GEAR_RATIO = 1.0;
-    public static final double MOVEMENTPERSPIN =
-        1.1938 / 6.0; // m / (50 rotations of motor) wtf is this
+  }
+
+  public static final class Intake {
+    public static final double WHEEL_SPEED = 0.6;
   }
 
   public static final class Drive {
@@ -252,13 +266,25 @@ public final class Constants {
     }
   }
 
-  public static final class Placement {
-    public static final State MID_CONE = State.fromAbsolute(0, 0.2, 0.6);
-    public static final State HIGH_CONE = State.fromAbsolute(0, 1, 1.1);
-    public static final State LOW_CONE = State.fromAbsolute(0, 0.1, 0);
-    public static final State MID_CUBE = State.fromAbsolute(0, 0.2, 0.6);
-    public static final State HIGH_CUBE = State.fromAbsolute(0, 1, 1.1);
-    public static final State LOW_CUBE = State.fromAbsolute(0, 0.1, 0);
+  public static final class Positions {
+    // tested
+
+    // untested
+    public static final PlacementState SAFE = PlacementState.fromAbsolute(0, Math.PI / 2.0, 0);
+
+    public static final PlacementState FRONT_MID_CONE = PlacementState.fromAbsolute(0, 0.2, 0.6);
+    public static final PlacementState FRONT_HIGH_CONE = PlacementState.fromAbsolute(0, 1, 1.1);
+
+    public static final PlacementState BACK_LOW_CONE = PlacementState.fromAbsolute(0, 0.1, 0);
+    public static final PlacementState BACK_MID_CONE = PlacementState.fromAbsolute(0, 0.2, 0.6);
+    public static final PlacementState BACK_HIGH_CONE = PlacementState.fromAbsolute(0, 1, 1.1);
+
+    public static final PlacementState FRONT_MID_CUBE = PlacementState.fromAbsolute(0, 0.2, 0.6);
+    public static final PlacementState FRONT_HIGH_CUBE = PlacementState.fromAbsolute(0, 1, 1.1);
+
+    public static final PlacementState BACK_LOW_CUBE = PlacementState.fromAbsolute(0, 0.1, 0);
+    public static final PlacementState BACK_MID_CUBE = PlacementState.fromAbsolute(0, 0.2, 0.6);
+    public static final PlacementState BACK_HIGH_CUBE = PlacementState.fromAbsolute(0, 1, 1.1);
   }
 
   public static final class Auto {

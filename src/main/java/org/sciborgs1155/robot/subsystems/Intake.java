@@ -12,7 +12,7 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.robot.Constants.Motors;
 
-public class Intake extends SubsystemBase implements Loggable {
+public class Intake extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log(name = "applied output", methodName = "getAppliedOutput")
   private final CANSparkMax wheels = Motors.INTAKE.build(MotorType.kBrushless, WHEEL_MOTOR);
@@ -20,8 +20,8 @@ public class Intake extends SubsystemBase implements Loggable {
   @Log(name = "velocity", methodName = "getVelocity")
   private final RelativeEncoder encoder = wheels.getEncoder();
 
-  public Command start() {
-    return runOnce(() -> wheels.set(WHEEL_SPEED));
+  public Command start(boolean reversed) {
+    return runOnce(() -> wheels.set(reversed ? -WHEEL_SPEED : WHEEL_SPEED));
   }
 
   public Command stop() {
@@ -30,5 +30,10 @@ public class Intake extends SubsystemBase implements Loggable {
 
   public Command run() {
     return startEnd(() -> wheels.set(WHEEL_SPEED), wheels::stopMotor);
+  }
+
+  @Override
+  public void close() {
+    wheels.close();
   }
 }

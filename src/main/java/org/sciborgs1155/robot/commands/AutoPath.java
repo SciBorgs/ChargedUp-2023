@@ -7,6 +7,7 @@ import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.subsystems.*;
 
 import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.commands.Autos.ShouldBeInDiffFile.RobotSide;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,7 +23,7 @@ public class AutoPath {
 
     private List<AutoStep> steps;
 
-    public AutoPath(Drive drive, Vision vision, Intake intake, Arm arm, Elevator elevator, List<AutoStep> steps) {
+    private AutoPath(Drive drive, Vision vision, Intake intake, Arm arm, Elevator elevator, List<AutoStep> steps) {
         this.drive = drive;
         this.vision = vision;
         this.intake = intake;
@@ -34,7 +35,7 @@ public class AutoPath {
     public static AutoPath examplePath(Drive drive, Vision vision, Intake intake, Arm arm, Elevator elevator) {
         AutoPath autoPath = new AutoPath(drive, vision, intake, arm, elevator, new ArrayList<AutoStep>());
         autoPath.addIntakeStep();
-        autoPath.addScoreStep(Constants.Field.ScoringPoints.BLUE_EIGHT);
+        autoPath.addScoreStep(Constants.Field.ScoringPoints.BLUE_EIGHT, RobotSide.FRONT);
         return autoPath;
     }
 
@@ -42,8 +43,8 @@ public class AutoPath {
         steps.add(new AutoStep.IntakePiece(drive, intake, elevator, arm));
     }
 
-    private void addScoreStep(Pose2d scoringPose) {
-        steps.add(new AutoStep.Score(scoringPose, drive, vision, intake, arm, elevator));
+    private void addScoreStep(Pose2d scoringPose, RobotSide robotSide) {
+        steps.add(new AutoStep.Score(scoringPose, robotSide, drive, vision, intake, arm, elevator));
     }
 
     public Command get() {
