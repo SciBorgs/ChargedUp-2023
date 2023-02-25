@@ -33,8 +33,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   private final CANSparkMax right = Motors.ELEVATOR.build(MotorType.kBrushless, RIGHT_MOTOR);
 
   // @Log(name = "distance", methodName = "getDistance")
-  @Log
-  private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1]);
+  @Log private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1]);
   private final EncoderSim simEncoder = new EncoderSim(encoder);
 
   private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);

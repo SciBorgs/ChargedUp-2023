@@ -2,11 +2,9 @@ package org.sciborgs1155.robot.subsystems;
 
 import static org.sciborgs1155.robot.Ports.Arm.*;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -94,7 +92,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowRight.follow(elbow);
 
     elbowEncoder.setDistancePerPulse(Elbow.ENCODER_FACTOR);
-    wristEncoder.setPositionConversionFactor(1/47.2);
+    wristEncoder.setPositionConversionFactor(1 / 47.2);
 
     elbow.burnFlash();
     elbowLeft.burnFlash();
