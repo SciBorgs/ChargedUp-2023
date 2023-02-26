@@ -20,6 +20,8 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/LiveWindow/Drive": "Subsystem",
+      "/LiveWindow/Ungrouped/DigitalInput[7]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[8]": "Digital Input",
       "/LiveWindow/Ungrouped/PIDController[10]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[11]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
@@ -257,21 +259,6 @@
           "visible": true
         }
       },
-      "/Shuffleboard/RobotContainer/autos": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/Shuffleboard/RobotContainer/visualizer": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/backCam Sim Field": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/backPhotonVision Sim Field": {
         "backPhotonVision Camera": {
           "arrowColor": [
@@ -295,11 +282,6 @@
           "visible": true
         }
       },
-      "/SmartDashboard/frontCam Sim Field": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/frontPhotonVision Sim Field": {
         "frontPhotonVision Camera": {
           "arrowColor": [
@@ -319,11 +301,6 @@
           "length": 0.4099999964237213,
           "width": 0.30000001192092896
         },
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/photonvision Sim Field": {
         "window": {
           "visible": true
         }
@@ -390,15 +367,6 @@
           "autos": {
             "open": true
           }
-        },
-        "open": true
-      },
-      "SmartDashboard": {
-        "backPhotonVision Sim Field": {
-          "open": true
-        },
-        "frontPhotonVision Sim Field": {
-          "open": true
         }
       },
       "photonvision": {
@@ -407,7 +375,8 @@
         },
         "frontPhotonVision": {
           "open": true
-        }
+        },
+        "open": true
       }
     }
   },
