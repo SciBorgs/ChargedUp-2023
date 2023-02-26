@@ -10,6 +10,7 @@ import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -27,7 +28,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
-import org.sciborgs1155.lib.ControllerOutputFunction;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Auto;
@@ -35,6 +35,7 @@ import org.sciborgs1155.robot.Ports.Sensors;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 
 public class Drive extends SubsystemBase implements Loggable {
+
   @Log
   private final SwerveModule frontLeft =
       SwerveModule.create(FRONT_LEFT_DRIVE, FRONT_LEFT_TURNING, ANGULAR_OFFSETS[0]);
@@ -56,13 +57,18 @@ public class Drive extends SubsystemBase implements Loggable {
   // The gyro sensor
   @Log private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Sensors.PIGEON);
 
+  private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
+
   // Odometry and pose estimation
   private final Vision vision;
   private final SwerveDrivePoseEstimator odometry =
-      new SwerveDrivePoseEstimator(KINEMATICS, getHeading(), getModulePositions(), new Pose2d());
+      new SwerveDrivePoseEstimator(kinematics, getHeading(), getModulePositions(), new Pose2d());
 
   @Log private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d = new FieldObject2d[modules.length];
+
+  // Rate limiting
+  private final SlewRateLimiter magnitudeLimiter = new SlewRateLimiter(MAX_RATE);
 
   public Drive(Vision vision) {
     this.vision = vision;
@@ -108,18 +114,26 @@ public class Drive extends SubsystemBase implements Loggable {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    // scale inputs based on maximum values
-    xSpeed *= MAX_SPEED;
-    ySpeed *= MAX_SPEED;
+    xSpeed = Math.pow(xSpeed, INPUT_POW) * MAX_SPEED;
+    ySpeed = Math.pow(ySpeed, INPUT_POW) * MAX_SPEED;
     rot *= MAX_ANGULAR_SPEED;
 
-    var states =
-        KINEMATICS.toSwerveModuleStates(
-            fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getHeading())
-                : new ChassisSpeeds(xSpeed, ySpeed, rot));
+    double magnitude = magnitudeLimiter.calculate(Math.hypot(xSpeed, ySpeed));
+    // Math.atan2(-0.0, -0.0) = -PI, we want it to be 0
+    double direction = ySpeed == 0 && xSpeed == 0 ? 0 : Math.atan2(ySpeed, xSpeed);
 
-    setModuleStates(states);
+    xSpeed = magnitude * Math.cos(direction);
+    ySpeed = magnitude * Math.sin(direction);
+
+    var speeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
+
+    if (fieldRelative) {
+      speeds =
+          ChassisSpeeds.fromFieldRelativeSpeeds(
+              speeds, odometry.getEstimatedPosition().getRotation());
+    }
+
+    setModuleStates(kinematics.toSwerveModuleStates(speeds));
   }
 
   /**
@@ -165,7 +179,7 @@ public class Drive extends SubsystemBase implements Loggable {
    */
   @Log
   public double getTurnRate() {
-    return gyro.getRate() * (GYRO_REVERSED ? -1.0 : 1.0);
+    return gyro.getRate();
   }
 
   /**
@@ -200,8 +214,9 @@ public class Drive extends SubsystemBase implements Loggable {
     gyro.getSimCollection()
         .addHeading(
             Units.radiansToDegrees(
-                KINEMATICS.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
+                kinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
                     * Constants.RATE));
+
     vision.updateSeenTags();
   }
 
@@ -226,7 +241,7 @@ public class Drive extends SubsystemBase implements Loggable {
     return new PPSwerveControllerCommand(
             trajectory,
             this::getPose,
-            KINEMATICS,
+            kinematics,
             x,
             y,
             rot,
@@ -244,40 +259,16 @@ public class Drive extends SubsystemBase implements Loggable {
   /** Drive based on xbox */
   public Command drive(CommandXboxController xbox, boolean fieldRelative) {
     return run(
-        () -> {
-          double rawX = -xbox.getLeftY();
-          double rawY = -xbox.getLeftX();
-          double rawSpeed = Math.sqrt(rawX * rawX + rawY * rawY);
-          double speedFactor = mapper.map(rawSpeed) / rawSpeed;
-          double rawOmega = -xbox.getRightX();
-          drive(
-              MathUtil.applyDeadband(rawX * speedFactor, Constants.DEADBAND),
-              MathUtil.applyDeadband(rawY * speedFactor, Constants.DEADBAND),
-              MathUtil.applyDeadband(mapper.map(rawOmega), Constants.DEADBAND),
-              fieldRelative);
-        });
+        () ->
+            drive(
+                -MathUtil.applyDeadband(xbox.getLeftX(), Constants.DEADBAND),
+                -MathUtil.applyDeadband(xbox.getLeftY(), Constants.DEADBAND),
+                MathUtil.applyDeadband(xbox.getRightX(), Constants.DEADBAND),
+                fieldRelative));
   }
-
-  // TODO replace
-  private static final ControllerOutputFunction mapper =
-      ControllerOutputFunction.powerExp(Math.E, Math.PI);
 
   /** Drive based on joysticks */
   public Command drive(CommandJoystick left, CommandJoystick right, boolean fieldRelative) {
-    // return run(
-    //     () -> {
-    //       double rawX = -left.getY();
-    //       double rawY = -left.getX();
-    //       double rawSpeed = Math.sqrt(rawX * rawX + rawY * rawY);
-    //       double speedFactor = mapper.map(rawSpeed) / rawSpeed;
-    //       double rawOmega = -right.getX();
-    //       drive(
-    //           MathUtil.applyDeadband(speedFactor * rawX, Constants.DEADBAND),
-    //           MathUtil.applyDeadband(speedFactor * rawY, Constants.DEADBAND),
-    //           MathUtil.applyDeadband(mapper.map(rawOmega), Constants.DEADBAND),
-    //           fieldRelative);
-    //     });
-
     return run(
         () ->
             drive(

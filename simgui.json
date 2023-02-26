@@ -20,6 +20,8 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/LiveWindow/Drive": "Subsystem",
+      "/LiveWindow/Ungrouped/DigitalInput[7]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[8]": "Digital Input",
       "/LiveWindow/Ungrouped/PIDController[10]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[11]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
@@ -374,7 +376,7 @@
               "autoFit": true
             }
           ],
-          "height": 0,
+          "height": 295,
           "series": [
             {
               "color": [
@@ -409,7 +411,7 @@
               "autoFit": true
             }
           ],
-          "height": 0,
+          "height": 295,
           "series": [
             {
               "color": [

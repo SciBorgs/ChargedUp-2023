@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
@@ -186,10 +185,6 @@ public final class Constants {
       new Translation2d(-Dimensions.WHEEL_BASE / 2, -Dimensions.TRACK_WIDTH / 2) // rear right
     };
 
-    public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(MODULE_OFFSET);
-
-    public static final boolean GYRO_REVERSED = false;
-
     // angular offsets of the modules, since we use absolute encoders
     // ignored (used as 0) in simulation because the simulated robot doesn't have offsets
     public static final double[] ANGULAR_OFFSETS = {
@@ -198,6 +193,10 @@ public final class Constants {
       Math.PI, // rear left
       Math.PI / 2 // rear right
     };
+
+    public static final double MAX_RATE = 7; // m / s^2
+    // limits open loop accel, used to prevent tipping
+    public static final int INPUT_POW = 3;
   }
 
   public static final class SwerveModule {
