@@ -38,10 +38,6 @@ public final class Ports {
     public static final int[] ENCODER = {6, 7};
   }
 
-  public static final class Sensors {
-    public static final int PIGEON = 2;
-  }
-
   public static final class Intake {
     public static final int WHEEL_MOTOR = 6;
   }

@@ -3,7 +3,6 @@ package org.sciborgs1155.robot.subsystems;
 import static org.sciborgs1155.robot.Constants.Drive.*;
 import static org.sciborgs1155.robot.Ports.Drive.*;
 
-import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
@@ -19,6 +18,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,7 +32,6 @@ import java.util.Arrays;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Auto;
-import org.sciborgs1155.robot.Ports.Sensors;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 
 public class Drive extends SubsystemBase implements Loggable {
@@ -55,7 +55,8 @@ public class Drive extends SubsystemBase implements Loggable {
   private final SwerveModule[] modules = {frontLeft, frontRight, rearLeft, rearRight};
 
   // The gyro sensor
-  @Log private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Sensors.PIGEON);
+  @Log private final ADIS16470_IMU gyro = new ADIS16470_IMU();
+  private final ADIS16470_IMUSim gyroSim = new ADIS16470_IMUSim(gyro);
 
   private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
@@ -94,7 +95,7 @@ public class Drive extends SubsystemBase implements Loggable {
    * @return A Rotation2d of our angle
    */
   public Rotation2d getHeading() {
-    return gyro.getRotation2d();
+    return Rotation2d.fromDegrees(gyro.getAngle());
   }
 
   /**
@@ -183,7 +184,11 @@ public class Drive extends SubsystemBase implements Loggable {
    */
   @Log
   public double getPitch() {
-    return gyro.getPitch();
+    // TODO this might work, i have no clue how to use the ADIS16470 class
+    //
+    // filteredAccelAngle methods could be used to balance gravity
+    // the method currently probably doesn't work
+    return gyro.getXComplementaryAngle();
   }
 
   @Override
@@ -191,10 +196,12 @@ public class Drive extends SubsystemBase implements Loggable {
     odometry.update(getHeading(), getModulePositions());
 
     var poses = vision.getPoseEstimates(getPose());
+
     for (int i = 0; i < poses.length; i++) {
       odometry.addVisionMeasurement(poses[i].estimatedPose.toPose2d(), poses[i].timestampSeconds);
       field2d.getObject("Cam-" + i + " Est Pose").setPose(poses[i].estimatedPose.toPose2d());
     }
+
     field2d.setRobotPose(getPose());
 
     for (int i = 0; i < modules2d.length; i++) {
@@ -205,11 +212,10 @@ public class Drive extends SubsystemBase implements Loggable {
 
   @Override
   public void simulationPeriodic() {
-    gyro.getSimCollection()
-        .addHeading(
-            Units.radiansToDegrees(
-                kinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
-                    * Constants.RATE));
+    double rate =
+        Units.radiansToDegrees(kinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond);
+    gyroSim.setGyroRateZ(rate);
+    gyroSim.setGyroAngleZ(gyro.getAngle() + rate * Constants.RATE);
 
     vision.updateSeenTags();
   }

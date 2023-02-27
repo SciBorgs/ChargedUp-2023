@@ -28,7 +28,7 @@ import org.sciborgs1155.lib.PlacementState;
  */
 public final class Constants {
 
-  public static final double RATE = 0.02; // roborio tickrate
+  public static final double RATE = 0.02; // roborio tickrate (s)
   public static final double CONTROLLER_RATE = 0.015; // controller tickrate
   public static final double DEADBAND = 0.06;
   public static final int THROUGH_BORE_CPP = 2048;
@@ -210,7 +210,7 @@ public final class Constants {
       Math.PI / 2 // rear right
     };
 
-    public static final double MAX_RATE = 7; // m / s^2
+    public static final double MAX_RATE = 8; // m / s^2
     // limits open loop accel, used to prevent tipping
     public static final int INPUT_POW = 3;
   }
