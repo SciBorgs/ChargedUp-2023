@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -77,6 +78,11 @@ public class RobotContainer {
     // xbox.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
     rightJoystick.trigger().onTrue(intake.start(false)).onFalse(intake.stop());
     rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
+
+    xbox.a().onTrue(elevator.setGoal(1));
+    xbox.b().onTrue(elevator.setGoal(0));
+    xbox.povUp().onTrue(arm.setGoals(Rotation2d.fromDegrees(5), Rotation2d.fromDegrees(15)));
+    xbox.povDown().onTrue(arm.setGoals(Rotation2d.fromDegrees(-5), Rotation2d.fromDegrees(5)));
   }
 
   /**

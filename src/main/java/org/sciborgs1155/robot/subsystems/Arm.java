@@ -146,6 +146,13 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Sets both the wrist and elbow goals */
+  public Command setGoals(Rotation2d elbowGoal, Rotation2d wristGoal) {
+    return setGoals(
+        new TrapezoidProfile.State(elbowGoal.getRadians(), 0),
+        new TrapezoidProfile.State(wristGoal.getRadians(), 0));
+  }
+
+  /** Sets both the wrist and elbow goals */
   public Command setGoals(TrapezoidProfile.State elbowGoal, TrapezoidProfile.State wristGoal) {
     return setElbowGoal(elbowGoal).andThen(setWristGoal(wristGoal));
   }

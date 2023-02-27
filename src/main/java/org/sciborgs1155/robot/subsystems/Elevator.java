@@ -78,6 +78,11 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     return pid.atGoal();
   }
 
+  /** Sets the elevator's goal to a height */
+  public Command setGoal(double goal) {
+    return setGoal(new TrapezoidProfile.State(goal, 0));
+  }
+
   /** Sets the elevator's goal to a {@link TrapezoidProfile.State} */
   public Command setGoal(TrapezoidProfile.State goal) {
     return runOnce(
