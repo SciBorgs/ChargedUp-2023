@@ -81,6 +81,8 @@ public class RobotContainer {
 
     xbox.a().onTrue(elevator.setGoal(1));
     xbox.b().onTrue(elevator.setGoal(0));
+    xbox.x().onTrue(intake.start(false)).onFalse(intake.stop());
+    xbox.y().onTrue(intake.start(true)).onFalse(intake.stop());
     xbox.povUp().onTrue(arm.setGoals(Rotation2d.fromDegrees(5), Rotation2d.fromDegrees(15)));
     xbox.povDown().onTrue(arm.setGoals(Rotation2d.fromDegrees(-5), Rotation2d.fromDegrees(5)));
   }
