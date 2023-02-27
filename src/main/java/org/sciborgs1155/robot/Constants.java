@@ -151,9 +151,9 @@ public final class Constants {
       public static final double ENCODER_FACTOR = CONVERSION / Constants.THROUGH_BORE_CPP;
 
       // public static final double kP = 8.0252;
-      public static final double kP = 1.4;
+      public static final double kP = 0.5;
       public static final double kI = 0;
-      public static final double kD = 0.5;
+      public static final double kD = 0.2;
 
       public static final double kS = 0.12117;
       public static final double kG = 0.48397;
