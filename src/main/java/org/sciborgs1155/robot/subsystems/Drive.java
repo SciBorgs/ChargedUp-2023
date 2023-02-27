@@ -68,7 +68,8 @@ public class Drive extends SubsystemBase implements Loggable {
   private final FieldObject2d[] modules2d = new FieldObject2d[modules.length];
 
   // Rate limiting
-  private final SlewRateLimiter magnitudeLimiter = new SlewRateLimiter(MAX_RATE);
+  private final SlewRateLimiter xLimiter = new SlewRateLimiter(MAX_RATE);
+  private final SlewRateLimiter yLimiter = new SlewRateLimiter(MAX_RATE);
 
   public Drive(Vision vision) {
     this.vision = vision;
@@ -114,16 +115,9 @@ public class Drive extends SubsystemBase implements Loggable {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    xSpeed = Math.pow(xSpeed, INPUT_POW) * MAX_SPEED;
-    ySpeed = Math.pow(ySpeed, INPUT_POW) * MAX_SPEED;
+    xSpeed = xLimiter.calculate(Math.pow(xSpeed, INPUT_POW) * MAX_SPEED);
+    ySpeed = yLimiter.calculate(Math.pow(ySpeed, INPUT_POW) * MAX_SPEED);
     rot *= MAX_ANGULAR_SPEED;
-
-    double magnitude = magnitudeLimiter.calculate(Math.hypot(xSpeed, ySpeed));
-    // Math.atan2(-0.0, -0.0) = -PI, we want it to be 0
-    double direction = ySpeed == 0 && xSpeed == 0 ? 0 : Math.atan2(ySpeed, xSpeed);
-
-    xSpeed = magnitude * Math.cos(direction);
-    ySpeed = magnitude * Math.sin(direction);
 
     var speeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
 
