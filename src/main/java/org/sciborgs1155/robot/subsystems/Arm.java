@@ -2,6 +2,8 @@ package org.sciborgs1155.robot.subsystems;
 
 import static org.sciborgs1155.robot.Ports.Arm.*;
 
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
@@ -93,7 +95,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
     elbowEncoder.setDistancePerPulse(Elbow.ENCODER_FACTOR);
     wristEncoder.setPositionConversionFactor(
-        1.0 / 20.0 * 2.0 * Math.PI); // neo built in is 1:1, gearing is 20:1, we use radians
+        1.0 / 47.22222222222 * 2.0 * Math.PI); // neo built in is 1:1, gearing is 20:1, we use radians
 
     elbow.burnFlash();
     elbowLeft.burnFlash();
@@ -173,15 +175,20 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     return setGoals(elbowGoal, wristGoal).andThen(Commands.waitUntil(this::atGoal));
   }
 
+  double v = 0;
+  public Command setVoltage(DoubleSupplier v) {
+    return run(() -> this.v = v.getAsDouble());
+  }
+
   @Override
   public void periodic() {
     double elbowFB = elbowFeedback.calculate(getElbowPosition().getRadians());
     double elbowFF =
         elbowFeedforward.calculate(
-            elbowFeedback.getSetpoint().position,
+            getElbowPosition().getRadians(),
             elbowFeedback.getSetpoint().velocity,
             elbowAccel.calculate(elbowFeedback.getSetpoint().velocity));
-    elbow.setVoltage(elbowFB + elbowFF);
+    elbow.setVoltage(v);
 
     // wrist feedback is calculated using an absolute angle setpoint, rather than a relative one
     // this means the extra voltage calculated to cancel out gravity is kG * cos(θ + ϕ), where θ is
@@ -191,7 +198,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     double wristFB = wristFeedback.calculate(getRelativeWristPosition().getRadians());
     double wristFF =
         wristFeedforward.calculate(
-            wristFeedback.getSetpoint().position + elbowFeedback.getSetpoint().position,
+            getAbsoluteWristPosition().getRadians(),
             wristFeedback.getSetpoint().velocity,
             wristAccel.calculate(wristFeedback.getSetpoint().velocity));
     wrist.setVoltage(wristFB + wristFF);

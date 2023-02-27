@@ -56,6 +56,7 @@ public class RobotContainer {
 
   private void configureSubsystemDefaults() {
     drive.setDefaultCommand(drive.drive(leftJoystick, rightJoystick, true));
+    arm.setDefaultCommand(arm.setVoltage(() -> xbox.getRightY() * 3));
   }
 
   /**
@@ -77,14 +78,18 @@ public class RobotContainer {
     // cancelling on release.
     // xbox.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
     rightJoystick.trigger().onTrue(intake.start(false)).onFalse(intake.stop());
-    rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
+    // rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
 
-    xbox.a().onTrue(elevator.setGoal(1));
+    xbox.a().onTrue(elevator.setGoal(0.5));
     xbox.b().onTrue(elevator.setGoal(0));
     xbox.x().onTrue(intake.start(false)).onFalse(intake.stop());
     xbox.y().onTrue(intake.start(true)).onFalse(intake.stop());
-    xbox.povUp().onTrue(arm.setGoals(Rotation2d.fromDegrees(5), Rotation2d.fromDegrees(15)));
-    xbox.povDown().onTrue(arm.setGoals(Rotation2d.fromDegrees(-5), Rotation2d.fromDegrees(5)));
+    // xbox.povUp().onTrue(arm.setGoals(Rotation2d.fromDegrees(5), Rotation2d.fromDegrees(0)));
+    // xbox.povDown().onTrue(arm.setGoals(Rotation2d.fromDegrees(-5), Rotation2d.fromDegrees(0)));
+    // xbox.povUp().onTrue(arm.setVoltage(3)).onFalse(arm.setVoltage(0));
+    // xbox.povDown().onTrue(arm.setVoltage(-3)).onFalse(arm.setVoltage(0));
+    
+    
   }
 
   /**

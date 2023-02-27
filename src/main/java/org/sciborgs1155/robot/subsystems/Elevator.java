@@ -13,6 +13,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -110,6 +111,8 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     lead.setVoltage(fbOutput + ffOutput);
 
     visualizer.setElevator(getPosition(), pid.getGoal().position);
+
+    SmartDashboard.putNumber("setpoint", pid.getSetpoint().position);
   }
 
   @Override

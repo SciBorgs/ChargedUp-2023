@@ -29,7 +29,7 @@ import org.sciborgs1155.lib.PlacementState;
 public final class Constants {
 
   public static final double RATE = 0.02; // roborio tickrate (s)
-  public static final double DEADBAND = 0.06;
+  public static final double DEADBAND = 0.1;
   public static final int THROUGH_BORE_CPP = 2048;
 
   public static final class Motors {
@@ -66,7 +66,7 @@ public final class Constants {
 
   public static final class Dimensions {
     public static final double ELEVATOR_MIN_HEIGHT = 0;
-    public static final double ELEVATOR_MAX_HEIGHT = Units.inchesToMeters(49.3);
+    public static final double ELEVATOR_MAX_HEIGHT = 0.7; // m
 
     public static final double ELBOW_MIN_ANGLE = -Math.PI / 2.0;
     public static final double ELBOW_MAX_ANGLE = 3.0 * Math.PI / 2.0;
@@ -129,7 +129,7 @@ public final class Constants {
 
   public static final class Arm {
     public static final class Wrist {
-      public static final double kP = 0;
+      public static final double kP = 0.6;
       public static final double kI = 0;
       public static final double kD = 0;
 
@@ -150,7 +150,7 @@ public final class Constants {
       public static final double ENCODER_FACTOR = CONVERSION / Constants.THROUGH_BORE_CPP;
 
       // public static final double kP = 8.0252;
-      public static final double kP = 0.5;
+      public static final double kP = 2;
       public static final double kI = 0;
       public static final double kD = 0.2;
 
@@ -171,16 +171,16 @@ public final class Constants {
     public static final double CONVERSION = 2.0 * Math.PI * SPROCKET_RADIUS; // m
     public static final double ENCODER_FACTOR = CONVERSION / Constants.THROUGH_BORE_CPP;
 
-    public static final double MAX_SPEED = 4; // m/s
-    public static final double MAX_ACCEL = 3; // m/s^2
-    public static final double kP = 0;
+    public static final double MAX_SPEED = 20; // m/s
+    public static final double MAX_ACCEL = 8; // m/s^2
+    public static final double kP = 45; // 384.48
     public static final double kI = 0;
-    public static final double kD = 0;
+    public static final double kD = 1; // 47.131
 
-    public static final double kS = 0;
-    public static final double kG = 0;
-    public static final double kV = 0;
-    public static final double kA = 0;
+    public static final double kS = 0.39974;
+    public static final double kG = 0.060732;
+    public static final double kV = 29.798;
+    public static final double kA = 2.554;
     public static final TrapezoidProfile.Constraints CONSTRAINTS =
         new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ACCEL);
   }

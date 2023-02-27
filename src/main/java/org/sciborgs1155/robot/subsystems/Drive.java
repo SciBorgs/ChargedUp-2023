@@ -262,9 +262,9 @@ public class Drive extends SubsystemBase implements Loggable {
     return run(
         () ->
             drive(
-                -MathUtil.applyDeadband(xbox.getLeftX(), Constants.DEADBAND),
                 -MathUtil.applyDeadband(xbox.getLeftY(), Constants.DEADBAND),
-                MathUtil.applyDeadband(xbox.getRightX(), Constants.DEADBAND),
+                -MathUtil.applyDeadband(xbox.getLeftX(), Constants.DEADBAND),
+                -MathUtil.applyDeadband(xbox.getRightX(), Constants.DEADBAND),
                 fieldRelative));
   }
 
@@ -273,9 +273,9 @@ public class Drive extends SubsystemBase implements Loggable {
     return run(
         () ->
             drive(
-                -MathUtil.applyDeadband(left.getX(), Constants.DEADBAND),
                 -MathUtil.applyDeadband(left.getY(), Constants.DEADBAND),
-                MathUtil.applyDeadband(right.getX(), Constants.DEADBAND),
+                -MathUtil.applyDeadband(left.getX(), Constants.DEADBAND),
+                -MathUtil.applyDeadband(right.getX(), Constants.DEADBAND),
                 fieldRelative));
   }
 
