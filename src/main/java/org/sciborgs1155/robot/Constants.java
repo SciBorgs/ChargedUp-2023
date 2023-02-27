@@ -29,7 +29,6 @@ import org.sciborgs1155.lib.PlacementState;
 public final class Constants {
 
   public static final double RATE = 0.02; // roborio tickrate (s)
-  public static final double CONTROLLER_RATE = 0.015; // controller tickrate
   public static final double DEADBAND = 0.06;
   public static final int THROUGH_BORE_CPP = 2048;
 
@@ -81,7 +80,7 @@ public final class Constants {
     public static final double CLAW_RADIUS = CLAW_LENGTH / 2.0;
 
     public static final double FOREARM_LENGTH = Units.inchesToMeters(41);
-    public static final double FOREARM_MASS = 4.2;
+    public static final double FOREARM_MASS = Units.lbsToKilograms(4.2);
     public static final double FOREARM_MOI =
         1. / 12 * FOREARM_MASS * FOREARM_LENGTH * FOREARM_LENGTH;
     public static final double FOREARM_RADIUS = FOREARM_LENGTH / 2;
@@ -90,9 +89,9 @@ public final class Constants {
 
     public static final double ELEVATOR_MASS = 4;
 
-    public static final double TRACK_WIDTH = Units.inchesToMeters(17);
+    public static final double TRACK_WIDTH = Units.inchesToMeters(24);
     // Distance between centers of right and left wheels on robot
-    public static final double WHEEL_BASE = Units.inchesToMeters(17);
+    public static final double WHEEL_BASE = Units.inchesToMeters(24);
     // Distance between front and back wheels on robot
 
     // Field dimensions
@@ -231,12 +230,12 @@ public final class Constants {
           (WHEEL_DIAMETER * Math.PI) / DRIVING_MOTOR_REDUCTION; // m
       public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0; // m/s
 
-      public static final double kP = 2.5;
+      public static final double kP = 0.07;
       public static final double kI = 0;
-      public static final double kD = 0.1;
+      public static final double kD = 0.06;
 
       public static final double kS = 0.27;
-      public static final double kV = 1;
+      public static final double kV = 0.4;
       public static final double kA = 0.2;
     }
 

@@ -142,6 +142,7 @@ public class Drive extends SubsystemBase implements Loggable {
     }
 
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, MAX_SPEED);
+
     for (int i = 0; i < modules.length; i++) {
       modules[i].setDesiredState(desiredStates[i]);
     }

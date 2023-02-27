@@ -92,7 +92,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowRight.follow(elbow);
 
     elbowEncoder.setDistancePerPulse(Elbow.ENCODER_FACTOR);
-    wristEncoder.setPositionConversionFactor(1 / 47.2);
+    wristEncoder.setPositionConversionFactor(
+        1.0 / 20.0 * 2.0 * Math.PI); // neo built in is 1:1, gearing is 20:1, we use radians
 
     elbow.burnFlash();
     elbowLeft.burnFlash();

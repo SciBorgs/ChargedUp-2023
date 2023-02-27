@@ -20,6 +20,9 @@
         "header": {
           "open": true
         }
+      },
+      "window": {
+        "visible": false
       }
     }
   },
@@ -266,6 +269,11 @@
           "visible": true
         }
       },
+      "/Shuffleboard/RobotContainer/visualizer": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/backPhotonVision Sim Field": {
         "backPhotonVision Camera": {
           "arrowColor": [
@@ -374,7 +382,8 @@
           "autos": {
             "open": true
           }
-        }
+        },
+        "open": true
       },
       "photonvision": {
         "backPhotonVision": {
@@ -382,8 +391,7 @@
         },
         "frontPhotonVision": {
           "open": true
-        },
-        "open": true
+        }
       }
     }
   },
