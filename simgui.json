@@ -47,6 +47,7 @@
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/Shuffleboard/Drive/field2d": "Field2d",
       "/Shuffleboard/Drive/gyro": "Gyro",
+      "/Shuffleboard/Drive/imu": "Gyro",
       "/Shuffleboard/Drivetrain/gyro": "Gyro",
       "/Shuffleboard/Elevator/limitSwitchOne": "Digital Input",
       "/Shuffleboard/Elevator/limitSwitchTwo": "Digital Input",

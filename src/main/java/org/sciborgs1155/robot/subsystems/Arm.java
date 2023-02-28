@@ -2,8 +2,6 @@ package org.sciborgs1155.robot.subsystems;
 
 import static org.sciborgs1155.robot.Ports.Arm.*;
 
-import java.util.function.DoubleSupplier;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
@@ -21,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
+import java.util.function.DoubleSupplier;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
@@ -95,7 +94,10 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
     elbowEncoder.setDistancePerPulse(Elbow.ENCODER_FACTOR);
     wristEncoder.setPositionConversionFactor(
-        1.0 / 47.22222222222 * 2.0 * Math.PI); // neo built in is 1:1, gearing is 20:1, we use radians
+        1.0
+            / 47.22222222222
+            * 2.0
+            * Math.PI); // neo built in is 1:1, gearing is 20:1, we use radians
 
     elbow.burnFlash();
     elbowLeft.burnFlash();
@@ -176,6 +178,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   double v = 0;
+
   public Command setVoltage(DoubleSupplier v) {
     return run(() -> this.v = v.getAsDouble());
   }
