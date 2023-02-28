@@ -86,8 +86,8 @@ public class RobotContainer {
     xbox.y().onTrue(intake.start(true)).onFalse(intake.stop());
     // xbox.povUp().onTrue(arm.setGoals(Rotation2d.fromDegrees(5), Rotation2d.fromDegrees(0)));
     // xbox.povDown().onTrue(arm.setGoals(Rotation2d.fromDegrees(-5), Rotation2d.fromDegrees(0)));
-    // xbox.povUp().onTrue(arm.setVoltage(3)).onFalse(arm.setVoltage(0));
-    // xbox.povDown().onTrue(arm.setVoltage(-3)).onFalse(arm.setVoltage(0));
+    // xbox.p.onTrue(arm.setVoltage(3)).onFalse(arm.setVoltage(0));
+    // xbox.povDownovUp()().onTrue(arm.setVoltage(-3)).onFalse(arm.setVoltage(0));
     
     
   }
@@ -98,6 +98,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return arm.setElbowGoal(new TrapezoidProfile.State(0.75 * Math.PI, 0));
+    // return drive.follow("PRAY", false, false);
+    // return arm.setElbowGoal(new TrapezoidProfile.State(0.75 * Math.PI, 0));
+    return autos.get();
   }
 }

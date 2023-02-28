@@ -209,7 +209,7 @@ public final class Constants {
       Math.PI / 2 // rear right
     };
 
-    public static final double MAX_RATE = 8; // m / s^2
+    public static final double MAX_RATE = 10; // m / s^2
     // limits open loop accel, used to prevent tipping
     public static final int INPUT_POW = 3;
   }
