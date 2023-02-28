@@ -37,7 +37,9 @@ public final class Autos implements Sendable {
   }
 
   private Command mobility() {
-    return Commands.run(() -> drive.drive(0.8, 0, 0, false), drive).withTimeout(2).andThen(() -> drive.drive(-0.8, 0, 0, false));
+    return Commands.run(() -> drive.drive(0.8, 0, 0, false), drive)
+        .withTimeout(2)
+        .andThen(() -> drive.drive(-0.8, 0, 0, false));
   }
 
   @Override

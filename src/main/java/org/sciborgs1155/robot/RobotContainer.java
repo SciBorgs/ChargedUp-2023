@@ -1,6 +1,5 @@
 package org.sciborgs1155.robot;
 
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -87,8 +86,7 @@ public class RobotContainer {
     // xbox.povDown().onTrue(arm.setGoals(Rotation2d.fromDegrees(-5), Rotation2d.fromDegrees(0)));
     // xbox.p.onTrue(arm.setVoltage(3)).onFalse(arm.setVoltage(0));
     // xbox.povDownovUp()().onTrue(arm.setVoltage(-3)).onFalse(arm.setVoltage(0));
-    
-    
+
   }
 
   /**
