@@ -54,7 +54,7 @@ public class RobotContainer {
 
   private void configureSubsystemDefaults() {
     drive.setDefaultCommand(drive.drive(leftJoystick, rightJoystick, true));
-    arm.setDefaultCommand(arm.setVoltage(() -> xbox.getRightY() * 3));
+    arm.setDefaultCommand(arm.setVoltage(() -> xbox.getRightY() * 3, () -> xbox.getLeftY() * 3));
   }
 
   /**
@@ -78,7 +78,7 @@ public class RobotContainer {
     rightJoystick.trigger().onTrue(intake.start(false)).onFalse(intake.stop());
     // rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
 
-    xbox.a().onTrue(elevator.setGoal(0.5));
+    xbox.a().onTrue(elevator.setGoal(0.55));
     xbox.b().onTrue(elevator.setGoal(0));
     xbox.x().onTrue(intake.start(false)).onFalse(intake.stop());
     xbox.y().onTrue(intake.start(true)).onFalse(intake.stop());
@@ -95,8 +95,9 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // return drive.follow("PRAY", false, false);
-    // return arm.setElbowGoal(new TrapezoidProfile.State(0.75 * Math.PI, 0));
+    // return drive.follow("PRAY", true, true);
     return autos.get();
+    // return arm.setElbowGoal(new TrapezoidProfile.State(0.75 * Math.PI, 0));
+    // return autos.get();
   }
 }

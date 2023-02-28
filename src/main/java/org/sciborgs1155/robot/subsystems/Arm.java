@@ -178,9 +178,18 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   double v = 0;
+  double wristV = 0;
 
-  public Command setVoltage(DoubleSupplier v) {
-    return run(() -> this.v = v.getAsDouble());
+  public Command setVoltage(DoubleSupplier v, DoubleSupplier wristV) {
+    return run(
+        () -> {
+          this.v = v.getAsDouble();
+          this.wristV = wristV.getAsDouble();
+        });
+  }
+
+  public Command setWristVoltage(DoubleSupplier v) {
+    return run(() -> this.wristV = v.getAsDouble());
   }
 
   @Override
@@ -204,7 +213,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             getAbsoluteWristPosition().getRadians(),
             wristFeedback.getSetpoint().velocity,
             wristAccel.calculate(wristFeedback.getSetpoint().velocity));
-    wrist.setVoltage(wristFB + wristFF);
+    wrist.setVoltage(wristV);
 
     visualizer.setElbow(
         getElbowPosition(), Rotation2d.fromRadians(elbowFeedback.getGoal().position));

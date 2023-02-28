@@ -186,7 +186,7 @@ public final class Constants {
   }
 
   public static final class Intake {
-    public static final double WHEEL_SPEED = 0.6;
+    public static final double WHEEL_SPEED = 0.4;
   }
 
   public static final class Drive {
@@ -286,13 +286,13 @@ public final class Constants {
 
   public static final class Auto {
     public static final class Cartesian {
-      public static final double kP = 3.5;
+      public static final double kP = 1.2;
       public static final double kI = 0;
       public static final double kD = 0;
     }
 
     public static final class Angular {
-      public static final double kP = 10;
+      public static final double kP = 1.2;
       public static final double kI = 0;
       public static final double kD = 1;
     }
