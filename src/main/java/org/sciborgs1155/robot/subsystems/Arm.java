@@ -88,6 +88,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   private final Visualizer visualizer;
 
+  private double v, wristV;
+
   public Arm(Visualizer visualizer) {
     elbowLeft.follow(elbow);
     elbowRight.follow(elbow);
@@ -105,6 +107,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     wrist.burnFlash();
 
     this.visualizer = visualizer;
+    this.v = 0;
+    this.wristV = 0;
   }
 
   /** Elbow position relative to the chassis */
@@ -176,9 +180,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   public Command runToGoals(TrapezoidProfile.State elbowGoal, TrapezoidProfile.State wristGoal) {
     return setGoals(elbowGoal, wristGoal).andThen(Commands.waitUntil(this::atGoal));
   }
-
-  double v = 0;
-  double wristV = 0;
 
   public Command setVoltage(DoubleSupplier v, DoubleSupplier wristV) {
     return run(
