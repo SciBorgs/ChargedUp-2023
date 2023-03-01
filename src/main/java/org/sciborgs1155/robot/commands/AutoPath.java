@@ -6,10 +6,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.ArrayList;
 import java.util.List;
-import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.commands.Autos.ShouldBeInDiffFile.RobotSide;
 import org.sciborgs1155.robot.subsystems.*;
+import org.sciborgs1155.robot.util.State.Side;
+import org.sciborgs1155.robot.util.Vision;
 
 public class AutoPath {
 
@@ -36,7 +36,7 @@ public class AutoPath {
     AutoPath autoPath =
         new AutoPath(drive, vision, intake, arm, elevator, new ArrayList<AutoStep>());
     // autoPath.addIntakeStep();
-    autoPath.addScoreStep(Constants.Field.ScoringPoints.BLUE_EIGHT, RobotSide.FRONT);
+    autoPath.addScoreStep(Constants.Field.SCORING_POINTS.get("B8"), Side.FRONT);
     return autoPath;
   }
 
@@ -50,7 +50,7 @@ public class AutoPath {
     steps.add(new AutoStep.IntakePiece(drive, intake, elevator, arm));
   }
 
-  private void addScoreStep(Pose2d scoringPose, RobotSide robotSide) {
+  private void addScoreStep(Pose2d scoringPose, Side robotSide) {
     steps.add(new AutoStep.Score(scoringPose, robotSide, drive, vision, intake, arm, elevator));
   }
 
