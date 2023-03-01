@@ -7,30 +7,30 @@ import org.sciborgs1155.robot.Constants;
 /** Ideal swerve module, useful for debugging */
 public class GoalSwerveModule implements SwerveModule {
 
-    private SwerveModuleState state = new SwerveModuleState();
-    private double distance;
+  private SwerveModuleState state = new SwerveModuleState();
+  private double distance;
 
-    @Override
-    public SwerveModuleState getState() {
-        return state;
-    }
+  @Override
+  public SwerveModuleState getState() {
+    return state;
+  }
 
-    @Override
-    public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(distance, state.angle);
-    }
+  @Override
+  public SwerveModulePosition getPosition() {
+    return new SwerveModulePosition(distance, state.angle);
+  }
 
-    @Override
-    public void setDesiredState(SwerveModuleState desiredState) {
-        state = SwerveModuleState.optimize(desiredState, state.angle);
-        distance += state.speedMetersPerSecond * Constants.RATE;
-    }
+  @Override
+  public void setDesiredState(SwerveModuleState desiredState) {
+    state = SwerveModuleState.optimize(desiredState, state.angle);
+    distance += state.speedMetersPerSecond * Constants.RATE;
+  }
 
-    @Override
-    public SwerveModuleState getDesiredState() {
-        return state;
-    }
+  @Override
+  public SwerveModuleState getDesiredState() {
+    return state;
+  }
 
-    @Override
-    public void resetEncoders() {}
+  @Override
+  public void resetEncoders() {}
 }

@@ -5,15 +5,15 @@ import static org.sciborgs1155.robot.Ports.Elevator.*;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.simulation.DIOSim;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,113 +27,105 @@ import org.sciborgs1155.robot.Constants.Motors;
 
 public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
-    @Log(name = "applied output", methodName = "getAppliedOutput")
-    private final CANSparkMax lead = Motors.ELEVATOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
+  @Log(name = "applied output", methodName = "getAppliedOutput")
+  private final CANSparkMax lead = Motors.ELEVATOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
 
-    private final CANSparkMax left = Motors.ELEVATOR.build(MotorType.kBrushless, LEFT_MOTOR);
-    private final CANSparkMax right = Motors.ELEVATOR.build(MotorType.kBrushless, RIGHT_MOTOR);
+  private final CANSparkMax left = Motors.ELEVATOR.build(MotorType.kBrushless, LEFT_MOTOR);
+  private final CANSparkMax right = Motors.ELEVATOR.build(MotorType.kBrushless, RIGHT_MOTOR);
 
-    @Log(name = "velocity", methodName = "getVelocity")
-    private final RelativeEncoder encoder = lead.getAlternateEncoder(Constants.THROUGH_BORE_CPR);
+  @Log private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1]);
+  private final EncoderSim simEncoder = new EncoderSim(encoder);
 
-    private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
-    @Log private final ProfiledPIDController pid = new ProfiledPIDController(kP, kI, kD, CONSTRAINTS);
+  private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
 
-    @Log private final DigitalInput limitSwitchOne = new DigitalInput(LIMIT_SWITCH_PORTS[0]);
-    @Log private final DigitalInput limitSwitchTwo = new DigitalInput(LIMIT_SWITCH_PORTS[1]);
+  @Log private final ProfiledPIDController pid = new ProfiledPIDController(kP, kI, kD, CONSTRAINTS);
 
-    private final DIOSim limitOneSim = new DIOSim(limitSwitchOne);
-    private final DIOSim limitTwoSim = new DIOSim(limitSwitchTwo);
+  @Log(name = "acceleration", methodName = "getLastOutput")
+  private final Derivative accel = new Derivative();
 
-    @Log(name = "acceleration", methodName = "getLastOutput")
-    private final Derivative accel = new Derivative();
+  private final ElevatorSim sim =
+      new ElevatorSim(
+          DCMotor.getNEO(3),
+          CONVERSION,
+          Dimensions.ELEVATOR_MASS + Dimensions.FOREARM_MASS + Dimensions.CLAW_MASS,
+          SPROCKET_RADIUS,
+          Dimensions.ELEVATOR_MIN_HEIGHT,
+          Dimensions.ELEVATOR_MAX_HEIGHT,
+          true);
 
-    // simulation
-    private final ElevatorSim sim =
-            new ElevatorSim(
-                    DCMotor.getNEO(3),
-                    10,
-                    4,
-                    Units.inchesToMeters(2),
-                    Dimensions.ELEVATOR_MIN_HEIGHT,
-                    Dimensions.ELEVATOR_MAX_HEIGHT,
-                    true);
+  private final Visualizer visualizer;
 
-    private final Visualizer visualizer;
+  public Elevator(Visualizer visualizer) {
+    left.follow(lead);
+    right.follow(lead);
 
-    public Elevator(Visualizer visualizer) {
-        left.follow(lead);
-        right.follow(lead);
+    encoder.setDistancePerPulse(ENCODER_FACTOR);
 
-        this.visualizer = visualizer;
-    }
+    lead.burnFlash();
+    left.burnFlash();
+    right.burnFlash();
 
-    /** Elevator is at goal */
-    @Log(name = "at goal")
-    public boolean atGoal() {
-        return pid.atGoal();
-    }
+    this.visualizer = visualizer;
+  }
 
-    /** Elevator height from the base, in meters */
-    @Log(name = "current height")
-    public double getHeight() {
-        return encoder.getPosition();
-    }
+  /** Returns the height of the elevator, in meters */
+  public double getPosition() {
+    return encoder.getDistance();
+  }
 
-    /** Elevator goal from the base, in meters */
-    @Log(name = "goal height")
-    public double getGoal() {
-        return pid.getGoal().position;
-    }
+  /** Returns the goal of the elevator, in meters */
+  public boolean atGoal() {
+    return pid.atGoal();
+  }
 
-    /** If a limit switch is triggered */
-    @Log(name = "hitting")
-    public boolean isHitting() {
-        return limitSwitchOne.get() || limitSwitchOne.get();
-    }
+  /** Sets the elevator's goal to a height */
+  public Command setGoal(double goal) {
+    return setGoal(new TrapezoidProfile.State(goal, 0));
+  }
 
-    /** Elevator goal from the base, in meters */
-    public Command setGoal(double height) {
-        return runOnce(
-                () ->
-                        pid.setGoal(
-                                MathUtil.clamp(
-                                        height, Dimensions.ELEVATOR_MIN_HEIGHT, Dimensions.ELEVATOR_MAX_HEIGHT)));
-    }
+  /** Sets the elevator's goal to a {@link TrapezoidProfile.State} */
+  public Command setGoal(TrapezoidProfile.State goal) {
+    return runOnce(
+        () ->
+            pid.setGoal(
+                new TrapezoidProfile.State(
+                    MathUtil.clamp(
+                        goal.position,
+                        Dimensions.ELEVATOR_MIN_HEIGHT,
+                        Dimensions.ELEVATOR_MAX_HEIGHT),
+                    goal.velocity)));
+  }
 
-    /** Runs elevator to goal height, from the base in meters */
-    public Command runToGoal(double height) {
-        return setGoal(height).andThen(Commands.waitUntil(this::atGoal));
-    }
+  /** Runs the elevator to a goal {@link TrapezoidProfile.State} */
+  public Command runToGoal(TrapezoidProfile.State goal) {
+    return setGoal(goal).andThen(Commands.waitUntil(this::atGoal));
+  }
 
-    @Override
-    public void periodic() {
-        double pidOutput = pid.calculate(encoder.getPosition());
-        double ffOutput =
-                ff.calculate(pid.getSetpoint().velocity, accel.calculate(pid.getSetpoint().velocity));
+  @Override
+  public void periodic() {
+    double fbOutput = pid.calculate(getPosition());
+    double ffOutput =
+        ff.calculate(pid.getSetpoint().velocity, accel.calculate(pid.getSetpoint().velocity));
 
-        lead.setVoltage(isHitting() ? 0 : pidOutput + ffOutput);
+    lead.setVoltage(fbOutput + ffOutput);
 
-        visualizer.setElevatorHeight(encoder.getPosition());
-    }
+    visualizer.setElevator(getPosition(), pid.getGoal().position);
 
-    @Override
-    public void simulationPeriodic() {
-        sim.setInputVoltage(lead.getAppliedOutput());
-        sim.update(Constants.RATE);
-        encoder.setPosition(sim.getPositionMeters());
+    SmartDashboard.putNumber("setpoint", pid.getSetpoint().position);
+  }
 
-        limitOneSim.setValue(false);
-        limitTwoSim.setValue(false);
-    }
+  @Override
+  public void simulationPeriodic() {
+    sim.setInputVoltage(lead.getAppliedOutput());
+    sim.update(Constants.RATE);
+    simEncoder.setDistance(sim.getPositionMeters());
+    simEncoder.setRate(sim.getVelocityMetersPerSecond());
+  }
 
-    @Override
-    public void close() {
-        lead.close();
-        left.close();
-        right.close();
-
-        limitSwitchOne.close();
-        limitSwitchTwo.close();
-    }
+  @Override
+  public void close() {
+    lead.close();
+    left.close();
+    right.close();
+  }
 }

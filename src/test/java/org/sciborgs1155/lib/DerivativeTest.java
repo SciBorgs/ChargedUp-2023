@@ -9,19 +9,19 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 public class DerivativeTest {
 
-    @BeforeEach
-    void setup() {
-        assert HAL.initialize(500, 0);
-    }
+  @BeforeEach
+  void setup() {
+    assert HAL.initialize(500, 0);
+  }
 
-    @ParameterizedTest
-    @ValueSource(doubles = {1, 2, 3, 4, 5})
-    void derivative(double x) throws InterruptedException {
-        for (int i = 0; i < 3; i++) {
-            Derivative dt = new Derivative();
-            dt.calculate(1);
-            Thread.sleep(100);
-            assertEquals(9.75 * (x - 1), dt.calculate(x), 2);
-        }
+  @ParameterizedTest
+  @ValueSource(doubles = {1, 2, 3, 4, 5})
+  void derivative(double x) throws InterruptedException {
+    for (int i = 0; i < 3; i++) {
+      Derivative dt = new Derivative();
+      dt.calculate(1);
+      Thread.sleep(100);
+      assertEquals(9.75 * (x - 1), dt.calculate(x), 2);
     }
+  }
 }
