@@ -113,9 +113,9 @@ public class Drive extends SubsystemBase implements Loggable {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    xSpeed = xLimiter.calculate(Math.pow(xSpeed, INPUT_POW) * MAX_SPEED);
-    ySpeed = yLimiter.calculate(Math.pow(ySpeed, INPUT_POW) * MAX_SPEED);
-    rot = Math.pow(rot, INPUT_POW) * MAX_ANGULAR_SPEED;
+    xSpeed = xLimiter.calculate(Math.pow(xSpeed, 2) * Math.signum(xSpeed) * MAX_SPEED);
+    ySpeed = yLimiter.calculate(Math.pow(ySpeed, 2) * Math.signum(ySpeed) * MAX_SPEED);
+    rot = Math.pow(rot, 2) * Math.signum(rot) * MAX_ANGULAR_SPEED;
 
     var speeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
 
