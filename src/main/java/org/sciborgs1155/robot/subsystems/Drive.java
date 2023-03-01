@@ -71,7 +71,7 @@ public class Drive extends SubsystemBase implements Loggable {
 
   public Drive(Vision vision) {
     this.vision = vision;
-
+  
     for (int i = 0; i < modules2d.length; i++) {
       modules2d[i] = field2d.getObject("module-" + i);
     }
@@ -189,7 +189,7 @@ public class Drive extends SubsystemBase implements Loggable {
 
     var poses = vision.getPoseEstimates(getPose());
     for (int i = 0; i < poses.length; i++) {
-      odometry.addVisionMeasurement(poses[i].estimatedPose.toPose2d(), poses[i].timestampSeconds);
+      // odometry.addVisionMeasurement(poses[i].estimatedPose.toPose2d(), poses[i].timestampSeconds);
       field2d.getObject("Cam-" + i + " Est Pose").setPose(poses[i].estimatedPose.toPose2d());
     }
     field2d.setRobotPose(getPose());

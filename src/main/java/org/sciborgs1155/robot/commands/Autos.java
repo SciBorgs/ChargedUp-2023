@@ -19,6 +19,7 @@ public class Autos implements Sendable {
   public Autos(Drive drive, Intake intake, Vision vision, Arm arm, Elevator elevator) {
     pathChooser = new SendableChooser<AutoPath>();
     pathChooser.setDefaultOption("simple", AutoPath.simpleDrivePath(drive, vision, intake, arm, elevator));
+    pathChooser.addOption("example", AutoPath.examplePath(drive, vision, intake, arm, elevator));
   }
 
   @Override

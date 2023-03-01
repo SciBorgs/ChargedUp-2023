@@ -2,6 +2,7 @@ package org.sciborgs1155.robot;
 
 import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -295,9 +296,9 @@ public final class Constants {
     }
 
     public static final class Angular {
-      public static final double kP = 10;
+      public static final double kP = 0.5;
       public static final double kI = 0;
-      public static final double kD = 1;
+      public static final double kD = 0;
     }
 
     public static final double MAX_SPEED = Drive.MAX_SPEED; // m/s
@@ -329,7 +330,7 @@ public final class Constants {
       public static final Pose2d BLUE_FIVE = new Pose2d();
       public static final Pose2d BLUE_SIX = new Pose2d();
       public static final Pose2d BLUE_SEVEN = new Pose2d();
-      public static final Pose2d BLUE_EIGHT = new Pose2d();
+      public static final Pose2d BLUE_EIGHT = new Pose2d(0, 4, Rotation2d.fromDegrees(45));
       public static final Pose2d BLUE_NINE = new Pose2d();
       // red
       public static final Pose2d RED_ONE = new Pose2d();

@@ -1,6 +1,9 @@
 package org.sciborgs1155.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -84,6 +87,14 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autos.get();
+    // return Commands.none();
+    // return autos.get();
+    drive.resetOdometry(new Pose2d(1, 1, Rotation2d.fromDegrees(0)));
+    return drive.driveToPose(new Pose2d(1, 4, Rotation2d.fromDegrees(0)));
+    // return Commands.run(() -> drive.drive(1, 1, Math.PI/2, false), drive);
   }
+
+  // public void initStuff() {
+  //   drive.resetOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
+  // }
 }
