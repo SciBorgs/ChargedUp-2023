@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.ArrayList;
@@ -39,12 +40,22 @@ public class AutoPath {
     return autoPath;
   }
 
+  public static AutoPath simpleDrivePath(Drive drive, Vision vision, Intake intake, Arm arm, Elevator elevator) {
+    AutoPath autoPath = new AutoPath(drive, vision, intake, arm, elevator, new ArrayList<AutoStep>());
+    autoPath.addDriveStep(new Pose2d(0, 4, Rotation2d.fromRadians(0)));
+    return autoPath;
+  }
+
   private void addIntakeStep() {
     steps.add(new AutoStep.IntakePiece(drive, intake, elevator, arm));
   }
 
   private void addScoreStep(Pose2d scoringPose, RobotSide robotSide) {
     steps.add(new AutoStep.Score(scoringPose, robotSide, drive, vision, intake, arm, elevator));
+  }
+
+  private void addDriveStep(Pose2d pose) {
+    steps.add(new AutoStep.DriveToPose(drive, pose));
   }
 
   public Command get() {

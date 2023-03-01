@@ -1,6 +1,8 @@
 package org.sciborgs1155.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -128,6 +130,41 @@ public interface AutoStep extends Sendable {
           .driveToPose(intakePoseChooser.getSelected())
           .andThen(
               PlaceHolderCommands.intake(intake, arm, elevator, gamePieceChooser.getSelected()));
+    }
+  }
+
+  public final class DriveToPose implements AutoStep {
+    private Pose2d pose;
+
+    private final Drive drive;
+
+    public DriveToPose(Drive drive, Pose2d pose) {
+      this.pose = pose;
+      this.drive = drive;
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.addDoubleProperty("x coord", () -> this.pose.getX(), this::setX);
+        builder.addDoubleProperty("y coord", () -> this.pose.getY(), this::setY);
+        builder.addDoubleProperty("theta (rads)", () -> this.pose.getRotation().getRadians(), this::setTheta);
+    }
+
+    @Override
+    public Command get() {
+        return drive.driveToPose(pose);
+    }
+
+    private void setX(double x) {
+      this.pose = new Pose2d(x, this.pose.getY(), this.pose.getRotation());
+    }
+
+    private void setY(double y) {
+      this.pose = new Pose2d(this.pose.getX(), y, this.pose.getRotation());
+    }
+
+    private void setTheta(double thetaRads) {
+      this.pose = new Pose2d(this.pose.getTranslation(), Rotation2d.fromRadians(thetaRads));
     }
   }
 }
