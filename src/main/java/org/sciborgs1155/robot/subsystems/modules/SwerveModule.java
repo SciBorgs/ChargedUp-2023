@@ -24,6 +24,10 @@ public interface SwerveModule extends Sendable {
 
   public void resetEncoders();
 
+  public void setTurnPID(double kP, double kI, double kD);
+
+  public void setDrivePID(double kP, double kI, double kD);
+
   @Override
   default void initSendable(SendableBuilder builder) {
     builder.addDoubleProperty("current velocity", () -> getState().speedMetersPerSecond, null);
