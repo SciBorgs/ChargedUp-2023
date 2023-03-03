@@ -21,8 +21,8 @@ public class SimSwerveModule implements SwerveModule {
   private final WheelSim turn =
       new WheelSim(Turning.kV, Turning.kA, DCMotor.getNeo550(1), Turning.ENCODER_POSITION_FACTOR);
 
-  private final PIDController driveFeedback = new PIDController(Driving.kP, Driving.kI, Driving.kD);
-  private final PIDController turnFeedback = new PIDController(Turning.kP, Turning.kI, Turning.kD);
+  private final PIDController driveFeedback = Driving.PID.create();
+  private final PIDController turnFeedback = Turning.PID.create();
 
   private final SimpleMotorFeedforward driveFeedforward =
       new SimpleMotorFeedforward(Driving.kS, Driving.kV, Driving.kA);

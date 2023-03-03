@@ -59,9 +59,7 @@ public class MAXSwerveModule implements SwerveModule {
     driveEncoder.setPositionConversionFactor(Driving.ENCODER_POSITION_FACTOR);
     driveEncoder.setVelocityConversionFactor(Driving.ENCODER_VELOCITY_FACTOR);
 
-    driveFeedback.setP(Driving.kP);
-    driveFeedback.setI(Driving.kI);
-    driveFeedback.setD(Driving.kD);
+    Driving.PID.set(driveFeedback);
 
     turningEncoder.setPositionConversionFactor(Turning.ENCODER_POSITION_FACTOR);
     turningEncoder.setVelocityConversionFactor(Turning.ENCODER_VELOCITY_FACTOR);
@@ -71,9 +69,7 @@ public class MAXSwerveModule implements SwerveModule {
     turnFeedback.setPositionPIDWrappingMinInput(Turning.MIN_INPUT);
     turnFeedback.setPositionPIDWrappingMaxInput(Turning.MAX_INPUT);
 
-    turnFeedback.setP(Turning.kP);
-    turnFeedback.setI(Turning.kI);
-    turnFeedback.setD(Turning.kD);
+    Turning.PID.set(turnFeedback);
 
     driveMotor.burnFlash();
     turnMotor.burnFlash();

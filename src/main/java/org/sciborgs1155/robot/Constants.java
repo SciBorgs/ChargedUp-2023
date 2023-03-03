@@ -230,11 +230,7 @@ public final class Constants {
           (WHEEL_DIAMETER * Math.PI) / DRIVING_MOTOR_REDUCTION; // m
       public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0; // m/s
 
-      public static final double kP = 0.07;
-      public static final double kI = 0;
-      public static final double kD = 0.06;
-      // TODO ^ replace these loose pid values with PIDConstants
-      public static final PIDConstants PID = new PIDConstants(kP, kI, kD);
+      public static final PIDConstants PID = new PIDConstants(0.07, 0, 0.06);
 
       public static final double kS = 0.27;
       public static final double kV = 0.4;
@@ -250,11 +246,7 @@ public final class Constants {
       public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
       public static final double MAX_ANGULAR_ACCELERATION = 2 * Math.PI; // rad / s^2
 
-      public static final double kP = 1.7;
-      public static final double kI = 0;
-      public static final double kD = 0.1;
-      // TODO ^ replace these loose pid values with PIDConstants
-      public static final PIDConstants PID = new PIDConstants(kP, kI, kD);
+      public static final PIDConstants PID = new PIDConstants(1.7, 0, 0.1);
 
       // feedforward constants for simulation
       public static final double kS = 0;
