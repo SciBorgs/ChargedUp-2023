@@ -10,6 +10,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import org.sciborgs1155.lib.WheelSim;
+import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.Constants;
 
 /** Class to encapsulate a rev max swerve module */
@@ -33,27 +34,20 @@ public class SimSwerveModule implements SwerveModule {
     turnFeedback.enableContinuousInput(Turning.MIN_INPUT, Turning.MAX_INPUT);
   }
 
-  /**
-   * Returns the current state of the module.
-   *
-   * @return The current state of the module.
-   */
+  @Override
   public SwerveModuleState getState() {
     return new SwerveModuleState(
         drive.getAngularVelocityRadPerSec(),
         Rotation2d.fromRadians(turn.getAngularVelocityRadPerSec()));
   }
 
+  @Override
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(
         drive.getAngularPositionRad(), Rotation2d.fromRadians(turn.getAngularPositionRad()));
   }
 
-  /**
-   * Sets the desired state for the module.
-   *
-   * @param desiredState Desired state with speed and angle.
-   */
+  @Override
   public void setDesiredState(SwerveModuleState desiredState) {
     // Optimize the reference state to avoid spinning further than 90 degrees
     setpoint =
@@ -78,9 +72,19 @@ public class SimSwerveModule implements SwerveModule {
     return setpoint;
   }
 
-  /** Zeroes all the SwerveModule encoders. */
+  @Override
   public void resetEncoders() {
     drive.setState(VecBuilder.fill(0, 0));
     turn.setState(VecBuilder.fill(0, 0));
+  }
+
+  @Override
+  public void setTurnPID(PIDConstants constants) {
+    constants.set(turnFeedback);
+  }
+
+  @Override
+  public void setDrivePID(PIDConstants constants) {
+    constants.set(driveFeedback);
   }
 }

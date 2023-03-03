@@ -29,6 +29,7 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
 import org.sciborgs1155.lib.Vision;
+import org.sciborgs1155.lib.constants.PIDConfigurer;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Auto;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
@@ -52,6 +53,10 @@ public class Drive extends SubsystemBase implements Loggable {
       SwerveModule.create(REAR_RIGHT_DRIVE, REAR_RIGHT_TURNING, ANGULAR_OFFSETS[3]);
 
   private final SwerveModule[] modules = {frontLeft, frontRight, rearLeft, rearRight};
+
+  // PID configurations for swerve modules
+  @Log private final PIDConfigurer moduleDrivePID = new PIDConfigurer(null);
+  @Log private final PIDConfigurer moduleTurnPID = new PIDConfigurer(null);
 
   @Log private final WPI_PigeonIMU imu = new WPI_PigeonIMU(PIGEON);
 
@@ -202,6 +207,11 @@ public class Drive extends SubsystemBase implements Loggable {
     for (int i = 0; i < modules2d.length; i++) {
       var transform = new Transform2d(MODULE_OFFSET[i], modules[i].getPosition().angle);
       modules2d[i].setPose(getPose().transformBy(transform));
+    }
+
+    for (var module : modules) {
+      module.setDrivePID(moduleDrivePID.get());
+      module.setTurnPID(moduleTurnPID.get());
     }
   }
 

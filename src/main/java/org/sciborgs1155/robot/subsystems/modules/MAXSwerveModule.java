@@ -13,6 +13,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.Constants.Motors;
 
 /** Class to encapsulate a rev max swerve module */
@@ -100,11 +101,6 @@ public class MAXSwerveModule implements SwerveModule {
         Rotation2d.fromRadians(turningEncoder.getPosition()).minus(angularOffset));
   }
 
-  /**
-   * Sets the desired state for the module.
-   *
-   * @param desiredState Desired state with speed and angle.
-   */
   @Override
   public void setDesiredState(SwerveModuleState desiredState) {
     SwerveModuleState correctedDesiredState = new SwerveModuleState();
@@ -126,9 +122,18 @@ public class MAXSwerveModule implements SwerveModule {
     return setpoint;
   }
 
-  /** Zeroes all the SwerveModule encoders. */
   @Override
   public void resetEncoders() {
     driveEncoder.setPosition(0);
+  }
+
+  @Override
+  public void setTurnPID(PIDConstants constants) {
+    constants.set(turnFeedback);
+  }
+
+  @Override
+  public void setDrivePID(PIDConstants constants) {
+    constants.set(driveFeedback);
   }
 }
