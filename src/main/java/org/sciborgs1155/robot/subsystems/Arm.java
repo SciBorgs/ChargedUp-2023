@@ -143,6 +143,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
                     goal.velocity)));
   }
 
+  
   /** Sets wrist goal relative to the forearm */
   public Command setWristGoal(TrapezoidProfile.State goal) {
     return runOnce(
@@ -166,6 +167,12 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     return setElbowGoal(elbowGoal).andThen(setWristGoal(wristGoal));
   }
 
+  public Rotation2d getElbowGoal(){
+  return elbowFeedback.getSetpoint();
+  }
+  public Rotation2d getWristGoal(){
+    return wristFeedback.getSetpoint();
+  }
   /** Runs elbow to goal relative to the chassis */
   public Command runElbowToGoal(TrapezoidProfile.State goal) {
     return setElbowGoal(goal).andThen(Commands.waitUntil(elbowFeedback::atGoal));
@@ -214,6 +221,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             getAbsoluteWristPosition().getRadians(),
             wristFeedback.getSetpoint().velocity,
             wristAccel.calculate(wristFeedback.getSetpoint().velocity));
+    
+    
     wrist.setVoltage(wristV);
 
     visualizer.setElbow(
