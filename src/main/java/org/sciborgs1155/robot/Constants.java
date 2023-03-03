@@ -11,6 +11,7 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.MotorConfig;
 import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.PlacementState;
+import org.sciborgs1155.lib.constants.PIDConstants;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -232,6 +233,8 @@ public final class Constants {
       public static final double kP = 0.07;
       public static final double kI = 0;
       public static final double kD = 0.06;
+      // TODO ^ replace these loose pid values with PIDConstants
+      public static final PIDConstants PID = new PIDConstants(kP, kI, kD);
 
       public static final double kS = 0.27;
       public static final double kV = 0.4;
@@ -250,6 +253,8 @@ public final class Constants {
       public static final double kP = 1.7;
       public static final double kI = 0;
       public static final double kD = 0.1;
+      // TODO ^ replace these loose pid values with PIDConstants
+      public static final PIDConstants PID = new PIDConstants(kP, kI, kD);
 
       // feedforward constants for simulation
       public static final double kS = 0;

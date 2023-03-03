@@ -18,6 +18,7 @@ import org.sciborgs1155.robot.Constants.Motors;
 
 /** Class to encapsulate a rev max swerve module */
 public class MAXSwerveModule implements SwerveModule {
+
   private final CANSparkMax driveMotor; // Regular Neo
   private final CANSparkMax turnMotor; // Neo 550
 

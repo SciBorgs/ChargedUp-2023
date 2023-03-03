@@ -339,7 +339,6 @@
           "elbowFeedback": {
             "open": true
           },
-          "open": true,
           "wrist feedback": {
             "open": true
           },
@@ -350,10 +349,19 @@
         "Drive": {
           "gyro": {
             "open": true
+          },
+          "moduleDrivePID": {
+            "open": true
+          },
+          "moduleTurnPID": {
+            "open": true
+          },
+          "open": true,
+          "rearLeft": {
+            "open": true
           }
         },
         "Elevator": {
-          "open": true,
           "pid": {
             "open": true
           }

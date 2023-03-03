@@ -32,6 +32,8 @@ import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.constants.PIDConfigurer;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Auto;
+import org.sciborgs1155.robot.Constants.SwerveModule.Driving;
+import org.sciborgs1155.robot.Constants.SwerveModule.Turning;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 
 public class Drive extends SubsystemBase implements Loggable {
@@ -55,8 +57,8 @@ public class Drive extends SubsystemBase implements Loggable {
   private final SwerveModule[] modules = {frontLeft, frontRight, rearLeft, rearRight};
 
   // PID configurations for swerve modules
-  @Log private final PIDConfigurer moduleDrivePID = new PIDConfigurer(null);
-  @Log private final PIDConfigurer moduleTurnPID = new PIDConfigurer(null);
+  @Log private final PIDConfigurer moduleDrivePID = new PIDConfigurer(Driving.PID);
+  @Log private final PIDConfigurer moduleTurnPID = new PIDConfigurer(Turning.PID);
 
   @Log private final WPI_PigeonIMU imu = new WPI_PigeonIMU(PIGEON);
 
