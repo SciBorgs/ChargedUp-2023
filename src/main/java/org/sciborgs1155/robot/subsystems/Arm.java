@@ -167,12 +167,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     return setElbowGoal(elbowGoal).andThen(setWristGoal(wristGoal));
   }
 
-  public Rotation2d getElbowGoal(){
-  return elbowFeedback.getSetpoint();
-  }
-  public Rotation2d getWristGoal(){
-    return wristFeedback.getSetpoint();
-  }
   /** Runs elbow to goal relative to the chassis */
   public Command runElbowToGoal(TrapezoidProfile.State goal) {
     return setElbowGoal(goal).andThen(Commands.waitUntil(elbowFeedback::atGoal));
