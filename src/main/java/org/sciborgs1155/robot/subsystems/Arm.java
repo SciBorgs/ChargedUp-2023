@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot.subsystems;
 
+import static org.sciborgs1155.robot.Constants.Arm.*;
 import static org.sciborgs1155.robot.Ports.Arm.*;
 
 import com.revrobotics.AbsoluteEncoder;
@@ -24,23 +25,19 @@ import java.util.function.DoubleSupplier;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Constants.Arm.Elbow;
-import org.sciborgs1155.robot.Constants.Arm.Wrist;
 import org.sciborgs1155.robot.Constants.Dimensions;
-import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Robot;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log(name = "elbow applied output", methodName = "getAppliedOutput")
-  private final CANSparkMax elbow = Motors.ELBOW.build(MotorType.kBrushless, MIDDLE_ELBOW_MOTOR);
+  private final CANSparkMax elbow = Elbow.MOTOR.build(MotorType.kBrushless, MIDDLE_ELBOW_MOTOR);
 
-  private final CANSparkMax elbowLeft = Motors.ELBOW.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
-  private final CANSparkMax elbowRight =
-      Motors.ELBOW.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
+  private final CANSparkMax elbowLeft = Elbow.MOTOR.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
+  private final CANSparkMax elbowRight = Elbow.MOTOR.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
 
   @Log(name = "wrist applied output", methodName = "getAppliedOutput")
-  private final CANSparkMax wrist = Motors.WRIST.build(MotorType.kBrushless, WRIST_MOTOR);
+  private final CANSparkMax wrist = Wrist.MOTOR.build(MotorType.kBrushless, WRIST_MOTOR);
 
   @Log private final Encoder elbowEncoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
   private final EncoderSim elbowEncoderSim = new EncoderSim(elbowEncoder);

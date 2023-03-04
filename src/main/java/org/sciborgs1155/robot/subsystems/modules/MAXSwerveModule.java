@@ -14,7 +14,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import org.sciborgs1155.lib.constants.PIDConstants;
-import org.sciborgs1155.robot.Constants.Motors;
 
 /** Class to encapsulate a rev max swerve module */
 public class MAXSwerveModule implements SwerveModule {
@@ -44,8 +43,8 @@ public class MAXSwerveModule implements SwerveModule {
    * @param angularOffset offset from drivetrain
    */
   public MAXSwerveModule(int drivePort, int turnPort, double angularOffset) {
-    driveMotor = Motors.DRIVE.build(MotorType.kBrushless, drivePort);
-    turnMotor = Motors.TURN.build(MotorType.kBrushless, turnPort);
+    driveMotor = Driving.MOTOR.build(MotorType.kBrushless, drivePort);
+    turnMotor = Turning.MOTOR.build(MotorType.kBrushless, turnPort);
 
     driveEncoder = driveMotor.getEncoder();
     turningEncoder = turnMotor.getAbsoluteEncoder(Type.kDutyCycle);
