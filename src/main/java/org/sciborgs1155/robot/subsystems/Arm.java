@@ -2,9 +2,10 @@ package org.sciborgs1155.robot.subsystems;
 
 import static org.sciborgs1155.robot.Ports.Arm.*;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -44,9 +45,9 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log private final Encoder elbowEncoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
   private final EncoderSim elbowEncoderSim = new EncoderSim(elbowEncoder);
 
+  @Log(name = "wrist position", methodName = "getPosition")
   @Log(name = "wrist velocity", methodName = "getVelocity")
-  @Log(name = "Wrist Position!!!", methodName = "getPosition")
-  private final RelativeEncoder wristEncoder = wrist.getEncoder();
+  private final AbsoluteEncoder wristEncoder = wrist.getAbsoluteEncoder(Type.kDutyCycle);
 
   private final ArmFeedforward elbowFeedforward =
       new ArmFeedforward(Elbow.kS, Elbow.kG, Elbow.kV, Elbow.kA);
@@ -95,11 +96,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowRight.follow(elbow);
 
     elbowEncoder.setDistancePerPulse(Elbow.CONVERSION.factor());
-    wristEncoder.setPositionConversionFactor(
-        1.0
-            / 47.22222222222
-            * 2.0
-            * Math.PI); // neo built in is 1:1, gearing is 20:1, we use radians
 
     elbow.burnFlash();
     elbowLeft.burnFlash();
@@ -199,7 +195,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             getElbowPosition().getRadians(),
             elbowFeedback.getSetpoint().velocity,
             elbowAccel.calculate(elbowFeedback.getSetpoint().velocity));
-    elbow.setVoltage(v);
+    elbow.setVoltage(elbowFB + elbowFF);
 
     // wrist feedback is calculated using an absolute angle setpoint, rather than a relative one
     // this means the extra voltage calculated to cancel out gravity is kG * cos(θ + ϕ), where θ is
@@ -212,7 +208,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             getAbsoluteWristPosition().getRadians(),
             wristFeedback.getSetpoint().velocity,
             wristAccel.calculate(wristFeedback.getSetpoint().velocity));
-    wrist.setVoltage(wristV);
+    wrist.setVoltage(wristFB + wristFF);
 
     visualizer.setElbow(
         getElbowPosition(), Rotation2d.fromRadians(elbowFeedback.getGoal().position));

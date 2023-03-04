@@ -53,16 +53,16 @@ public class MAXSwerveModule implements SwerveModule {
     driveFeedback.setFeedbackDevice(driveEncoder);
     turnFeedback.setFeedbackDevice(turningEncoder);
 
-    turningEncoder.setInverted(Turning.ENCODER_INVERTED);
+    // turningEncoder.setInverted(Turning.ENCODER_INVERTED);
 
     // encoder ratios
-    driveEncoder.setPositionConversionFactor(Driving.ENCODER_POSITION_FACTOR);
-    driveEncoder.setVelocityConversionFactor(Driving.ENCODER_VELOCITY_FACTOR);
+    driveEncoder.setPositionConversionFactor(Driving.CONVERSION.factor());
+    driveEncoder.setVelocityConversionFactor(Driving.CONVERSION.factor() / 60.0);
 
     Driving.PID.set(driveFeedback);
 
-    turningEncoder.setPositionConversionFactor(Turning.ENCODER_POSITION_FACTOR);
-    turningEncoder.setVelocityConversionFactor(Turning.ENCODER_VELOCITY_FACTOR);
+    turningEncoder.setPositionConversionFactor(Turning.CONVERSION.factor());
+    turningEncoder.setVelocityConversionFactor(Turning.CONVERSION.factor() / 60.0);
 
     // set up continuous input for turning
     turnFeedback.setPositionPIDWrappingEnabled(true);

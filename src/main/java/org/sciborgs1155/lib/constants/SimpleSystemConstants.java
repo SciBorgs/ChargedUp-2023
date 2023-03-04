@@ -10,32 +10,32 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
-public record SimpleSystemConstants(double S, double V, double A) {
+public record SimpleSystemConstants(double ks, double kv, double ka) {
 
   public SimpleMotorFeedforward feedforward() {
-    return new SimpleMotorFeedforward(S, V, A);
+    return new SimpleMotorFeedforward(ks, kv, ka);
   }
 
   public LinearSystem<N2, N1, N1> positionSystem() {
-    return LinearSystemId.identifyPositionSystem(V, A);
+    return LinearSystemId.identifyPositionSystem(kv, ka);
   }
 
   public LinearSystem<N1, N1, N1> velocitySystem() {
-    return LinearSystemId.identifyVelocitySystem(V, A);
+    return LinearSystemId.identifyVelocitySystem(kv, ka);
   }
 
   public DCMotorSim sim(DCMotor gearbox, double gearing) {
     var system =
         new LinearSystem<N2, N1, N2>(
-            Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -V / A),
-            Matrix.mat(Nat.N2(), Nat.N1()).fill(0, 1.0 / A),
+            Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -kv / ka),
+            Matrix.mat(Nat.N2(), Nat.N1()).fill(0, 1.0 / ka),
             Matrix.eye(Nat.N2()),
             Matrix.mat(Nat.N2(), Nat.N1()).fill(0.0, 0.0));
 
     return new DCMotorSim(system, gearbox, gearing);
   }
 
-  public static record ArmSystemConstants(SimpleSystemConstants system, double G) {}
+  public static record ArmSystemConstants(SimpleSystemConstants system, double kg) {}
 
-  public static record ElevatorSystemConstants(SimpleSystemConstants system, double G) {}
+  public static record ElevatorSystemConstants(SimpleSystemConstants system, double kg) {}
 }
