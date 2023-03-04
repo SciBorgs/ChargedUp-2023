@@ -272,4 +272,44 @@ public final class Constants {
     public static final PlacementState BACK_MID_CUBE = PlacementState.fromAbsolute(0, 0.2, 0.6);
     public static final PlacementState BACK_HIGH_CUBE = PlacementState.fromAbsolute(0, 1, 1.1);
   }
+
+  public static final class Auto {
+    public static final class Cartesian {
+      public static final double kP = 1.2;
+      public static final double kI = 0;
+      public static final double kD = 0;
+    }
+
+    public static final class Angular {
+      public static final double kP = 1.2;
+      public static final double kI = 0;
+      public static final double kD = 1;
+    }
+
+    public static final double MAX_SPEED = Drive.MAX_SPEED; // m/s
+    public static final double MAX_ACCEL = 4; // m/s^2
+    public static final PathConstraints CONSTRAINTS = new PathConstraints(RATE, RATE);
+  }
+
+  public static final class BalanceConstants {
+    // update these!
+
+    // pid
+    public static final double KP = 0;
+    public static final double KI = 0;
+    public static final double KD = 0;
+    public static final double SETPOINT = 0;
+
+    // ff
+    public static final double KS = 0;
+    public static final double KV = 0;
+    public static final double KA = 0;
+    public static final double KG = 0;
+
+    public static final double MAX_VELOCITY = 0;
+    public static final double MAX_ACCELERATION = 0;
+
+    public static final TrapezoidProfile.Constraints CONSTRAINTS =
+        new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCELERATION);
+  }
 }
