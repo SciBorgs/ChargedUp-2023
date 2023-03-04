@@ -94,7 +94,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   public Arm(Visualizer visualizer) {
     elbowLeft.follow(elbow);
     elbowRight.follow(elbow);
-
+    
     elbowEncoder.setDistancePerPulse(Elbow.CONVERSION.factor());
 
     elbow.burnFlash();
