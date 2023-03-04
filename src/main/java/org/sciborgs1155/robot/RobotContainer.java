@@ -53,7 +53,8 @@ public class RobotContainer {
   }
 
   private void configureSubsystemDefaults() {
-    drive.setDefaultCommand(drive.drive(leftJoystick, rightJoystick, true));
+    drive.setDefaultCommand(
+        drive.drive(leftJoystick::getX, leftJoystick::getX, rightJoystick::getY, true));
     arm.setDefaultCommand(arm.setVoltage(() -> xbox.getRightY() * 3, () -> xbox.getLeftY() * 3));
   }
 

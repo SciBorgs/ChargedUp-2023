@@ -1,4 +1,4 @@
-package org.sciborgs1155.lib;
+package org.sciborgs1155.lib.constants;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -48,7 +48,7 @@ public record MotorConfig(
   }
 
   public static MotorConfig base() {
-    return new MotorConfig(false, NeutralBehavior.COAST, 0, 80, true);
+    return new MotorConfig(false, NeutralBehavior.COAST, 0, 80, false);
   }
 
   /**

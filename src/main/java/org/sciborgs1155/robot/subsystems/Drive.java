@@ -8,7 +8,6 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -23,14 +22,15 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
+import java.util.function.DoubleSupplier;
 import org.sciborgs1155.lib.Vision;
+import org.sciborgs1155.lib.constants.PIDConfigurer;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Constants.Auto;
+import org.sciborgs1155.robot.Constants.SwerveModule.Driving;
+import org.sciborgs1155.robot.Constants.SwerveModule.Turning;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 
 public class Drive extends SubsystemBase implements Loggable {
@@ -53,6 +53,10 @@ public class Drive extends SubsystemBase implements Loggable {
 
   private final SwerveModule[] modules = {frontLeft, frontRight, rearLeft, rearRight};
 
+  // PID configurations for swerve modules
+  @Log private final PIDConfigurer moduleDrivePID = new PIDConfigurer(Driving.PID);
+  @Log private final PIDConfigurer moduleTurnPID = new PIDConfigurer(Turning.PID);
+
   @Log private final WPI_PigeonIMU imu = new WPI_PigeonIMU(PIGEON);
 
   private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
@@ -66,8 +70,8 @@ public class Drive extends SubsystemBase implements Loggable {
   private final FieldObject2d[] modules2d = new FieldObject2d[modules.length];
 
   // Rate limiting
-  private final SlewRateLimiter xLimiter = new SlewRateLimiter(MAX_RATE);
-  private final SlewRateLimiter yLimiter = new SlewRateLimiter(MAX_RATE);
+  private final SlewRateLimiter xLimiter = new SlewRateLimiter(MAX_ACCEL);
+  private final SlewRateLimiter yLimiter = new SlewRateLimiter(MAX_ACCEL);
 
   public Drive(Vision vision) {
     this.vision = vision;
@@ -203,6 +207,11 @@ public class Drive extends SubsystemBase implements Loggable {
       var transform = new Transform2d(MODULE_OFFSET[i], modules[i].getPosition().angle);
       modules2d[i].setPose(getPose().transformBy(transform));
     }
+
+    for (var module : modules) {
+      module.setDrivePID(moduleDrivePID.get());
+      module.setTurnPID(moduleTurnPID.get());
+    }
   }
 
   @Override
@@ -228,19 +237,15 @@ public class Drive extends SubsystemBase implements Loggable {
    */
   public Command follow(
       PathPlannerTrajectory trajectory, boolean resetPosition, boolean useAllianceColor) {
-    PIDController x = new PIDController(Auto.Cartesian.kP, Auto.Cartesian.kI, Auto.Cartesian.kD);
-    PIDController y = new PIDController(Auto.Cartesian.kP, Auto.Cartesian.kI, Auto.Cartesian.kD);
-    PIDController rot = new PIDController(Auto.Angular.kP, Auto.Angular.kI, Auto.Angular.kD);
-
     if (resetPosition) resetOdometry(trajectory.getInitialPose());
 
     return new PPSwerveControllerCommand(
             trajectory,
             this::getPose,
             kinematics,
-            x,
-            y,
-            rot,
+            CARTESIAN.create(),
+            CARTESIAN.create(),
+            ANGULAR.create(),
             this::setModuleStates,
             useAllianceColor)
         .andThen(stop());
@@ -248,32 +253,21 @@ public class Drive extends SubsystemBase implements Loggable {
 
   /** Follows the specified path planner path given a path name */
   public Command follow(String pathName, boolean resetPosition, boolean useAllianceColor) {
-    PathPlannerTrajectory loadedPath = PathPlanner.loadPath(pathName, Auto.CONSTRAINTS);
+    PathPlannerTrajectory loadedPath = PathPlanner.loadPath(pathName, CONSTRAINTS);
     return follow(loadedPath, resetPosition, useAllianceColor);
   }
 
-  /** Drive based on xbox */
-  public Command drive(CommandXboxController xbox, boolean fieldRelative) {
+  /** Drives robot based on three double suppliers (x,y and rot) */
+  public Command drive(
+      DoubleSupplier x, DoubleSupplier y, DoubleSupplier rot, boolean fieldRelative) {
     return run(
         () ->
             drive(
-                -MathUtil.applyDeadband(xbox.getLeftY(), Constants.DEADBAND),
-                -MathUtil.applyDeadband(xbox.getLeftX(), Constants.DEADBAND),
-                -MathUtil.applyDeadband(xbox.getRightX(), Constants.DEADBAND),
+                MathUtil.applyDeadband(x.getAsDouble(), Constants.DEADBAND),
+                MathUtil.applyDeadband(y.getAsDouble(), Constants.DEADBAND),
+                MathUtil.applyDeadband(rot.getAsDouble(), Constants.DEADBAND),
                 fieldRelative));
   }
-
-  /** Drive based on joysticks */
-  public Command drive(CommandJoystick left, CommandJoystick right, boolean fieldRelative) {
-    return run(
-        () ->
-            drive(
-                -MathUtil.applyDeadband(left.getY(), Constants.DEADBAND),
-                -MathUtil.applyDeadband(left.getX(), Constants.DEADBAND),
-                -MathUtil.applyDeadband(right.getX(), Constants.DEADBAND),
-                fieldRelative));
-  }
-
   /** Stops drivetrain */
   public Command stop() {
     return run(() -> setModuleStates(getModuleStates()));
