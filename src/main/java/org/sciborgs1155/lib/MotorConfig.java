@@ -25,7 +25,12 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
  * var drive = new DifferentialDrive(leftMotor, rightGroup);
  * </pre></code>
  */
-public final class MotorConfig {
+public record MotorConfig(
+    boolean inverted,
+    NeutralBehavior neutralBehavior,
+    double openLoopRampRate,
+    int currentLimit,
+    boolean burnFlash) {
 
   public enum NeutralBehavior {
     COAST(true),
@@ -42,25 +47,6 @@ public final class MotorConfig {
     }
   }
 
-  private final boolean inverted;
-  private final NeutralBehavior neutralBehavior;
-  private final double openLoopRampRate;
-  private final int currentLimit;
-  private final boolean burnFlash;
-
-  public MotorConfig(
-      boolean inverted,
-      NeutralBehavior neutralBehavior,
-      double openLoopRampRate,
-      int currentLimit,
-      boolean burnFlash) {
-    this.inverted = inverted;
-    this.neutralBehavior = neutralBehavior;
-    this.openLoopRampRate = openLoopRampRate;
-    this.currentLimit = currentLimit;
-    this.burnFlash = burnFlash;
-  }
-
   public static MotorConfig base() {
     return new MotorConfig(false, NeutralBehavior.COAST, 0, 80, true);
   }
@@ -72,7 +58,7 @@ public final class MotorConfig {
    * @param id the motor controller's device id
    * @return a new CANSparkMax object
    */
-  public CANSparkMax buildCanSparkMax(MotorType motorType, int id) {
+  public CANSparkMax build(MotorType motorType, int id) {
     var motor = new CANSparkMax(id, motorType);
     motor.restoreFactoryDefaults();
     motor.setInverted(inverted);
@@ -92,7 +78,7 @@ public final class MotorConfig {
    * @param ids a variable number of ids
    * @return array of CANSparkMax objects
    */
-  public CANSparkMax[] buildCanSparkMax(MotorType motorType, int... ids) {
+  public CANSparkMax[] build(MotorType motorType, int... ids) {
     if (ids.length < 1) {
       throw new IllegalArgumentException("Number of inputted ids is less than 1.");
     }
@@ -100,71 +86,26 @@ public final class MotorConfig {
     var res = new CANSparkMax[ids.length];
 
     for (int i = 0; i < ids.length; i++) {
-      res[i] = buildCanSparkMax(motorType, ids[i]);
+      res[i] = build(motorType, ids[i]);
     }
 
     return res;
-  }
-
-  /**
-   * Returns a lead motor with others bound to follow each other based on their configured values
-   *
-   * <p>One motor controller will be created per id, in order
-   *
-   * @param motorType the rev motor type
-   * @param ids a variable number of ids
-   * @return The lead motor as a CANSparkMax object
-   */
-  public CANSparkMax buildCanSparkMaxGearbox(MotorType motorType, int... ids) {
-    if (ids.length < 1) {
-      throw new IllegalArgumentException("Number of inputted ids is less than 1.");
-    }
-
-    var lead = buildCanSparkMax(motorType, ids[0]);
-
-    for (int i = 1; i < ids.length; i++) {
-      buildCanSparkMax(motorType, ids[i]).follow(lead);
-    }
-
-    return lead;
-  }
-
-  // i hate java
-
-  public boolean isInverted() {
-    return inverted;
   }
 
   public MotorConfig withInvert(boolean inverted) {
     return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
   }
 
-  public NeutralBehavior getNeutralBehavior() {
-    return neutralBehavior;
-  }
-
   public MotorConfig withNeutralBehavior(NeutralBehavior neutralBehavior) {
     return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
-  }
-
-  public double getOpenLoopRampRate() {
-    return openLoopRampRate;
   }
 
   public MotorConfig withOpenLoopRampRate(double openLoopRampRate) {
     return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
   }
 
-  public int getCurrentLimit() {
-    return currentLimit;
-  }
-
   public MotorConfig withCurrentLimit(int currentLimit) {
     return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
-  }
-
-  public boolean getBurnFlash() {
-    return burnFlash;
   }
 
   public MotorConfig withBurnFlash(boolean burnFlash) {

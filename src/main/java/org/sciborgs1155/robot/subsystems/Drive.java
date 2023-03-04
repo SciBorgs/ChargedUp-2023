@@ -7,7 +7,6 @@ import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -19,7 +18,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,19 +27,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
-import java.util.Optional;
-import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.ControllerOutputFunction;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Kinematics.ChassisState;
 import org.sciborgs1155.lib.Kinematics.SciSwerveKinematics;
 import org.sciborgs1155.lib.Kinematics.SciSwerveModuleState;
+import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Auto;
-import org.sciborgs1155.robot.Constants.Vision;
 import org.sciborgs1155.robot.Ports.Sensors;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 
@@ -66,29 +59,25 @@ public class Drive extends SubsystemBase implements Loggable {
 
   // The gyro sensor
   @Log private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(Sensors.PIGEON);
-  private final ADIS16470_IMU imu = new ADIS16470_IMU();
 
   // Odometry and pose estimation
-  private final PhotonCamera cam;
+  private final Vision vision;
   private final SwerveDrivePoseEstimator odometry =
       new SwerveDrivePoseEstimator(
           AUTOKINEMATICS, getHeading(), getModulePositions(), new Pose2d());
-  private final AprilTagFieldLayout layout =
-      new AprilTagFieldLayout(Vision.TEST_TAGS, getTurnRate(), getPitch());
-  private final PhotonPoseEstimator visionOdometry;
-  private final Derivative accelX = new Derivative();
-  private final Derivative accelY = new Derivative();
-  private final Derivative rotAccel = new Derivative();
+
   @Log private final Field2d field2d = new Field2d();
-
   private final FieldObject2d[] modules2d = new FieldObject2d[modules.length];
+  public Derivative accelX = new Derivative();
+  public Derivative accelY = new Derivative();
+  public Derivative accelRot = new Derivative();
 
-  public Drive(PhotonCamera cam) {
-    this.cam = cam;
-    visionOdometry =
-        new PhotonPoseEstimator(layout, PoseStrategy.LOWEST_AMBIGUITY, cam, Vision.ROBOT_TO_CAM);
+  public Drive(Vision vision) {
+    this.vision = vision;
 
-    for (int i = 0; i < modules2d.length; i++) modules2d[i] = field2d.getObject("module-" + i);
+    for (int i = 0; i < modules2d.length; i++) {
+      modules2d[i] = field2d.getObject("module-" + i);
+    }
   }
 
   /**
@@ -101,14 +90,12 @@ public class Drive extends SubsystemBase implements Loggable {
   }
 
   /**
-   * Returns the heading of the robot, based on our imu
-   *
-   * <p>The imu is ccw positive, but mounted upside down
+   * Returns the heading of the robot, based on our pigeon
    *
    * @return A Rotation2d of our angle
    */
   public Rotation2d getHeading() {
-    return Rotation2d.fromDegrees(imu.getAngle());
+    return gyro.getRotation2d();
   }
 
   /**
@@ -137,7 +124,7 @@ public class Drive extends SubsystemBase implements Loggable {
 
     double xAccel = accelX.calculate(xSpeed);
     double yAccel = accelY.calculate(ySpeed);
-    double rotAlpha = rotAccel.calculate(rot);
+    double rotAlpha = accelRot.calculate(rot);
 
     states =
         DRIVERKINEMATICS.toSwerveModuleStates(
@@ -223,25 +210,17 @@ public class Drive extends SubsystemBase implements Loggable {
     return gyro.getPitch();
   }
 
-  private void updateOdometry() {
-    odometry.update(getHeading(), getModulePositions());
-
-    var latest = cam.getLatestResult();
-
-    visionOdometry.setReferencePose(odometry.getEstimatedPosition());
-    Optional<EstimatedRobotPose> visionEstimate = visionOdometry.update();
-
-    if (latest.hasTargets()) {
-      EstimatedRobotPose visionPose = visionEstimate.get();
-      odometry.addVisionMeasurement(
-          visionPose.estimatedPose.toPose2d(), visionPose.timestampSeconds);
-    }
-  }
-
   @Override
   public void periodic() {
-    updateOdometry();
+    odometry.update(getHeading(), getModulePositions());
+
+    var poses = vision.getPoseEstimates(getPose());
+    for (int i = 0; i < poses.length; i++) {
+      odometry.addVisionMeasurement(poses[i].estimatedPose.toPose2d(), poses[i].timestampSeconds);
+      field2d.getObject("Cam-" + i + " Est Pose").setPose(poses[i].estimatedPose.toPose2d());
+    }
     field2d.setRobotPose(getPose());
+
     for (int i = 0; i < modules2d.length; i++) {
       var transform = new Transform2d(MODULE_OFFSET[i], modules[i].getPosition().angle);
       modules2d[i].setPose(getPose().transformBy(transform));
@@ -255,19 +234,43 @@ public class Drive extends SubsystemBase implements Loggable {
             Units.radiansToDegrees(
                 DRIVERKINEMATICS.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond
                     * Constants.RATE));
+    vision.updateSeenTags();
   }
 
-  /** Follows the specified path planner path */
-  public Command follow(String pathName) {
+  /**
+   * Follows a path on the field.
+   *
+   * @param trajectory The pathplanner trajectory the robot will follow
+   * @param resetPosition Whether the robot should set its odometry to the initial pose of the
+   *     trajectory
+   * @param useAllianceColor Whether the robot should take into account alliance color before
+   *     following
+   * @return The command that follows the trajectory
+   */
+  public Command follow(
+      PathPlannerTrajectory trajectory, boolean resetPosition, boolean useAllianceColor) {
     PIDController x = new PIDController(Auto.Cartesian.kP, Auto.Cartesian.kI, Auto.Cartesian.kD);
     PIDController y = new PIDController(Auto.Cartesian.kP, Auto.Cartesian.kI, Auto.Cartesian.kD);
     PIDController rot = new PIDController(Auto.Angular.kP, Auto.Angular.kI, Auto.Angular.kD);
-    PathPlannerTrajectory loadedPath = PathPlanner.loadPath(pathName, Auto.CONSTRAINTS);
 
-    resetOdometry(loadedPath.getInitialPose());
+    if (resetPosition) resetOdometry(trajectory.getInitialPose());
+
     return new PPSwerveControllerCommand(
-            loadedPath, this::getPose, AUTOKINEMATICS, x, y, rot, this::setModuleStates, false)
+            trajectory,
+            this::getPose,
+            AUTOKINEMATICS,
+            x,
+            y,
+            rot,
+            this::setModuleStates,
+            useAllianceColor)
         .andThen(stop());
+  }
+
+  /** Follows the specified path planner path given a path name */
+  public Command follow(String pathName, boolean resetPosition, boolean useAllianceColor) {
+    PathPlannerTrajectory loadedPath = PathPlanner.loadPath(pathName, Auto.CONSTRAINTS);
+    return follow(loadedPath, resetPosition, useAllianceColor);
   }
 
   /** Drive based on xbox */
@@ -289,23 +292,31 @@ public class Drive extends SubsystemBase implements Loggable {
 
   // TODO replace
   private static final ControllerOutputFunction mapper =
-      // ControllerOutputFunction.powerExp(Math.E, Math.PI);
-      ControllerOutputFunction.power(1);
+      ControllerOutputFunction.powerExp(Math.E, Math.PI);
+
   /** Drive based on joysticks */
   public Command drive(CommandJoystick left, CommandJoystick right, boolean fieldRelative) {
+    // return run(
+    //     () -> {
+    //       double rawX = -left.getY();
+    //       double rawY = -left.getX();
+    //       double rawSpeed = Math.sqrt(rawX * rawX + rawY * rawY);
+    //       double speedFactor = mapper.map(rawSpeed) / rawSpeed;
+    //       double rawOmega = -right.getX();
+    //       drive(
+    //           MathUtil.applyDeadband(speedFactor * rawX, Constants.DEADBAND),
+    //           MathUtil.applyDeadband(speedFactor * rawY, Constants.DEADBAND),
+    //           MathUtil.applyDeadband(mapper.map(rawOmega), Constants.DEADBAND),
+    //           fieldRelative);
+    //     });
+
     return run(
-        () -> {
-          double rawX = -left.getY();
-          double rawY = -left.getX();
-          double rawSpeed = Math.sqrt(rawX * rawX + rawY * rawY);
-          double speedFactor = mapper.map(rawSpeed) / rawSpeed;
-          double rawOmega = -right.getX();
-          drive(
-              MathUtil.applyDeadband(speedFactor * rawX, Constants.DEADBAND),
-              MathUtil.applyDeadband(speedFactor * rawY, Constants.DEADBAND),
-              MathUtil.applyDeadband(mapper.map(rawOmega), Constants.DEADBAND),
-              fieldRelative);
-        });
+        () ->
+            drive(
+                -MathUtil.applyDeadband(left.getX(), Constants.DEADBAND),
+                -MathUtil.applyDeadband(left.getY(), Constants.DEADBAND),
+                MathUtil.applyDeadband(right.getX(), Constants.DEADBAND),
+                fieldRelative));
   }
 
   /** Stops drivetrain */

@@ -13,13 +13,11 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import org.sciborgs1155.lib.Kinematics.SciSwerveModuleState;
 import org.sciborgs1155.robot.Constants.Motors;
 
 /** Class to encapsulate a rev max swerve module */
-public class MAXSwerveModule implements SwerveModule, Sendable {
+public class MAXSwerveModule implements SwerveModule {
   private final CANSparkMax driveMotor; // Regular Neo
   private final CANSparkMax turnMotor; // Neo 550
 
@@ -44,8 +42,8 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
    * @param angularOffset offset from drivetrain
    */
   public MAXSwerveModule(int drivePort, int turnPort, double angularOffset) {
-    driveMotor = Motors.DRIVE.buildCanSparkMax(MotorType.kBrushless, drivePort);
-    turnMotor = Motors.TURN.buildCanSparkMax(MotorType.kBrushless, turnPort);
+    driveMotor = Motors.DRIVE.build(MotorType.kBrushless, drivePort);
+    turnMotor = Motors.TURN.build(MotorType.kBrushless, turnPort);
 
     driveEncoder = driveMotor.getEncoder();
     turningEncoder = turnMotor.getAbsoluteEncoder(Type.kDutyCycle);
@@ -96,13 +94,7 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
         Rotation2d.fromRadians(turningEncoder.getPosition()).minus(angularOffset));
   }
 
-  public SciSwerveModuleState getState() {
-    return new SciSwerveModuleState(
-        0,
-        driveEncoder.getVelocity(),
-        Rotation2d.fromRadians(turningEncoder.getPosition()).minus(angularOffset));
-  }
-
+  @Override
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(
         driveEncoder.getPosition(),
@@ -114,22 +106,7 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
    *
    * @param desiredState Desired state with speed and angle.
    */
-  public void setDesiredState(SciSwerveModuleState desiredState) {
-    SciSwerveModuleState correctedDesiredState = new SciSwerveModuleState();
-    correctedDesiredState.moduleAcceleration = desiredState.moduleAcceleration;
-    correctedDesiredState.angle = desiredState.angle.plus(angularOffset);
-    // Optimize the reference state to avoid spinning further than 90 degrees
-    setpoint =
-        SciSwerveModuleState.optimize(
-            correctedDesiredState, Rotation2d.fromRadians(turningEncoder.getPosition()));
-
-    // setpoint = desiredState;
-    double driveFF =
-        driveFeedforward.calculate(setpoint.speedMetersPerSecond, setpoint.moduleAcceleration);
-    driveFeedback.setReference(setpoint.moduleAcceleration, ControlType.kVelocity, 0, driveFF);
-    turnFeedback.setReference(setpoint.angle.getRadians(), ControlType.kPosition);
-  }
-
+  @Override
   public void setDesiredState(SwerveModuleState desiredState) {
     SwerveModuleState correctedDesiredState = new SwerveModuleState();
     correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
@@ -146,19 +123,26 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
     turnFeedback.setReference(setpoint.angle.getRadians(), ControlType.kPosition);
   }
 
+  @Override
+  public SwerveModuleState getDesiredState() {
+    return setpoint;
+  }
+
   /** Zeroes all the SwerveModule encoders. */
+  @Override
   public void resetEncoders() {
     driveEncoder.setPosition(0);
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.addDoubleProperty("current velocity", driveEncoder::getVelocity, null);
-    builder.addDoubleProperty("currnt acceleration", () -> setpoint.moduleAcceleration, null);
-    // builder.addDoubleProperty("current angle", () -> this.getPosition().angle.getRadians(),
-    // null);
-    builder.addDoubleProperty("current angle", turningEncoder::getPosition, null);
-    builder.addDoubleProperty("target angle", () -> setpoint.angle.getRadians(), null);
-    builder.addDoubleProperty("target velocity", () -> setpoint.speedMetersPerSecond, null);
+  public SwerveModuleState getState() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void setDesiredState(SciSwerveModuleState desiredState) {
+    // TODO Auto-generated method stub
+
   }
 }

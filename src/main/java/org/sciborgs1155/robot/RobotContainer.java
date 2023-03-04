@@ -6,14 +6,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
-import org.photonvision.PhotonCamera;
-// import org.sciborgs1155.lib.Visualizer;
-import org.sciborgs1155.robot.Constants.Vision;
+import org.sciborgs1155.lib.Vision;
+import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
-// import org.sciborgs1155.robot.subsystems.Arm;
+import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
-// import org.sciborgs1155.robot.subsystems.Elevator;
+import org.sciborgs1155.robot.subsystems.Elevator;
+import org.sciborgs1155.robot.subsystems.Intake;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -22,16 +22,15 @@ import org.sciborgs1155.robot.subsystems.Drive;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  // Define camera for PoseEstimation
-  private final PhotonCamera cam = new PhotonCamera(Vision.CAMERA_NAME);
 
-  // Visualizer for elevator/arm simulation
-  // private final Visualizer visualizer = new Visualizer();
+  @Log private final Visualizer visualizer = new Visualizer();
+  private final Vision vision = new Vision();
 
   // The robot's subsystems and commands are defined here...
-  private final Drive drive = new Drive(cam);
-  // private final Arm arm = new Arm(visualizer);
-  // private final Elevator elevator = new Elevator(visualizer);
+  private final Drive drive = new Drive(vision);
+  private final Arm arm = new Arm(visualizer);
+  private final Elevator elevator = new Elevator(visualizer);
+  private final Intake intake = new Intake();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController xbox = new CommandXboxController(OI.XBOX);
@@ -39,7 +38,7 @@ public class RobotContainer {
   private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
 
   // Autos
-  @Log private final Autos autos = new Autos(drive);
+  @Log private final Autos autos = new Autos(drive, vision);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -52,7 +51,7 @@ public class RobotContainer {
   }
 
   private void configureSubsystemDefaults() {
-    drive.setDefaultCommand(drive.drive(xbox, true));
+    drive.setDefaultCommand(drive.drive(leftJoystick, rightJoystick, true));
   }
 
   /**
