@@ -6,7 +6,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
-import org.sciborgs1155.lib.BalanceFeedForward;
+import org.sciborgs1155.lib.BalanceFeedforward;
 import org.sciborgs1155.robot.Constants.Auto;
 import org.sciborgs1155.robot.Constants.BalanceConstants;
 import org.sciborgs1155.robot.subsystems.Drive;
@@ -18,15 +18,15 @@ public final class Balance {
     return Commands.run(
             () ->
                 drive.drive(
-                    controller.calculate(drive.getPitch(), BalanceConstants.SETPOINT), 0, 0, true))
+                    controller.calculate(drive.getTotalIncline(), BalanceConstants.SETPOINT), 0, 0, true))
         .andThen(controller::close);
   }
 
   public static CommandBase balanceFF(Drive drive) {
     // relies on very good odometry/pose estimation
     // we also cannot slip
-    BalanceFeedForward ff =
-        new BalanceFeedForward(
+    BalanceFeedforward ff =
+        new BalanceFeedforward(
             BalanceConstants.KS, BalanceConstants.KV, BalanceConstants.KA, BalanceConstants.KG);
 
     ProfiledPIDController pid =
@@ -38,7 +38,7 @@ public final class Balance {
     Runnable action =
         () -> {
           double out = pid.calculate(drive.getPose().getX(), target.getX()); // might not be getX
-          out += ff.calculate(drive.getPitch(), pid.getSetpoint().velocity);
+          out += ff.calculate(drive.getTotalIncline(), pid.getSetpoint().velocity);
           drive.drive(out, 0, 0, true);
         };
 
@@ -47,6 +47,6 @@ public final class Balance {
 
   public static CommandBase balanceBangBang(Drive drive) {
     BangBangController balance = new BangBangController(5);
-    return Commands.run(() -> drive.drive(balance.calculate(drive.getPitch(), 0), 0, 0, true));
+    return Commands.run(() -> drive.drive(balance.calculate(drive.getTotalIncline(), 0), 0, 0, true));
   }
 }
