@@ -1,6 +1,5 @@
 package org.sciborgs1155.robot.commands;
 
-import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPoint;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,9 +28,6 @@ public final class Scoring {
     destination.add(
         new PathPoint(new Translation2d(drive.getPose().getX(), target.getY()), new Rotation2d()));
     return drive.follow(
-        PathPlanner.generatePath(
-            new PathConstraints(Constants.Auto.MAX_SPEED, Constants.Auto.MAX_ACCEL), destination),
-        false,
-        false);
+        PathPlanner.generatePath(Constants.Drive.CONSTRAINTS, destination), false, false);
   }
 }

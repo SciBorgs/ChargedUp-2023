@@ -23,22 +23,23 @@ import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
-import org.sciborgs1155.robot.Constants.Motors;
 
 public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log(name = "applied output", methodName = "getAppliedOutput")
-  private final CANSparkMax lead = Motors.ELEVATOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
+  private final CANSparkMax lead = MOTOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
 
-  private final CANSparkMax left = Motors.ELEVATOR.build(MotorType.kBrushless, LEFT_MOTOR);
-  private final CANSparkMax right = Motors.ELEVATOR.build(MotorType.kBrushless, RIGHT_MOTOR);
+  private final CANSparkMax left = MOTOR.build(MotorType.kBrushless, LEFT_MOTOR);
+  private final CANSparkMax right = MOTOR.build(MotorType.kBrushless, RIGHT_MOTOR);
 
   @Log private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1]);
   private final EncoderSim simEncoder = new EncoderSim(encoder);
 
   private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
 
-  @Log private final ProfiledPIDController pid = new ProfiledPIDController(kP, kI, kD, CONSTRAINTS);
+  @Log
+  private final ProfiledPIDController pid =
+      new ProfiledPIDController(PID.kp(), PID.ki(), PID.kd(), CONSTRAINTS);
 
   @Log(name = "acceleration", methodName = "getLastOutput")
   private final Derivative accel = new Derivative();
@@ -46,9 +47,9 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   private final ElevatorSim sim =
       new ElevatorSim(
           DCMotor.getNEO(3),
-          CONVERSION,
+          CONVERSION.gearing(),
           Dimensions.ELEVATOR_MASS + Dimensions.FOREARM_MASS + Dimensions.CLAW_MASS,
-          SPROCKET_RADIUS,
+          CONVERSION.units(),
           Dimensions.ELEVATOR_MIN_HEIGHT,
           Dimensions.ELEVATOR_MAX_HEIGHT,
           true);
@@ -59,7 +60,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     left.follow(lead);
     right.follow(lead);
 
-    encoder.setDistancePerPulse(ENCODER_FACTOR);
+    encoder.setDistancePerPulse(CONVERSION.factor());
 
     lead.burnFlash();
     left.burnFlash();

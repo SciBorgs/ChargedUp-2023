@@ -356,6 +356,15 @@
         "Drive": {
           "gyro": {
             "open": true
+          },
+          "moduleDrivePID": {
+            "open": true
+          },
+          "moduleTurnPID": {
+            "open": true
+          },
+          "rearLeft": {
+            "open": true
           }
         },
         "Elevator": {
