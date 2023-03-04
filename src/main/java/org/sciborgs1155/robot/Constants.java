@@ -130,9 +130,8 @@ public final class Constants {
 
   public static final class Arm {
     public static final class Wrist {
-      public static final double kP = 0.6;
-      public static final double kI = 0;
-      public static final double kD = 0;
+
+      public static final PIDConstants PID = new PIDConstants(0.6, 0, 0);
 
       public static final double kS = 0;
       public static final double kG = 0;
@@ -150,10 +149,7 @@ public final class Constants {
       public static final double CONVERSION = GEARING * 2.0 * Math.PI; // rad
       public static final double ENCODER_FACTOR = CONVERSION / Constants.THROUGH_BORE_CPP;
 
-      // public static final double kP = 8.0252;
-      public static final double kP = 2;
-      public static final double kI = 0;
-      public static final double kD = 0.2;
+      public static final PIDConstants PID = new PIDConstants(2, 0, 0.2);
 
       public static final double kS = 0.12117;
       public static final double kG = 0.48397;
@@ -174,9 +170,8 @@ public final class Constants {
 
     public static final double MAX_SPEED = 20; // m/s
     public static final double MAX_ACCEL = 8; // m/s^2
-    public static final double kP = 45; // 384.48
-    public static final double kI = 0;
-    public static final double kD = 1; // 47.131
+
+    public static final PIDConstants PID = new PIDConstants(45, 0, 1);
 
     public static final double kS = 0.39974;
     public static final double kG = 0.060732;

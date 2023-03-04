@@ -38,7 +38,9 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
 
-  @Log private final ProfiledPIDController pid = new ProfiledPIDController(kP, kI, kD, CONSTRAINTS);
+  @Log
+  private final ProfiledPIDController pid =
+      new ProfiledPIDController(PID.P(), PID.I(), PID.D(), CONSTRAINTS);
 
   @Log(name = "acceleration", methodName = "getLastOutput")
   private final Derivative accel = new Derivative();

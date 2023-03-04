@@ -55,11 +55,11 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log(name = "elbow feedback")
   private final ProfiledPIDController elbowFeedback =
-      new ProfiledPIDController(Elbow.kP, Elbow.kI, Elbow.kD, Elbow.CONSTRAINTS);
+      new ProfiledPIDController(Elbow.PID.P(), Elbow.PID.I(), Elbow.PID.D(), Elbow.CONSTRAINTS);
 
   @Log(name = "wrist feedback")
   private final ProfiledPIDController wristFeedback =
-      new ProfiledPIDController(Wrist.kP, Wrist.kI, Wrist.kD, Wrist.CONSTRAINTS);
+      new ProfiledPIDController(Wrist.PID.P(), Wrist.PID.I(), Wrist.PID.D(), Wrist.CONSTRAINTS);
 
   @Log(name = "wrist acceleration", methodName = "getLastOutput")
   private final Derivative wristAccel = new Derivative();
