@@ -208,10 +208,10 @@ public class Drive extends SubsystemBase implements Loggable {
       modules2d[i].setPose(getPose().transformBy(transform));
     }
 
-    for (var module : modules) {
-      module.setDrivePID(moduleDrivePID.get());
-      module.setTurnPID(moduleTurnPID.get());
-    }
+    // for (var module : modules) {
+    //   module.setDrivePID(moduleDrivePID.get());
+    //   module.setTurnPID(moduleTurnPID.get());
+    // }
   }
 
   @Override

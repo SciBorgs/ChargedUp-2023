@@ -19,7 +19,7 @@ public final class Ports {
     public static final int FRONT_RIGHT_TURNING = 3;
     public static final int REAR_RIGHT_TURNING = 40;
 
-    public static final int PIGEON = 10;
+    public static final int PIGEON = 42;
   }
 
   public static final class Arm {
