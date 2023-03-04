@@ -8,7 +8,6 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -31,7 +30,6 @@ import java.util.Arrays;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.constants.PIDConfigurer;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Constants.Auto;
 import org.sciborgs1155.robot.Constants.SwerveModule.Driving;
 import org.sciborgs1155.robot.Constants.SwerveModule.Turning;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
@@ -73,8 +71,8 @@ public class Drive extends SubsystemBase implements Loggable {
   private final FieldObject2d[] modules2d = new FieldObject2d[modules.length];
 
   // Rate limiting
-  private final SlewRateLimiter xLimiter = new SlewRateLimiter(MAX_RATE);
-  private final SlewRateLimiter yLimiter = new SlewRateLimiter(MAX_RATE);
+  private final SlewRateLimiter xLimiter = new SlewRateLimiter(MAX_ACCEL);
+  private final SlewRateLimiter yLimiter = new SlewRateLimiter(MAX_ACCEL);
 
   public Drive(Vision vision) {
     this.vision = vision;
@@ -240,19 +238,15 @@ public class Drive extends SubsystemBase implements Loggable {
    */
   public Command follow(
       PathPlannerTrajectory trajectory, boolean resetPosition, boolean useAllianceColor) {
-    PIDController x = new PIDController(Auto.Cartesian.kP, Auto.Cartesian.kI, Auto.Cartesian.kD);
-    PIDController y = new PIDController(Auto.Cartesian.kP, Auto.Cartesian.kI, Auto.Cartesian.kD);
-    PIDController rot = new PIDController(Auto.Angular.kP, Auto.Angular.kI, Auto.Angular.kD);
-
     if (resetPosition) resetOdometry(trajectory.getInitialPose());
 
     return new PPSwerveControllerCommand(
             trajectory,
             this::getPose,
             kinematics,
-            x,
-            y,
-            rot,
+            CARTESIAN.create(),
+            CARTESIAN.create(),
+            ANGULAR.create(),
             this::setModuleStates,
             useAllianceColor)
         .andThen(stop());
@@ -260,7 +254,7 @@ public class Drive extends SubsystemBase implements Loggable {
 
   /** Follows the specified path planner path given a path name */
   public Command follow(String pathName, boolean resetPosition, boolean useAllianceColor) {
-    PathPlannerTrajectory loadedPath = PathPlanner.loadPath(pathName, Auto.CONSTRAINTS);
+    PathPlannerTrajectory loadedPath = PathPlanner.loadPath(pathName, CONSTRAINTS);
     return follow(loadedPath, resetPosition, useAllianceColor);
   }
 
