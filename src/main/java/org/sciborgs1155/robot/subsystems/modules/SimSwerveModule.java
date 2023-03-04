@@ -17,9 +17,9 @@ import org.sciborgs1155.robot.Constants;
 public class SimSwerveModule implements SwerveModule {
 
   private final WheelSim drive =
-      new WheelSim(Driving.kV, Driving.kA, DCMotor.getNEO(1), Driving.ENCODER_VELOCITY_FACTOR);
+      new WheelSim(Driving.kV, Driving.kA, DCMotor.getNEO(1), Driving.CONVERSION.gearing());
   private final WheelSim turn =
-      new WheelSim(Turning.kV, Turning.kA, DCMotor.getNeo550(1), Turning.ENCODER_POSITION_FACTOR);
+      new WheelSim(Turning.kV, Turning.kA, DCMotor.getNeo550(1), Turning.CONVERSION.gearing());
 
   private final PIDController driveFeedback = Driving.PID.create();
   private final PIDController turnFeedback = Turning.PID.create();

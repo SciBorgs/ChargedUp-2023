@@ -356,12 +356,12 @@
           "moduleTurnPID": {
             "open": true
           },
-          "open": true,
           "rearLeft": {
             "open": true
           }
         },
         "Elevator": {
+          "open": true,
           "pid": {
             "open": true
           }

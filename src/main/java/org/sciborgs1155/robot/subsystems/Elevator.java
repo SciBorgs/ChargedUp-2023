@@ -48,9 +48,9 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   private final ElevatorSim sim =
       new ElevatorSim(
           DCMotor.getNEO(3),
-          CONVERSION,
+          CONVERSION.gearing(),
           Dimensions.ELEVATOR_MASS + Dimensions.FOREARM_MASS + Dimensions.CLAW_MASS,
-          SPROCKET_RADIUS,
+          CONVERSION.units(),
           Dimensions.ELEVATOR_MIN_HEIGHT,
           Dimensions.ELEVATOR_MAX_HEIGHT,
           true);
@@ -61,7 +61,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     left.follow(lead);
     right.follow(lead);
 
-    encoder.setDistancePerPulse(ENCODER_FACTOR);
+    encoder.setDistancePerPulse(CONVERSION.factor());
 
     lead.burnFlash();
     left.burnFlash();
