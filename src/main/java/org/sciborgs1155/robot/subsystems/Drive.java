@@ -36,7 +36,6 @@ import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Auto;
 import org.sciborgs1155.robot.Ports.Sensors;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
-import org.sciborgs1155.robot.util.PathPlannerHelpers;
 import org.sciborgs1155.robot.util.Vision;
 
 public class Drive extends SubsystemBase implements Loggable {
@@ -71,7 +70,7 @@ public class Drive extends SubsystemBase implements Loggable {
 
   public Drive(Vision vision) {
     this.vision = vision;
-  
+
     for (int i = 0; i < modules2d.length; i++) {
       modules2d[i] = field2d.getObject("module-" + i);
     }
@@ -189,7 +188,8 @@ public class Drive extends SubsystemBase implements Loggable {
 
     var poses = vision.getPoseEstimates(getPose());
     for (int i = 0; i < poses.length; i++) {
-      // odometry.addVisionMeasurement(poses[i].estimatedPose.toPose2d(), poses[i].timestampSeconds);
+      // odometry.addVisionMeasurement(poses[i].estimatedPose.toPose2d(),
+      // poses[i].timestampSeconds);
       field2d.getObject("Cam-" + i + " Est Pose").setPose(poses[i].estimatedPose.toPose2d());
     }
     field2d.setRobotPose(getPose());
@@ -308,15 +308,22 @@ public class Drive extends SubsystemBase implements Loggable {
     return run(() -> setModuleStates(states));
   }
 
-  public Command driveToPose(Pose2d pose) {
-    PathPoint point = PathPlannerHelpers.pose2dToPathPoint(pose);
+  public Command driveToPose(Pose2d desiredPose) {
+    Pose2d currentPose = getPose();
+    Rotation2d heading =
+        new Rotation2d(
+            Math.atan2(
+                desiredPose.getY() - currentPose.getY(), desiredPose.getX() - currentPose.getX()));
     PathConstraints constraints =
         new PathConstraints(Constants.Auto.MAX_SPEED, Constants.Auto.MAX_ACCEL);
-    Pose2d currentPose = getPose();
-    PathPoint currentPoint =
-        new PathPoint(
-            currentPose.getTranslation(), currentPose.getRotation(), currentPose.getRotation());
-    List<PathPoint> points = new ArrayList<PathPoint>(List.of(currentPoint, point));
+
+    PathPoint startingPos =
+        new PathPoint(getPose().getTranslation(), heading, getPose().getRotation());
+
+    PathPoint endPos =
+        new PathPoint(desiredPose.getTranslation(), heading, desiredPose.getRotation());
+
+    List<PathPoint> points = new ArrayList<PathPoint>(List.of(startingPos, endPos));
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(constraints, points);
     return follow(trajectory, false, false);
   }

@@ -40,8 +40,10 @@ public class AutoPath {
     return autoPath;
   }
 
-  public static AutoPath simpleDrivePath(Drive drive, Vision vision, Intake intake, Arm arm, Elevator elevator) {
-    AutoPath autoPath = new AutoPath(drive, vision, intake, arm, elevator, new ArrayList<AutoStep>());
+  public static AutoPath simpleDrivePath(
+      Drive drive, Vision vision, Intake intake, Arm arm, Elevator elevator) {
+    AutoPath autoPath =
+        new AutoPath(drive, vision, intake, arm, elevator, new ArrayList<AutoStep>());
     autoPath.addDriveStep(new Pose2d(0, 4, Rotation2d.fromRadians(0)));
     return autoPath;
   }

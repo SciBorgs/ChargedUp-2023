@@ -2,7 +2,6 @@ package org.sciborgs1155.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -145,14 +144,15 @@ public interface AutoStep extends Sendable {
 
     @Override
     public void initSendable(SendableBuilder builder) {
-        builder.addDoubleProperty("x coord", () -> this.pose.getX(), this::setX);
-        builder.addDoubleProperty("y coord", () -> this.pose.getY(), this::setY);
-        builder.addDoubleProperty("theta (rads)", () -> this.pose.getRotation().getRadians(), this::setTheta);
+      builder.addDoubleProperty("x coord", () -> this.pose.getX(), this::setX);
+      builder.addDoubleProperty("y coord", () -> this.pose.getY(), this::setY);
+      builder.addDoubleProperty(
+          "theta (rads)", () -> this.pose.getRotation().getRadians(), this::setTheta);
     }
 
     @Override
     public Command get() {
-        return drive.driveToPose(pose);
+      return drive.driveToPose(pose);
     }
 
     private void setX(double x) {
