@@ -8,6 +8,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.AutoStep;
 import org.sciborgs1155.robot.commands.Autos;
@@ -90,5 +94,8 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // return Commands.none();
     return autos.get();
+    // return new AutoStep.DriveToPoses(drive, new ArrayList<Pose2d>(List.of(new Pose2d(5, 5, Rotation2d.fromDegrees(45)),
+    //                                                                       new Pose2d(3, 8, Rotation2d.fromDegrees(0))))).get().
+    // andThen(new AutoStep.DriveToPose(drive, new Pose2d(1, 1, Rotation2d.fromDegrees(0))).get());
   }
 }

@@ -31,6 +31,8 @@ import io.github.oblarg.oblog.annotations.Log;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BooleanSupplier;
+
 import org.sciborgs1155.lib.ControllerOutputFunction;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Auto;
@@ -359,9 +361,13 @@ public class Drive extends SubsystemBase implements Loggable {
   }
 
   public Command driveToPoses(List<Pose2d> desiredPoses) {
+    BooleanSupplier closeEnough = () -> {
+      Transform2d transform = getPose().minus(desiredPoses.get(desiredPoses.size() - 1));
+      return Math.abs(transform.getX()) < 0.05 && Math.abs(transform.getY()) < 0.05 && Math.abs(transform.getRotation().getDegrees()) < 0.5;
+    };
     List<Pose2d> posesWithStart = new ArrayList<Pose2d>(List.of(getPose()));
     posesWithStart.addAll(desiredPoses);
-    return driveToPosesH(posesWithStart);
+    return driveToPosesH(posesWithStart).until(closeEnough);
   }
 
   public Command driveToPose(Pose2d desiredPose) {

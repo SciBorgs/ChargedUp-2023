@@ -453,7 +453,7 @@
               "autoFit": true
             }
           ],
-          "height": 59,
+          "height": 28,
           "series": [
             {
               "color": [
@@ -477,7 +477,8 @@
         }
       ],
       "window": {
-        "name": "velocity"
+        "name": "velocity",
+        "visible": false
       }
     }
   }

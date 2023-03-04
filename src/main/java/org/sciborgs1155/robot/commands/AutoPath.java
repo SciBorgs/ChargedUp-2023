@@ -53,6 +53,7 @@ public class AutoPath implements Sendable {
     AutoPath autoPath = new AutoPath(drive, vision, intake, arm, elevator, new ArrayList<AutoStep>());
     autoPath.addDriveStep(new ArrayList<Pose2d>(List.of(new Pose2d(6, 1, Rotation2d.fromDegrees(0)),
                                                         new Pose2d(6, 5, Rotation2d.fromDegrees(90)))));
+    autoPath.addDriveStep(new Pose2d(1, 1, Rotation2d.fromDegrees(0)));
     return autoPath;
   }
 
