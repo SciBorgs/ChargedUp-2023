@@ -70,7 +70,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   private final SingleJointedArmSim elbowSim =
       new SingleJointedArmSim(
           DCMotor.getNEO(3),
-          1 / Elbow.CONVERSION,
+          Elbow.CONVERSION.gearing(),
           SingleJointedArmSim.estimateMOI(Dimensions.FOREARM_LENGTH, Dimensions.FOREARM_MASS),
           Dimensions.FOREARM_LENGTH,
           Dimensions.ELBOW_MIN_ANGLE,
@@ -94,7 +94,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowLeft.follow(elbow);
     elbowRight.follow(elbow);
 
-    elbowEncoder.setDistancePerPulse(Elbow.ENCODER_FACTOR);
+    elbowEncoder.setDistancePerPulse(Elbow.CONVERSION.factor());
     wristEncoder.setPositionConversionFactor(
         1.0
             / 47.22222222222
@@ -107,8 +107,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     wrist.burnFlash();
 
     this.visualizer = visualizer;
-    this.v = 0;
-    this.wristV = 0;
   }
 
   /** Elbow position relative to the chassis */

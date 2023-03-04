@@ -9,6 +9,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.PlacementState;
+import org.sciborgs1155.lib.constants.ConversionConfig;
+import org.sciborgs1155.lib.constants.ConversionConfig.PulsesPerRev;
 import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
@@ -146,9 +148,12 @@ public final class Constants {
     }
 
     public static final class Elbow {
-      public static final double GEARING = 12.0 / 72.0; // rot
-      public static final double CONVERSION = GEARING * 2.0 * Math.PI; // rad
-      public static final double ENCODER_FACTOR = CONVERSION / Constants.THROUGH_BORE_CPP;
+      public static final ConversionConfig CONVERSION =
+          ConversionConfig.base()
+              .multiplyGearing(12)
+              .divideGearing(72)
+              .withUnits(ConversionConfig.Units.RADIANS)
+              .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
 
       // public static final double kP = 8.0252;
       public static final double kP = 2;
@@ -168,9 +173,11 @@ public final class Constants {
   }
 
   public static final class Elevator {
-    public static final double SPROCKET_RADIUS = Units.inchesToMeters(0.716);
-    public static final double CONVERSION = 2.0 * Math.PI * SPROCKET_RADIUS; // m
-    public static final double ENCODER_FACTOR = CONVERSION / Constants.THROUGH_BORE_CPP;
+    public static final ConversionConfig CONVERSION =
+        ConversionConfig.base()
+            .multiplyRadius(0.0181864)
+            .withUnits(ConversionConfig.Units.RADIANS)
+            .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
 
     public static final double MAX_SPEED = 20; // m/s
     public static final double MAX_ACCEL = 8; // m/s^2
@@ -218,17 +225,19 @@ public final class Constants {
     // we use a 14T pinion
     public static final int PINION_TEETH = 14;
 
-    public static final double WHEEL_DIAMETER = 0.0762;
-
-    // 45 teeth on the wheel's bevel gear
-    // 22 teeth on the first-stage spur gear
-    // 15 teeth on the bevel pinion
-    public static final double DRIVING_MOTOR_REDUCTION = (45.0 * 22) / (PINION_TEETH * 15);
-
     public static final class Driving {
-      public static final double ENCODER_POSITION_FACTOR =
-          (WHEEL_DIAMETER * Math.PI) / DRIVING_MOTOR_REDUCTION; // m
-      public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0; // m/s
+      // 45 teeth on the wheel's bevel gear
+      // 22 teeth on the first-stage spur gear
+      // 15 teeth on the bevel pinion
+      public static final ConversionConfig CONVERSION =
+          ConversionConfig.base()
+              .multiplyRadius(0.0381)
+              .withUnits(ConversionConfig.Units.RADIANS)
+              .divideGearing(45.0)
+              .divideGearing(22.0)
+              .multiplyGearing(15.0)
+              .multiplyGearing(PINION_TEETH)
+              .withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
 
       public static final PIDConstants PID = new PIDConstants(0.07, 0, 0.06);
 
@@ -238,10 +247,9 @@ public final class Constants {
     }
 
     public static final class Turning {
-      public static final double ENCODER_POSITION_FACTOR = (2 * Math.PI); // rad
-      public static final double ENCODER_VELOCITY_FACTOR =
-          ENCODER_POSITION_FACTOR / 60.0; // rad / s
-      public static final boolean ENCODER_INVERTED = true;
+      public static final ConversionConfig CONVERSION =
+          ConversionConfig.base().withUnits(ConversionConfig.Units.RADIANS).inverted();
+      // public static final boolean ENCODER_INVERTED = true;
 
       public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
       public static final double MAX_ANGULAR_ACCELERATION = 2 * Math.PI; // rad / s^2
@@ -255,7 +263,7 @@ public final class Constants {
 
       // pid wrapping
       public static final double MIN_INPUT = 0;
-      public static final double MAX_INPUT = ENCODER_POSITION_FACTOR;
+      public static final double MAX_INPUT = CONVERSION.factor();
     }
   }
 

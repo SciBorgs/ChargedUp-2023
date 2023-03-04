@@ -1,6 +1,6 @@
 package org.sciborgs1155.lib.constants;
 
-public record ConversionConfig(double ppr, double gearing, double units) {
+public record ConversionConfig(double pulsesPerRev, double gearing, double units) {
 
   /**
    * An enum to represent common pulses per rotation presets
@@ -8,18 +8,18 @@ public record ConversionConfig(double ppr, double gearing, double units) {
    * <p>Note that there is a difference between PPR (pulses per revolution) and CPR (cycles per
    * revolution). In a quadrature encoder, the CPR will be 4 * PPR.
    */
-  public enum PPR {
+  public enum PulsesPerRev {
     REV_THROUGHBORE(2048),
     REV_INTEGRATED(1);
 
     public final double pulses;
 
-    private PPR(double pulses) {
+    private PulsesPerRev(double pulses) {
       this.pulses = pulses;
     }
   }
 
-  /** An enum to represent common unit conversions */
+  /** An enum to represent common unit conversions for rotations to the respective units */
   public enum Units {
     RADIANS(2.0 * Math.PI),
     DEGREES(360.0);
@@ -31,25 +31,41 @@ public record ConversionConfig(double ppr, double gearing, double units) {
     }
   }
 
+  public static ConversionConfig base() {
+    return new ConversionConfig(1, 1, 1);
+  }
+
   /**
    * The position factor for the encoder.
    *
-   * @return The product of gearing, units per rotation, and pulses per revolution
+   * @return The product of gearing and units per rotation, divded by pulses per revolution
    */
   public double factor() {
-    return gearing * units * ppr;
+    return gearing * units / pulsesPerRev;
   }
 
-  public ConversionConfig withPPR(PPR ppr) {
-    return withPPR(ppr.pulses);
+  public ConversionConfig withPulsesPerRev(PulsesPerRev pulsesPerRev) {
+    return withPulsesPerRev(pulsesPerRev.pulses);
   }
 
-  public ConversionConfig withPPR(double ppr) {
-    return new ConversionConfig(ppr, gearing, units);
+  public ConversionConfig withPulsesPerRev(double pulsesPerRev) {
+    return new ConversionConfig(pulsesPerRev, gearing, units);
   }
 
-  public ConversionConfig withGearing(double gearing) {
-    return new ConversionConfig(ppr, gearing, units);
+  public ConversionConfig multiplyGearing(double ratio) {
+    return new ConversionConfig(pulsesPerRev, gearing * ratio, units);
+  }
+
+  public ConversionConfig divideGearing(double ratio) {
+    return new ConversionConfig(pulsesPerRev, gearing / ratio, units);
+  }
+
+  public ConversionConfig multiplyRadius(double radius) {
+    return multiplyGearing(radius);
+  }
+
+  public ConversionConfig inverted() {
+    return multiplyGearing(-1.0); // TODO might introduce bugs
   }
 
   public ConversionConfig withUnits(Units units) {
@@ -57,10 +73,6 @@ public record ConversionConfig(double ppr, double gearing, double units) {
   }
 
   public ConversionConfig withUnits(double units) {
-    return new ConversionConfig(ppr, gearing, units);
-  }
-
-  public ConversionConfig multiplyGearing(double gearing) {
-    return new ConversionConfig(ppr, this.gearing * gearing, units);
+    return new ConversionConfig(pulsesPerRev, gearing, units);
   }
 }
