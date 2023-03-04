@@ -8,9 +8,9 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.sciborgs1155.lib.MotorConfig;
-import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.PlacementState;
+import org.sciborgs1155.lib.constants.MotorConfig;
+import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
 
 /**
