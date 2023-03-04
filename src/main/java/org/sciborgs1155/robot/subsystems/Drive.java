@@ -67,6 +67,8 @@ public class Drive extends SubsystemBase implements Loggable {
 
   @Log private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d = new FieldObject2d[modules.length];
+  private final PathConstraints constraints =
+      new PathConstraints(Constants.Auto.MAX_SPEED, Constants.Auto.MAX_ACCEL);
 
   public Drive(Vision vision) {
     this.vision = vision;
@@ -309,13 +311,22 @@ public class Drive extends SubsystemBase implements Loggable {
   }
 
   public Command driveToPose(Pose2d desiredPose) {
+    List<PathPoint> points =
+        new ArrayList<PathPoint>(
+            List.of(
+                new PathPoint(
+                    getPose().getTranslation(), new Rotation2d(), getPose().getRotation()),
+                new PathPoint(
+                    desiredPose.getTranslation(), new Rotation2d(), desiredPose.getRotation())));
+    return follow(PathPlanner.generatePath(constraints, points), false, false);
+  }
+
+  public Command driveStraightToPose(Pose2d desiredPose) {
     Pose2d currentPose = getPose();
     Rotation2d heading =
         new Rotation2d(
             Math.atan2(
                 desiredPose.getY() - currentPose.getY(), desiredPose.getX() - currentPose.getX()));
-    PathConstraints constraints =
-        new PathConstraints(Constants.Auto.MAX_SPEED, Constants.Auto.MAX_ACCEL);
 
     PathPoint startingPos =
         new PathPoint(getPose().getTranslation(), heading, getPose().getRotation());

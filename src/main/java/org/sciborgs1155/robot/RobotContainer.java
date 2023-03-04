@@ -89,7 +89,7 @@ public class RobotContainer {
     // return Commands.none();
     // return autos.get();
     drive.resetOdometry(new Pose2d(5.89, 7.62, Rotation2d.fromDegrees(0)));
-    return drive.driveToPose(new Pose2d(2.5, 3.2, Rotation2d.fromDegrees(0)));
+    return drive.driveStraightToPose(new Pose2d(2.5, 3.2, Rotation2d.fromDegrees(0)));
     // return Commands.run(() -> drive.drive(1, 1, Math.PI/2, false), drive);
   }
 
