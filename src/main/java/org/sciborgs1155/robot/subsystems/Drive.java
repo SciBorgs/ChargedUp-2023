@@ -312,24 +312,6 @@ public class Drive extends SubsystemBase implements Loggable {
     return run(() -> setModuleStates(states));
   }
 
-  public Command driveStraightToPose(Pose2d desiredPose) {
-    Pose2d currentPose = getPose();
-    Rotation2d heading =
-        new Rotation2d(
-            Math.atan2(
-                desiredPose.getY() - currentPose.getY(), desiredPose.getX() - currentPose.getX()));
-
-    PathPoint startingPos =
-        new PathPoint(currentPose.getTranslation(), heading, currentPose.getRotation());
-
-    PathPoint endPos =
-        new PathPoint(desiredPose.getTranslation(), heading, desiredPose.getRotation());
-
-    List<PathPoint> points = new ArrayList<PathPoint>(List.of(startingPos, endPos));
-    PathPlannerTrajectory trajectory = PathPlanner.generatePath(constraints, points);
-    return follow(trajectory, false, false);
-  }
-
   public Rotation2d headingToPose(Pose2d currentPose, Pose2d desiredPose) {
     return new Rotation2d(
         Math.atan2(

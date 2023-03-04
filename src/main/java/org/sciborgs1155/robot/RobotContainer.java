@@ -93,9 +93,9 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // return Commands.none();
-    return autos.get();
-    // return new AutoStep.DriveToPoses(drive, new ArrayList<Pose2d>(List.of(new Pose2d(5, 5, Rotation2d.fromDegrees(45)),
-    //                                                                       new Pose2d(3, 8, Rotation2d.fromDegrees(0))))).get().
-    // andThen(new AutoStep.DriveToPose(drive, new Pose2d(1, 1, Rotation2d.fromDegrees(0))).get());
+    // return autos.get();
+    return new AutoStep.DriveToPoses(drive, new ArrayList<Pose2d>(List.of(new Pose2d(5, 5, Rotation2d.fromDegrees(45)),
+                                                                          new Pose2d(3, 8, Rotation2d.fromDegrees(0))))).get().
+    andThen(new AutoStep.DriveToPose(drive, new Pose2d(1, 1, Rotation2d.fromDegrees(0))).get());
   }
 }
