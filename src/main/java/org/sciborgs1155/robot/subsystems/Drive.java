@@ -31,9 +31,6 @@ import io.github.oblarg.oblog.annotations.Log;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import javax.sound.midi.Track;
-
 import org.sciborgs1155.lib.ControllerOutputFunction;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Auto;
@@ -333,8 +330,8 @@ public class Drive extends SubsystemBase implements Loggable {
 
   public Rotation2d headingToPose(Pose2d currentPose, Pose2d desiredPose) {
     return new Rotation2d(
-      Math.atan2(
-          desiredPose.getY() - currentPose.getY(), desiredPose.getX() - currentPose.getX()));
+        Math.atan2(
+            desiredPose.getY() - currentPose.getY(), desiredPose.getX() - currentPose.getX()));
   }
 
   // i'm sorry i'll make this not super ulgy but it works so go with it for now - Siggy
@@ -343,13 +340,19 @@ public class Drive extends SubsystemBase implements Loggable {
     for (int i = 0; i < desiredPoses.size() - 1; i++) {
       Pose2d startPose = desiredPoses.get(i);
       Pose2d endPose2d = desiredPoses.get(i + 1);
-      points.add(new PathPoint(startPose.getTranslation(), headingToPose(startPose, endPose2d), startPose.getRotation()));
+      points.add(
+          new PathPoint(
+              startPose.getTranslation(),
+              headingToPose(startPose, endPose2d),
+              startPose.getRotation()));
     }
     Pose2d lastPose = desiredPoses.get(desiredPoses.size() - 1);
     Pose2d secondToLastPose = desiredPoses.get(desiredPoses.size() - 2);
-    points.add(new PathPoint(lastPose.getTranslation(), 
-                             headingToPose(secondToLastPose, lastPose),
-                             lastPose.getRotation()));
+    points.add(
+        new PathPoint(
+            lastPose.getTranslation(),
+            headingToPose(secondToLastPose, lastPose),
+            lastPose.getRotation()));
     PathConstraints constraints = new PathConstraints(Auto.MAX_SPEED, Auto.MAX_ACCEL);
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(constraints, points);
     return follow(trajectory, false, false);
