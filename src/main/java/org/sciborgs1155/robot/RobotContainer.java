@@ -1,5 +1,7 @@
 package org.sciborgs1155.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -7,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.robot.Ports.OI;
+import org.sciborgs1155.robot.commands.AutoStep;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Placement;
 import org.sciborgs1155.robot.subsystems.Arm;
@@ -40,6 +43,7 @@ public class RobotContainer {
 
   // command factories
   @Log private final Autos autos = new Autos(drive, intake, vision, arm, elevator);
+  @Log private final AutoStep step = new AutoStep.DriveToPose(drive, new Pose2d(5, 5, Rotation2d.fromDegrees(0)));
   private final Placement placement = new Placement(arm, elevator);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -87,8 +91,4 @@ public class RobotContainer {
     // return Commands.none();
     return autos.get();
   }
-
-  // public void initStuff() {
-  //   drive.resetOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
-  // }
 }

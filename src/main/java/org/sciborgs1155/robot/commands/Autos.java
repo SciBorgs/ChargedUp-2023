@@ -5,6 +5,8 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import io.github.oblarg.oblog.annotations.Log;
+
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
@@ -19,15 +21,19 @@ public class Autos implements Sendable {
 
   public Autos(Drive drive, Intake intake, Vision vision, Arm arm, Elevator elevator) {
     pathChooser = new SendableChooser<AutoPath>();
-    pathChooser.setDefaultOption(
-        "simple", AutoPath.simpleDrivePath(drive, vision, intake, arm, elevator));
-    pathChooser.addOption("example", AutoPath.examplePath(drive, vision, intake, arm, elevator));
+    pathChooser.addOption("driveAround", AutoPath.driveAroundPath(drive, vision, intake, arm, elevator));
+    pathChooser.addOption("simpleDrive", AutoPath.simpleDrivePath(drive, vision, intake, arm, elevator));
+    pathChooser.setDefaultOption("intakeScore", AutoPath.exampleIntakeScorePath(drive, vision, intake, arm, elevator));
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    pathChooser.initSendable(builder);
+    pathChooser.initSendable(builder); 
   }
+
+  @Log(name = "auto path", methodName = "getAutoPath")
+
+  private AutoPath getAutoPath() {return pathChooser.getSelected(); }
 
   public Command get() {
     return pathChooser.getSelected().get();

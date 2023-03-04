@@ -6,6 +6,9 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+
+import java.util.List;
+
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.commands.Autos.PlaceHolderCommands;
 import org.sciborgs1155.robot.commands.Autos.ShouldBeInDiffFile;
@@ -165,6 +168,25 @@ public interface AutoStep extends Sendable {
 
     private void setTheta(double thetaRads) {
       this.pose = new Pose2d(this.pose.getTranslation(), Rotation2d.fromRadians(thetaRads));
+    }
+  }
+
+  public final class DriveToPoses implements AutoStep {
+    private List<Pose2d> poses;
+
+    private final Drive drive;
+
+    public DriveToPoses(Drive drive, List<Pose2d> poses) {
+      this.poses = poses;
+      this.drive = drive;
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {}
+
+    @Override
+    public Command get() {
+      return drive.driveToPoses(poses);
     }
   }
 }

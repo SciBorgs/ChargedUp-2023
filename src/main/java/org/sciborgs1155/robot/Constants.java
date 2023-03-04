@@ -2,6 +2,7 @@ package org.sciborgs1155.robot;
 
 import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -338,7 +339,7 @@ public final class Constants {
             Map.entry("R5", new Pose2d()),
             Map.entry("R6", new Pose2d()),
             Map.entry("R7", new Pose2d()),
-            Map.entry("R8", new Pose2d()),
+            Map.entry("R8", new Pose2d(10, 3, Rotation2d.fromDegrees(90))),
             Map.entry("R9", new Pose2d()));
   }
 }
