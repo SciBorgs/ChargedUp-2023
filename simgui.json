@@ -43,6 +43,7 @@
       "/LiveWindow/Ungrouped/PIDController[7]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
+      "/LiveWindow/Ungrouped/Pigeon IMU [10]": "Gyro",
       "/LiveWindow/Ungrouped/Pigeon IMU [2]": "Gyro",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/Shuffleboard/Drive/field2d": "Field2d",
@@ -324,6 +325,9 @@
     }
   },
   "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
     "Retained Values": {
       "open": false
     },
@@ -419,7 +423,7 @@
               "autoFit": true
             }
           ],
-          "height": 295,
+          "height": 0,
           "series": [
             {
               "color": [
@@ -454,7 +458,7 @@
               "autoFit": true
             }
           ],
-          "height": 295,
+          "height": 0,
           "series": [
             {
               "color": [

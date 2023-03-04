@@ -8,6 +8,7 @@ import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.Visualizer;
+import org.sciborgs1155.robot.Constants.Positions;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Placement;
@@ -54,7 +55,7 @@ public class RobotContainer {
 
   private void configureSubsystemDefaults() {
     drive.setDefaultCommand(drive.drive(leftJoystick, rightJoystick, true));
-    arm.setDefaultCommand(arm.setVoltage(() -> xbox.getRightY() * 3, () -> xbox.getLeftY() * 3));
+    // arm.setDefaultCommand(arm.setVoltage(() -> xbox.getRightY() * 3, () -> xbox.getLeftY() * 3));
   }
 
   /**
@@ -96,6 +97,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // return drive.follow("PRAY", true, true);
+
     return autos.get();
     // return arm.setElbowGoal(new TrapezoidProfile.State(0.75 * Math.PI, 0));
     // return autos.get();
