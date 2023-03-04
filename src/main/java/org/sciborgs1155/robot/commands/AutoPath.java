@@ -35,7 +35,7 @@ public class AutoPath {
       Drive drive, Vision vision, Intake intake, Arm arm, Elevator elevator) {
     AutoPath autoPath =
         new AutoPath(drive, vision, intake, arm, elevator, new ArrayList<AutoStep>());
-    // autoPath.addIntakeStep();
+    autoPath.addIntakeStep();
     autoPath.addScoreStep(Constants.Field.SCORING_POINTS.get("B8"), Side.FRONT);
     return autoPath;
   }
