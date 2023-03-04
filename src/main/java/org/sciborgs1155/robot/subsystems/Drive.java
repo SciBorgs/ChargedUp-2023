@@ -23,11 +23,10 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.Arrays;
+import java.util.function.DoubleSupplier;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.constants.PIDConfigurer;
 import org.sciborgs1155.robot.Constants;
@@ -264,28 +263,17 @@ public class Drive extends SubsystemBase implements Loggable {
     return follow(loadedPath, resetPosition, useAllianceColor);
   }
 
-  /** Drive based on xbox */
-  public Command drive(CommandXboxController xbox, boolean fieldRelative) {
+  /** Drives robot based on three double suppliers (x,y and rot) */
+  public Command drive(
+      DoubleSupplier x, DoubleSupplier y, DoubleSupplier rot, boolean fieldRelative) {
     return run(
         () ->
             drive(
-                -MathUtil.applyDeadband(xbox.getLeftY(), Constants.DEADBAND),
-                -MathUtil.applyDeadband(xbox.getLeftX(), Constants.DEADBAND),
-                -MathUtil.applyDeadband(xbox.getRightX(), Constants.DEADBAND),
+                MathUtil.applyDeadband(x.getAsDouble(), Constants.DEADBAND),
+                MathUtil.applyDeadband(y.getAsDouble(), Constants.DEADBAND),
+                MathUtil.applyDeadband(rot.getAsDouble(), Constants.DEADBAND),
                 fieldRelative));
   }
-
-  /** Drive based on joysticks */
-  public Command drive(CommandJoystick left, CommandJoystick right, boolean fieldRelative) {
-    return run(
-        () ->
-            drive(
-                -MathUtil.applyDeadband(left.getY(), Constants.DEADBAND),
-                -MathUtil.applyDeadband(left.getX(), Constants.DEADBAND),
-                -MathUtil.applyDeadband(right.getX(), Constants.DEADBAND),
-                fieldRelative));
-  }
-
   /** Stops drivetrain */
   public Command stop() {
     return run(() -> setModuleStates(getModuleStates()));
