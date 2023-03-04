@@ -1,10 +1,5 @@
 {
   "HALProvider": {
-    "DIO": {
-      "window": {
-        "visible": true
-      }
-    },
     "Other Devices": {
       "ADIS16470[0]": {
         "header": {
@@ -29,6 +24,7 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/Arm": "Subsystem",
       "/LiveWindow/Drive": "Subsystem",
       "/LiveWindow/Ungrouped/DigitalInput[7]": "Digital Input",
       "/LiveWindow/Ungrouped/DigitalInput[8]": "Digital Input",
@@ -43,8 +39,10 @@
       "/LiveWindow/Ungrouped/PIDController[7]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
+      "/LiveWindow/Ungrouped/Pigeon IMU [10]": "Gyro",
       "/LiveWindow/Ungrouped/Pigeon IMU [2]": "Gyro",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
+      "/Shuffleboard/Balance/raw pid": "PIDController",
       "/Shuffleboard/Drive/field2d": "Field2d",
       "/Shuffleboard/Drive/gyro": "Gyro",
       "/Shuffleboard/Drive/imu": "Gyro",
@@ -339,11 +337,19 @@
           "elbowFeedback": {
             "open": true
           },
-          "open": true,
           "wrist feedback": {
             "open": true
           },
           "wristFeedback": {
+            "open": true
+          }
+        },
+        "Balance": {
+          "bang bang": {
+            "open": true
+          },
+          "open": true,
+          "ppid": {
             "open": true
           }
         },
@@ -419,7 +425,7 @@
               "autoFit": true
             }
           ],
-          "height": 295,
+          "height": 0,
           "series": [
             {
               "color": [
@@ -443,7 +449,8 @@
         }
       ],
       "window": {
-        "name": "angle"
+        "name": "angle",
+        "visible": false
       }
     },
     "Plot <1>": {
@@ -454,7 +461,7 @@
               "autoFit": true
             }
           ],
-          "height": 295,
+          "height": 118,
           "series": [
             {
               "color": [
@@ -478,7 +485,8 @@
         }
       ],
       "window": {
-        "name": "velocity"
+        "name": "velocity",
+        "visible": false
       }
     }
   }

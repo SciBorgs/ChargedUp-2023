@@ -36,32 +36,33 @@ import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 public class Drive extends SubsystemBase implements Loggable {
 
   @Log
-  private final SwerveModule frontLeft = SwerveModule.create(FRONT_LEFT_DRIVE, FRONT_LEFT_TURNING, ANGULAR_OFFSETS[0]);
+  private final SwerveModule frontLeft =
+      SwerveModule.create(FRONT_LEFT_DRIVE, FRONT_LEFT_TURNING, ANGULAR_OFFSETS[0]);
 
   @Log
-  private final SwerveModule frontRight = SwerveModule.create(FRONT_RIGHT_DRIVE, FRONT_RIGHT_TURNING,
-      ANGULAR_OFFSETS[1]);
+  private final SwerveModule frontRight =
+      SwerveModule.create(FRONT_RIGHT_DRIVE, FRONT_RIGHT_TURNING, ANGULAR_OFFSETS[1]);
 
   @Log
-  private final SwerveModule rearLeft = SwerveModule.create(REAR_LEFT_DRIVE, REAR_LEFT_TURNING, ANGULAR_OFFSETS[2]);
+  private final SwerveModule rearLeft =
+      SwerveModule.create(REAR_LEFT_DRIVE, REAR_LEFT_TURNING, ANGULAR_OFFSETS[2]);
 
   @Log
-  private final SwerveModule rearRight = SwerveModule.create(REAR_RIGHT_DRIVE, REAR_RIGHT_TURNING, ANGULAR_OFFSETS[3]);
+  private final SwerveModule rearRight =
+      SwerveModule.create(REAR_RIGHT_DRIVE, REAR_RIGHT_TURNING, ANGULAR_OFFSETS[3]);
 
-  private final SwerveModule[] modules = { frontLeft, frontRight, rearLeft, rearRight };
+  private final SwerveModule[] modules = {frontLeft, frontRight, rearLeft, rearRight};
 
-  @Log
-  private final WPI_PigeonIMU imu = new WPI_PigeonIMU(PIGEON);
+  @Log private final WPI_PigeonIMU imu = new WPI_PigeonIMU(PIGEON);
 
   private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
   // Odometry and pose estimation
   private final Vision vision;
-  private final SwerveDrivePoseEstimator odometry = new SwerveDrivePoseEstimator(kinematics, getHeading(),
-      getModulePositions(), new Pose2d());
+  private final SwerveDrivePoseEstimator odometry =
+      new SwerveDrivePoseEstimator(kinematics, getHeading(), getModulePositions(), new Pose2d());
 
-  @Log
-  private final Field2d field2d = new Field2d();
+  @Log private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d = new FieldObject2d[modules.length];
 
   // Rate limiting
@@ -106,11 +107,10 @@ public class Drive extends SubsystemBase implements Loggable {
   /**
    * Method to drive the robot using joystick info.
    *
-   * @param xSpeed        Speed of the robot in the x direction (forward).
-   * @param ySpeed        Speed of the robot in the y direction (sideways).
-   * @param rot           Angular rate of the robot.
-   * @param fieldRelative Whether the provided x and y speeds are relative to the
-   *                      field.
+   * @param xSpeed Speed of the robot in the x direction (forward).
+   * @param ySpeed Speed of the robot in the y direction (sideways).
+   * @param rot Angular rate of the robot.
+   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     xSpeed = xLimiter.calculate(Math.pow(xSpeed, 2) * Math.signum(xSpeed) * MAX_SPEED);
@@ -120,8 +120,9 @@ public class Drive extends SubsystemBase implements Loggable {
     var speeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
 
     if (fieldRelative) {
-      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-          speeds, odometry.getEstimatedPosition().getRotation());
+      speeds =
+          ChassisSpeeds.fromFieldRelativeSpeeds(
+              speeds, odometry.getEstimatedPosition().getRotation());
     }
 
     setModuleStates(kinematics.toSwerveModuleStates(speeds));
@@ -154,7 +155,7 @@ public class Drive extends SubsystemBase implements Loggable {
     imu.reset();
   }
 
-  private SwerveModuleState[] getModuleStates() {
+  public SwerveModuleState[] getModuleStates() {
     return Arrays.stream(modules).map(SwerveModule::getState).toArray(SwerveModuleState[]::new);
   }
 
@@ -195,14 +196,14 @@ public class Drive extends SubsystemBase implements Loggable {
   }
 
   /**
-   * Calculates the sine of the angle of incline, given yaw-pitch-roll angles.
-   * Contribution of gravity to parallel force may be calculated as follows:
-   * 
+   * Calculates the sine of the angle of incline, given yaw-pitch-roll angles. Contribution of
+   * gravity to parallel force may be calculated as follows:
+   *
    * <pre>
-   * 
+   *
    * double F_g = M * g * pitchRollToIncline(pigeon.getPitch(), pigeon.getRoll());
    * </pre>
-   * 
+   *
    * @return sine of the total incline of the robot
    */
   @Log
@@ -234,7 +235,7 @@ public class Drive extends SubsystemBase implements Loggable {
     imu.getSimCollection()
         .addHeading(
             Units.radiansToDegrees(
-                kinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond)
+                    kinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond)
                 * Constants.RATE);
 
     vision.updateSeenTags();
@@ -243,13 +244,11 @@ public class Drive extends SubsystemBase implements Loggable {
   /**
    * Follows a path on the field.
    *
-   * @param trajectory       The pathplanner trajectory the robot will follow
-   * @param resetPosition    Whether the robot should set its odometry to the
-   *                         initial pose of the
-   *                         trajectory
-   * @param useAllianceColor Whether the robot should take into account alliance
-   *                         color before
-   *                         following
+   * @param trajectory The pathplanner trajectory the robot will follow
+   * @param resetPosition Whether the robot should set its odometry to the initial pose of the
+   *     trajectory
+   * @param useAllianceColor Whether the robot should take into account alliance color before
+   *     following
    * @return The command that follows the trajectory
    */
   public Command follow(
@@ -258,18 +257,17 @@ public class Drive extends SubsystemBase implements Loggable {
     PIDController y = new PIDController(Auto.Cartesian.kP, Auto.Cartesian.kI, Auto.Cartesian.kD);
     PIDController rot = new PIDController(Auto.Angular.kP, Auto.Angular.kI, Auto.Angular.kD);
 
-    if (resetPosition)
-      resetOdometry(trajectory.getInitialPose());
+    if (resetPosition) resetOdometry(trajectory.getInitialPose());
 
     return new PPSwerveControllerCommand(
-        trajectory,
-        this::getPose,
-        kinematics,
-        x,
-        y,
-        rot,
-        this::setModuleStates,
-        useAllianceColor)
+            trajectory,
+            this::getPose,
+            kinematics,
+            x,
+            y,
+            rot,
+            this::setModuleStates,
+            useAllianceColor)
         .andThen(stop());
   }
 
@@ -282,21 +280,23 @@ public class Drive extends SubsystemBase implements Loggable {
   /** Drive based on xbox */
   public Command drive(CommandXboxController xbox, boolean fieldRelative) {
     return run(
-        () -> drive(
-            -MathUtil.applyDeadband(xbox.getLeftY(), Constants.DEADBAND),
-            -MathUtil.applyDeadband(xbox.getLeftX(), Constants.DEADBAND),
-            -MathUtil.applyDeadband(xbox.getRightX(), Constants.DEADBAND),
-            fieldRelative));
+        () ->
+            drive(
+                -MathUtil.applyDeadband(xbox.getLeftY(), Constants.DEADBAND),
+                -MathUtil.applyDeadband(xbox.getLeftX(), Constants.DEADBAND),
+                -MathUtil.applyDeadband(xbox.getRightX(), Constants.DEADBAND),
+                fieldRelative));
   }
 
   /** Drive based on joysticks */
   public Command drive(CommandJoystick left, CommandJoystick right, boolean fieldRelative) {
     return run(
-        () -> drive(
-            -MathUtil.applyDeadband(left.getY(), Constants.DEADBAND),
-            -MathUtil.applyDeadband(left.getX(), Constants.DEADBAND),
-            -MathUtil.applyDeadband(right.getX(), Constants.DEADBAND),
-            fieldRelative));
+        () ->
+            drive(
+                -MathUtil.applyDeadband(left.getY(), Constants.DEADBAND),
+                -MathUtil.applyDeadband(left.getX(), Constants.DEADBAND),
+                -MathUtil.applyDeadband(right.getX(), Constants.DEADBAND),
+                fieldRelative));
   }
 
   /** Stops drivetrain */
@@ -306,13 +306,13 @@ public class Drive extends SubsystemBase implements Loggable {
 
   /** Sets the drivetrain to an "X" configuration, preventing movement */
   public Command lock() {
-    var states = new SwerveModuleState[] {
-        new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
-        new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
-        new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
-        new SwerveModuleState(0, Rotation2d.fromDegrees(45))
-    };
+    var states =
+        new SwerveModuleState[] {
+          new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(45))
+        };
     return run(() -> setModuleStates(states));
   }
-
 }

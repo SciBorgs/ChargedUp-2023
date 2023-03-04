@@ -10,6 +10,7 @@ import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.Balance;
 import org.sciborgs1155.robot.commands.Placement;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
@@ -95,8 +96,16 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+
+    /*
+     * Balance auto commands for testing.
+     */
+    // return Balance.balancePID(drive);
+    // return Balance.balanceBangBang(drive);
+    return Balance.balanceFF(drive);
+
     // return drive.follow("PRAY", true, true);
-    return autos.get();
+    // return autos.get();
     // return arm.setElbowGoal(new TrapezoidProfile.State(0.75 * Math.PI, 0));
     // return autos.get();
   }
