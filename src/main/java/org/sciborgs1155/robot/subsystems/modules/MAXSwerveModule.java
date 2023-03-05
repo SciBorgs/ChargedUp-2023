@@ -55,7 +55,7 @@ public class MAXSwerveModule implements SwerveModule {
     driveFeedback.setFeedbackDevice(driveEncoder);
     turnFeedback.setFeedbackDevice(turningEncoder);
 
-    // turningEncoder.setInverted(Turning.ENCODER_INVERTED);
+    turningEncoder.setInverted(Turning.ENCODER_INVERTED);
 
     Driving.PID.set(driveFeedback);
     Turning.PID.set(turnFeedback);

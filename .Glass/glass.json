@@ -3,6 +3,9 @@
     "transitory": {
       "Shuffleboard": {
         "Arm": {
+          "elbow feedback": {
+            "open": true
+          },
           "elbowEncoder": {
             "open": true
           },
@@ -45,6 +48,7 @@
       "/FMSInfo": "FMSInfo",
       "/Shuffleboard/Drive/field2d": "Field2d",
       "/Shuffleboard/Drive/gyro": "Gyro",
+      "/Shuffleboard/Drive/imu": "Gyro",
       "/Shuffleboard/Drivetrain/field2d": "Field2d",
       "/Shuffleboard/Drivetrain/gyro": "Gyro",
       "/Shuffleboard/RobotContainer/autos": "String Chooser",
@@ -120,6 +124,41 @@
                 1.0
               ],
               "id": "NT:/Shuffleboard/Arm/wrist feedback/p"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "visible": false
+      }
+    },
+    "Plot <2>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 332,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Arm/elbowEncoder/Distance"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Arm/elbow feedback/goal"
             }
           ]
         }

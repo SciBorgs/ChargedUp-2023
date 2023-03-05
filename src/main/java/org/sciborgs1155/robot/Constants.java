@@ -126,15 +126,15 @@ public final class Constants {
               .withUnits(ConversionConfig.Units.RADIANS)
               .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
 
-      public static final PIDConstants PID = new PIDConstants(2, 0, 0.2);
+      public static final PIDConstants PID = new PIDConstants(8, 0, 1); // d = 2.18954
 
-      public static final double kS = 0.12117;
-      public static final double kG = 0.48397;
-      public static final double kV = 1.1967;
-      public static final double kA = 0.23693;
+      public static final double kS = 0.020283;
+      public static final double kG = 0.71; // 0.63031;
+      public static final double kV = 1.3174;
+      public static final double kA = 0.20891;
 
-      public static final double MAX_VELOCITY = 1; // rad / s
-      public static final double MAX_ACCEL = 0.5; // rad / s^2
+      public static final double MAX_VELOCITY = 1.3; // rad / s
+      public static final double MAX_ACCEL = 0.75; // rad / s^2
       public static final TrapezoidProfile.Constraints CONSTRAINTS =
           new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
     }
@@ -232,9 +232,9 @@ public final class Constants {
       public static final ConversionConfig CONVERSION =
           ConversionConfig.base()
               .withUnits(ConversionConfig.Units.RADIANS)
-              .inverted()
+              // .inverted()
               .withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
-      // public static final boolean ENCODER_INVERTED = true;
+      public static final boolean ENCODER_INVERTED = true;
 
       public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
       public static final double MAX_ANGULAR_ACCELERATION = 2 * Math.PI; // rad / s^2

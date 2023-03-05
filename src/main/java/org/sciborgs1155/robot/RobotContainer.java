@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot;
 
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -54,8 +55,8 @@ public class RobotContainer {
 
   private void configureSubsystemDefaults() {
     drive.setDefaultCommand(
-        drive.drive(leftJoystick::getX, leftJoystick::getX, rightJoystick::getY, true));
-    arm.setDefaultCommand(arm.setVoltage(() -> xbox.getRightY() * 3, () -> xbox.getLeftY() * 3));
+        drive.drive(() -> -xbox.getLeftX(), leftJoystick::getX, rightJoystick::getY, true));
+    // arm.setDefaultCommand(arm.setVoltage(() -> xbox.getRightY() * 3, () -> xbox.getLeftY() * 3));
   }
 
   /**
@@ -83,6 +84,11 @@ public class RobotContainer {
     xbox.b().onTrue(elevator.setGoal(0));
     xbox.x().onTrue(intake.start(false)).onFalse(intake.stop());
     xbox.y().onTrue(intake.start(true)).onFalse(intake.stop());
+
+    xbox.povLeft().onTrue(arm.setElbowGoal(new State(0, 0)));
+    xbox.povUp().onTrue(arm.setElbowGoal(new State(1.57, 0)));
+    xbox.povRight().onTrue(arm.setElbowGoal(new State(3.14, 0)));
+    
     // xbox.povUp().onTrue(arm.setGoals(Rotation2d.fromDegrees(5), Rotation2d.fromDegrees(0)));
     // xbox.povDown().onTrue(arm.setGoals(Rotation2d.fromDegrees(-5), Rotation2d.fromDegrees(0)));
     // xbox.p.onTrue(arm.setVoltage(3)).onFalse(arm.setVoltage(0));
