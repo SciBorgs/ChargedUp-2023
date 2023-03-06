@@ -91,10 +91,6 @@ public record ConversionConfig(double pulsesPerRev, double gearing, double units
     return multiplyGearing(radius);
   }
 
-  public ConversionConfig inverted() {
-    return multiplyGearing(-1.0); // TODO might introduce bugs
-  }
-
   public ConversionConfig withUnits(Units units) {
     return withUnits(units.conversion);
   }

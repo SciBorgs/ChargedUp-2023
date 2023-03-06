@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.PlacementState;
@@ -16,18 +16,24 @@ import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
 
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants. This class should not be used for any other purpose. All constants should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
+ * Constants is a globally accessible class for storing immutable values. Every value should be
+ * <code>public static final</code>.
  *
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
- * constants are needed, to reduce verbosity. <b>Units</b>
+ * constants are needed, to reduce verbosity.
+ *
+ * <p><b>Units</b>
  *
  * <ul>
  *   <li>length: meters
- *   <li>time: seconds, minutes
+ *   <li>time: seconds
  *   <li>angle: radians
  * </ul>
+ *
+ * @see MotorConfig
+ * @see ConversionConfig
+ * @see PIDConstants
+ * @see Constraints
  */
 public final class Constants {
 
@@ -109,10 +115,7 @@ public final class Constants {
       public static final double kV = 0;
       public static final double kA = 0;
 
-      public static final double MAX_VELOCITY = 3; // radians / s
-      public static final double MAX_ACCEL = 3; // radians / s^2
-      public static final TrapezoidProfile.Constraints CONSTRAINTS =
-          new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
+      public static final Constraints CONSTRAINTS = new Constraints(3, 3);
     }
 
     public static final class Elbow {
@@ -133,10 +136,7 @@ public final class Constants {
       public static final double kV = 1.3174;
       public static final double kA = 0.20891;
 
-      public static final double MAX_VELOCITY = 1.3; // rad / s
-      public static final double MAX_ACCEL = 0.75; // rad / s^2
-      public static final TrapezoidProfile.Constraints CONSTRAINTS =
-          new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
+      public static final Constraints CONSTRAINTS = new Constraints(1.3, 0.75);
     }
   }
 
@@ -150,17 +150,14 @@ public final class Constants {
             .withUnits(ConversionConfig.Units.RADIANS)
             .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
 
-    public static final double MAX_SPEED = 20; // m/s
-    public static final double MAX_ACCEL = 8; // m/s^2
-
     public static final PIDConstants PID = new PIDConstants(45, 0, 1);
 
     public static final double kS = 0.39974;
     public static final double kG = 0.060732;
     public static final double kV = 29.798;
     public static final double kA = 2.554;
-    public static final TrapezoidProfile.Constraints CONSTRAINTS =
-        new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ACCEL);
+
+    public static final Constraints CONSTRAINTS = new Constraints(20, 8);
   }
 
   public static final class Intake {
@@ -215,8 +212,7 @@ public final class Constants {
               .divideGearing(45.0)
               .divideGearing(22.0)
               .multiplyGearing(15.0)
-              .multiplyGearing(PINION_TEETH)
-              .withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
+              .multiplyGearing(PINION_TEETH);
 
       public static final PIDConstants PID = new PIDConstants(0.07, 0, 0.06);
 
@@ -232,12 +228,9 @@ public final class Constants {
       public static final ConversionConfig CONVERSION =
           ConversionConfig.base()
               .withUnits(ConversionConfig.Units.RADIANS)
-              // .inverted()
               .withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
-      public static final boolean ENCODER_INVERTED = true;
 
-      public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
-      public static final double MAX_ANGULAR_ACCELERATION = 2 * Math.PI; // rad / s^2
+      public static final boolean ENCODER_INVERTED = true;
 
       public static final PIDConstants PID = new PIDConstants(1.7, 0, 0.1);
 
@@ -245,10 +238,6 @@ public final class Constants {
       public static final double kS = 0;
       public static final double kV = 0.25;
       public static final double kA = 0.015;
-
-      // pid wrapping
-      public static final double MIN_INPUT = 0;
-      public static final double MAX_INPUT = CONVERSION.factor();
     }
   }
 

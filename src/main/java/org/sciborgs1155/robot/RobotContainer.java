@@ -55,7 +55,8 @@ public class RobotContainer {
 
   private void configureSubsystemDefaults() {
     drive.setDefaultCommand(
-        drive.drive(() -> -xbox.getLeftX(), leftJoystick::getX, rightJoystick::getY, true));
+        drive.drive(
+            () -> -xbox.getLeftX(), () -> -leftJoystick.getX(), () -> -rightJoystick.getY(), true));
     // arm.setDefaultCommand(arm.setVoltage(() -> xbox.getRightY() * 3, () -> xbox.getLeftY() * 3));
   }
 
@@ -88,7 +89,7 @@ public class RobotContainer {
     xbox.povLeft().onTrue(arm.setElbowGoal(new State(0, 0)));
     xbox.povUp().onTrue(arm.setElbowGoal(new State(1.57, 0)));
     xbox.povRight().onTrue(arm.setElbowGoal(new State(3.14, 0)));
-    
+
     // xbox.povUp().onTrue(arm.setGoals(Rotation2d.fromDegrees(5), Rotation2d.fromDegrees(0)));
     // xbox.povDown().onTrue(arm.setGoals(Rotation2d.fromDegrees(-5), Rotation2d.fromDegrees(0)));
     // xbox.p.onTrue(arm.setVoltage(3)).onFalse(arm.setVoltage(0));

@@ -65,8 +65,8 @@ public class MAXSwerveModule implements SwerveModule {
 
     // set up continuous input for turning
     turnFeedback.setPositionPIDWrappingEnabled(true);
-    turnFeedback.setPositionPIDWrappingMinInput(Turning.MIN_INPUT);
-    turnFeedback.setPositionPIDWrappingMaxInput(Turning.MAX_INPUT);
+    turnFeedback.setPositionPIDWrappingMinInput(0);
+    turnFeedback.setPositionPIDWrappingMaxInput(Turning.CONVERSION.factor());
 
     driveMotor.burnFlash();
     turnMotor.burnFlash();

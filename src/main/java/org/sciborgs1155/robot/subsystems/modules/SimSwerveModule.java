@@ -30,8 +30,7 @@ public class SimSwerveModule implements SwerveModule {
   private SwerveModuleState setpoint = new SwerveModuleState();
 
   public SimSwerveModule() {
-    // set up continuous input for turning
-    turnFeedback.enableContinuousInput(Turning.MIN_INPUT, Turning.MAX_INPUT);
+    turnFeedback.enableContinuousInput(0, Turning.CONVERSION.factor());
   }
 
   @Override
