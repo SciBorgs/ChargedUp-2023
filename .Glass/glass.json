@@ -2,13 +2,10 @@
   "NetworkTables": {
     "transitory": {
       "Shuffleboard": {
+        ".metadata": {
+          "open": true
+        },
         "Arm": {
-          "elbow feedback": {
-            "open": true
-          },
-          "elbowEncoder": {
-            "open": true
-          },
           "open": true,
           "wrist feedback": {
             "open": true
@@ -32,15 +29,11 @@
         "Elevator": {
           "encoder": {
             "open": true
-          },
-          "open": true
+          }
         },
         "RobotContainer": {
           "open": true
         },
-        "open": true
-      },
-      "SmartDashboard": {
         "open": true
       }
     },
@@ -159,6 +152,36 @@
                 1.0
               ],
               "id": "NT:/Shuffleboard/Arm/elbow feedback/goal"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "visible": false
+      }
+    },
+    "Plot <3>": {
+      "plots": [
+        {
+          "height": 332,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Arm/wrist feedback/goal"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Arm/wrist position"
             }
           ]
         }

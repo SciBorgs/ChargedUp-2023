@@ -93,6 +93,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowRight.follow(elbow);
 
     elbowEncoder.setDistancePerPulse(Elbow.CONVERSION.factor());
+    Wrist.CONVERSION.configureSparkFactors(wristEncoder);
 
     elbow.burnFlash();
     elbowLeft.burnFlash();

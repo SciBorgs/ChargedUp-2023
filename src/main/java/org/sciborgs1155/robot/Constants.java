@@ -106,16 +106,19 @@ public final class Constants {
   public static final class Arm {
     public static final class Wrist {
       public static final MotorConfig MOTOR =
-          MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withBurnFlash(true);
+          MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
 
-      public static final PIDConstants PID = new PIDConstants(0.6, 0, 0);
+      public static final ConversionConfig CONVERSION =
+          ConversionConfig.base().withUnits(ConversionConfig.Units.RADIANS);
 
-      public static final double kS = 0;
-      public static final double kG = 0;
-      public static final double kV = 0;
-      public static final double kA = 0;
+      public static final PIDConstants PID = new PIDConstants(1, 0, 0.1); // p: 6.1297, d: 0.8453
 
-      public static final Constraints CONSTRAINTS = new Constraints(3, 3);
+      public static final double kS = 0.1542;
+      public static final double kG = 0.53127;
+      public static final double kV = 0.87884;
+      public static final double kA = 0.038046;
+
+      public static final Constraints CONSTRAINTS = new Constraints(1, 1);
     }
 
     public static final class Elbow {
