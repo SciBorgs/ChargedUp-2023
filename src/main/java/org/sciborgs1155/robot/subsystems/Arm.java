@@ -66,7 +66,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   private final SingleJointedArmSim elbowSim =
       new SingleJointedArmSim(
           DCMotor.getNEO(3),
-          Elbow.CONVERSION.gearing(),
+          1 / Elbow.CONVERSION.gearing(),
           SingleJointedArmSim.estimateMOI(Dimensions.FOREARM_LENGTH, Dimensions.FOREARM_MASS),
           Dimensions.FOREARM_LENGTH,
           Dimensions.ELBOW_MIN_ANGLE,
@@ -84,7 +84,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   private final Visualizer visualizer;
 
-  private double v, wristV;
+  private double elbowV, wristV;
 
   public Arm(Visualizer visualizer) {
     elbowLeft.follow(elbow);
@@ -108,8 +108,9 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   /** Wrist position relative to the forearm */
   public Rotation2d getRelativeWristPosition() {
+    // encoder is zeroed fully folded in, which is actually PI, so we offset by -PI
     return Rotation2d.fromRadians(
-        Robot.isReal() ? wristEncoder.getPosition() : wristSim.getAngleRads());
+        Robot.isReal() ? wristEncoder.getPosition() - Math.PI : wristSim.getAngleRads());
   }
 
   /** Wrist position relative to chassis */
@@ -135,12 +136,15 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   /** Sets wrist goal relative to the forearm */
   public Command setWristGoal(TrapezoidProfile.State goal) {
+    // encoder is zeroed fully folded in, which is actually PI, so we offset by -PI
     return runOnce(
         () ->
             wristFeedback.setGoal(
                 new TrapezoidProfile.State(
                     MathUtil.clamp(
-                        goal.position, Dimensions.WRIST_MIN_ANGLE, Dimensions.WRIST_MAX_ANGLE),
+                        goal.position + Math.PI,
+                        Dimensions.WRIST_MIN_ANGLE,
+                        Dimensions.WRIST_MAX_ANGLE),
                     goal.velocity)));
   }
 
@@ -174,7 +178,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   public Command setVoltage(DoubleSupplier v, DoubleSupplier wristV) {
     return run(
         () -> {
-          this.v = v.getAsDouble();
+          this.elbowV = v.getAsDouble();
           this.wristV = wristV.getAsDouble();
         });
   }

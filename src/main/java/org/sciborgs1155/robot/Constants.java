@@ -187,9 +187,6 @@ public final class Constants {
   }
 
   public static final class SwerveModule {
-    // we use a 14T pinion
-    public static final int PINION_TEETH = 14;
-
     public static final class Driving {
       public static final MotorConfig MOTOR =
           MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
@@ -201,7 +198,7 @@ public final class Constants {
               .divideGearing(45.0)
               .divideGearing(22.0)
               .multiplyGearing(15.0)
-              .multiplyGearing(PINION_TEETH);
+              .multiplyGearing(14.0); // pinion teeth
 
       public static final PIDConstants PID = new PIDConstants(0.07, 0, 0.06);
       public static final SimpleParameters FF = new SimpleParameters(0.27, 0.4, 0.2);

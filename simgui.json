@@ -339,6 +339,7 @@
           "elbowFeedback": {
             "open": true
           },
+          "open": true,
           "wrist feedback": {
             "open": true
           },
