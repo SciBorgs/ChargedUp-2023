@@ -8,6 +8,7 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -24,13 +25,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-import java.util.Arrays;
+import java.util.List;
 import java.util.function.DoubleSupplier;
 import org.sciborgs1155.lib.Vision;
-import org.sciborgs1155.lib.constants.PIDConfigurer;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Constants.SwerveModule.Driving;
-import org.sciborgs1155.robot.Constants.SwerveModule.Turning;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 
 public class Drive extends SubsystemBase implements Loggable {
@@ -51,11 +49,7 @@ public class Drive extends SubsystemBase implements Loggable {
   private final SwerveModule rearRight =
       SwerveModule.create(REAR_RIGHT_DRIVE, REAR_RIGHT_TURNING, ANGULAR_OFFSETS[3]);
 
-  private final SwerveModule[] modules = {frontLeft, frontRight, rearLeft, rearRight};
-
-  // PID configurations for swerve modules
-  @Log private final PIDConfigurer moduleDrivePID = new PIDConfigurer(Driving.PID);
-  @Log private final PIDConfigurer moduleTurnPID = new PIDConfigurer(Turning.PID);
+  private final List<SwerveModule> modules = List.of(frontLeft, frontRight, rearLeft, rearRight);
 
   @Log private final WPI_PigeonIMU imu = new WPI_PigeonIMU(PIGEON);
 
@@ -67,7 +61,7 @@ public class Drive extends SubsystemBase implements Loggable {
       new SwerveDrivePoseEstimator(kinematics, getHeading(), getModulePositions(), new Pose2d());
 
   @Log private final Field2d field2d = new Field2d();
-  private final FieldObject2d[] modules2d = new FieldObject2d[modules.length];
+  private final FieldObject2d[] modules2d = new FieldObject2d[modules.size()];
 
   // Rate limiting
   private final SlewRateLimiter xLimiter = new SlewRateLimiter(MAX_ACCEL);
@@ -138,20 +132,20 @@ public class Drive extends SubsystemBase implements Loggable {
    * @param desiredStates The desired SwerveModule states.
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
-    if (desiredStates.length != modules.length) {
+    if (desiredStates.length != modules.size()) {
       throw new IllegalArgumentException("desiredStates must have the same length as modules");
     }
 
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, MAX_SPEED);
 
-    for (int i = 0; i < modules.length; i++) {
-      modules[i].setDesiredState(desiredStates[i]);
+    for (int i = 0; i < modules.size(); i++) {
+      modules.get(i).setDesiredState(desiredStates[i]);
     }
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
   public void resetEncoders() {
-    Arrays.stream(modules).forEach(SwerveModule::resetEncoders);
+    modules.forEach(SwerveModule::resetEncoders);
   }
 
   /** Zeroes the heading of the robot. */
@@ -160,13 +154,11 @@ public class Drive extends SubsystemBase implements Loggable {
   }
 
   private SwerveModuleState[] getModuleStates() {
-    return Arrays.stream(modules).map(SwerveModule::getState).toArray(SwerveModuleState[]::new);
+    return modules.stream().map(SwerveModule::getState).toArray(SwerveModuleState[]::new);
   }
 
   private SwerveModulePosition[] getModulePositions() {
-    return Arrays.stream(modules)
-        .map(SwerveModule::getPosition)
-        .toArray(SwerveModulePosition[]::new);
+    return modules.stream().map(SwerveModule::getPosition).toArray(SwerveModulePosition[]::new);
   }
 
   /**
@@ -204,7 +196,7 @@ public class Drive extends SubsystemBase implements Loggable {
     field2d.setRobotPose(getPose());
 
     for (int i = 0; i < modules2d.length; i++) {
-      var transform = new Transform2d(MODULE_OFFSET[i], modules[i].getPosition().angle);
+      var transform = new Transform2d(MODULE_OFFSET[i], modules.get(i).getPosition().angle);
       modules2d[i].setPose(getPose().transformBy(transform));
     }
 
@@ -243,9 +235,9 @@ public class Drive extends SubsystemBase implements Loggable {
             trajectory,
             this::getPose,
             kinematics,
-            CARTESIAN.create(),
-            CARTESIAN.create(),
-            ANGULAR.create(),
+            new PIDController(CARTESIAN.p(), CARTESIAN.i(), CARTESIAN.d()),
+            new PIDController(CARTESIAN.p(), CARTESIAN.i(), CARTESIAN.d()),
+            new PIDController(ANGULAR.p(), ANGULAR.i(), ANGULAR.d()),
             this::setModuleStates,
             useAllianceColor)
         .andThen(stop());
@@ -268,6 +260,7 @@ public class Drive extends SubsystemBase implements Loggable {
                 MathUtil.applyDeadband(rot.getAsDouble(), Constants.DEADBAND),
                 fieldRelative));
   }
+
   /** Stops drivetrain */
   public Command stop() {
     return run(() -> setModuleStates(getModuleStates()));

@@ -2,7 +2,6 @@ package org.sciborgs1155.lib.constants;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
@@ -10,10 +9,10 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 /** Record to store static, voltage, and acceleration gains for simple DC motor systems */
-public record SimpleParameters(double s, double v, double a) {
+public record SystemConstants(double s, double g, double v, double a) {
 
-  public SimpleMotorFeedforward feedforward() {
-    return new SimpleMotorFeedforward(s, v, a);
+  public SystemConstants(double s, double v, double a) {
+    this(s, 0, v, a);
   }
 
   public DCMotorSim sim(DCMotor gearbox, double gearing) {

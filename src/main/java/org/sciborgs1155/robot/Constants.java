@@ -9,14 +9,12 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.PlacementState;
-import org.sciborgs1155.lib.constants.ArmParameters;
 import org.sciborgs1155.lib.constants.Conversion;
 import org.sciborgs1155.lib.constants.Conversion.PulsesPerRev;
-import org.sciborgs1155.lib.constants.ElevatorParameters;
 import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
-import org.sciborgs1155.lib.constants.SimpleParameters;
+import org.sciborgs1155.lib.constants.SystemConstants;
 
 /**
  * Constants is a globally accessible class for storing immutable values. Every value should be
@@ -111,7 +109,8 @@ public final class Constants {
           Conversion.base().withUnits(Conversion.Units.RADIANS);
 
       public static final PIDConstants PID = new PIDConstants(1, 0, 0.1); // p: 6.1297, d: 0.8453
-      public static final ArmParameters FF = new ArmParameters(0.1542, 0.53127, 0.87884, 0.038046);
+      public static final SystemConstants FF =
+          new SystemConstants(0.1542, 0.53127, 0.87884, 0.038046);
 
       public static final Constraints CONSTRAINTS = new Constraints(1, 1);
     }
@@ -128,8 +127,8 @@ public final class Constants {
               .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
 
       public static final PIDConstants PID = new PIDConstants(8, 0, 1); // d = 2.18954
-      public static final ArmParameters FF =
-          new ArmParameters(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
+      public static final SystemConstants FF =
+          new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
       public static final Constraints CONSTRAINTS = new Constraints(1.3, 0.75);
     }
@@ -146,8 +145,7 @@ public final class Constants {
             .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
 
     public static final PIDConstants PID = new PIDConstants(45, 0, 1);
-    public static final ElevatorParameters FF =
-        new ElevatorParameters(0.39974, 0.060732, 29.798, 2.554);
+    public static final SystemConstants FF = new SystemConstants(0.39974, 0.060732, 29.798, 2.554);
 
     public static final Constraints CONSTRAINTS = new Constraints(20, 8);
   }
@@ -201,7 +199,7 @@ public final class Constants {
               .multiplyGearing(14.0); // pinion teeth
 
       public static final PIDConstants PID = new PIDConstants(0.07, 0, 0.06);
-      public static final SimpleParameters FF = new SimpleParameters(0.27, 0.4, 0.2);
+      public static final SystemConstants FF = new SystemConstants(0.27, 0.4, 0.2);
     }
 
     public static final class Turning {
@@ -217,7 +215,7 @@ public final class Constants {
 
       public static final PIDConstants PID = new PIDConstants(1.7, 0, 0.1);
       // system constants only used in simulation
-      public static final SimpleParameters FF = new SimpleParameters(0, 0.25, 0.015);
+      public static final SystemConstants FF = new SystemConstants(0, 0.25, 0.015);
     }
   }
 

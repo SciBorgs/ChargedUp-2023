@@ -20,10 +20,13 @@ public class SimSwerveModule implements SwerveModule {
   private final DCMotorSim turn =
       Turning.FF.sim(DCMotor.getNeo550(1), Turning.CONVERSION.gearing());
 
-  private final PIDController driveFeedback = Driving.PID.create();
-  private final PIDController turnFeedback = Turning.PID.create();
+  private final PIDController driveFeedback =
+      new PIDController(Driving.PID.p(), Driving.PID.i(), Driving.PID.d());
+  private final PIDController turnFeedback =
+      new PIDController(Turning.PID.p(), Turning.PID.i(), Turning.PID.d());
 
-  private final SimpleMotorFeedforward driveFeedforward = Driving.FF.feedforward();
+  private final SimpleMotorFeedforward driveFeedforward =
+      new SimpleMotorFeedforward(Driving.FF.s(), Driving.FF.v(), Driving.FF.a());
 
   private SwerveModuleState setpoint = new SwerveModuleState();
 
@@ -77,11 +80,11 @@ public class SimSwerveModule implements SwerveModule {
 
   @Override
   public void setTurnPID(PIDConstants constants) {
-    constants.set(turnFeedback);
+    turnFeedback.setPID(constants.p(), constants.i(), constants.d());
   }
 
   @Override
   public void setDrivePID(PIDConstants constants) {
-    constants.set(driveFeedback);
+    driveFeedback.setPID(constants.p(), constants.i(), constants.d());
   }
 }

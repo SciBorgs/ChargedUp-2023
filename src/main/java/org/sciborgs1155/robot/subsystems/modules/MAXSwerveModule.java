@@ -27,7 +27,8 @@ public class MAXSwerveModule implements SwerveModule {
   private final SparkMaxPIDController driveFeedback;
   private final SparkMaxPIDController turnFeedback;
 
-  private final SimpleMotorFeedforward driveFeedforward = Driving.FF.feedforward();
+  private final SimpleMotorFeedforward driveFeedforward =
+      new SimpleMotorFeedforward(Driving.FF.s(), Driving.FF.v(), Driving.FF.a());
 
   private final Rotation2d angularOffset;
 
@@ -56,8 +57,8 @@ public class MAXSwerveModule implements SwerveModule {
 
     turningEncoder.setInverted(Turning.ENCODER_INVERTED);
 
-    Driving.PID.set(driveFeedback);
-    Turning.PID.set(turnFeedback);
+    setDrivePID(Driving.PID);
+    setTurnPID(Turning.PID);
 
     Driving.CONVERSION.configureSparkFactors(driveEncoder);
     Turning.CONVERSION.configureSparkFactors(turningEncoder);
@@ -123,11 +124,15 @@ public class MAXSwerveModule implements SwerveModule {
 
   @Override
   public void setTurnPID(PIDConstants constants) {
-    constants.set(turnFeedback);
+    turnFeedback.setP(constants.p());
+    turnFeedback.setI(constants.i());
+    turnFeedback.setD(constants.d());
   }
 
   @Override
   public void setDrivePID(PIDConstants constants) {
-    constants.set(driveFeedback);
+    driveFeedback.setP(constants.p());
+    driveFeedback.setI(constants.i());
+    driveFeedback.setD(constants.d());
   }
 }
