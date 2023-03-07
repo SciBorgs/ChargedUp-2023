@@ -9,23 +9,21 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
-import org.sciborgs1155.lib.WheelSim;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.Constants;
 
 /** Class to encapsulate a rev max swerve module */
 public class SimSwerveModule implements SwerveModule {
 
-  private final WheelSim drive =
-      new WheelSim(Driving.kV, Driving.kA, DCMotor.getNEO(1), Driving.CONVERSION.gearing());
-  private final WheelSim turn =
-      new WheelSim(Turning.kV, Turning.kA, DCMotor.getNeo550(1), Turning.CONVERSION.gearing());
+  private final DCMotorSim drive = Driving.FF.sim(DCMotor.getNEO(1), Driving.CONVERSION.gearing());
+  private final DCMotorSim turn =
+      Turning.FF.sim(DCMotor.getNeo550(1), Turning.CONVERSION.gearing());
 
   private final PIDController driveFeedback = Driving.PID.create();
   private final PIDController turnFeedback = Turning.PID.create();
 
-  private final SimpleMotorFeedforward driveFeedforward =
-      new SimpleMotorFeedforward(Driving.kS, Driving.kV, Driving.kA);
+  private final SimpleMotorFeedforward driveFeedforward = Driving.FF.feedforward();
 
   private SwerveModuleState setpoint = new SwerveModuleState();
 

@@ -46,18 +46,16 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log(name = "wrist velocity", methodName = "getVelocity")
   private final AbsoluteEncoder wristEncoder = wrist.getAbsoluteEncoder(Type.kDutyCycle);
 
-  private final ArmFeedforward elbowFeedforward =
-      new ArmFeedforward(Elbow.kS, Elbow.kG, Elbow.kV, Elbow.kA);
-  private final ArmFeedforward wristFeedforward =
-      new ArmFeedforward(Wrist.kS, Wrist.kG, Wrist.kV, Wrist.kA);
+  private final ArmFeedforward elbowFeedforward = Elbow.FF.feedforward();
+  private final ArmFeedforward wristFeedforward = Wrist.FF.feedforward();
 
   @Log(name = "elbow feedback")
   private final ProfiledPIDController elbowFeedback =
-      new ProfiledPIDController(Elbow.PID.kp(), Elbow.PID.ki(), Elbow.PID.kd(), Elbow.CONSTRAINTS);
+      new ProfiledPIDController(Elbow.PID.p(), Elbow.PID.i(), Elbow.PID.d(), Elbow.CONSTRAINTS);
 
   @Log(name = "wrist feedback")
   private final ProfiledPIDController wristFeedback =
-      new ProfiledPIDController(Wrist.PID.kp(), Wrist.PID.ki(), Wrist.PID.kd(), Wrist.CONSTRAINTS);
+      new ProfiledPIDController(Wrist.PID.p(), Wrist.PID.i(), Wrist.PID.d(), Wrist.CONSTRAINTS);
 
   @Log(name = "wrist acceleration", methodName = "getLastOutput")
   private final Derivative wristAccel = new Derivative();

@@ -3,7 +3,7 @@ package org.sciborgs1155.lib.constants;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 
-public record ConversionConfig(double pulsesPerRev, double gearing, double units) {
+public record Conversion(double pulsesPerRev, double gearing, double units) {
 
   /**
    * An enum to represent common pulses per rotation presets
@@ -34,8 +34,8 @@ public record ConversionConfig(double pulsesPerRev, double gearing, double units
     }
   }
 
-  public static ConversionConfig base() {
-    return new ConversionConfig(1, 1, 1);
+  public static Conversion base() {
+    return new Conversion(1, 1, 1);
   }
 
   /**
@@ -71,31 +71,31 @@ public record ConversionConfig(double pulsesPerRev, double gearing, double units
     encoder.setVelocityConversionFactor(factor() / 60.0);
   }
 
-  public ConversionConfig withPulsesPerRev(PulsesPerRev pulsesPerRev) {
+  public Conversion withPulsesPerRev(PulsesPerRev pulsesPerRev) {
     return withPulsesPerRev(pulsesPerRev.pulses);
   }
 
-  public ConversionConfig withPulsesPerRev(double pulsesPerRev) {
-    return new ConversionConfig(pulsesPerRev, gearing, units);
+  public Conversion withPulsesPerRev(double pulsesPerRev) {
+    return new Conversion(pulsesPerRev, gearing, units);
   }
 
-  public ConversionConfig multiplyGearing(double ratio) {
-    return new ConversionConfig(pulsesPerRev, gearing * ratio, units);
+  public Conversion multiplyGearing(double ratio) {
+    return new Conversion(pulsesPerRev, gearing * ratio, units);
   }
 
-  public ConversionConfig divideGearing(double ratio) {
-    return new ConversionConfig(pulsesPerRev, gearing / ratio, units);
+  public Conversion divideGearing(double ratio) {
+    return new Conversion(pulsesPerRev, gearing / ratio, units);
   }
 
-  public ConversionConfig multiplyRadius(double radius) {
+  public Conversion multiplyRadius(double radius) {
     return multiplyGearing(radius);
   }
 
-  public ConversionConfig withUnits(Units units) {
+  public Conversion withUnits(Units units) {
     return withUnits(units.conversion);
   }
 
-  public ConversionConfig withUnits(double units) {
-    return new ConversionConfig(pulsesPerRev, gearing, units);
+  public Conversion withUnits(double units) {
+    return new Conversion(pulsesPerRev, gearing, units);
   }
 }

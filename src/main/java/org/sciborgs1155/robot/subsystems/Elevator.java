@@ -35,11 +35,11 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   @Log private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1]);
   private final EncoderSim simEncoder = new EncoderSim(encoder);
 
-  private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
+  private final ElevatorFeedforward ff = FF.feedforward();
 
   @Log
   private final ProfiledPIDController pid =
-      new ProfiledPIDController(PID.kp(), PID.ki(), PID.kd(), CONSTRAINTS);
+      new ProfiledPIDController(PID.p(), PID.i(), PID.d(), CONSTRAINTS);
 
   @Log(name = "acceleration", methodName = "getLastOutput")
   private final Derivative accel = new Derivative();

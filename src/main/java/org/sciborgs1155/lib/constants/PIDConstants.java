@@ -3,8 +3,8 @@ package org.sciborgs1155.lib.constants;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.controller.PIDController;
 
-/** Record to store kP, kI, and kD values for PID controllers */
-public record PIDConstants(double kp, double ki, double kd) {
+/** Record to store P, I, and D gains for PID controllers */
+public record PIDConstants(double p, double i, double d) {
 
   /**
    * Creates a PID controller from these constants.
@@ -12,7 +12,7 @@ public record PIDConstants(double kp, double ki, double kd) {
    * @return A new WPILib {@link PIDController}.
    */
   public PIDController create() {
-    return new PIDController(kp, ki, kd);
+    return new PIDController(p, i, d);
   }
 
   /**
@@ -21,7 +21,7 @@ public record PIDConstants(double kp, double ki, double kd) {
    * @param controller A WPILib {@link PIDController}
    */
   public void set(PIDController controller) {
-    controller.setPID(kp, ki, kd);
+    controller.setPID(p, i, d);
   }
 
   /**
@@ -30,8 +30,8 @@ public record PIDConstants(double kp, double ki, double kd) {
    * @param controller A REVLib {@link SparkMaxPIDController}
    */
   public void set(SparkMaxPIDController controller) {
-    controller.setP(kp);
-    controller.setI(ki);
-    controller.setD(kd);
+    controller.setP(p);
+    controller.setI(i);
+    controller.setD(d);
   }
 }

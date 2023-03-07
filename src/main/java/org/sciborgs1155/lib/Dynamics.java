@@ -10,10 +10,8 @@ import org.sciborgs1155.robot.Constants.Arm.*;
 import org.sciborgs1155.robot.Constants.Dimensions;
 
 public class Dynamics {
-  private final SimpleMotorFeedforward wristFeedforward =
-      new SimpleMotorFeedforward(Wrist.kS, Wrist.kV, Wrist.kA);
-  private final SimpleMotorFeedforward elbowFeedforward =
-      new SimpleMotorFeedforward(Elbow.kS, Elbow.kV, Elbow.kA);
+  private final SimpleMotorFeedforward wristFeedforward = Wrist.FF.base().feedforward();
+  private final SimpleMotorFeedforward elbowFeedforward = Elbow.FF.base().feedforward();
 
   private final DCMotor motor = DCMotor.getNEO(1);
 

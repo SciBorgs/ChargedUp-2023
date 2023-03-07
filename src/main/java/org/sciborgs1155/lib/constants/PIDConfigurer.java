@@ -10,9 +10,9 @@ public class PIDConfigurer implements Sendable {
   private double kD;
 
   public PIDConfigurer(PIDConstants defaults) {
-    kP = defaults.kp();
-    kI = defaults.ki();
-    kD = defaults.kd();
+    kP = defaults.p();
+    kI = defaults.i();
+    kD = defaults.d();
   }
 
   public void setP(double kP) {

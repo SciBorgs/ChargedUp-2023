@@ -27,8 +27,7 @@ public class MAXSwerveModule implements SwerveModule {
   private final SparkMaxPIDController driveFeedback;
   private final SparkMaxPIDController turnFeedback;
 
-  private final SimpleMotorFeedforward driveFeedforward =
-      new SimpleMotorFeedforward(Driving.kS, Driving.kV, Driving.kA);
+  private final SimpleMotorFeedforward driveFeedforward = Driving.FF.feedforward();
 
   private final Rotation2d angularOffset;
 
