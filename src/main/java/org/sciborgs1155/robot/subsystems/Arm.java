@@ -101,6 +101,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     wrist.burnFlash();
 
     this.visualizer = visualizer;
+
+    wristFeedback.setGoal(Math.PI);
   }
 
   /** Elbow position relative to the chassis */
@@ -204,7 +206,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     // the elbow setpoint and ϕ is the wrist setpoint
     // the elbow angle is used as a setpoint instead of current position because we're using a
     // profiled pid controller, which means setpoints are achievable states, rather than goals
-    double wristFB = wristFeedback.calculate(getRelativeWristPosition().getRadians());
+    double wristFB = wristFeedback.calculate(wristEncoder.getPosition());
     double wristFF =
         wristFeedforward.calculate(
             getAbsoluteWristPosition().getRadians(),

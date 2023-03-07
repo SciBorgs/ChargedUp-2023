@@ -103,16 +103,16 @@ public final class Constants {
   public static final class Arm {
     public static final class Wrist {
       public static final MotorConfig MOTOR =
-          MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
+          MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withInvert(true);
 
       public static final Conversion CONVERSION =
           Conversion.base().withUnits(Conversion.Units.RADIANS);
 
-      public static final PIDConstants PID = new PIDConstants(1, 0, 0.1); // p: 6.1297, d: 0.8453
+      public static final PIDConstants PID = new PIDConstants(4, 0, 0.1); // p: 6.1297, d: 0.8453
       public static final SystemConstants FF =
           new SystemConstants(0.1542, 0.53127, 0.87884, 0.038046);
 
-      public static final Constraints CONSTRAINTS = new Constraints(1, 1);
+      public static final Constraints CONSTRAINTS = new Constraints(1.2, 0.6);
     }
 
     public static final class Elbow {
@@ -126,7 +126,7 @@ public final class Constants {
               .withUnits(Conversion.Units.RADIANS)
               .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
 
-      public static final PIDConstants PID = new PIDConstants(8, 0, 1); // d = 2.18954
+      public static final PIDConstants PID = new PIDConstants(9, 0, 1); // d = 2.18954
       public static final SystemConstants FF =
           new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
