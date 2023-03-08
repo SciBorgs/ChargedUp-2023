@@ -13,7 +13,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -94,10 +94,13 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowRight.follow(elbow);
 
     elbowEncoder.setDistancePerPulse(Elbow.CONVERSION.factor());
-    Wrist.CONVERSION.configureSparkFactors(wristEncoder);
+    wristEncoder.setPositionConversionFactor(Wrist.CONVERSION.factor());
+    wristEncoder.setVelocityConversionFactor(Wrist.CONVERSION.factor() / 60.0);
 
     // set wrist duty cycle absolute encoder frame periods to be the same as our tickrate
-    // TODO raise other periodic frame periods if it starts complaining
+    // periodic frames 3 and 4 are useless to us, so to improve performance we set them to 1155 ms
+    wrist.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1155);
+    wrist.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1155);
     wrist.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
     wrist.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
 
@@ -108,7 +111,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
     this.visualizer = visualizer;
 
-    wristFeedback.setGoal(Math.PI);
+    // wristFeedback.setGoal(Math.PI);
   }
 
   /** Elbow position relative to the chassis */
@@ -134,54 +137,49 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Sets elbow goal relative to the chassis */
-  public Command setElbowGoal(TrapezoidProfile.State goal) {
+  public Command setElbowGoal(State goal) {
     return runOnce(
         () ->
             elbowFeedback.setGoal(
-                new TrapezoidProfile.State(
+                new State(
                     MathUtil.clamp(
                         goal.position, Dimensions.ELBOW_MIN_ANGLE, Dimensions.ELBOW_MAX_ANGLE),
                     goal.velocity)));
   }
 
-  /** Sets wrist goal relative to the forearm */
-  public Command setWristGoal(TrapezoidProfile.State goal) {
-    // encoder is zeroed fully folded in, which is actually PI, so we offset by -PI
+  /** Sets wrist goal relative to being parallel to the forearm */
+  public Command setWristGoal(State goal) {
     return runOnce(
         () ->
             wristFeedback.setGoal(
-                new TrapezoidProfile.State(
+                new State(
                     MathUtil.clamp(
-                        goal.position + Math.PI,
-                        Dimensions.WRIST_MIN_ANGLE,
-                        Dimensions.WRIST_MAX_ANGLE),
+                        goal.position, Dimensions.WRIST_MIN_ANGLE, Dimensions.WRIST_MAX_ANGLE),
                     goal.velocity)));
   }
 
   /** Sets both the wrist and elbow goals */
   public Command setGoals(Rotation2d elbowGoal, Rotation2d wristGoal) {
-    return setGoals(
-        new TrapezoidProfile.State(elbowGoal.getRadians(), 0),
-        new TrapezoidProfile.State(wristGoal.getRadians(), 0));
+    return setGoals(new State(elbowGoal.getRadians(), 0), new State(wristGoal.getRadians(), 0));
   }
 
   /** Sets both the wrist and elbow goals */
-  public Command setGoals(TrapezoidProfile.State elbowGoal, TrapezoidProfile.State wristGoal) {
+  public Command setGoals(State elbowGoal, State wristGoal) {
     return setElbowGoal(elbowGoal).andThen(setWristGoal(wristGoal));
   }
 
   /** Runs elbow to goal relative to the chassis */
-  public Command runElbowToGoal(TrapezoidProfile.State goal) {
+  public Command runElbowToGoal(State goal) {
     return setElbowGoal(goal).andThen(Commands.waitUntil(elbowFeedback::atGoal));
   }
 
   /** Runs wrist to goal relative to the forearm */
-  public Command runWristToGoal(TrapezoidProfile.State goal) {
+  public Command runWristToGoal(State goal) {
     return setWristGoal(goal).andThen(Commands.waitUntil(wristFeedback::atGoal));
   }
 
   /** Runs elbow and wrist go provided goals, with the wrist goal relative to the forearm */
-  public Command runToGoals(TrapezoidProfile.State elbowGoal, TrapezoidProfile.State wristGoal) {
+  public Command runToGoals(State elbowGoal, State wristGoal) {
     return setGoals(elbowGoal, wristGoal).andThen(Commands.waitUntil(this::atGoal));
   }
 
@@ -202,7 +200,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     double elbowFB = elbowFeedback.calculate(getElbowPosition().getRadians());
     double elbowFF =
         elbowFeedforward.calculate(
-            getElbowPosition().getRadians(),
+            elbowFeedback.getSetpoint().position,
             elbowFeedback.getSetpoint().velocity,
             elbowAccel.calculate(elbowFeedback.getSetpoint().velocity));
     elbow.setVoltage(elbowFB + elbowFF);
@@ -212,10 +210,10 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     // the elbow setpoint and ϕ is the wrist setpoint
     // the elbow angle is used as a setpoint instead of current position because we're using a
     // profiled pid controller, which means setpoints are achievable states, rather than goals
-    double wristFB = wristFeedback.calculate(wristEncoder.getPosition());
+    double wristFB = wristFeedback.calculate(getRelativeWristPosition().getRadians());
     double wristFF =
         wristFeedforward.calculate(
-            getAbsoluteWristPosition().getRadians(),
+            wristFeedback.getSetpoint().position + elbowFeedback.getSetpoint().position,
             wristFeedback.getSetpoint().velocity,
             wristAccel.calculate(wristFeedback.getSetpoint().velocity));
     wrist.setVoltage(wristFB + wristFF);

@@ -33,7 +33,6 @@ public class MAXSwerveModule implements SwerveModule {
   private final Rotation2d angularOffset;
 
   private SwerveModuleState setpoint = new SwerveModuleState();
-  ;
 
   /**
    * Constructs a SwerveModule for rev's MAX Swerve.
@@ -60,8 +59,10 @@ public class MAXSwerveModule implements SwerveModule {
     setDrivePID(Driving.PID);
     setTurnPID(Turning.PID);
 
-    Driving.CONVERSION.configureSparkFactors(driveEncoder);
-    Turning.CONVERSION.configureSparkFactors(turningEncoder);
+    driveEncoder.setPositionConversionFactor(Driving.CONVERSION.factor());
+    driveEncoder.setVelocityConversionFactor(Driving.CONVERSION.factor() / 60.0);
+    turningEncoder.setPositionConversionFactor(Turning.CONVERSION.factor());
+    turningEncoder.setVelocityConversionFactor(Turning.CONVERSION.factor() / 60.0);
 
     // set up continuous input for turning
     turnFeedback.setPositionPIDWrappingEnabled(true);

@@ -1,8 +1,5 @@
 package org.sciborgs1155.lib.constants;
 
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.RelativeEncoder;
-
 public record Conversion(double pulsesPerRev, double gearing, double units) {
 
   /**
@@ -45,30 +42,6 @@ public record Conversion(double pulsesPerRev, double gearing, double units) {
    */
   public double factor() {
     return gearing * units / pulsesPerRev;
-  }
-
-  /**
-   * Configures the position and velocity factors for a {@link RelativeEncoder}.
-   *
-   * <p>The velocity factor is divided by 60 to get values in u / s, rather than u / m
-   *
-   * @param encoder The encoder to be configured.
-   */
-  public void configureSparkFactors(RelativeEncoder encoder) {
-    encoder.setPositionConversionFactor(factor());
-    encoder.setVelocityConversionFactor(factor() / 60.0);
-  }
-
-  /**
-   * Configures the position and velocity factors for a {@link AbsoluteEncoder}.
-   *
-   * <p>The velocity factor is divided by 60 to get values in u / s, rather than u / m
-   *
-   * @param encoder The encoder to be configured.
-   */
-  public void configureSparkFactors(AbsoluteEncoder encoder) {
-    encoder.setPositionConversionFactor(factor());
-    encoder.setVelocityConversionFactor(factor() / 60.0);
   }
 
   public Conversion withPulsesPerRev(PulsesPerRev pulsesPerRev) {

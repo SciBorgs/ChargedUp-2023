@@ -268,13 +268,8 @@ public class Drive extends SubsystemBase implements Loggable {
 
   /** Sets the drivetrain to an "X" configuration, preventing movement */
   public Command lock() {
-    var states =
-        new SwerveModuleState[] {
-          new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(45))
-        };
-    return run(() -> setModuleStates(states));
+    var front = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+    var back = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
+    return run(() -> setModuleStates(new SwerveModuleState[] {front, back, back, front}));
   }
 }
