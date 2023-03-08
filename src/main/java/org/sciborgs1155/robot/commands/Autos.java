@@ -1,5 +1,8 @@
 package org.sciborgs1155.robot.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
@@ -30,12 +33,22 @@ public class Autos implements Loggable {
         this.intake = intake;
 
         autoChooser = new SendableChooser<Command>();
-        autoChooser.setDefaultOption("simpleDrive", simpleDriveAuto());
+        autoChooser.setDefaultOption("simple drive", simpleDriveAuto());
+        autoChooser.addOption("meandering drive", meanderingDriveAuto());
     }
 
     private final Command simpleDriveAuto() {
         return drive.driveToPose(new Pose2d(1, 5, Rotation2d.fromDegrees(0))).andThen(
                drive.driveToPose(new Pose2d(1, 1, Rotation2d.fromDegrees(0))));
+    }
+
+    private final Command meanderingDriveAuto() {
+        List<Pose2d> poses = new ArrayList<Pose2d>(List.of(
+            new Pose2d(7, 0.5, Rotation2d.fromDegrees(0)),
+            new Pose2d(7, 7, Rotation2d.fromDegrees(0)),
+            new Pose2d(15, 7, Rotation2d.fromDegrees(0))));
+        Pose2d endPose = new Pose2d(1, 7, Rotation2d.fromDegrees(20));
+        return drive.driveToPoses(poses).andThen(drive.driveToPose(endPose));
     }
 
     public Command get() { return autoChooser.getSelected(); }
