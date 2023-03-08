@@ -1,11 +1,17 @@
 {
   "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
     "transitory": {
       "Shuffleboard": {
-        ".metadata": {
-          "open": true
-        },
         "Arm": {
+          "elbow feedback": {
+            "open": true
+          },
+          "elbowEncoder": {
+            "open": true
+          },
           "open": true,
           "wrist feedback": {
             "open": true
@@ -133,7 +139,7 @@
               "autoFit": true
             }
           ],
-          "height": 332,
+          "height": 169,
           "series": [
             {
               "color": [
@@ -163,7 +169,7 @@
     "Plot <3>": {
       "plots": [
         {
-          "height": 332,
+          "height": 260,
           "series": [
             {
               "color": [
@@ -182,6 +188,73 @@
                 1.0
               ],
               "id": "NT:/Shuffleboard/Arm/wrist position"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "visible": false
+      }
+    },
+    "Plot <4>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 338,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Arm/wrist position"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Arm/wrist feedback/goal"
+            }
+          ]
+        }
+      ]
+    },
+    "Plot <5>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 338,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Arm/elbow feedback/goal"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Arm/elbowEncoder/Distance"
             }
           ]
         }
