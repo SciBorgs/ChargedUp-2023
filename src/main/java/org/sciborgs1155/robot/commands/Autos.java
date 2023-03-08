@@ -1,124 +1,42 @@
 package org.sciborgs1155.robot.commands;
 
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import io.github.oblarg.oblog.annotations.Log;
-
-import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
-import org.sciborgs1155.robot.util.PlacementState;
-import org.sciborgs1155.robot.util.State.Side;
 import org.sciborgs1155.robot.util.Vision;
 
-public class Autos implements Sendable {
-  private final SendableChooser<AutoPath> pathChooser;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj2.command.Command;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
 
-  public Autos(Drive drive, Intake intake, Vision vision, Arm arm, Elevator elevator) {
-    pathChooser = new SendableChooser<AutoPath>();
-    pathChooser.addOption("driveAround", AutoPath.driveAroundPath(drive, vision, intake, arm, elevator));
-    pathChooser.addOption("simpleDrive", AutoPath.simpleDrivePath(drive, vision, intake, arm, elevator));
-    pathChooser.setDefaultOption("intakeScore", AutoPath.exampleIntakeScorePath(drive, vision, intake, arm, elevator));
-  }
+public class Autos implements Loggable {
+    @Log private final SendableChooser<Command> autoChooser;
 
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    pathChooser.initSendable(builder); 
-  }
+    private final Drive drive;
+    private final Arm arm;
+    private final Elevator elevator;
+    private final Vision vision;
+    private final Intake intake;
 
-  @Log(name = "auto path", methodName = "getAutoPath")
+    public Autos(Drive drive, Arm arm, Elevator elevator, Vision vision, Intake intake) {
+        this.drive = drive;
+        this.arm = arm;
+        this.vision = vision;
+        this.elevator = elevator;
+        this.intake = intake;
 
-  private AutoPath getAutoPath() {return pathChooser.getSelected(); }
-
-  public Command get() {
-    return pathChooser.getSelected().get();
-  }
-
-  public final class PlaceHolderCommands {
-    public static Command score(
-        Intake intake,
-        Drive drive,
-        Elevator elevator,
-        Arm arm,
-        Vision vision,
-        ShouldBeInDiffFile.GamePiece gamePiece,
-        PlacementState scoringState) {
-      return Commands.none();
+        autoChooser = new SendableChooser<Command>();
+        autoChooser.setDefaultOption("simpleDrive", simpleDriveAuto());
     }
 
-    public static Command intake(
-        Intake intake, Arm arm, Elevator elevator, ShouldBeInDiffFile.GamePiece gamePiece) {
-      return Commands.none();
-    }
-  }
-
-  public final class ShouldBeInDiffFile {
-    public enum ScoringHeight {
-      HIGH,
-      MID,
-      LOW;
+    private final Command simpleDriveAuto() {
+        return drive.driveToPose(new Pose2d(1, 5, Rotation2d.fromDegrees(0))).andThen(
+               drive.driveToPose(new Pose2d(1, 1, Rotation2d.fromDegrees(0))));
     }
 
-    public enum GamePiece {
-      CONE,
-      CUBE
-    }
-
-    public static PlacementState scoringState(
-        GamePiece gamePiece, ScoringHeight height, Side side) {
-      switch (gamePiece) {
-        case CONE:
-          switch (height) {
-            case HIGH:
-              switch (side) {
-                case FRONT:
-                  return Constants.Positions.FRONT_HIGH_CONE;
-                case BACK:
-                  return Constants.Positions.BACK_HIGH_CONE;
-              }
-            case MID:
-              switch (side) {
-                case FRONT:
-                  return Constants.Positions.FRONT_MID_CONE;
-                case BACK:
-                  return Constants.Positions.BACK_MID_CONE;
-              }
-            case LOW:
-              return Constants.Positions.BACK_LOW_CONE;
-          }
-        case CUBE:
-          switch (height) {
-            case HIGH:
-              switch (side) {
-                case FRONT:
-                  return Constants.Positions.FRONT_HIGH_CUBE;
-                case BACK:
-                  return Constants.Positions.BACK_HIGH_CUBE;
-              }
-            case MID:
-              switch (side) {
-                case FRONT:
-                  return Constants.Positions.FRONT_MID_CUBE;
-                case BACK:
-                  return Constants.Positions.BACK_MID_CUBE;
-              }
-            case LOW:
-              return Constants.Positions.BACK_LOW_CUBE;
-          }
-      }
-      throw new RuntimeException(
-          "scoringState was not called on a valid arguments. \n"
-              + "gamePiece: "
-              + gamePiece
-              + "; height: "
-              + height
-              + "; side: "
-              + side);
-    }
-  }
+    public Command get() { return autoChooser.getSelected(); }
 }
