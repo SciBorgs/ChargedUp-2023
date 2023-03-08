@@ -46,8 +46,6 @@ public class RobotContainer {
   private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
 
   // command factories
-  @Log private final Autos autos = new Autos(drive, intake, vision, arm, elevator);
-  @Log private final AutoStep step = new AutoStep.DriveToPose(drive, new Pose2d(5, 5, Rotation2d.fromDegrees(0)));
   private final Placement placement = new Placement(arm, elevator);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -92,20 +90,5 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // return Commands.none();
-    // return autos.get();
-    // return new AutoStep.DriveToPoses(drive, new ArrayList<Pose2d>(List.of(new Pose2d(5, 5, Rotation2d.fromDegrees(45)),
-    //                                                                       new Pose2d(3, 8, Rotation2d.fromDegrees(0))))).get().
-    // andThen(new AutoStep.DriveToPose(drive, new Pose2d(1, 1, Rotation2d.fromDegrees(0))).get());
-    List<Pose2d> poses = 
-            new ArrayList<Pose2d>(List.of(
-            new Pose2d(7, 2, Rotation2d.fromDegrees(0)),
-            new Pose2d(7, 7, Rotation2d.fromDegrees(0)),
-            new Pose2d(15, 7, Rotation2d.fromDegrees(0))));
-            // new Pose2d(1, 7, Rotation2d.fromDegrees(0))));
-            // new ArrayList<Pose2d>(List.of(new Pose2d(6, 1, Rotation2d.fromDegrees(0)),
-            // new Pose2d(6, 5, Rotation2d.fromDegrees(90))));
-    Pose2d endPose = new Pose2d(1, 7, Rotation2d.fromDegrees(0));
-    return drive.driveToPoses(poses).andThen(drive.driveToPose(new Pose2d(15, 7, Rotation2d.fromDegrees(0)), endPose));
   }
 }
