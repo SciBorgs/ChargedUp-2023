@@ -43,7 +43,7 @@ public final class Constants {
 
   public static final class Dimensions {
     public static final double ELEVATOR_MIN_HEIGHT = 0;
-    public static final double ELEVATOR_MAX_HEIGHT = 0.7; // m
+    public static final double ELEVATOR_MAX_HEIGHT = 0.6; // m
 
     public static final double ELBOW_MIN_ANGLE = -Math.PI / 2.0;
     public static final double ELBOW_MAX_ANGLE = 3.0 * Math.PI / 2.0;
@@ -117,7 +117,7 @@ public final class Constants {
 
     public static final class Elbow {
       public static final MotorConfig MOTOR =
-          MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
+          MotorConfig.base().withNeutralBehavior(NeutralBehavior.COAST).withCurrentLimit(50);
 
       public static final Conversion CONVERSION =
           Conversion.base()
@@ -143,11 +143,12 @@ public final class Constants {
             .multiplyRadius(0.0181864)
             .withUnits(Conversion.Units.RADIANS)
             .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
+            // units field for sysid is 0.1143
 
     public static final PIDConstants PID = new PIDConstants(45, 0, 1);
-    public static final SystemConstants FF = new SystemConstants(0.39974, 0.060732, 29.798, 2.554);
+    public static final SystemConstants FF = new SystemConstants(0.20619, 0.069335, 33.25, 1.5514);
 
-    public static final Constraints CONSTRAINTS = new Constraints(20, 8);
+    public static final Constraints CONSTRAINTS = new Constraints(1, 1);
   }
 
   public static final class Intake {
