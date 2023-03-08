@@ -6,6 +6,7 @@ import static org.sciborgs1155.robot.Ports.Arm.*;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -94,6 +95,11 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
     elbowEncoder.setDistancePerPulse(Elbow.CONVERSION.factor());
     Wrist.CONVERSION.configureSparkFactors(wristEncoder);
+
+    // set wrist duty cycle absolute encoder frame periods to be the same as our tickrate
+    // TODO raise other periodic frame periods if it starts complaining
+    wrist.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
+    wrist.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
 
     elbow.burnFlash();
     elbowLeft.burnFlash();
