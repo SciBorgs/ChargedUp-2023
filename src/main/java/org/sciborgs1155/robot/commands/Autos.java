@@ -8,27 +8,24 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.ArrayList;
 import java.util.List;
-import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
-import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.util.Vision;
+import org.sciborgs1155.robot.commands.Placement;
 
 public class Autos implements Loggable {
   @Log private final SendableChooser<Command> autoChooser;
 
   private final Drive drive;
-  private final Arm arm;
-  private final Elevator elevator;
+  private final Placement placement;
   private final Vision vision;
   private final Intake intake;
 
-  public Autos(Drive drive, Arm arm, Elevator elevator, Vision vision, Intake intake) {
+  public Autos(Drive drive, Placement placement, Vision vision, Intake intake) {
     this.drive = drive;
-    this.arm = arm;
     this.vision = vision;
-    this.elevator = elevator;
     this.intake = intake;
+    this.placement = placement;
 
     autoChooser = new SendableChooser<Command>();
     autoChooser.setDefaultOption("simple drive", simpleDriveAuto());
