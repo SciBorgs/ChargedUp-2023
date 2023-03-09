@@ -1,11 +1,11 @@
 package org.sciborgs1155.robot.subsystems;
 
+import static org.sciborgs1155.robot.Constants.Arm.*;
 import static org.sciborgs1155.robot.Ports.Arm.*;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -13,37 +13,36 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
+import java.util.function.DoubleSupplier;
 import org.sciborgs1155.lib.Derivative;
+import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Constants.Arm.Elbow;
-import org.sciborgs1155.robot.Constants.Arm.Wrist;
 import org.sciborgs1155.robot.Constants.Dimensions;
-import org.sciborgs1155.robot.Constants.Motors;
 import org.sciborgs1155.robot.Robot;
-import org.sciborgs1155.robot.util.Visualizer;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log(name = "elbow applied output", methodName = "getAppliedOutput")
-  private final CANSparkMax elbow = Motors.ELBOW.build(MotorType.kBrushless, MIDDLE_ELBOW_MOTOR);
+  private final CANSparkMax elbow = Elbow.MOTOR.build(MotorType.kBrushless, MIDDLE_ELBOW_MOTOR);
 
-  private final CANSparkMax elbowLeft = Motors.ELBOW.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
-  private final CANSparkMax elbowRight =
-      Motors.ELBOW.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
+  private final CANSparkMax elbowLeft = Elbow.MOTOR.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
+  private final CANSparkMax elbowRight = Elbow.MOTOR.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
 
   @Log(name = "wrist applied output", methodName = "getAppliedOutput")
-  private final CANSparkMax wrist = Motors.WRIST.build(MotorType.kBrushless, WRIST_MOTOR);
+  private final CANSparkMax wrist = Wrist.MOTOR.build(MotorType.kBrushless, WRIST_MOTOR);
 
-  @Log(name = "elbow velocity", methodName = "getVelocity")
-  private final RelativeEncoder elbowEncoder =
-      elbow.getAlternateEncoder(Constants.THROUGH_BORE_CPR);
+  @Log private final Encoder elbowEncoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
+  private final EncoderSim elbowEncoderSim = new EncoderSim(elbowEncoder);
 
+  @Log(name = "wrist position", methodName = "getPosition")
   @Log(name = "wrist velocity", methodName = "getVelocity")
   private final AbsoluteEncoder wristEncoder = wrist.getAbsoluteEncoder(Type.kDutyCycle);
 
@@ -54,11 +53,11 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log(name = "elbow feedback")
   private final ProfiledPIDController elbowFeedback =
-      new ProfiledPIDController(Elbow.kP, Elbow.kI, Elbow.kD, Elbow.CONSTRAINTS);
+      new ProfiledPIDController(Elbow.PID.kp(), Elbow.PID.ki(), Elbow.PID.kd(), Elbow.CONSTRAINTS);
 
   @Log(name = "wrist feedback")
   private final ProfiledPIDController wristFeedback =
-      new ProfiledPIDController(Wrist.kP, Wrist.kI, Wrist.kD, Wrist.CONSTRAINTS);
+      new ProfiledPIDController(Wrist.PID.kp(), Wrist.PID.ki(), Wrist.PID.kd(), Wrist.CONSTRAINTS);
 
   @Log(name = "wrist acceleration", methodName = "getLastOutput")
   private final Derivative wristAccel = new Derivative();
@@ -69,7 +68,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   private final SingleJointedArmSim elbowSim =
       new SingleJointedArmSim(
           DCMotor.getNEO(3),
-          1 / Elbow.ENCODER_POSITION_FACTOR,
+          Elbow.CONVERSION.gearing(),
           SingleJointedArmSim.estimateMOI(Dimensions.FOREARM_LENGTH, Dimensions.FOREARM_MASS),
           Dimensions.FOREARM_LENGTH,
           Dimensions.ELBOW_MIN_ANGLE,
@@ -87,12 +86,13 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   private final Visualizer visualizer;
 
+  private double v, wristV;
+
   public Arm(Visualizer visualizer) {
     elbowLeft.follow(elbow);
     elbowRight.follow(elbow);
 
-    elbowEncoder.setPositionConversionFactor(Elbow.ENCODER_POSITION_FACTOR);
-    elbowEncoder.setVelocityConversionFactor(Elbow.ENCODER_VELOCITY_FACTOR);
+    elbowEncoder.setDistancePerPulse(Elbow.CONVERSION.factor());
 
     elbow.burnFlash();
     elbowLeft.burnFlash();
@@ -104,8 +104,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   /** Elbow position relative to the chassis */
   public Rotation2d getElbowPosition() {
-    return Rotation2d.fromRadians(
-        Robot.isReal() ? elbowEncoder.getPosition() : elbowSim.getAngleRads());
+    return Rotation2d.fromRadians(elbowEncoder.getDistance());
   }
 
   /** Wrist position relative to the forearm */
@@ -120,7 +119,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Elbow and wrist at goals */
-  @Log(name = "at goal")
   public boolean atGoal() {
     return elbowFeedback.atGoal() && wristFeedback.atGoal();
   }
@@ -148,6 +146,13 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Sets both the wrist and elbow goals */
+  public Command setGoals(Rotation2d elbowGoal, Rotation2d wristGoal) {
+    return setGoals(
+        new TrapezoidProfile.State(elbowGoal.getRadians(), 0),
+        new TrapezoidProfile.State(wristGoal.getRadians(), 0));
+  }
+
+  /** Sets both the wrist and elbow goals */
   public Command setGoals(TrapezoidProfile.State elbowGoal, TrapezoidProfile.State wristGoal) {
     return setElbowGoal(elbowGoal).andThen(setWristGoal(wristGoal));
   }
@@ -167,12 +172,24 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     return setGoals(elbowGoal, wristGoal).andThen(Commands.waitUntil(this::atGoal));
   }
 
+  public Command setVoltage(DoubleSupplier v, DoubleSupplier wristV) {
+    return run(
+        () -> {
+          this.v = v.getAsDouble();
+          this.wristV = wristV.getAsDouble();
+        });
+  }
+
+  public Command setWristVoltage(DoubleSupplier v) {
+    return run(() -> this.wristV = v.getAsDouble());
+  }
+
   @Override
   public void periodic() {
     double elbowFB = elbowFeedback.calculate(getElbowPosition().getRadians());
     double elbowFF =
         elbowFeedforward.calculate(
-            elbowFeedback.getSetpoint().position,
+            getElbowPosition().getRadians(),
             elbowFeedback.getSetpoint().velocity,
             elbowAccel.calculate(elbowFeedback.getSetpoint().velocity));
     elbow.setVoltage(elbowFB + elbowFF);
@@ -185,7 +202,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     double wristFB = wristFeedback.calculate(getRelativeWristPosition().getRadians());
     double wristFF =
         wristFeedforward.calculate(
-            wristFeedback.getSetpoint().position + elbowFeedback.getSetpoint().position,
+            getAbsoluteWristPosition().getRadians(),
             wristFeedback.getSetpoint().velocity,
             wristAccel.calculate(wristFeedback.getSetpoint().velocity));
     wrist.setVoltage(wristFB + wristFF);
@@ -200,6 +217,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   public void simulationPeriodic() {
     elbowSim.setInputVoltage(elbow.getAppliedOutput());
     elbowSim.update(Constants.RATE);
+    elbowEncoderSim.setDistance(elbowSim.getAngleRads());
+    elbowEncoderSim.setRate(elbowSim.getVelocityRadPerSec());
 
     wristSim.setInputVoltage(wrist.getAppliedOutput());
     wristSim.update(Constants.RATE);

@@ -152,6 +152,7 @@ gradle-app.setting
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
+!photonvision-settings960x544.zip
 
 # Cache of project
 .gradletasknamecache

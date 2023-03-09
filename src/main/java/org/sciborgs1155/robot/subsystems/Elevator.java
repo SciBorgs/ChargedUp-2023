@@ -13,29 +13,32 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Derivative;
+import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants.Dimensions;
-import org.sciborgs1155.robot.Constants.Motors;
-import org.sciborgs1155.robot.util.Visualizer;
 
 public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log(name = "applied output", methodName = "getAppliedOutput")
-  private final CANSparkMax lead = Motors.ELEVATOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
+  private final CANSparkMax lead = MOTOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
 
-  private final CANSparkMax left = Motors.ELEVATOR.build(MotorType.kBrushless, LEFT_MOTOR);
-  private final CANSparkMax right = Motors.ELEVATOR.build(MotorType.kBrushless, RIGHT_MOTOR);
+  private final CANSparkMax left = MOTOR.build(MotorType.kBrushless, LEFT_MOTOR);
+  private final CANSparkMax right = MOTOR.build(MotorType.kBrushless, RIGHT_MOTOR);
 
-  @Log private final Encoder encoder = new Encoder(DIO[0], DIO[1]);
+  @Log private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1]);
+  private final EncoderSim simEncoder = new EncoderSim(encoder);
 
   private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
 
-  @Log private final ProfiledPIDController pid = new ProfiledPIDController(kP, kI, kD, CONSTRAINTS);
+  @Log
+  private final ProfiledPIDController pid =
+      new ProfiledPIDController(PID.kp(), PID.ki(), PID.kd(), CONSTRAINTS);
 
   @Log(name = "acceleration", methodName = "getLastOutput")
   private final Derivative accel = new Derivative();
@@ -43,14 +46,12 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   private final ElevatorSim sim =
       new ElevatorSim(
           DCMotor.getNEO(3),
-          1 / ENCODER_FACTOR,
-          Dimensions.ELEVATOR_MASS,
-          SPROCKET_RADIUS,
+          CONVERSION.gearing(),
+          Dimensions.ELEVATOR_MASS + Dimensions.FOREARM_MASS + Dimensions.CLAW_MASS,
+          CONVERSION.units(),
           Dimensions.ELEVATOR_MIN_HEIGHT,
           Dimensions.ELEVATOR_MAX_HEIGHT,
           true);
-
-  private final EncoderSim simEncoder = new EncoderSim(encoder);
 
   private final Visualizer visualizer;
 
@@ -58,7 +59,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     left.follow(lead);
     right.follow(lead);
 
-    encoder.setDistancePerPulse(ENCODER_FACTOR);
+    encoder.setDistancePerPulse(CONVERSION.factor());
 
     lead.burnFlash();
     left.burnFlash();
@@ -68,15 +69,18 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Returns the height of the elevator, in meters */
-  @Log(name = "position")
   public double getPosition() {
     return encoder.getDistance();
   }
 
   /** Returns the goal of the elevator, in meters */
-  @Log(name = "at goal")
   public boolean atGoal() {
     return pid.atGoal();
+  }
+
+  /** Sets the elevator's goal to a height */
+  public Command setGoal(double goal) {
+    return setGoal(new TrapezoidProfile.State(goal, 0));
   }
 
   /** Sets the elevator's goal to a {@link TrapezoidProfile.State} */
@@ -106,6 +110,8 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     lead.setVoltage(fbOutput + ffOutput);
 
     visualizer.setElevator(getPosition(), pid.getGoal().position);
+
+    SmartDashboard.putNumber("setpoint", pid.getSetpoint().position);
   }
 
   @Override
@@ -113,6 +119,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     sim.setInputVoltage(lead.getAppliedOutput());
     // sim.update(Constants.RATE);
     simEncoder.setDistance(sim.getPositionMeters());
+    simEncoder.setRate(sim.getVelocityMetersPerSecond());
   }
 
   @Override

@@ -7,9 +7,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
+
+import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
-import org.sciborgs1155.robot.util.Vision;
 
 public class Autos implements Loggable {
   @Log private final SendableChooser<Command> autoChooser;
@@ -31,9 +32,10 @@ public class Autos implements Loggable {
   }
 
   private final Command simpleDriveAuto() {
+    Pose2d end = new Pose2d(1, 5,Rotation2d.fromDegrees(0));
     return drive
-        .driveToPose(new Pose2d(1, 5, Rotation2d.fromDegrees(0)))
-        .andThen(drive.driveToPose(new Pose2d(1, 1, Rotation2d.fromDegrees(0))));
+        .driveToPose(end)
+        .andThen(drive.driveToPose(end, new Pose2d(0, 0, Rotation2d.fromDegrees(0))));
   }
 
   private final Command meanderingDriveAuto() {

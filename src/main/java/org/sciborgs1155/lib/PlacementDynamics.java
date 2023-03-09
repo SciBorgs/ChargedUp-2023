@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.util;
+package org.sciborgs1155.lib;
 
 import edu.wpi.first.math.Vector;
 import org.ejml.data.DMatrixRMaj;
