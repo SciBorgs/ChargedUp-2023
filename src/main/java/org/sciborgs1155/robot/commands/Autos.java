@@ -11,7 +11,6 @@ import java.util.List;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.util.Vision;
-import org.sciborgs1155.robot.commands.Placement;
 
 public class Autos implements Loggable {
   @Log private final SendableChooser<Command> autoChooser;
