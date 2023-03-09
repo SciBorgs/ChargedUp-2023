@@ -320,8 +320,8 @@ public class Drive extends SubsystemBase implements Loggable {
     BooleanSupplier closeEnough =
         () -> {
           Transform2d transform = getPose().minus(desiredPoses.get(desiredPoses.size() - 1));
-          return Math.abs(transform.getX()) < 0.1
-              && Math.abs(transform.getY()) < 0.1
+          return Math.abs(transform.getX()) < 0.3
+              && Math.abs(transform.getY()) < 0.3
               && Math.abs(transform.getRotation().getDegrees()) < 5;
         };
     List<Pose2d> posesWithStart = Stream.concat(Stream.of(startPose), desiredPoses.stream()).toList();

@@ -45,6 +45,9 @@
       "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
       "/LiveWindow/Ungrouped/Pigeon IMU [2]": "Gyro",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
+      "/Shuffleboard/Autos/Drive/field2d": "Field2d",
+      "/Shuffleboard/Autos/Drive/imu": "Gyro",
+      "/Shuffleboard/Autos/autoChooser": "String Chooser",
       "/Shuffleboard/Drive/field2d": "Field2d",
       "/Shuffleboard/Drive/gyro": "Gyro",
       "/Shuffleboard/Drive/imu": "Gyro",
@@ -61,6 +64,11 @@
       "/SmartDashboard/photonvision Sim Field": "Field2d"
     },
     "windows": {
+      "/Shuffleboard/Autos/autoChooser": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Shuffleboard/Drive/field2d": {
         "Cam Est Pose": {
           "color": [
@@ -428,7 +436,7 @@
               "autoFit": true
             }
           ],
-          "height": 295,
+          "height": 8,
           "series": [
             {
               "color": [
@@ -463,7 +471,7 @@
               "autoFit": true
             }
           ],
-          "height": 295,
+          "height": 131,
           "series": [
             {
               "color": [
