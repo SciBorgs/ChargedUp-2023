@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-import java.util.ArrayList;
 import java.util.List;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
@@ -40,10 +39,10 @@ public class Autos implements Loggable {
   private final Command meanderingDriveAuto() {
     Pose2d transitionPose = new Pose2d(15, 7, Rotation2d.fromDegrees(0));
     List<Pose2d> poses =
-      List.of(
-        new Pose2d(7, 2, Rotation2d.fromDegrees(0)),
-        new Pose2d(7, 7, Rotation2d.fromDegrees(75)),
-        transitionPose);
+        List.of(
+            new Pose2d(7, 2, Rotation2d.fromDegrees(0)),
+            new Pose2d(7, 7, Rotation2d.fromDegrees(75)),
+            transitionPose);
     Pose2d endPose = new Pose2d(1, 7, Rotation2d.fromDegrees(20));
     return drive.driveToPoses(poses).andThen(drive.driveToPose(transitionPose, endPose));
   }
