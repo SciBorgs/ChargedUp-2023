@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
@@ -283,25 +284,19 @@ public class Drive extends SubsystemBase implements Loggable {
             desiredPose.getY() - currentPose.getY(), desiredPose.getX() - currentPose.getX()));
   }
 
-  // i'm sorry i'll make this not super ulgy but it works so go with it for now - Siggy
   private Command driveToPosesH(List<Pose2d> desiredPoses) {
     List<PathPoint> points = new ArrayList<PathPoint>();
-    for (int i = 0; i < desiredPoses.size() - 1; i++) {
-      Pose2d startPose = desiredPoses.get(i);
-      Pose2d endPose2d = desiredPoses.get(i + 1);
-      points.add(
-          new PathPoint(
-              startPose.getTranslation(),
-              headingToPose(startPose, endPose2d),
-              startPose.getRotation()));
+    Function<Integer, Rotation2d> heading =
+        (i) ->
+            i < desiredPoses.size() - 1
+                ? headingToPose(desiredPoses.get(i), desiredPoses.get(i + 1))
+                : headingToPose(
+                    desiredPoses.get(i - 1),
+                    desiredPoses.get(i)); // i hate that i can't do a recursive lambda
+    for (int i = 0; i < desiredPoses.size(); i++) {
+      Pose2d rawPose = desiredPoses.get(i);
+      points.add(new PathPoint(rawPose.getTranslation(), heading.apply(i), rawPose.getRotation()));
     }
-    Pose2d lastPose = desiredPoses.get(desiredPoses.size() - 1);
-    Pose2d secondToLastPose = desiredPoses.get(desiredPoses.size() - 2);
-    points.add(
-        new PathPoint(
-            lastPose.getTranslation(),
-            headingToPose(secondToLastPose, lastPose),
-            lastPose.getRotation()));
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(CONSTRAINTS, points);
     return follow(trajectory, false, false);
   }
