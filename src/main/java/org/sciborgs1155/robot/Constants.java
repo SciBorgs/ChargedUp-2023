@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import java.util.Map;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.PlacementState;
 import org.sciborgs1155.lib.constants.Conversion;
@@ -143,7 +144,7 @@ public final class Constants {
             .multiplyRadius(0.0181864)
             .withUnits(Conversion.Units.RADIANS)
             .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
-            // units field for sysid is 0.1143
+    // units field for sysid is 0.1143
 
     public static final PIDConstants PID = new PIDConstants(45, 0, 1);
     public static final SystemConstants FF = new SystemConstants(0.20619, 0.069335, 33.25, 1.5514);
@@ -239,5 +240,39 @@ public final class Constants {
     public static final PlacementState BACK_LOW_CUBE = PlacementState.fromAbsolute(0, 0.1, 0);
     public static final PlacementState BACK_MID_CUBE = PlacementState.fromAbsolute(0, 0.2, 0.6);
     public static final PlacementState BACK_HIGH_CUBE = PlacementState.fromAbsolute(0, 1, 1.1);
+  }
+
+  public static final class Field {
+    public static final Map<String, Translation2d> INTAKE_POINTS =
+        Map.ofEntries(
+            Map.entry("B1", new Translation2d()),
+            Map.entry("B2", new Translation2d()),
+            Map.entry("B3", new Translation2d()),
+            Map.entry("B4", new Translation2d()),
+            Map.entry("R1", new Translation2d()),
+            Map.entry("R2", new Translation2d()),
+            Map.entry("R3", new Translation2d()),
+            Map.entry("R4", new Translation2d()));
+
+    public static final Map<String, Translation2d> SCORING_POINTS =
+        Map.ofEntries(
+            Map.entry("B1", new Translation2d()),
+            Map.entry("B2", new Translation2d()),
+            Map.entry("B3", new Translation2d()),
+            Map.entry("B4", new Translation2d()),
+            Map.entry("B5", new Translation2d()),
+            Map.entry("B6", new Translation2d()),
+            Map.entry("B7", new Translation2d()),
+            Map.entry("B8", new Translation2d()),
+            Map.entry("B9", new Translation2d()),
+            Map.entry("R1", new Translation2d()),
+            Map.entry("R2", new Translation2d()),
+            Map.entry("R3", new Translation2d()),
+            Map.entry("R4", new Translation2d()),
+            Map.entry("R5", new Translation2d()),
+            Map.entry("R6", new Translation2d()),
+            Map.entry("R7", new Translation2d()),
+            Map.entry("R8", new Translation2d(10, 3)),
+            Map.entry("R9", new Translation2d()));
   }
 }

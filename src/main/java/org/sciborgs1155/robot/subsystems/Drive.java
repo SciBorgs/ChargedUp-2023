@@ -26,13 +26,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.stream.Stream;
-
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
@@ -324,7 +322,8 @@ public class Drive extends SubsystemBase implements Loggable {
               && Math.abs(transform.getY()) < 0.3
               && Math.abs(transform.getRotation().getDegrees()) < 5;
         };
-    List<Pose2d> posesWithStart = Stream.concat(Stream.of(startPose), desiredPoses.stream()).toList();
+    List<Pose2d> posesWithStart =
+        Stream.concat(Stream.of(startPose), desiredPoses.stream()).toList();
     return driveToPosesH(posesWithStart).until(closeEnough);
   }
 

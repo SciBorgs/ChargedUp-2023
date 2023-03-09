@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
-
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
@@ -35,7 +34,7 @@ public class Autos implements Loggable {
   }
 
   private final Command simpleDrive() {
-    Pose2d end = new Pose2d(1, 5,Rotation2d.fromDegrees(0));
+    Pose2d end = new Pose2d(1, 5, Rotation2d.fromDegrees(0));
     return drive
         .driveToPose(end)
         .andThen(drive.driveToPose(end, new Pose2d(0, 0, Rotation2d.fromDegrees(0))));
@@ -63,5 +62,3 @@ public class Autos implements Loggable {
     return Commands.run(() -> drive.drive(balance.calculate(drive.getPitch(), 0), 0, 0, true));
   }
 }
-
-
