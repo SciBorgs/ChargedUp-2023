@@ -59,7 +59,9 @@ public class Scoring {
     FRONT;
 
     public double rads() {
-      if (this == BACK) { return Math.PI; }
+      if (this == BACK) {
+        return Math.PI;
+      }
       return 0;
     }
   }
@@ -69,8 +71,9 @@ public class Scoring {
     BLUE;
 
     public double rads() {
-      if (this == RED) { return Math.PI; }
-      else return 0;
+      if (this == RED) {
+        return Math.PI;
+      } else return 0;
     }
   }
 
