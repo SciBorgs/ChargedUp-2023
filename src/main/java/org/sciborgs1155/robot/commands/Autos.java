@@ -47,6 +47,7 @@ public class Autos implements Loggable {
     return drive.driveToPoses(poses).andThen(drive.driveToPose(transitionPose, endPose));
   }
 
+  //** returns currently selected auto command */
   public Command get() {
     return autoChooser.getSelected();
   }
