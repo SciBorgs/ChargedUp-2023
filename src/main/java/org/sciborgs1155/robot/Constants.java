@@ -321,25 +321,25 @@ public final class Constants {
             Map.entry("R3", new Pose2d()),
             Map.entry("R4", new Pose2d()));
 
-    public static final Map<String, Pose2d> SCORING_POINTS =
+    public static final Map<String, Translation2d> SCORING_POINTS =
         Map.ofEntries(
-            Map.entry("B1", new Pose2d()),
-            Map.entry("B2", new Pose2d()),
-            Map.entry("B3", new Pose2d()),
-            Map.entry("B4", new Pose2d()),
-            Map.entry("B5", new Pose2d()),
-            Map.entry("B6", new Pose2d()),
-            Map.entry("B7", new Pose2d()),
-            Map.entry("B8", new Pose2d()),
-            Map.entry("B9", new Pose2d()),
-            Map.entry("R1", new Pose2d()),
-            Map.entry("R2", new Pose2d()),
-            Map.entry("R3", new Pose2d()),
-            Map.entry("R4", new Pose2d()),
-            Map.entry("R5", new Pose2d()),
-            Map.entry("R6", new Pose2d()),
-            Map.entry("R7", new Pose2d()),
-            Map.entry("R8", new Pose2d(10, 3, Rotation2d.fromDegrees(90))),
-            Map.entry("R9", new Pose2d()));
+            Map.entry("B1", new Translation2d()),
+            Map.entry("B2", new Translation2d()),
+            Map.entry("B3", new Translation2d()),
+            Map.entry("B4", new Translation2d()),
+            Map.entry("B5", new Translation2d()),
+            Map.entry("B6", new Translation2d()),
+            Map.entry("B7", new Translation2d()),
+            Map.entry("B8", new Translation2d()),
+            Map.entry("B9", new Translation2d()),
+            Map.entry("R1", new Translation2d()),
+            Map.entry("R2", new Translation2d()),
+            Map.entry("R3", new Translation2d()),
+            Map.entry("R4", new Translation2d()),
+            Map.entry("R5", new Translation2d()),
+            Map.entry("R6", new Translation2d()),
+            Map.entry("R7", new Translation2d()),
+            Map.entry("R8", new Translation2d(10, 3)),
+            Map.entry("R9", new Translation2d()));
   }
 }
