@@ -6,6 +6,7 @@ import static org.sciborgs1155.robot.Ports.Drive.*;
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -25,8 +26,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.stream.Stream;
+
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
@@ -271,5 +277,64 @@ public class Drive extends SubsystemBase implements Loggable {
     var front = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
     var back = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
     return run(() -> setModuleStates(new SwerveModuleState[] {front, back, back, front}));
+  }
+
+  public Rotation2d headingToPose(Pose2d currentPose, Pose2d desiredPose) {
+    return new Rotation2d(
+        Math.atan2(
+            desiredPose.getY() - currentPose.getY(), desiredPose.getX() - currentPose.getX()));
+  }
+
+  // i'm sorry i'll make this not super ulgy but it works so go with it for now - Siggy
+  private Command driveToPosesH(List<Pose2d> desiredPoses) {
+    List<PathPoint> points = new ArrayList<PathPoint>();
+    for (int i = 0; i < desiredPoses.size() - 1; i++) {
+      Pose2d startPose = desiredPoses.get(i);
+      Pose2d endPose2d = desiredPoses.get(i + 1);
+      points.add(
+          new PathPoint(
+              startPose.getTranslation(),
+              headingToPose(startPose, endPose2d),
+              startPose.getRotation()));
+    }
+    Pose2d lastPose = desiredPoses.get(desiredPoses.size() - 1);
+    Pose2d secondToLastPose = desiredPoses.get(desiredPoses.size() - 2);
+    points.add(
+        new PathPoint(
+            lastPose.getTranslation(),
+            headingToPose(secondToLastPose, lastPose),
+            lastPose.getRotation()));
+    PathPlannerTrajectory trajectory = PathPlanner.generatePath(CONSTRAINTS, points);
+    return follow(trajectory, false, false);
+  }
+
+  // ** Creates and follows trajectory for swerve, starting at curent pose, through all desired
+  // poses */
+  public Command driveToPoses(List<Pose2d> desiredPoses) {
+    return driveToPoses(getPose(), desiredPoses);
+  }
+
+  // ** Creates and follows trajectory for swerve, starting at startPose, through all desired poses
+  // */
+  public Command driveToPoses(Pose2d startPose, List<Pose2d> desiredPoses) {
+    BooleanSupplier closeEnough =
+        () -> {
+          Transform2d transform = getPose().minus(desiredPoses.get(desiredPoses.size() - 1));
+          return Math.abs(transform.getX()) < 0.1
+              && Math.abs(transform.getY()) < 0.1
+              && Math.abs(transform.getRotation().getDegrees()) < 5;
+        };
+    List<Pose2d> posesWithStart = Stream.concat(Stream.of(startPose), desiredPoses.stream()).toList();
+    return driveToPosesH(posesWithStart).until(closeEnough);
+  }
+
+  // ** Creates and follows trajectory for swerve from current pose to desiredPose */
+  public Command driveToPose(Pose2d desiredPose) {
+    return driveToPose(getPose(), desiredPose);
+  }
+
+  // ** Creates and follows trajectroy for swerve from startPose to desiredPose */
+  public Command driveToPose(Pose2d startPose, Pose2d desiredPose) {
+    return driveToPoses(startPose, List.of(desiredPose));
   }
 }
