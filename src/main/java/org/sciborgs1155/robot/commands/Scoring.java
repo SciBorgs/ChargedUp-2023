@@ -50,25 +50,28 @@ public class Scoring {
             .getPose()
             .getTranslation()
             .nearest(new ArrayList<Translation2d>(List.copyOf(scoringPoints)));
-    // blue front: 180; blue back: 0; red front: 0; red front: 180
-    double rotationDeg = 180;
-    if (side == Side.BACK) {
-      rotationDeg = (rotationDeg + 180) % 360;
-    }
-    if (color == Color.RED) {
-      rotationDeg = (rotationDeg + 180) % 360;
-    }
-    return new Pose2d(point, Rotation2d.fromDegrees(rotationDeg));
+    double rotationDeg = (side.rads() + color.rads()) % (2 * Math.PI);
+    return new Pose2d(point, Rotation2d.fromRadians(rotationDeg));
   }
 
   public enum Side {
     BACK,
-    FRONT
+    FRONT;
+
+    public double rads() {
+      if (this == BACK) { return Math.PI; }
+      return 0;
+    }
   }
 
   public enum Color {
     RED,
-    BLUE
+    BLUE;
+
+    public double rads() {
+      if (this == RED) { return Math.PI; }
+      else return 0;
+    }
   }
 
   public enum GamePiece {
