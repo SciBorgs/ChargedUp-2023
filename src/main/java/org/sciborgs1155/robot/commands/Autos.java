@@ -40,11 +40,10 @@ public class Autos implements Loggable {
   private final Command meanderingDriveAuto() {
     Pose2d transitionPose = new Pose2d(15, 7, Rotation2d.fromDegrees(0));
     List<Pose2d> poses =
-        new ArrayList<Pose2d>(
-            List.of(
-                new Pose2d(7, 2, Rotation2d.fromDegrees(0)),
-                new Pose2d(7, 7, Rotation2d.fromDegrees(75)),
-                transitionPose));
+      List.of(
+        new Pose2d(7, 2, Rotation2d.fromDegrees(0)),
+        new Pose2d(7, 7, Rotation2d.fromDegrees(75)),
+        transitionPose);
     Pose2d endPose = new Pose2d(1, 7, Rotation2d.fromDegrees(20));
     return drive.driveToPoses(poses).andThen(drive.driveToPose(transitionPose, endPose));
   }

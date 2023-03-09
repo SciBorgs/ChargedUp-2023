@@ -353,7 +353,7 @@ public class Drive extends SubsystemBase implements Loggable {
               && Math.abs(transform.getY()) < 0.05
               && Math.abs(transform.getRotation().getDegrees()) < 0.5;
         };
-    List<Pose2d> posesWithStart = new ArrayList<Pose2d>(List.of(startPose));
+    List<Pose2d> posesWithStart = List.of(startPose);
     posesWithStart.addAll(desiredPoses);
     return driveToPosesH(posesWithStart).until(closeEnough);
   }
@@ -363,6 +363,6 @@ public class Drive extends SubsystemBase implements Loggable {
   }
 
   public Command driveToPose(Pose2d startPose, Pose2d desiredPose) {
-    return driveToPoses(startPose, new ArrayList<Pose2d>(List.of(desiredPose)));
+    return driveToPoses(startPose, List.of(desiredPose));
   }
 }
