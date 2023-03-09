@@ -33,14 +33,14 @@ public class Autos implements Loggable {
     autoChooser.addOption("balance", balance());
   }
 
-  private final Command simpleDrive() {
+  private Command simpleDrive() {
     Pose2d end = new Pose2d(1, 5, Rotation2d.fromDegrees(0));
     return drive
         .driveToPose(end)
         .andThen(drive.driveToPose(end, new Pose2d(0, 0, Rotation2d.fromDegrees(0))));
   }
 
-  private final Command meanderingDrive() {
+  private Command meanderingDrive() {
     Pose2d transitionPose = new Pose2d(15, 7, Rotation2d.fromDegrees(0));
     List<Pose2d> poses =
         List.of(
@@ -51,7 +51,7 @@ public class Autos implements Loggable {
     return drive.driveToPoses(poses).andThen(drive.driveToPose(transitionPose, endPose));
   }
 
-  // ** returns currently selected auto command */
+  /** returns currently selected auto command */
   public Command get() {
     return autoChooser.getSelected();
   }

@@ -306,14 +306,13 @@ public class Drive extends SubsystemBase implements Loggable {
     return follow(trajectory, false, false);
   }
 
-  // ** Creates and follows trajectory for swerve, starting at curent pose, through all desired
+  /** Creates and follows trajectory for swerve, starting at curent pose, through all desired
   // poses */
   public Command driveToPoses(List<Pose2d> desiredPoses) {
     return driveToPoses(getPose(), desiredPoses);
   }
 
-  // ** Creates and follows trajectory for swerve, starting at startPose, through all desired poses
-  // */
+  /** Creates and follows trajectory for swerve, starting at startPose, through all desired poses*/
   public Command driveToPoses(Pose2d startPose, List<Pose2d> desiredPoses) {
     BooleanSupplier closeEnough =
         () -> {
@@ -327,12 +326,12 @@ public class Drive extends SubsystemBase implements Loggable {
     return driveToPosesH(posesWithStart).until(closeEnough);
   }
 
-  // ** Creates and follows trajectory for swerve from current pose to desiredPose */
+  /** Creates and follows trajectory for swerve from current pose to desiredPose */
   public Command driveToPose(Pose2d desiredPose) {
     return driveToPose(getPose(), desiredPose);
   }
 
-  // ** Creates and follows trajectroy for swerve from startPose to desiredPose */
+  /** Creates and follows trajectroy for swerve from startPose to desiredPose */
   public Command driveToPose(Pose2d startPose, Pose2d desiredPose) {
     return driveToPoses(startPose, List.of(desiredPose));
   }

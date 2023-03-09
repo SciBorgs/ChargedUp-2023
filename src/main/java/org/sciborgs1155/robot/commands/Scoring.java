@@ -27,7 +27,7 @@ public class Scoring {
     this.vision = vision;
   }
 
-  public final Command score(GamePiece gamePiece, ScoringHeight height, Side side) {
+  public Command score(GamePiece gamePiece, ScoringHeight height, Side side) {
     if (height == ScoringHeight.HIGH && side == Side.BACK) {
       throw new RuntimeException("cannot score high in the back");
     }
@@ -39,11 +39,11 @@ public class Scoring {
   }
 
   // make it take gamePiece into account (maybe need to change format of field constants)
-  public final Command odometryAlign(Side side, Color color) {
+  public Command odometryAlign(Side side, Color color) {
     return drive.driveToPose(closestScoringPoint(side, color));
   }
 
-  private final Pose2d closestScoringPoint(Side side, Color color) {
+  private Pose2d closestScoringPoint(Side side, Color color) {
     Collection<Translation2d> scoringPoints = Constants.Field.SCORING_POINTS.values();
     Translation2d point =
         drive
