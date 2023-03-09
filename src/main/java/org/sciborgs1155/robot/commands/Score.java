@@ -60,4 +60,12 @@ public class Score {
         CONE,
         CUBE
     }
+
+    public enum ScoringHeight {
+        HIGH,
+        MID,
+        LOW
+    }
+
+    
 }
