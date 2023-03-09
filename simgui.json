@@ -1,10 +1,5 @@
 {
   "HALProvider": {
-    "DIO": {
-      "window": {
-        "visible": true
-      }
-    },
     "Other Devices": {
       "ADIS16470[0]": {
         "header": {
@@ -460,7 +455,8 @@
         }
       ],
       "window": {
-        "name": "angle"
+        "name": "angle",
+        "visible": false
       }
     },
     "Plot <1>": {

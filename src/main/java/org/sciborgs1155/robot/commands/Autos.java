@@ -31,6 +31,8 @@ public class Autos implements Loggable {
     autoChooser.setDefaultOption("simple drive", simpleDrive());
     autoChooser.addOption("meandering drive", meanderingDrive());
     autoChooser.addOption("balance", balance());
+    autoChooser.addOption("goofy", goofy());
+    autoChooser.addOption("goofyApp", goofyApp());
   }
 
   private Command simpleDrive() {
@@ -51,14 +53,27 @@ public class Autos implements Loggable {
     return drive.driveToPoses(poses).andThen(drive.driveToPose(transitionPose, endPose));
   }
 
-  /** returns currently selected auto command */
-  public Command get() {
-    return autoChooser.getSelected();
-  }
-
-  public Command balance() {
+  private Command balance() {
     double tolerance = 5;
     BangBangController balance = new BangBangController(tolerance);
     return Commands.run(() -> drive.drive(balance.calculate(drive.getPitch(), 0), 0, 0, true));
+  }
+
+  private Command goofy() {
+    drive.resetOdometry(new Pose2d(1, 3, Rotation2d.fromDegrees(0)));
+    return drive.driveToPoses(
+        List.of(
+            new Pose2d(1.87, 3.79, Rotation2d.fromDegrees(180)),
+            new Pose2d(2.84, 4.76, Rotation2d.fromDegrees(0)),
+            new Pose2d(2.05, 1.99, Rotation2d.fromDegrees(180))));
+  }
+
+  private Command goofyApp() {
+    return drive.follow("goofy", true, false);
+  }
+
+  /** returns currently selected auto command */
+  public Command get() {
+    return autoChooser.getSelected();
   }
 }
