@@ -182,6 +182,7 @@ public final class Constants {
 
     public static final PIDConstants CARTESIAN = new PIDConstants(1.2, 0, 0);
     public static final PIDConstants ANGULAR = new PIDConstants(1.2, 0, 1);
+    public static final PIDConstants BALANCE = new PIDConstants(1, 0, 0);
 
     public static final PathConstraints CONSTRAINTS = new PathConstraints(MAX_SPEED, MAX_ACCEL);
   }

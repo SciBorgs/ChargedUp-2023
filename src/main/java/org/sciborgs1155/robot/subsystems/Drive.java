@@ -183,8 +183,17 @@ public class Drive extends SubsystemBase implements Loggable {
    */
   @Log
   public double getPitch() {
-    // TODO make this account for pitch and roll
     return imu.getPitch();
+  }
+
+  /**
+   * Returns the roll value recorded by the pigeon.
+   *
+   * @return The roll value of the pigeon.
+   */
+  @Log
+  public double getRoll() {
+    return imu.getRoll();
   }
 
   @Override
@@ -204,11 +213,6 @@ public class Drive extends SubsystemBase implements Loggable {
       var transform = new Transform2d(MODULE_OFFSET[i], modules.get(i).getPosition().angle);
       modules2d[i].setPose(getPose().transformBy(transform));
     }
-
-    // for (var module : modules) {
-    //   module.setDrivePID(moduleDrivePID.get());
-    //   module.setTurnPID(moduleTurnPID.get());
-    // }
   }
 
   @Override
@@ -264,6 +268,22 @@ public class Drive extends SubsystemBase implements Loggable {
                 MathUtil.applyDeadband(y.getAsDouble(), Constants.DEADBAND),
                 MathUtil.applyDeadband(rot.getAsDouble(), Constants.DEADBAND),
                 fieldRelative));
+  }
+
+  public Command balance() {
+    PIDController controller = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
+    return run(() -> drive(controller.calculate(getPitch()), 0, 0, true))
+        .until(controller::atSetpoint)
+        .andThen(lock());
+  }
+
+  public Command balanceOrthogonal() {
+    PIDController x = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
+    PIDController y = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
+    return run(() -> drive(x.calculate(getPitch()), y.calculate(getRoll()), 0, false))
+        .until(() -> x.atSetpoint() && y.atSetpoint())
+        .andThen(lock());
+    // TODO see if pitch and yaw have to be switched
   }
 
   /** Stops drivetrain */
