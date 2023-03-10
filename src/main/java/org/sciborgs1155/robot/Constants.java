@@ -242,6 +242,7 @@ public final class Constants {
     public static final PlacementState BACK_HIGH_CUBE = PlacementState.fromAbsolute(0, 1, 1.1);
   }
 
+  // TODO make this less horrable
   public static final class Field {
     public static final Map<String, Translation2d> INTAKE_POINTS =
         Map.ofEntries(

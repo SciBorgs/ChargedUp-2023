@@ -38,10 +38,14 @@ public class Scoring {
         .andThen(intake.stop());
   }
 
-  // make it take gamePiece into account (maybe need to change format of field constants)
+  // TODO make it take gamePiece into account
   public Command odometryAlign(Side side, Color color) {
     return drive.driveToPose(closestScoringPoint(side, color));
   }
+
+  // TODO make commands to go to the next scoring poses to the left and right
+
+  // TODO vision alignment
 
   private Pose2d closestScoringPoint(Side side, Color color) {
     Collection<Translation2d> scoringPoints = Constants.Field.SCORING_POINTS.values();
@@ -50,8 +54,8 @@ public class Scoring {
             .getPose()
             .getTranslation()
             .nearest(new ArrayList<Translation2d>(List.copyOf(scoringPoints)));
-    double rotationDeg = (side.rads() + color.rads()) % (2 * Math.PI);
-    return new Pose2d(point, Rotation2d.fromRadians(rotationDeg));
+    double rotationRad = (side.rads() + color.rads()) % (2 * Math.PI);
+    return new Pose2d(point, Rotation2d.fromRadians(rotationRad));
   }
 
   public enum Side {
