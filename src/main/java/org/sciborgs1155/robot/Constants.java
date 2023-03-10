@@ -132,12 +132,13 @@ public final class Constants {
           new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
       public static final Constraints CONSTRAINTS = new Constraints(1.3, 0.75);
+      public static final double ELBOW_OFFSET = -1.248660;
     }
   }
 
   public static final class Elevator {
     public static final MotorConfig MOTOR =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(40);
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.COAST).withCurrentLimit(40);
 
     public static final Conversion CONVERSION =
         Conversion.base()

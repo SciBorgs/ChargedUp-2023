@@ -116,7 +116,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   /** Elbow position relative to the chassis */
   public Rotation2d getElbowPosition() {
-    return Rotation2d.fromRadians(elbowEncoder.getDistance());
+    return Rotation2d.fromRadians(elbowEncoder.getDistance() + Elbow.ELBOW_OFFSET);
   }
 
   /** Wrist position relative to the forearm */
