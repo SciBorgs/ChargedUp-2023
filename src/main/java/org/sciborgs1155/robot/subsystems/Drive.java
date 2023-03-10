@@ -315,7 +315,7 @@ public class Drive extends SubsystemBase implements Loggable {
     return driveToPosesHelper(posesWithStart).until(closeEnough);
   }
 
-   /**
+  /**
    * Creates and follows trajectory for swerve, starting at curent pose, through all desired //
    * poses
    */
