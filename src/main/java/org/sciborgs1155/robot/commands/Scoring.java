@@ -44,7 +44,11 @@ public class Scoring {
   }
 
   // TODO make commands to go to the next scoring poses to the left and right
+  // public Pose2d changeScoringTarget(Side side, Color color) {
+  //   if (vision.checkFiducial(vision.getBestTarget()) != null) {
 
+  //   }
+  // }
   // TODO vision alignment
 
   private Pose2d closestScoringPoint(Side side, Color color) {

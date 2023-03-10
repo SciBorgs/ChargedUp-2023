@@ -150,11 +150,24 @@ public class Vision {
         .toArray(EstimatedRobotPose[]::new);
   }
 
-  /** Use hasTargets() before calling */
+  /** Gets best target from each camera */
   public PhotonTrackedTarget[] getBestTarget() {
     return Stream.of(frontCam, backCam)
         .map(PhotonCamera::getLatestResult)
+        .filter(PhotonPipelineResult::hasTargets)
         .map(PhotonPipelineResult::getBestTarget)
         .toArray(PhotonTrackedTarget[]::new);
   }
+
+  //   /** Checks if target is a fiducial target */
+  //   public Optional<Pose3d> checkFiducial(PhotonTrackedTarget[] targets) {
+  //     for (target:targets) {
+
+  //     if (targets.getFiducialId() != 1) {
+  //       return layout.getTagPose(targets.getFiducialId());
+  //     } else {
+  //       return Optional.empty();
+  //     }
+  //   }
+  // }
 }
