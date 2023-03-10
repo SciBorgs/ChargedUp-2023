@@ -98,8 +98,6 @@ public class Scoring {
         switch (height) {
           case HIGH:
             switch (side) {
-              case FRONT:
-                return Constants.Positions.FRONT_HIGH_CONE;
               case BACK:
                 return Constants.Positions.BACK_HIGH_CONE;
             }

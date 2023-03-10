@@ -2,7 +2,9 @@ package org.sciborgs1155.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import org.sciborgs1155.lib.PlacementState;
+import org.sciborgs1155.robot.Constants.Positions;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Elevator;
 
@@ -17,6 +19,13 @@ public class Placement {
     this.elevator = elevator;
   }
 
+  public PlacementState state() {
+    return PlacementState.fromRelative(
+        elevator.getPosition(),
+        arm.getElbowPosition().getRadians(),
+        arm.getRelativeWristPosition().getRadians());
+  }
+
   /** Runs elevator and arm to a state, which can include velocity */
   public Command toState(PlacementState state) {
     return Commands.parallel(
@@ -29,5 +38,10 @@ public class Placement {
     Command cmd = Commands.none();
     for (var state : states) cmd = cmd.andThen(toState(state));
     return cmd;
+  }
+
+  public Command safeToState(PlacementState state) {
+    return new ConditionalCommand(
+        toState(Positions.PASS_OVER, state), toState(state), () -> state.side() != state().side());
   }
 }

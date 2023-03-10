@@ -16,6 +16,7 @@ import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.constants.SystemConstants;
+import org.sciborgs1155.robot.Constants.Arm.Elbow;
 
 /**
  * Constants is a globally accessible class for storing immutable values. Every value should be
@@ -118,7 +119,7 @@ public final class Constants {
 
     public static final class Elbow {
       public static final MotorConfig MOTOR =
-          MotorConfig.base().withNeutralBehavior(NeutralBehavior.COAST).withCurrentLimit(50);
+          MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
 
       public static final Conversion CONVERSION =
           Conversion.base()
@@ -151,6 +152,8 @@ public final class Constants {
     public static final SystemConstants FF = new SystemConstants(0.20619, 0.069335, 33.25, 1.5514);
 
     public static final Constraints CONSTRAINTS = new Constraints(1, 1);
+
+    public static final double OFFSET = 0.618420;
   }
 
   public static final class Intake {
@@ -225,16 +228,18 @@ public final class Constants {
 
   public static final class Positions {
     // tested
-
+    public static final PlacementState STOW = PlacementState.fromRelative(0, 2.467, Math.PI / 2.0);
+    public static final PlacementState BACK_HIGH_CONE =
+        PlacementState.fromAbsolute(0.521769, 3.04, 2.74);
+    public static final PlacementState FRONT_INTAKE =
+        PlacementState.fromAbsolute(0.44, 0.137803 + Elbow.ELBOW_OFFSET, 0.1);
+    public static final PlacementState PASS_OVER =
+        PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0);
     // untested
-    public static final PlacementState SAFE = PlacementState.fromAbsolute(0, Math.PI / 2.0, 0);
 
     public static final PlacementState FRONT_MID_CONE = PlacementState.fromAbsolute(0, 0.2, 0.6);
-    public static final PlacementState FRONT_HIGH_CONE = PlacementState.fromAbsolute(0, 1, 1.1);
-
     public static final PlacementState BACK_LOW_CONE = PlacementState.fromAbsolute(0, 0.1, 0);
     public static final PlacementState BACK_MID_CONE = PlacementState.fromAbsolute(0, 0.2, 0.6);
-    public static final PlacementState BACK_HIGH_CONE = PlacementState.fromAbsolute(0, 1, 1.1);
 
     public static final PlacementState FRONT_MID_CUBE = PlacementState.fromAbsolute(0, 0.2, 0.6);
     public static final PlacementState FRONT_HIGH_CUBE = PlacementState.fromAbsolute(0, 1, 1.1);

@@ -8,6 +8,7 @@ import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.Visualizer;
+import org.sciborgs1155.robot.Constants.Positions;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Placement;
@@ -34,7 +35,8 @@ public class RobotContainer {
   private final Intake intake = new Intake();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController xbox = new CommandXboxController(OI.XBOX);
+  private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
+  private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
   private final CommandJoystick leftJoystick = new CommandJoystick(OI.LEFT_STICK);
   private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
 
@@ -55,8 +57,7 @@ public class RobotContainer {
   private void configureSubsystemDefaults() {
     drive.setDefaultCommand(
         drive.drive(
-            () -> -xbox.getLeftX(), () -> -leftJoystick.getX(), () -> -rightJoystick.getY(), true));
-    // arm.setDefaultCommand(arm.setVoltage(() -> xbox.getRightY() * 3, () -> xbox.getLeftY() * 3));
+            () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX(), true));
   }
 
   /**
@@ -77,13 +78,17 @@ public class RobotContainer {
     // pressed,
     // cancelling on release.
     // xbox.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
-    rightJoystick.trigger().onTrue(intake.start(false)).onFalse(intake.stop());
+    // rightJoystick.trigger().onTrue(intake.start(false)).onFalse(intake.stop());
     // rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
 
-    xbox.a().onTrue(elevator.setGoal(0.3));
-    xbox.b().onTrue(elevator.setGoal(0));
-    xbox.x().onTrue(intake.start(false)).onFalse(intake.stop());
-    xbox.y().onTrue(intake.start(true)).onFalse(intake.stop());
+    // xbox.a().onTrue(elevator.setGoal(0.3));
+    // xbox.b().onTrue(elevator.setGoal(0));
+    operator.a().onTrue(placement.safeToState(Positions.FRONT_INTAKE));
+    operator.b().onTrue(placement.safeToState(Positions.BACK_HIGH_CONE));
+    operator.x().onTrue(placement.safeToState(Positions.STOW));
+
+    operator.leftBumper().onTrue(intake.start(false)).onFalse(intake.stop());
+    operator.rightBumper().onTrue(intake.start(true)).onFalse(intake.stop());
 
     // xbox.povLeft().onTrue(arm.setElbowGoal(new State(0, 0)));
     // xbox.povUp().onTrue(arm.setElbowGoal(new State(1.57, 0)));

@@ -67,11 +67,13 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     right.burnFlash();
 
     this.visualizer = visualizer;
+
+    pid.setGoal(getPosition());
   }
 
   /** Returns the height of the elevator, in meters */
   public double getPosition() {
-    return encoder.getDistance();
+    return encoder.getDistance() + OFFSET;
   }
 
   /** Returns the goal of the elevator, in meters */
@@ -113,13 +115,14 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     visualizer.setElevator(getPosition(), pid.getGoal().position);
 
     SmartDashboard.putNumber("setpoint", pid.getSetpoint().position);
+    SmartDashboard.putNumber("position", this.getPosition());
   }
 
   @Override
   public void simulationPeriodic() {
     sim.setInputVoltage(lead.getAppliedOutput());
     sim.update(Constants.RATE);
-    simEncoder.setDistance(sim.getPositionMeters());
+    simEncoder.setDistance(sim.getPositionMeters() - OFFSET);
     simEncoder.setRate(sim.getVelocityMetersPerSecond());
   }
 

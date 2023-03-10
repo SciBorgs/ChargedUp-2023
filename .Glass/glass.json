@@ -45,6 +45,9 @@
     },
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Autos/Drive/field2d": "Field2d",
+      "/Shuffleboard/Autos/Drive/imu": "Gyro",
+      "/Shuffleboard/Autos/autoChooser": "String Chooser",
       "/Shuffleboard/Drive/field2d": "Field2d",
       "/Shuffleboard/Drive/gyro": "Gyro",
       "/Shuffleboard/Drive/imu": "Gyro",
@@ -204,7 +207,7 @@
               "autoFit": true
             }
           ],
-          "height": 338,
+          "height": 0,
           "series": [
             {
               "color": [
@@ -236,7 +239,7 @@
               "autoFit": true
             }
           ],
-          "height": 338,
+          "height": 405,
           "series": [
             {
               "color": [
