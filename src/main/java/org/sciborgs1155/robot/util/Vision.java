@@ -151,11 +151,12 @@ public class Vision {
   }
 
   /** Gets best target from each camera */
-  public PhotonTrackedTarget[] getBestTarget() {
+  public PhotonTrackedTarget[] getBestTag() {
     return Stream.of(frontCam, backCam)
         .map(PhotonCamera::getLatestResult)
-        .filter(PhotonPipelineResult::hasTargets)
+        .filter(target -> target.hasTargets() == true)
         .map(PhotonPipelineResult::getBestTarget)
+        .filter(target -> target.getFiducialId() != -1)
         .toArray(PhotonTrackedTarget[]::new);
   }
 
