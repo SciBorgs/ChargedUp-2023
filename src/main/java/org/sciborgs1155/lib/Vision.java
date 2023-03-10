@@ -148,4 +148,6 @@ public class Vision {
         .flatMap(Optional::stream)
         .toArray(EstimatedRobotPose[]::new);
   }
+
+  // TODO make public method to get targets (for scoring aligment) - might not be necessary
 }
