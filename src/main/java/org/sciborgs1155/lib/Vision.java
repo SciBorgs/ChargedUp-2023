@@ -149,5 +149,8 @@ public class Vision {
         .toArray(EstimatedRobotPose[]::new);
   }
 
-  // TODO make public method to get targets (for scoring aligment) - might not be necessary
+  /** Use hasTargets() before calling */
+  public PhotonTrackedTarget getBestTarget(PhotonCamera cam) {
+    return cam.getLatestResult().getBestTarget();
+  }
 }
