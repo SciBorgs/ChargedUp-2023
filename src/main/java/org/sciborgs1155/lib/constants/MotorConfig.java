@@ -1,4 +1,4 @@
-package org.sciborgs1155.lib;
+package org.sciborgs1155.lib.constants;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -26,11 +26,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
  * </pre></code>
  */
 public record MotorConfig(
-    boolean inverted,
-    NeutralBehavior neutralBehavior,
-    double openLoopRampRate,
-    int currentLimit,
-    boolean burnFlash) {
+    boolean inverted, NeutralBehavior neutralBehavior, double openLoopRampRate, int currentLimit) {
 
   public enum NeutralBehavior {
     COAST(true),
@@ -48,7 +44,7 @@ public record MotorConfig(
   }
 
   public static MotorConfig base() {
-    return new MotorConfig(false, NeutralBehavior.COAST, 0, 80, true);
+    return new MotorConfig(false, NeutralBehavior.COAST, 0, 80);
   }
 
   /**
@@ -65,7 +61,6 @@ public record MotorConfig(
     motor.setIdleMode(neutralBehavior.getREV());
     motor.setOpenLoopRampRate(openLoopRampRate);
     motor.setSmartCurrentLimit(currentLimit);
-    if (burnFlash) motor.burnFlash();
     return motor;
   }
 
@@ -93,22 +88,18 @@ public record MotorConfig(
   }
 
   public MotorConfig withInvert(boolean inverted) {
-    return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
+    return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit);
   }
 
   public MotorConfig withNeutralBehavior(NeutralBehavior neutralBehavior) {
-    return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
+    return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit);
   }
 
   public MotorConfig withOpenLoopRampRate(double openLoopRampRate) {
-    return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
+    return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit);
   }
 
   public MotorConfig withCurrentLimit(int currentLimit) {
-    return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
-  }
-
-  public MotorConfig withBurnFlash(boolean burnFlash) {
-    return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit, burnFlash);
+    return new MotorConfig(inverted, neutralBehavior, openLoopRampRate, currentLimit);
   }
 }

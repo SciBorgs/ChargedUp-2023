@@ -9,6 +9,7 @@ optimization/lib*
 # log files
 *.wpilog
 
+
 ### C++ ###
 # Prerequisites
 *.d
@@ -152,6 +153,8 @@ gradle-app.setting
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
+!photonvision-settings960x544.zip
+!photonvision-settings960x544atomic.zip
 
 # Cache of project
 .gradletasknamecache

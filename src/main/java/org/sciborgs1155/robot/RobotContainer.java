@@ -53,7 +53,10 @@ public class RobotContainer {
   }
 
   private void configureSubsystemDefaults() {
-    drive.setDefaultCommand(drive.drive(xbox, true));
+    drive.setDefaultCommand(
+        drive.drive(
+            () -> -xbox.getLeftX(), () -> -leftJoystick.getX(), () -> -rightJoystick.getY(), true));
+    // arm.setDefaultCommand(arm.setVoltage(() -> xbox.getRightY() * 3, () -> xbox.getLeftY() * 3));
   }
 
   /**
@@ -75,7 +78,24 @@ public class RobotContainer {
     // cancelling on release.
     // xbox.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
     rightJoystick.trigger().onTrue(intake.start(false)).onFalse(intake.stop());
-    rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
+    // rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
+
+    xbox.a().onTrue(elevator.setGoal(0.3));
+    xbox.b().onTrue(elevator.setGoal(0));
+    xbox.x().onTrue(intake.start(false)).onFalse(intake.stop());
+    xbox.y().onTrue(intake.start(true)).onFalse(intake.stop());
+
+    // xbox.povLeft().onTrue(arm.setElbowGoal(new State(0, 0)));
+    // xbox.povUp().onTrue(arm.setElbowGoal(new State(1.57, 0)));
+    // xbox.povRight().onTrue(arm.setElbowGoal(new State(3.14, 0)));
+
+    // xbox.povUp().onTrue(arm.set)
+
+    // xbox.povUp().onTrue(arm.setGoals(Rotation2d.fromDegrees(5), Rotation2d.fromDegrees(0)));
+    // xbox.povDown().onTrue(arm.setGoals(Rotation2d.fromDegrees(-5), Rotation2d.fromDegrees(0)));
+    // xbox.p.onTrue(arm.setVoltage(3)).onFalse(arm.setVoltage(0));
+    // xbox.povDownovUp()().onTrue(arm.setVoltage(-3)).onFalse(arm.setVoltage(0));
+
   }
 
   /**
@@ -84,6 +104,9 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    // return drive.follow("PRAY", true, true);
     return autos.get();
+    // return arm.setElbowGoal(new TrapezoidProfile.State(0.75 * Math.PI, 0));
+    // return autos.get();
   }
 }
