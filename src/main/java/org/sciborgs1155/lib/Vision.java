@@ -17,6 +17,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.SimVisionSystem;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.sciborgs1155.robot.Robot;
 
@@ -150,7 +151,10 @@ public class Vision {
   }
 
   /** Use hasTargets() before calling */
-  public PhotonTrackedTarget getBestTarget(PhotonCamera cam) {
-    return cam.getLatestResult().getBestTarget();
+  public PhotonTrackedTarget[] getBestTarget() {
+    return Stream.of(frontCam, backCam)
+        .map(PhotonCamera::getLatestResult)
+        .map(PhotonPipelineResult::getBestTarget)
+        .toArray(PhotonTrackedTarget[]::new);
   }
 }
