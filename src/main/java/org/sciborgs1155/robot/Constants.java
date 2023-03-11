@@ -110,11 +110,11 @@ public final class Constants {
       public static final Conversion CONVERSION =
           Conversion.base().withUnits(Conversion.Units.RADIANS);
 
-      public static final PIDConstants PID = new PIDConstants(4, 0, 0.1); // p: 6.1297, d: 0.8453
+      public static final PIDConstants PID = new PIDConstants(9, 0, 0.6); // p: 6.1297, d: 0.8453
       public static final SystemConstants FF =
-          new SystemConstants(0.1542, 0.53127, 0.87884, 0.038046);
+          new SystemConstants(0.1542, 0.6, 0.91, 0.038046); // v =  0.87884 
 
-      public static final Constraints CONSTRAINTS = new Constraints(1.2, 0.6);
+      public static final Constraints CONSTRAINTS = new Constraints(1.4, 1.3);
     }
 
     public static final class Elbow {
@@ -132,7 +132,7 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
-      public static final Constraints CONSTRAINTS = new Constraints(1.3, 0.75);
+      public static final Constraints CONSTRAINTS = new Constraints(1.5, 1.2);
       public static final double ELBOW_OFFSET = -1.248660;
     }
   }
@@ -228,7 +228,7 @@ public final class Constants {
 
   public static final class Positions {
     // tested
-    public static final PlacementState STOW = PlacementState.fromRelative(0, 2.467, Math.PI / 2.0);
+    public static final PlacementState STOW = PlacementState.fromRelative(0, 2.467 + Elbow.ELBOW_OFFSET, Math.PI / 2.0);
     public static final PlacementState BACK_HIGH_CONE =
         PlacementState.fromAbsolute(0.521769, 3.04, 2.74);
     public static final PlacementState FRONT_INTAKE =
