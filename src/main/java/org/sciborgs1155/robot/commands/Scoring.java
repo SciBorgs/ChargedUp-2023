@@ -57,7 +57,7 @@ public class Scoring {
   }
 
   // TODO make it take gamePiece into account
-  public Command odometryAlign(Side side, Color color) {
+  public Command odometryAlign(Side side, Alliance color) {
     return drive.driveToPose(closestScoringPoint(side, color));
   }
 
@@ -65,7 +65,7 @@ public class Scoring {
 
   // TODO vision alignment
 
-  private Pose2d closestScoringPoint(Side side, Color color) {
+  private Pose2d closestScoringPoint(Side side, Alliance color) {
     Collection<Translation2d> scoringPoints = Field.SCORING_POINTS.values();
     Translation2d point =
         drive
@@ -98,7 +98,7 @@ public class Scoring {
     }
   }
 
-  public enum Color {
+  public enum Alliance {
     RED,
     BLUE;
 
