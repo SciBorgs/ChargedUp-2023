@@ -125,10 +125,7 @@ public class Scoring {
       case CONE:
         switch (height) {
           case HIGH:
-            switch (side) {
-              case BACK:
-                return Positions.BACK_HIGH_CONE;
-            }
+            return Positions.BACK_HIGH_CONE;
           case MID:
             switch (side) {
               case FRONT:
