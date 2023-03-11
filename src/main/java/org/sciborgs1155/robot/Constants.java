@@ -112,7 +112,7 @@ public final class Constants {
 
       public static final PIDConstants PID = new PIDConstants(9, 0, 0.6); // p: 6.1297, d: 0.8453
       public static final SystemConstants FF =
-          new SystemConstants(0.1542, 0.6, 0.91, 0.038046); // v =  0.87884 
+          new SystemConstants(0.1542, 0.6, 0.91, 0.038046); // v =  0.87884
 
       public static final Constraints CONSTRAINTS = new Constraints(1.4, 1.3);
     }
@@ -231,7 +231,8 @@ public final class Constants {
 
   public static final class Positions {
     // tested
-    public static final PlacementState STOW = PlacementState.fromRelative(0, 2.467 + Elbow.ELBOW_OFFSET, Math.PI / 2.0);
+    public static final PlacementState STOW =
+        PlacementState.fromRelative(0, 2.467 + Elbow.ELBOW_OFFSET, Math.PI / 2.0);
     public static final PlacementState BACK_HIGH_CONE =
         PlacementState.fromAbsolute(0.521769, 3.04, 2.74);
     public static final PlacementState FRONT_INTAKE =
