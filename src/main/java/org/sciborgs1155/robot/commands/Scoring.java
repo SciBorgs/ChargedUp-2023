@@ -125,10 +125,7 @@ public class Scoring {
       case CONE:
         switch (height) {
           case HIGH:
-            switch (side) {
-              case BACK:
-                return Positions.BACK_HIGH_CONE;
-            }
+            return Positions.BACK_HIGH_CONE;
           case MID:
             switch (side) {
               case FRONT:
@@ -169,8 +166,9 @@ public class Scoring {
             + side);
   }
 
+  // we probably don't need this
   public static PlacementState intakeState(GamePiece gamePiece, Side side) {
-    // TODO make this and the intake state constants actually correct
+    // TODO either get rid of this or make it actually correct
     switch (side) {
       case BACK:
         return Positions.BACK_INTAKE;
