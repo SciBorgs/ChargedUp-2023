@@ -51,9 +51,9 @@ public class Scoring {
 
   // not sure if this is more helpful
   public Command toggleGamePiece() {
-    return gamePiece == GamePiece.CONE ? 
-              setGamePiece(GamePiece.CUBE) :
-              setGamePiece(GamePiece.CONE);
+    return gamePiece == GamePiece.CONE
+        ? setGamePiece(GamePiece.CUBE)
+        : setGamePiece(GamePiece.CONE);
   }
 
   // TODO make it take gamePiece into account
