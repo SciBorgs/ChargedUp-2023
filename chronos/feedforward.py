@@ -81,15 +81,17 @@ class PlacementFeedforward:
     _elbow: JointConfig
     _wrist: JointConfig
 
+    # position: (height (m), elbow (rad), wrist (rad))
+
     def __init__(self, elevator: LiftConfig, elbow: JointConfig, wrist: JointConfig):
         self._elevator = elevator
         self._elbow = elbow
         self._wrist = wrist
 
     def calculate(self, position, velocity, acceleration):
-        M = [[0, 0], [0, 0]]
-        C = [[0, 0], [0, 0]]
-        Tg = [0, 0]
+        M = [[0, 0], [0, 0], [0, 0]]
+        C = [[0, 0], [0, 0], [0, 0]]
+        Tg = [0, 0, 0]
 
         M[0][0] = (
             self._shoulder.mass * (self._shoulder.cgRadius**2.0)
@@ -174,3 +176,30 @@ class PlacementFeedforward:
             self._shoulder.motor.getVoltage(torque[0], velocity[0]),
             self._elbow.motor.getVoltage(torque[1], velocity[1]),
         )
+    
+    def gravity(self, pos):
+        '''
+        Gravity vector for this system: gravity for elevator, torque for elbow and wrist
+        '''
+        g = [0, 0, 0]
+
+        g[0] = (
+            self._g * (self._elevator.mass + self._elbow.mass + self._wrist.mass)
+        )
+
+        g[2] = (
+            self._elbow.mass
+            * self._elbow.cgRadius
+            * self._g
+            * cos(pos[1] + pos[2])
+        )
+    
+        g[1] = (
+            self._elbow.mass * self._elbow.cgRadius
+            + self._wrist.mass * self._elbow.length
+        ) * self._g * cos(
+            pos[1]
+        ) + g[2]
+
+        return g
+        
