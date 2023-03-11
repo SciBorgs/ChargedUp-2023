@@ -103,6 +103,22 @@ public class Vision {
     }
   }
 
+  /* Gets estimated pose from vision measurements */
+  public EstimatedRobotPose[] getPoseEstimates(Pose2d lastPose) {
+    frontEstimator.setReferencePose(lastPose);
+    backEstimator.setReferencePose(lastPose);
+
+    if (mode == Mode.SIM) {
+      simFront.processFrame(lastPose);
+      simBack.processFrame(lastPose);
+    }
+
+    return Stream.of(frontEstimator, backEstimator)
+        .map(PhotonPoseEstimator::update)
+        .flatMap(Optional::stream)
+        .toArray(EstimatedRobotPose[]::new);
+  }
+
   private double[] createObjects(Pose3d[] scopeTags) {
     double[] data = new double[scopeTags.length * 7];
     for (int i = 0; i < scopeTags.length; i++) {
@@ -134,22 +150,6 @@ public class Vision {
         "visible back tags", createObjects(determineSeenTags(backCam, layout)));
   }
 
-  /* Gets estimated pose from vision measurements */
-  public EstimatedRobotPose[] getPoseEstimates(Pose2d lastPose) {
-    frontEstimator.setReferencePose(lastPose);
-    backEstimator.setReferencePose(lastPose);
-
-    if (mode == Mode.SIM) {
-      simFront.processFrame(lastPose);
-      simBack.processFrame(lastPose);
-    }
-
-    return Stream.of(frontEstimator, backEstimator)
-        .map(PhotonPoseEstimator::update)
-        .flatMap(Optional::stream)
-        .toArray(EstimatedRobotPose[]::new);
-  }
-
   /** Gets best target from each camera */
   public PhotonTrackedTarget[] getBestTag() {
     return Stream.of(frontCam, backCam)
@@ -160,15 +160,41 @@ public class Vision {
         .toArray(PhotonTrackedTarget[]::new);
   }
 
-  //   /** Checks if target is a fiducial target */
-  //   public Optional<Pose3d> checkFiducial(PhotonTrackedTarget[] targets) {
-  //     for (target:targets) {
+  /** Return tag pose given ID, returns empty if ID is tag is not on field (>8) */
+  public Optional<Pose3d> getTagPose(int ID) {
+    return layout.getTagPose(ID);
+  }
 
-  //     if (targets.getFiducialId() != 1) {
-  //       return layout.getTagPose(targets.getFiducialId());
-  //     } else {
-  //       return Optional.empty();
-  //     }
-  //   }
-  // }
+  public Optional<Pose3d> getTagPose(PhotonTrackedTarget target) {
+    return getTagPose(target.getFiducialId());
+  }
+
+  private double calculateDifference(Pose3d x, Pose3d y) {
+    return x.getTranslation().getDistance(y.getTranslation());
+  }
+
+  /**
+   * Compares the distance between two transformations given an array of size 2; intended for use
+   * with getBestTag() in alignment
+   *
+   * @return The tag closest to the robot
+   */
+  public PhotonTrackedTarget compareTags(PhotonTrackedTarget[] targets) {
+    switch (targets.length) {
+      case 1:
+        return targets[0];
+      case 2:
+        double frontCamTrans =
+            calculateDifference(getTagPose(targets[0]).get(), getRobotTranslation(targets[0]));
+        double backCamTrans =
+            calculateDifference(getTagPose(targets[1]).get(), getRobotTranslation(targets[1]));
+        return (frontCamTrans < backCamTrans) ? targets[0] : targets[1];
+      default:
+        throw new IllegalArgumentException("This literally shouldn't happen yell at me if it does");
+    }
+  }
+
+  public Pose3d getRobotTranslation(PhotonTrackedTarget target) {
+    return getTagPose(target).get().plus(target.getBestCameraToTarget().inverse());
+  }
 }

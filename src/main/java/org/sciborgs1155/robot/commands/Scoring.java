@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.photonvision.targeting.PhotonTrackedTarget;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
@@ -43,12 +44,45 @@ public class Scoring {
     return drive.driveToPose(closestScoringPoint(side, color));
   }
 
-  // TODO make commands to go to the next scoring poses to the left and right
-  // public Pose2d changeScoringTarget(Side side, Color color) {
-  //   if (vision.checkFiducial(vision.getBestTarget()) != null) {
+  public Command shiftScoringNode(Side side, Color color, Direction direction) {
+    return drive.driveToPose(shiftScoringTarget(side, color, direction));
+  }
 
-  //   }
-  // }
+  // TODO msomebody pleasse make this look presentable
+  private Pose2d shiftScoringTarget(Side side, Color color, Direction direction) {
+    ArrayList<Translation2d> scoringPoints =
+        new ArrayList<>(List.copyOf(Constants.Field.SCORING_POINTS.values()));
+    PhotonTrackedTarget[] tags = vision.getBestTag();
+    PhotonTrackedTarget closestID = vision.compareTags(tags);
+    Translation2d closest2 = new Translation2d();
+    Translation2d closest3 = new Translation2d();
+    Translation2d robotTrans = new Translation2d();
+    var tagPose = vision.getTagPose(closestID).get();
+    Translation2d robotPos =
+        tagPose.transformBy(closestID.getBestCameraToTarget()).toPose2d().getTranslation();
+    // unnecessary but just in case
+    Translation2d point = tagPose.getTranslation().toTranslation2d().nearest(scoringPoints);
+
+    scoringPoints.remove(point);
+
+    for (Translation2d tag : scoringPoints) {
+      double distance = tag.getDistance(robotPos);
+      if (distance < robotPos.getDistance(closest2)) {
+        closest2 = tag;
+      } else if (distance <= robotPos.getDistance(closest3)) {
+        closest3 = tag;
+      }
+    }
+    // relative to driver direction, works because of iteration order
+    switch (direction) {
+      case LEFT:
+        robotTrans = closest3;
+      case RIGHT:
+        robotTrans = closest2;
+    }
+    double rotationRad = (side.rads() + color.rads()) % (2 * Math.PI);
+    return new Pose2d(robotTrans, Rotation2d.fromRadians(rotationRad));
+  }
   // TODO vision alignment
 
   private Pose2d closestScoringPoint(Side side, Color color) {
@@ -60,6 +94,11 @@ public class Scoring {
             .nearest(new ArrayList<Translation2d>(List.copyOf(scoringPoints)));
     double rotationRad = (side.rads() + color.rads()) % (2 * Math.PI);
     return new Pose2d(point, Rotation2d.fromRadians(rotationRad));
+  }
+
+  public enum Direction {
+    LEFT,
+    RIGHT;
   }
 
   public enum Side {
