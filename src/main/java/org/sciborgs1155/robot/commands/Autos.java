@@ -1,86 +1,79 @@
 package org.sciborgs1155.robot.commands;
 
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPoint;
+import edu.wpi.first.math.controller.BangBangController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import java.util.ArrayList;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import org.sciborgs1155.lib.Vision;
-import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.Drive;
+import org.sciborgs1155.robot.subsystems.Intake;
 
-public final class Autos implements Sendable {
+public class Autos implements Loggable {
+  @Log private final SendableChooser<Command> autoChooser;
 
   private final Drive drive;
+  private final Placement placement;
   private final Vision vision;
-  private final SendableChooser<Command> chooser;
+  private final Intake intake;
 
-  public Autos(Drive drive, Vision vision) {
+  public Autos(Drive drive, Placement placement, Vision vision, Intake intake) {
     this.drive = drive;
     this.vision = vision;
-    chooser = new SendableChooser<>();
-    chooser.setDefaultOption("mobility", mobility());
-    chooser.addOption("other", drive.follow("New Path", true, false));
+    this.intake = intake;
+    this.placement = placement;
+
+    autoChooser = new SendableChooser<Command>();
+    autoChooser.setDefaultOption("simple drive", simpleDrive());
+    autoChooser.addOption("meandering drive", meanderingDrive());
+    autoChooser.addOption("balance", balance());
+    autoChooser.addOption("goofy", goofy());
+    autoChooser.addOption("goofyApp", goofyApp());
   }
 
+  private Command simpleDrive() {
+    Pose2d end = new Pose2d(1, 5, Rotation2d.fromDegrees(0));
+    return drive
+        .driveToPose(end)
+        .andThen(drive.driveToPose(end, new Pose2d(0, 0, Rotation2d.fromDegrees(0))));
+  }
+
+  private Command meanderingDrive() {
+    Pose2d transitionPose = new Pose2d(15, 7, Rotation2d.fromDegrees(0));
+    List<Pose2d> poses =
+        List.of(
+            new Pose2d(7, 2, Rotation2d.fromDegrees(0)),
+            new Pose2d(7, 7, Rotation2d.fromDegrees(75)),
+            transitionPose);
+    Pose2d endPose = new Pose2d(1, 7, Rotation2d.fromDegrees(20));
+    return drive.driveToPoses(poses).andThen(drive.driveToPose(transitionPose, endPose));
+  }
+
+  private Command balance() {
+    double tolerance = 5;
+    BangBangController balance = new BangBangController(tolerance);
+    return Commands.run(() -> drive.drive(balance.calculate(drive.getPitch(), 0), 0, 0, true));
+  }
+
+  private Command goofy() {
+    drive.resetOdometry(new Pose2d(1, 3, Rotation2d.fromDegrees(0)));
+    return drive.driveToPoses(
+        List.of(
+            new Pose2d(1.87, 3.79, Rotation2d.fromDegrees(180)),
+            new Pose2d(2.84, 4.76, Rotation2d.fromDegrees(0)),
+            new Pose2d(2.05, 1.99, Rotation2d.fromDegrees(180))));
+  }
+
+  private Command goofyApp() {
+    return drive.follow("goofy", true, false);
+  }
+
+  /** returns currently selected auto command */
   public Command get() {
-    return chooser.getSelected();
-  }
-
-  private Command mobility() {
-    return Commands.run(() -> drive.drive(0.5, 0, 0, false), drive).withTimeout(5);
-  }
-
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    chooser.initSendable(builder);
-  }
-
-  // public Command cameraAlignment() {
-
-  //   var result = cam.getLatestResult();
-  //   PhotonTrackedTarget target = result.getBestTarget();
-  //   Transform3d bestCameraToTarget = target.getBestCameraToTarget();
-  //   double xp = bestCameraToTarget.getX();
-  //   double yp = bestCameraToTarget.getY();
-  //   double currentX = odometry.getEstimatedPosition().getX();
-  //   double currentY = odometry.getEstimatedPosition().getY();
-  //   double xpole = xp + currentX;
-  //   double ypole = yp + currentY;
-  //   return align(xpole, ypole);
-  // }
-  // public Command align(double xpole, double ypole) {
-  //   PathPlannerTrajectory trajectory;
-  //   return Commands.run(
-  //     () -> drive.follow(PathPlannerTrajectory trajectory));
-  // }
-
-  public List<PathPoint> generatePointList(double xpole, double ypole) {
-    Translation2d pointPosition = new Translation2d(xpole, ypole);
-    PathPoint polePoint = new PathPoint(pointPosition, new Rotation2d(0), new Rotation2d(0), 0);
-    List<PathPoint> pointList = new ArrayList<PathPoint>();
-    pointList.add(polePoint);
-    return pointList;
-  }
-
-  public PathPlannerTrajectory generateTrajectory(double xpole, double ypole) {
-    PathConstraints trajectoryConstraints =
-        new PathConstraints(Constants.Auto.MAX_SPEED, Constants.Auto.MAX_ACCEL);
-    PathPlannerTrajectory trajectory =
-        PathPlanner.generatePath(trajectoryConstraints, generatePointList(xpole, ypole));
-    return trajectory;
-  }
-
-  public Command align(double xpole, double ypole) {
-    PathPlannerTrajectory trajectory = generateTrajectory(xpole, ypole);
-    return drive.follow(trajectory, false, false);
+    return autoChooser.getSelected();
   }
 }

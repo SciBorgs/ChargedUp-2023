@@ -1,6 +1,11 @@
 {
   "HALProvider": {
     "Other Devices": {
+      "ADIS16470[0]": {
+        "header": {
+          "open": true
+        }
+      },
       "Pigeon IMU[2]": {
         "header": {
           "open": true
@@ -20,6 +25,8 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/LiveWindow/Drive": "Subsystem",
+      "/LiveWindow/Ungrouped/DigitalInput[7]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[8]": "Digital Input",
       "/LiveWindow/Ungrouped/PIDController[10]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[11]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
@@ -33,8 +40,12 @@
       "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
       "/LiveWindow/Ungrouped/Pigeon IMU [2]": "Gyro",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
+      "/Shuffleboard/Autos/Drive/field2d": "Field2d",
+      "/Shuffleboard/Autos/Drive/imu": "Gyro",
+      "/Shuffleboard/Autos/autoChooser": "String Chooser",
       "/Shuffleboard/Drive/field2d": "Field2d",
       "/Shuffleboard/Drive/gyro": "Gyro",
+      "/Shuffleboard/Drive/imu": "Gyro",
       "/Shuffleboard/Drivetrain/gyro": "Gyro",
       "/Shuffleboard/Elevator/limitSwitchOne": "Digital Input",
       "/Shuffleboard/Elevator/limitSwitchTwo": "Digital Input",
@@ -48,6 +59,11 @@
       "/SmartDashboard/photonvision Sim Field": "Field2d"
     },
     "windows": {
+      "/Shuffleboard/Autos/autoChooser": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Shuffleboard/Drive/field2d": {
         "Cam Est Pose": {
           "color": [
@@ -257,17 +273,7 @@
           "visible": true
         }
       },
-      "/Shuffleboard/RobotContainer/autos": {
-        "window": {
-          "visible": true
-        }
-      },
       "/Shuffleboard/RobotContainer/visualizer": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/backCam Sim Field": {
         "window": {
           "visible": true
         }
@@ -295,11 +301,6 @@
           "visible": true
         }
       },
-      "/SmartDashboard/frontCam Sim Field": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/frontPhotonVision Sim Field": {
         "frontPhotonVision Camera": {
           "arrowColor": [
@@ -319,11 +320,6 @@
           "length": 0.4099999964237213,
           "width": 0.30000001192092896
         },
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/photonvision Sim Field": {
         "window": {
           "visible": true
         }
@@ -356,6 +352,15 @@
         },
         "Drive": {
           "gyro": {
+            "open": true
+          },
+          "moduleDrivePID": {
+            "open": true
+          },
+          "moduleTurnPID": {
+            "open": true
+          },
+          "rearLeft": {
             "open": true
           }
         },
@@ -393,14 +398,6 @@
         },
         "open": true
       },
-      "SmartDashboard": {
-        "backPhotonVision Sim Field": {
-          "open": true
-        },
-        "frontPhotonVision Sim Field": {
-          "open": true
-        }
-      },
       "photonvision": {
         "backPhotonVision": {
           "open": true
@@ -434,7 +431,7 @@
               "autoFit": true
             }
           ],
-          "height": 295,
+          "height": 8,
           "series": [
             {
               "color": [
@@ -458,7 +455,8 @@
         }
       ],
       "window": {
-        "name": "angle"
+        "name": "angle",
+        "visible": false
       }
     },
     "Plot <1>": {
@@ -469,7 +467,7 @@
               "autoFit": true
             }
           ],
-          "height": 295,
+          "height": 248,
           "series": [
             {
               "color": [

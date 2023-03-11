@@ -8,11 +8,13 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,23 +24,27 @@ import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
-import org.sciborgs1155.robot.Constants.Motors;
 
 public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log(name = "applied output", methodName = "getAppliedOutput")
-  private final CANSparkMax lead = Motors.ELEVATOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
+  private final CANSparkMax lead = MOTOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
 
-  private final CANSparkMax left = Motors.ELEVATOR.build(MotorType.kBrushless, LEFT_MOTOR);
-  private final CANSparkMax right = Motors.ELEVATOR.build(MotorType.kBrushless, RIGHT_MOTOR);
+  private final CANSparkMax left = MOTOR.build(MotorType.kBrushless, LEFT_MOTOR);
+  private final CANSparkMax right = MOTOR.build(MotorType.kBrushless, RIGHT_MOTOR);
 
-  // @Log(name = "distance", methodName = "getDistance")
   @Log private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1]);
   private final EncoderSim simEncoder = new EncoderSim(encoder);
 
-  private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
+  private final ElevatorFeedforward ff = new ElevatorFeedforward(FF.s(), FF.g(), FF.v(), FF.a());
 
-  @Log private final ProfiledPIDController pid = new ProfiledPIDController(kP, kI, kD, CONSTRAINTS);
+  private final LinearFilter filter = LinearFilter.movingAverage(SAMPLE_SIZE_TAPS);
+
+  @Log private Boolean hasSpiked = false;
+
+  @Log
+  private final ProfiledPIDController pid =
+      new ProfiledPIDController(PID.p(), PID.i(), PID.d(), CONSTRAINTS);
 
   @Log(name = "acceleration", methodName = "getLastOutput")
   private final Derivative accel = new Derivative();
@@ -46,9 +52,9 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   private final ElevatorSim sim =
       new ElevatorSim(
           DCMotor.getNEO(3),
-          CONVERSION,
-          Dimensions.ELEVATOR_MASS,
-          SPROCKET_RADIUS,
+          CONVERSION.gearing(),
+          Dimensions.ELEVATOR_MASS + Dimensions.FOREARM_MASS + Dimensions.CLAW_MASS,
+          CONVERSION.units(),
           Dimensions.ELEVATOR_MIN_HEIGHT,
           Dimensions.ELEVATOR_MAX_HEIGHT,
           true);
@@ -59,23 +65,30 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     left.follow(lead);
     right.follow(lead);
 
-    encoder.setDistancePerPulse(ENCODER_FACTOR);
+    encoder.setDistancePerPulse(CONVERSION.factor());
 
     lead.burnFlash();
     left.burnFlash();
     right.burnFlash();
 
     this.visualizer = visualizer;
+
+    pid.setGoal(getPosition());
   }
 
   /** Returns the height of the elevator, in meters */
   public double getPosition() {
-    return encoder.getDistance();
+    return encoder.getDistance() + OFFSET;
   }
 
   /** Returns the goal of the elevator, in meters */
   public boolean atGoal() {
     return pid.atGoal();
+  }
+
+  /** Sets the elevator's goal to a height */
+  public Command setGoal(double goal) {
+    return setGoal(new TrapezoidProfile.State(goal, 0));
   }
 
   /** Sets the elevator's goal to a {@link TrapezoidProfile.State} */
@@ -104,14 +117,23 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
     lead.setVoltage(fbOutput + ffOutput);
 
+    filter.calculate(lead.getOutputCurrent());
+
+    if (lead.getOutputCurrent() >= CURRENT_SPIKE_THRESHOLD) {
+      hasSpiked = true;
+    }
+
     visualizer.setElevator(getPosition(), pid.getGoal().position);
+
+    SmartDashboard.putNumber("setpoint", pid.getSetpoint().position);
+    SmartDashboard.putNumber("position", this.getPosition());
   }
 
   @Override
   public void simulationPeriodic() {
     sim.setInputVoltage(lead.getAppliedOutput());
     sim.update(Constants.RATE);
-    simEncoder.setDistance(sim.getPositionMeters());
+    simEncoder.setDistance(sim.getPositionMeters() - OFFSET);
     simEncoder.setRate(sim.getVelocityMetersPerSecond());
   }
 

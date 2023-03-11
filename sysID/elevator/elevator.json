@@ -8,8 +8,8 @@
   "encoder canivore name": "rio",
   "encoder type": "roboRIO quadrature",
   "encoding": false,
-  "gearing denominator": 12.0,
-  "gearing numerator": 72.0,
+  "gearing denominator": 1.0,
+  "gearing numerator": 1.0,
   "gyro": "Analog Gyro",
   "gyro canivore name": "rio",
   "gyro ctor": "0",
@@ -19,16 +19,16 @@
     "SPARK MAX (Brushless)",
     "SPARK MAX (Brushless)"
   ],
-  "number of samples per average": 20,
+  "number of samples per average": 50,
   "primary encoder inverted": false,
   "primary encoder ports": [
-    8,
-    9
+    6,
+    7
   ],
   "primary motor ports": [
-    14,
-    15,
-    16
+    24,
+    25,
+    26
   ],
   "primary motors inverted": [
     false,
