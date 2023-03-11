@@ -151,6 +151,9 @@ public final class Constants {
     public static final PIDConstants PID = new PIDConstants(45, 0, 1);
     public static final SystemConstants FF = new SystemConstants(0.20619, 0.069335, 33.25, 1.5514);
 
+    public static final int SAMPLE_SIZE_TAPS = 5;
+    public static final int CURRENT_SPIKE_THRESHOLD = 3;
+
     public static final Constraints CONSTRAINTS = new Constraints(1, 1);
 
     public static final double OFFSET = 0.618420;
