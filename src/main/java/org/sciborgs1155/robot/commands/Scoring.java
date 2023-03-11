@@ -20,6 +20,8 @@ public class Scoring {
   private final Placement placement;
   private final Vision vision;
 
+  private GamePiece gamePiece;
+
   public Scoring(Drive drive, Placement placement, Intake intake, Vision vision) {
     this.intake = intake;
     this.drive = drive;
@@ -27,7 +29,11 @@ public class Scoring {
     this.vision = vision;
   }
 
-  public Command score(GamePiece gamePiece, ScoringHeight height, Side side) {
+  public Command score(ScoringHeight height, Side side) {
+    return score(gamePiece, height, side);
+  }
+
+  private Command score(GamePiece gamePiece, ScoringHeight height, Side side) {
     if (height == ScoringHeight.HIGH && side == Side.FRONT && gamePiece == GamePiece.CONE) {
       throw new RuntimeException("cannot score a cone high in the front");
     }
@@ -36,6 +42,18 @@ public class Scoring {
         .andThen(intake.start(true))
         .andThen(Commands.waitSeconds(3))
         .andThen(intake.stop());
+  }
+
+  // TODO leds!
+  public Command setGamePiece(GamePiece gamePiece) {
+    return Commands.runOnce(() -> this.gamePiece = gamePiece);
+  }
+
+  // not sure if this is more helpful
+  public Command toggleGamePiece() {
+    return gamePiece == GamePiece.CONE ? 
+              setGamePiece(GamePiece.CUBE) :
+              setGamePiece(GamePiece.CONE);
   }
 
   // TODO make it take gamePiece into account
