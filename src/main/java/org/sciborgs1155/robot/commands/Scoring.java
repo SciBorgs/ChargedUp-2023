@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import org.sciborgs1155.lib.PlacementState;
 import org.sciborgs1155.lib.Vision;
-import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.Constants.*;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 
@@ -28,8 +28,8 @@ public class Scoring {
   }
 
   public Command score(GamePiece gamePiece, ScoringHeight height, Side side) {
-    if (height == ScoringHeight.HIGH && side == Side.BACK) {
-      throw new RuntimeException("cannot score high in the back");
+    if (height == ScoringHeight.HIGH && side == Side.FRONT && gamePiece == GamePiece.CONE) {
+      throw new RuntimeException("cannot score a cone high in the front");
     }
     return placement
         .toState(scoringState(gamePiece, height, side))
@@ -48,7 +48,7 @@ public class Scoring {
   // TODO vision alignment
 
   private Pose2d closestScoringPoint(Side side, Color color) {
-    Collection<Translation2d> scoringPoints = Constants.Field.SCORING_POINTS.values();
+    Collection<Translation2d> scoringPoints = Field.SCORING_POINTS.values();
     Translation2d point =
         drive
             .getPose()
@@ -56,6 +56,11 @@ public class Scoring {
             .nearest(new ArrayList<Translation2d>(List.copyOf(scoringPoints)));
     double rotationRad = (side.rads() + color.rads()) % (2 * Math.PI);
     return new Pose2d(point, Rotation2d.fromRadians(rotationRad));
+  }
+
+  // TODO make it stop once intaking has occured but we need to have the voltage thing first
+  public Command intake(Side side, GamePiece gamePiece) {
+    return placement.toState(intakeState(gamePiece, side)).andThen(intake.start(false));
   }
 
   public enum Side {
@@ -99,36 +104,36 @@ public class Scoring {
           case HIGH:
             switch (side) {
               case BACK:
-                return Constants.Positions.BACK_HIGH_CONE;
+                return Positions.BACK_HIGH_CONE;
             }
           case MID:
             switch (side) {
               case FRONT:
-                return Constants.Positions.FRONT_MID_CONE;
+                return Positions.FRONT_MID_CONE;
               case BACK:
-                return Constants.Positions.BACK_MID_CONE;
+                return Positions.BACK_MID_CONE;
             }
           case LOW:
-            return Constants.Positions.BACK_LOW_CONE;
+            return Positions.BACK_LOW_CONE;
         }
       case CUBE:
         switch (height) {
           case HIGH:
             switch (side) {
               case FRONT:
-                return Constants.Positions.FRONT_HIGH_CUBE;
+                return Positions.FRONT_HIGH_CUBE;
               case BACK:
-                return Constants.Positions.BACK_HIGH_CUBE;
+                return Positions.BACK_HIGH_CUBE;
             }
           case MID:
             switch (side) {
               case FRONT:
-                return Constants.Positions.FRONT_MID_CUBE;
+                return Positions.FRONT_MID_CUBE;
               case BACK:
-                return Constants.Positions.BACK_MID_CUBE;
+                return Positions.BACK_MID_CUBE;
             }
           case LOW:
-            return Constants.Positions.BACK_LOW_CUBE;
+            return Positions.BACK_LOW_CUBE;
         }
     }
     throw new RuntimeException(
@@ -137,6 +142,22 @@ public class Scoring {
             + gamePiece
             + "; height: "
             + height
+            + "; side: "
+            + side);
+  }
+
+  public static PlacementState intakeState(GamePiece gamePiece, Side side) {
+    // TODO make this and the intake state constants actually correct
+    switch (side) {
+      case BACK:
+        return Positions.BACK_INTAKE;
+      case FRONT:
+        return Positions.FRONT_INTAKE;
+    }
+    throw new RuntimeException(
+        "intakeState was not called on a valid arguments. \n"
+            + "gamePiece: "
+            + gamePiece
             + "; side: "
             + side);
   }

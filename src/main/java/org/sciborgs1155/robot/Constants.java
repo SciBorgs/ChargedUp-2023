@@ -235,8 +235,10 @@ public final class Constants {
         PlacementState.fromAbsolute(0.44, 0.137803 + Elbow.ELBOW_OFFSET, 0.1);
     public static final PlacementState PASS_OVER =
         PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0);
+
     // untested
 
+    // scoring
     public static final PlacementState FRONT_MID_CONE = PlacementState.fromAbsolute(0, 0.2, 0.6);
     public static final PlacementState BACK_LOW_CONE = PlacementState.fromAbsolute(0, 0.1, 0);
     public static final PlacementState BACK_MID_CONE = PlacementState.fromAbsolute(0, 0.2, 0.6);
@@ -247,6 +249,10 @@ public final class Constants {
     public static final PlacementState BACK_LOW_CUBE = PlacementState.fromAbsolute(0, 0.1, 0);
     public static final PlacementState BACK_MID_CUBE = PlacementState.fromAbsolute(0, 0.2, 0.6);
     public static final PlacementState BACK_HIGH_CUBE = PlacementState.fromAbsolute(0, 1, 1.1);
+
+    // intaking
+
+    public static final PlacementState BACK_INTAKE = PlacementState.fromAbsolute(0, 0, 0);
   }
 
   // TODO make this less horrable
