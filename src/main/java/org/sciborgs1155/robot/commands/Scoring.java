@@ -63,6 +63,11 @@ public class Scoring {
     return placement.toState(intakeState(gamePiece, side)).andThen(intake.start(false));
   }
 
+  // this might end up being the right thing to do
+  public Command intake(PlacementState intakeState) {
+    return placement.toState(intakeState).andThen(intake.start(false));
+  }
+
   public enum Side {
     BACK,
     FRONT;
