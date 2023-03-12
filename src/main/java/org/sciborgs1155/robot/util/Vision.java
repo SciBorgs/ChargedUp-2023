@@ -175,7 +175,7 @@ public class Vision {
 
   /**
    * Compares the distance between two transformations given an array of size 2; intended for use
-   * with getBestTag() in alignment
+   * with getBestTag() in alignment. ENSURE YOU CALL hasTargets() BEFORE USE
    *
    * @return The tag closest to the robot
    */

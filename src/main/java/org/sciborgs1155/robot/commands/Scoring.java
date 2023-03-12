@@ -48,39 +48,54 @@ public class Scoring {
     return drive.driveToPose(shiftScoringTarget(side, color, direction));
   }
 
-  // TODO msomebody pleasse make this look presentable
-  private Pose2d shiftScoringTarget(Side side, Color color, Direction direction) {
+  // TODO fix
+  public Pose2d shiftScoringTarget(Side side, Color color, Direction direction) {
     ArrayList<Translation2d> scoringPoints =
-        new ArrayList<>(List.copyOf(Constants.Field.SCORING_POINTS.values()));
+        new ArrayList<>(List.copyOf(Constants.Field.SCORING_TAGS.values()));
     PhotonTrackedTarget[] tags = vision.getBestTag();
-    PhotonTrackedTarget closestID = vision.compareTags(tags);
+    PhotonTrackedTarget closest = vision.compareTags(tags);
     Translation2d closest2 = new Translation2d();
     Translation2d closest3 = new Translation2d();
     Translation2d robotTrans = new Translation2d();
-    var tagPose = vision.getTagPose(closestID).get();
+    var tagPose =
+        vision.getTagPose(closest).get().toPose2d().getTranslation().nearest(scoringPoints);
     Translation2d robotPos =
-        tagPose.transformBy(closestID.getBestCameraToTarget()).toPose2d().getTranslation();
-    // unnecessary but just in case
-    Translation2d point = tagPose.getTranslation().toTranslation2d().nearest(scoringPoints);
-
-    scoringPoints.remove(point);
+        // tagPose.transformBy(closest.getBestCameraToTarget()).toPose2d().getTranslation();
+        drive.getPose().getTranslation();
+    double rotationRad = (side.rads() + color.rads()) % (2 * Math.PI);
+    scoringPoints.remove(tagPose);
 
     for (Translation2d tag : scoringPoints) {
-      double distance = tag.getDistance(robotPos);
-      if (distance < robotPos.getDistance(closest2)) {
-        closest2 = tag;
-      } else if (distance <= robotPos.getDistance(closest3)) {
-        closest3 = tag;
+      double distance = robotPos.getDistance(tag);
+      // System.out.println(robotPos.getDistance(tag));
+      if (robotPos.getDistance(tag) > 5) { // somehow this does nothing, even if val > 10
+        if (robotPos.getDistance(tag) < robotPos.getDistance(closest2)) {
+          closest2 = tag;
+          System.out.println(closest2.toString());
+        } else if (distance <= robotPos.getDistance(closest3)) {
+          // System.out.println(robotPos.getDistance(closest3));
+          closest3 = tag;
+        }
       }
+      switch (direction) { // relative to driver direction, works because of iteration order
+        case LEFT:
+          robotTrans = closest3;
+        case RIGHT:
+          robotTrans = closest2;
+      }
+
+      // Pose3d one = new Pose3d(new Translation3d(tagPose.getX(), tagPose.getY(), 0.462788), new
+      // Rotation3d());
+      // Pose3d two =
+      //     new Pose3d(new Translation3d(closest2.getX(), closest2.getY(), 0.462788), new
+      // Rotation3d());
+      // Pose3d three =
+      //     new Pose3d(new Translation3d(closest3.getX(), closest3.getY(), 0.462788), new
+      // Rotation3d());
+      //
+      // SmartDashboard.putNumberArray(
+      //     "targetable targets", vision.createObjects(new Pose3d[] {one, two, three}));
     }
-    // relative to driver direction, works because of iteration order
-    switch (direction) {
-      case LEFT:
-        robotTrans = closest3;
-      case RIGHT:
-        robotTrans = closest2;
-    }
-    double rotationRad = (side.rads() + color.rads()) % (2 * Math.PI);
     return new Pose2d(robotTrans, Rotation2d.fromRadians(rotationRad));
   }
   // TODO vision alignment
