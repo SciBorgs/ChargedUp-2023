@@ -12,6 +12,7 @@ import org.sciborgs1155.robot.Constants.Positions;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Placement;
+import org.sciborgs1155.robot.commands.Scoring;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
@@ -42,7 +43,8 @@ public class RobotContainer {
 
   // command factories
   private final Placement placement = new Placement(arm, elevator);
-  private final Autos autos = new Autos(drive, placement, vision, intake);
+  private final Scoring scoring = new Scoring(drive, placement, intake, vision);
+  private final Autos autos = new Autos(drive, placement, vision, intake, scoring);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

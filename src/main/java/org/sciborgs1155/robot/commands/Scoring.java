@@ -74,9 +74,7 @@ public class Scoring {
     }
     return placement
         .toState(scoringState(gamePiece, height, side))
-        .andThen(intake.start(true))
-        .andThen(Commands.waitSeconds(3))
-        .andThen(intake.stop());
+        .andThen(intake.outtake());
   }
 
   // TODO leds!
@@ -111,14 +109,13 @@ public class Scoring {
     return new Pose2d(point, Rotation2d.fromRadians(rotationRad));
   }
 
-  // TODO make it stop once intaking has occured but we need to have the voltage thing first
   public Command intake(Side side, GamePiece gamePiece) {
-    return placement.toState(intakeState(gamePiece, side)).andThen(intake.start(false));
+    return placement.toState(intakeState(gamePiece, side)).andThen(intake.intake());
   }
 
   // this might end up being the right thing to do
   public Command intake(PlacementState intakeState) {
-    return placement.toState(intakeState).andThen(intake.start(false));
+    return placement.toState(intakeState).andThen(intake.intake());
   }
 
   public static PlacementState scoringState(GamePiece gamePiece, ScoringHeight height, Side side) {

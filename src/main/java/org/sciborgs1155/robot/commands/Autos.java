@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
+
+import org.sciborgs1155.lib.PlacementState;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
@@ -20,12 +22,14 @@ public class Autos implements Loggable {
   private final Placement placement;
   private final Vision vision;
   private final Intake intake;
+  private final Scoring scoring;
 
-  public Autos(Drive drive, Placement placement, Vision vision, Intake intake) {
+  public Autos(Drive drive, Placement placement, Vision vision, Intake intake, Scoring scoring) {
     this.drive = drive;
     this.vision = vision;
     this.intake = intake;
     this.placement = placement;
+    this.scoring = scoring;
 
     autoChooser = new SendableChooser<Command>();
     autoChooser.setDefaultOption("simple drive", simpleDrive());
@@ -70,6 +74,15 @@ public class Autos implements Loggable {
 
   private Command goofyApp() {
     return drive.follow("goofy", true, false);
+  }
+
+  
+
+  // i kind of hate having this here but oh well
+  private Command autoIntake(PlacementState placementState) {
+    return scoring.intake(placementState)
+                  .alongWith(drive.drive(() -> 0.1, () -> 0.1, () -> 0, false))
+                  .until(intake::isHoldingItem);
   }
 
   /** returns currently selected auto command */
