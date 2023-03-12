@@ -108,15 +108,14 @@ public class Autos implements Loggable {
   // TODO jasdfhjisauhg
   /** score cube low, intake cube, score cube low, intake cube */
   private Command twoCubesLow() {
-    Pose2d scoringPose1 = new Pose2d(Field.SCORING_POINTS.get(1), Rotation2d.fromRadians(0));
+    Pose2d startingPose = new Pose2d(Field.SCORING_POINTS.get(1), Rotation2d.fromRadians(0));
     Pose2d intakePose1 = new Pose2d(Field.INTAKE_POINTS.get(1), Rotation2d.fromRadians(Math.PI));
     Pose2d scoringPose2 = new Pose2d(Field.SCORING_POINTS.get(2), Rotation2d.fromRadians(0));
     Pose2d intakePose2 = new Pose2d(Field.INTAKE_POINTS.get(2), Rotation2d.fromRadians(Math.PI));
     return scoring
         .setGamePiece(GamePiece.CUBE)
-        .andThen(drive.driveToPose(scoringPose1))
         .andThen(scoring.score(ScoringHeight.LOW, Side.FRONT))
-        .andThen(drive.driveToPose(scoringPose1, intakePose1))
+        .andThen(drive.driveToPose(startingPose, intakePose1))
         .andThen(autoIntake(Positions.BACK_INTAKE))
         .andThen(drive.driveToPose(intakePose1, scoringPose2))
         .andThen(scoring.score(ScoringHeight.LOW, Side.FRONT))
