@@ -62,6 +62,8 @@ public class Scoring {
     this.drive = drive;
     this.placement = placement;
     this.vision = vision;
+
+    this.gamePiece = GamePiece.CUBE;
   }
 
   public Command score(ScoringHeight height, Side side) {
@@ -89,7 +91,7 @@ public class Scoring {
 
   // TODO make it take gamePiece into account
   public Command odometryAlign(Side side, Alliance color) {
-    return drive.driveToPose(closestScoringPoint(side, color));
+    return drive.driveToPose(drive.getPose(), closestScoringPoint(side, color));
   }
 
   // TODO make commands to go to the next scoring poses to the left and right

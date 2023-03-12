@@ -1,5 +1,8 @@
 package org.sciborgs1155.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -13,10 +16,15 @@ import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Placement;
 import org.sciborgs1155.robot.commands.Scoring;
+import org.sciborgs1155.robot.commands.Scoring.Alliance;
+import org.sciborgs1155.robot.commands.Scoring.ScoringHeight;
+import org.sciborgs1155.robot.commands.Scoring.Side;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
+
+import com.fasterxml.jackson.databind.deser.std.FromStringDeserializer;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -115,9 +123,10 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    drive.resetOdometry(new Pose2d(3, 5, Rotation2d.fromDegrees(0)));
     // return drive.follow("PRAY", true, true);
-    return autos.get();
-    // return arm.setElbowGoal(new TrapezoidProfile.State(0.75 * Math.PI, 0));
     // return autos.get();
+    // return arm.setElbowGoal(new TrapezoidProfile.State(0.75 * Math.PI, 0));
+    return scoring.odometryAlign(Side.FRONT, Alliance.BLUE).andThen(scoring.score(ScoringHeight.LOW, Side.FRONT));
   }
 }

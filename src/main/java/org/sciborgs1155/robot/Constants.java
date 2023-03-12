@@ -261,36 +261,23 @@ public final class Constants {
 
   // TODO make this less horrable
   public static final class Field {
-    public static final Map<String, Translation2d> INTAKE_POINTS =
+    public static final Map<Integer, Translation2d> INTAKE_POINTS =
         Map.ofEntries(
-            Map.entry("B1", new Translation2d()),
-            Map.entry("B2", new Translation2d()),
-            Map.entry("B3", new Translation2d()),
-            Map.entry("B4", new Translation2d()),
-            Map.entry("R1", new Translation2d()),
-            Map.entry("R2", new Translation2d()),
-            Map.entry("R3", new Translation2d()),
-            Map.entry("R4", new Translation2d()));
+            Map.entry(1, new Translation2d(5, 2)),
+            Map.entry(2, new Translation2d(5, 3)),
+            Map.entry(3, new Translation2d(5, 4)),
+            Map.entry(4, new Translation2d(5, 5)));
 
-    public static final Map<String, Translation2d> SCORING_POINTS =
+    public static final Map<Integer, Translation2d> SCORING_POINTS =
         Map.ofEntries(
-            Map.entry("B1", new Translation2d()),
-            Map.entry("B2", new Translation2d()),
-            Map.entry("B3", new Translation2d()),
-            Map.entry("B4", new Translation2d()),
-            Map.entry("B5", new Translation2d()),
-            Map.entry("B6", new Translation2d()),
-            Map.entry("B7", new Translation2d()),
-            Map.entry("B8", new Translation2d()),
-            Map.entry("B9", new Translation2d()),
-            Map.entry("R1", new Translation2d()),
-            Map.entry("R2", new Translation2d()),
-            Map.entry("R3", new Translation2d()),
-            Map.entry("R4", new Translation2d()),
-            Map.entry("R5", new Translation2d()),
-            Map.entry("R6", new Translation2d()),
-            Map.entry("R7", new Translation2d()),
-            Map.entry("R8", new Translation2d(10, 3)),
-            Map.entry("R9", new Translation2d()));
+            Map.entry(1, new Translation2d(1, 2)),
+            Map.entry(2, new Translation2d(1, 3)),
+            Map.entry(3, new Translation2d(1, 4)),
+            Map.entry(4, new Translation2d(1, 5)),
+            Map.entry(5, new Translation2d(1, 6)),
+            Map.entry(6, new Translation2d(1, 7)),
+            Map.entry(7, new Translation2d(1, 8)),
+            Map.entry(8, new Translation2d(1, 9)),
+            Map.entry(9, new Translation2d(1, 10)));
   }
 }

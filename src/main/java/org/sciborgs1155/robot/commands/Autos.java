@@ -11,6 +11,11 @@ import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import org.sciborgs1155.lib.PlacementState;
 import org.sciborgs1155.lib.Vision;
+import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.commands.Scoring.Alliance;
+import org.sciborgs1155.robot.commands.Scoring.GamePiece;
+import org.sciborgs1155.robot.commands.Scoring.ScoringHeight;
+import org.sciborgs1155.robot.commands.Scoring.Side;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 
@@ -36,6 +41,8 @@ public class Autos implements Loggable {
     autoChooser.addOption("balance", balance());
     autoChooser.addOption("goofy", goofy());
     autoChooser.addOption("goofyApp", goofyApp());
+    autoChooser.addOption("2 cubes low", Commands.run(() -> twoCubesLow().schedule()));
+    autoChooser.addOption("score", Commands.run(() -> score()).andThen(drive.stop()));
   }
 
   private Command simpleDrive() {
@@ -81,6 +88,30 @@ public class Autos implements Loggable {
         .intake(placementState)
         .alongWith(drive.drive(() -> 0.1, () -> 0.1, () -> 0, false))
         .until(intake::isHoldingItem);
+  }
+
+  private Command score() {
+    return scoring.odometryAlign(Side.FRONT, Alliance.BLUE).andThen(
+           scoring.score(ScoringHeight.LOW, Side.FRONT));
+  }
+
+  // TODO jasdfhjisauhg
+  /** score cube low, intake cube, score cube low, intake cube */
+  private Command twoCubesLow() {
+    Pose2d scoringPose1 = new Pose2d(Constants.Field.SCORING_POINTS.get(1), Rotation2d.fromRadians(0));
+    Pose2d intakePose1 = new Pose2d(Constants.Field.INTAKE_POINTS.get(1), Rotation2d.fromRadians(Math.PI));
+    Pose2d scoringPose2 = new Pose2d(Constants.Field.SCORING_POINTS.get(2), Rotation2d.fromRadians(0));
+    Pose2d intakePose2 = new Pose2d(Constants.Field.INTAKE_POINTS.get(2), Rotation2d.fromRadians(Math.PI));
+    return
+      scoring.setGamePiece(GamePiece.CUBE).andThen(
+      drive.driveToPose(scoringPose1)).andThen(
+      scoring.score(ScoringHeight.LOW, Side.FRONT)).andThen(
+      drive.driveToPose(scoringPose1, intakePose1)).andThen(
+      autoIntake(Constants.Positions.BACK_INTAKE)).andThen(
+      drive.driveToPose(intakePose1, scoringPose2)).andThen(
+      scoring.score(ScoringHeight.LOW, Side.FRONT)).andThen(
+      drive.driveToPose(scoringPose2, intakePose2)).andThen(
+      autoIntake(Constants.Positions.BACK_INTAKE));
   }
 
   /** returns currently selected auto command */
