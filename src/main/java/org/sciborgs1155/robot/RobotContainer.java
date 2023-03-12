@@ -90,6 +90,10 @@ public class RobotContainer {
     operator.leftBumper().onTrue(intake.start(false)).onFalse(intake.stop());
     operator.rightBumper().onTrue(intake.start(true)).onFalse(intake.stop());
 
+    // TODO: not a todo but use this??
+    // operator.leftBumper().onTrue(intake.intake());
+    // operator.rightBumper().onTrue(intake.stop());
+
     // xbox.povLeft().onTrue(arm.setElbowGoal(new State(0, 0)));
     // xbox.povUp().onTrue(arm.setElbowGoal(new State(1.57, 0)));
     // xbox.povRight().onTrue(arm.setElbowGoal(new State(3.14, 0)));

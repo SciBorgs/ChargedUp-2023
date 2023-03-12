@@ -15,6 +15,29 @@ import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 
 public class Scoring {
+  public enum Color {
+    RED,
+    BLUE;
+
+    public double rads() {
+      if (this == RED) {
+        return Math.PI;
+      } else return 0;
+    }
+  }
+
+  public enum GamePiece {
+    NONE,
+    CONE,
+    CUBE
+  }
+
+  public enum ScoringHeight {
+    HIGH,
+    MID,
+    LOW
+  }
+
   private final Intake intake;
   private final Drive drive;
   private final Placement placement;
@@ -96,28 +119,6 @@ public class Scoring {
       }
       return 0;
     }
-  }
-
-  public enum Color {
-    RED,
-    BLUE;
-
-    public double rads() {
-      if (this == RED) {
-        return Math.PI;
-      } else return 0;
-    }
-  }
-
-  public enum GamePiece {
-    CONE,
-    CUBE
-  }
-
-  public enum ScoringHeight {
-    HIGH,
-    MID,
-    LOW
   }
 
   public static PlacementState scoringState(GamePiece gamePiece, ScoringHeight height, Side side) {
