@@ -1,11 +1,9 @@
 package org.sciborgs1155.robot.commands;
 
-import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
@@ -42,6 +40,7 @@ public class Autos implements Loggable {
     autoChooser.addOption("goofy", goofy());
     autoChooser.addOption("goofyApp", goofyApp());
     autoChooser.addOption("2 cubes low", twoCubesLow());
+    autoChooser.addOption("2 cubes engage", twoCubesEngage());
     autoChooser.addOption("score", highConeScore());
     autoChooser.addOption("align score", allignScore());
     autoChooser.addOption("intake", autoIntake(Positions.FRONT_INTAKE));
@@ -66,9 +65,10 @@ public class Autos implements Loggable {
   }
 
   private Command balance() {
-    double tolerance = 5;
-    BangBangController balance = new BangBangController(tolerance);
-    return Commands.run(() -> drive.drive(balance.calculate(drive.getPitch(), 0), 0, 0, true));
+    return drive
+        .drive(() -> 0.5, () -> 0, () -> 0, true)
+        .withTimeout(0.6)
+        .andThen(drive.balanceOrthogonal());
   }
 
   private Command goofy() {
@@ -121,6 +121,23 @@ public class Autos implements Loggable {
         .andThen(scoring.score(ScoringHeight.LOW, Side.FRONT))
         .andThen(drive.driveToPose(scoringPose2, intakePose2))
         .andThen(autoIntake(Positions.BACK_INTAKE));
+  }
+
+  // TODO make accurate
+  private Command twoCubesEngage() {
+    Pose2d startPose = new Pose2d(Field.SCORING_POINTS.get(1), Rotation2d.fromRadians(Math.PI));
+    Pose2d intakePose = new Pose2d(Field.INTAKE_POINTS.get(1), Rotation2d.fromRadians(Math.PI));
+    Pose2d scorePose = new Pose2d(Field.INTAKE_POINTS.get(2), Rotation2d.fromRadians(Math.PI));
+    Pose2d balancePose = new Pose2d(Field.BALANCE_POINTS.get(1), Rotation2d.fromRadians(Math.PI));
+    return scoring
+        .setGamePiece(GamePiece.CUBE)
+        .andThen(scoring.score(ScoringHeight.HIGH, Side.BACK))
+        .andThen(drive.driveToPose(startPose, intakePose))
+        .andThen(autoIntake(Positions.FRONT_INTAKE))
+        .andThen(drive.driveToPose(intakePose, scorePose))
+        .andThen(scoring.score(ScoringHeight.HIGH, Side.BACK))
+        .andThen(drive.driveToPose(scorePose, balancePose))
+        .andThen(balance());
   }
 
   /** returns currently selected auto command */
