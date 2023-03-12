@@ -41,13 +41,14 @@ public class Autos implements Loggable {
     autoChooser.addOption("balance", balance());
     autoChooser.addOption("goofy", goofy());
     autoChooser.addOption("goofyApp", goofyApp());
-    autoChooser.addOption("2 cubes low", Commands.run(() -> twoCubesLow().schedule()));
+    autoChooser.addOption("2 cubes low", twoCubesLow());
     autoChooser.addOption("score", highConeScore());
     autoChooser.addOption("align score", allignScore());
+    autoChooser.addOption("intake", autoIntake(Positions.FRONT_INTAKE));
   }
 
   private Command simpleDrive() {
-    Pose2d end = new Pose2d(1, 5, Rotation2d.fromDegrees(0));
+    Pose2d end = new Pose2d(0, 5, Rotation2d.fromDegrees(0));
     return drive
         .driveToPose(end)
         .andThen(drive.driveToPose(end, new Pose2d(0, 0, Rotation2d.fromDegrees(0))));
