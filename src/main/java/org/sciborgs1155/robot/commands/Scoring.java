@@ -114,11 +114,15 @@ public class Scoring {
   // TODO make it stop once intaking has occured but we need to have the voltage thing first
   public Command intake(Side side, GamePiece gamePiece) {
     return placement.toState(intakeState(gamePiece, side)).andThen(intake.start(false));
+    // TODO: change it to below?
+    // return placement.toState(intakeState(gamePiece, side)).andThen(intake.intake());
   }
 
   // this might end up being the right thing to do
   public Command intake(PlacementState intakeState) {
     return placement.toState(intakeState).andThen(intake.start(false));
+    // TODO: change it to below?
+    // return placement.toState(intakeState).andThen(intake.intake());
   }
 
   public static PlacementState scoringState(GamePiece gamePiece, ScoringHeight height, Side side) {

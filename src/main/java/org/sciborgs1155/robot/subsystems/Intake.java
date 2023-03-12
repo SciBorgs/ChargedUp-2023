@@ -24,7 +24,7 @@ public class Intake extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   public Command intake() {
-    return run(() -> wheels.set(WHEEL_SPEED)).until(() -> isHoldingItem()).andThen(() -> stop());
+    return run(() -> wheels.set(WHEEL_SPEED)).until(this::isHoldingItem).andThen(wheels::stopMotor);
   }
 
   public Command outtake() {
@@ -41,8 +41,8 @@ public class Intake extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   public boolean isHoldingItem() {
-    double threshold = 0.5; // TODO: Change this
-    return (wheels.getOutputCurrent() > threshold);
+    double threshold = 0.5; // TODO: Change this, probably move to constants as well?
+    return wheels.getOutputCurrent() > threshold;
   }
 
   @Override
