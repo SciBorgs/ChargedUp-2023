@@ -15,7 +15,19 @@ import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 
 public class Scoring {
-  public enum Color {
+  public enum Side {
+    BACK,
+    FRONT;
+
+    public double rads() {
+      if (this == BACK) {
+        return Math.PI;
+      }
+      return 0;
+    }
+  }
+
+  public enum Alliance {
     RED,
     BLUE;
 
@@ -80,7 +92,7 @@ public class Scoring {
   }
 
   // TODO make it take gamePiece into account
-  public Command odometryAlign(Side side, Color color) {
+  public Command odometryAlign(Side side, Alliance color) {
     return drive.driveToPose(closestScoringPoint(side, color));
   }
 
@@ -88,7 +100,7 @@ public class Scoring {
 
   // TODO vision alignment
 
-  private Pose2d closestScoringPoint(Side side, Color color) {
+  private Pose2d closestScoringPoint(Side side, Alliance color) {
     Collection<Translation2d> scoringPoints = Field.SCORING_POINTS.values();
     Translation2d point =
         drive
@@ -107,18 +119,6 @@ public class Scoring {
   // this might end up being the right thing to do
   public Command intake(PlacementState intakeState) {
     return placement.toState(intakeState).andThen(intake.start(false));
-  }
-
-  public enum Side {
-    BACK,
-    FRONT;
-
-    public double rads() {
-      if (this == BACK) {
-        return Math.PI;
-      }
-      return 0;
-    }
   }
 
   public static PlacementState scoringState(GamePiece gamePiece, ScoringHeight height, Side side) {
