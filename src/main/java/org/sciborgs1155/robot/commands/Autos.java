@@ -11,7 +11,7 @@ import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import org.sciborgs1155.lib.PlacementState;
 import org.sciborgs1155.lib.Vision;
-import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.Constants.*;
 import org.sciborgs1155.robot.commands.Scoring.Alliance;
 import org.sciborgs1155.robot.commands.Scoring.GamePiece;
 import org.sciborgs1155.robot.commands.Scoring.ScoringHeight;
@@ -42,7 +42,8 @@ public class Autos implements Loggable {
     autoChooser.addOption("goofy", goofy());
     autoChooser.addOption("goofyApp", goofyApp());
     autoChooser.addOption("2 cubes low", Commands.run(() -> twoCubesLow().schedule()));
-    autoChooser.addOption("score", Commands.run(() -> score()).andThen(drive.stop()));
+    autoChooser.addOption("score", highConeScore());
+    autoChooser.addOption("align score", allignScore());
   }
 
   private Command simpleDrive() {
@@ -90,33 +91,38 @@ public class Autos implements Loggable {
         .until(intake::isHoldingItem);
   }
 
-  private Command score() {
-    return scoring
-        .odometryAlign(Side.FRONT, Alliance.BLUE)
-        .andThen(scoring.score(ScoringHeight.LOW, Side.FRONT));
+  private Command allignScore() {
+    return scoring.setGamePiece(GamePiece.CONE)
+        .andThen(scoring.odometryAlign(Side.BACK, Alliance.BLUE))
+        .andThen(scoring.score(ScoringHeight.HIGH, Side.BACK)); 
+  }
+
+  private Command highConeScore() {
+    return scoring.setGamePiece(GamePiece.CONE).andThen(
+           scoring.score(ScoringHeight.HIGH, Side.BACK));
   }
 
   // TODO jasdfhjisauhg
   /** score cube low, intake cube, score cube low, intake cube */
   private Command twoCubesLow() {
     Pose2d scoringPose1 =
-        new Pose2d(Constants.Field.SCORING_POINTS.get(1), Rotation2d.fromRadians(0));
+        new Pose2d(Field.SCORING_POINTS.get(1), Rotation2d.fromRadians(0));
     Pose2d intakePose1 =
-        new Pose2d(Constants.Field.INTAKE_POINTS.get(1), Rotation2d.fromRadians(Math.PI));
+        new Pose2d(Field.INTAKE_POINTS.get(1), Rotation2d.fromRadians(Math.PI));
     Pose2d scoringPose2 =
-        new Pose2d(Constants.Field.SCORING_POINTS.get(2), Rotation2d.fromRadians(0));
+        new Pose2d(Field.SCORING_POINTS.get(2), Rotation2d.fromRadians(0));
     Pose2d intakePose2 =
-        new Pose2d(Constants.Field.INTAKE_POINTS.get(2), Rotation2d.fromRadians(Math.PI));
+        new Pose2d(Field.INTAKE_POINTS.get(2), Rotation2d.fromRadians(Math.PI));
     return scoring
         .setGamePiece(GamePiece.CUBE)
         .andThen(drive.driveToPose(scoringPose1))
         .andThen(scoring.score(ScoringHeight.LOW, Side.FRONT))
         .andThen(drive.driveToPose(scoringPose1, intakePose1))
-        .andThen(autoIntake(Constants.Positions.BACK_INTAKE))
+        .andThen(autoIntake(Positions.BACK_INTAKE))
         .andThen(drive.driveToPose(intakePose1, scoringPose2))
         .andThen(scoring.score(ScoringHeight.LOW, Side.FRONT))
         .andThen(drive.driveToPose(scoringPose2, intakePose2))
-        .andThen(autoIntake(Constants.Positions.BACK_INTAKE));
+        .andThen(autoIntake(Positions.BACK_INTAKE));
   }
 
   /** returns currently selected auto command */

@@ -122,10 +122,10 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     drive.resetOdometry(new Pose2d(3, 5, Rotation2d.fromDegrees(0)));
     // return drive.follow("PRAY", true, true);
-    // return autos.get();
+    return autos.get();
     // return arm.setElbowGoal(new TrapezoidProfile.State(0.75 * Math.PI, 0));
-    return scoring
-        .odometryAlign(Side.FRONT, Alliance.BLUE)
-        .andThen(scoring.score(ScoringHeight.LOW, Side.FRONT));
+    // return scoring
+    //     .odometryAlign(Side.FRONT, Alliance.BLUE)
+    //     .andThen(scoring.score(ScoringHeight.LOW, Side.FRONT));
   }
 }
