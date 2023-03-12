@@ -107,6 +107,10 @@ public class Drive extends SubsystemBase implements Loggable {
     odometry.resetPosition(getHeading(), getModulePositions(), pose);
   }
 
+  private double scale(double input) {
+    return Math.sqrt(Math.pow(Math.abs(input), 3)) * Math.signum(input);
+  }
+
   /**
    * Method to drive the robot using joystick info.
    *
@@ -116,9 +120,9 @@ public class Drive extends SubsystemBase implements Loggable {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    xSpeed = xLimiter.calculate(Math.pow(xSpeed, 2) * Math.signum(xSpeed) * MAX_SPEED);
-    ySpeed = yLimiter.calculate(Math.pow(ySpeed, 2) * Math.signum(ySpeed) * MAX_SPEED);
-    rot = Math.pow(rot, 2) * Math.signum(rot) * MAX_ANGULAR_SPEED;
+    xSpeed = xLimiter.calculate(scale(xSpeed) * MAX_SPEED);
+    ySpeed = yLimiter.calculate(scale(ySpeed) * MAX_SPEED);
+    rot = scale(rot) * MAX_ANGULAR_SPEED;
 
     var speeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
 
@@ -154,8 +158,8 @@ public class Drive extends SubsystemBase implements Loggable {
   }
 
   /** Zeroes the heading of the robot. */
-  public void zeroHeading() {
-    imu.reset();
+  public Command zeroHeading() {
+    return runOnce(imu::reset);
   }
 
   private SwerveModuleState[] getModuleStates() {

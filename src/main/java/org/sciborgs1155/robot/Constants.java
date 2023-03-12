@@ -162,9 +162,10 @@ public final class Constants {
 
   public static final class Intake {
     public static final MotorConfig MOTOR =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withInvert(true);
 
-    public static final double WHEEL_SPEED = 0.4;
+    public static final double INTAKE_SPEED = 0.4;
+    public static final double OUTTAKE_SPEED = -0.25;
   }
 
   public static final class Drive {
@@ -234,17 +235,20 @@ public final class Constants {
     // tested
     public static final PlacementState STOW =
         PlacementState.fromRelative(0, 2.467 + Elbow.ELBOW_OFFSET, Math.PI / 2.0);
+    // public static final PlacementState BACK_HIGH_CONE =
+    //     PlacementState.fromAbsolute(0.357, 3.04, 2.74);
     public static final PlacementState BACK_HIGH_CONE =
-        PlacementState.fromAbsolute(0.521769, 3.04, 2.74);
+        PlacementState.fromAbsolute(0.31, 3.034, 2.59);
     public static final PlacementState FRONT_INTAKE =
-        PlacementState.fromAbsolute(0.44, 0.137803 + Elbow.ELBOW_OFFSET, 0.1);
+        PlacementState.fromAbsolute(0.44, -0.983, -0.09);
     public static final PlacementState PASS_OVER =
         PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0);
+    public static final PlacementState FRONT_MID_CONE =
+        PlacementState.fromAbsolute(0.061612, 0.493303, 0.001378);
 
     // untested
 
     // scoring
-    public static final PlacementState FRONT_MID_CONE = PlacementState.fromAbsolute(0, 0.2, 0.6);
     public static final PlacementState BACK_LOW_CONE = PlacementState.fromAbsolute(0, 0.1, 0);
     public static final PlacementState BACK_MID_CONE = PlacementState.fromAbsolute(0, 0.2, 0.6);
 
@@ -256,8 +260,9 @@ public final class Constants {
     public static final PlacementState BACK_HIGH_CUBE = PlacementState.fromAbsolute(0, 1, 1.1);
 
     // intaking
-
     public static final PlacementState BACK_INTAKE = PlacementState.fromAbsolute(0, 0, 0);
+    public static final PlacementState SINGLE_SUBSTATION_CONE =
+        PlacementState.fromAbsolute(0.425006, 0.128855, -0.305); // wrist: -0.292673
   }
 
   // TODO make this less horrable

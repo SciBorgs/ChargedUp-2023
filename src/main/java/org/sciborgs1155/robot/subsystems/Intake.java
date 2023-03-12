@@ -14,30 +14,29 @@ import io.github.oblarg.oblog.annotations.Log;
 public class Intake extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log(name = "applied output", methodName = "getAppliedOutput")
+  @Log(name = "current", methodName = "getOutputCurrent")
   private final CANSparkMax wheels = MOTOR.build(MotorType.kBrushless, WHEEL_MOTOR);
 
   @Log(name = "velocity", methodName = "getVelocity")
   private final RelativeEncoder encoder = wheels.getEncoder();
 
-  public Command start(boolean reversed) {
-    return runOnce(() -> wheels.set(reversed ? -WHEEL_SPEED : WHEEL_SPEED));
-  }
+  @Log private double intakeSpeed = INTAKE_SPEED;
+  @Log private double outtakeSpeed = OUTTAKE_SPEED;
 
   public Command intake() {
-    return run(() -> wheels.set(WHEEL_SPEED)).until(this::isHoldingItem).andThen(wheels::stopMotor);
+    return run(() -> wheels.set(intakeSpeed)).until(this::isHoldingItem).andThen(wheels::stopMotor);
+  }
+
+  public Command intakeTmp() {
+    return run(() -> wheels.set(intakeSpeed));
   }
 
   public Command outtake() {
-    return runEnd(() -> wheels.set(-WHEEL_SPEED), wheels::stopMotor)
-        .withTimeout(3); // TODO: Change timeout
+    return run(() -> wheels.set(outtakeSpeed));
   }
 
   public Command stop() {
     return runOnce(wheels::stopMotor);
-  }
-
-  public Command run() {
-    return startEnd(() -> wheels.set(WHEEL_SPEED), wheels::stopMotor);
   }
 
   public boolean isHoldingItem() {

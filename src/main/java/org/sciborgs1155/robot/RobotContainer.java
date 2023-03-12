@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot;
 
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -83,15 +84,22 @@ public class RobotContainer {
     // rightJoystick.trigger().onTrue(intake.start(false)).onFalse(intake.stop());
     // rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
 
+    driver.b().onTrue(drive.zeroHeading());
     // xbox.a().onTrue(elevator.setGoal(0.3));
     // xbox.b().onTrue(elevator.setGoal(0));
-    operator.a().onTrue(placement.safeToState(Positions.FRONT_INTAKE));
-    operator.b().onTrue(placement.safeToState(Positions.BACK_HIGH_CONE));
-    operator.x().onTrue(placement.safeToState(Positions.STOW));
+    operator.povLeft().onTrue(placement.safeToState(Positions.FRONT_INTAKE));
+    operator.povUp().onTrue(placement.safeToState(Positions.BACK_HIGH_CONE));
+    operator.povRight().onTrue(placement.safeToState(Positions.FRONT_MID_CONE));
+    
 
-    operator.leftBumper().onTrue(intake.start(false)).onFalse(intake.stop());
-    operator.rightBumper().onTrue(intake.start(true)).onFalse(intake.stop());
-    operator.y().onTrue(elevator.setGoal(Constants.Elevator.OFFSET));
+    operator.x().onTrue(placement.safeToState(Positions.STOW));
+    operator.y().onTrue(placement.safeToState(Positions.SINGLE_SUBSTATION_CONE));
+    operator.rightStick().onTrue(arm.setWristGoal(new State(1, 0)));
+    // angery
+    // stop fucking my wires up
+    // no
+    operator.leftBumper().onTrue(intake.intakeTmp()).onFalse(intake.stop());
+    operator.rightBumper().onTrue(intake.outtake()).onFalse(intake.stop());
 
     // TODO: not a todo but use this??
     // operator.leftBumper().onTrue(intake.intake());
