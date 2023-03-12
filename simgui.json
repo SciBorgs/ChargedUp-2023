@@ -21,6 +21,27 @@
         "window": {
           "visible": true
         }
+      },
+      "/Shuffleboard/RobotContainer/visualizer": {
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "Shuffleboard": {
+        "Arm": {
+          "open": true
+        },
+        "Elevator": {
+          "open": true
+        },
+        "open": true
+      },
+      "SmartDashboard": {
+        "open": true
       }
     }
   }

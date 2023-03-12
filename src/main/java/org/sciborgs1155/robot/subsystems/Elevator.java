@@ -40,9 +40,10 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   private final LinearFilter filter = LinearFilter.movingAverage(SAMPLE_SIZE_TAPS);
 
-  @Log private Boolean hasSpiked = false;
+  @Log private boolean hasSpiked = false;
 
   @Log
+  @Log(name = "at goal", methodName = "atGoal")
   private final ProfiledPIDController pid =
       new ProfiledPIDController(PID.p(), PID.i(), PID.d(), CONSTRAINTS);
 
@@ -73,6 +74,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
     this.visualizer = visualizer;
 
+    // pid.setTolerance(0.0);
     pid.setGoal(getPosition());
   }
 
@@ -123,8 +125,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
     visualizer.setElevator(getPosition(), pid.getGoal().position);
 
-    SmartDashboard.putNumber("setpoint", pid.getSetpoint().position);
-    SmartDashboard.putNumber("position", this.getPosition());
+    SmartDashboard.putNumber("elevator position", this.getPosition());
   }
 
   @Override

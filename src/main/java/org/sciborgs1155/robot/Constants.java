@@ -110,7 +110,7 @@ public final class Constants {
       public static final Conversion CONVERSION =
           Conversion.base().withUnits(Conversion.Units.RADIANS);
 
-      public static final PIDConstants PID = new PIDConstants(9, 0, 0.6); // p: 6.1297, d: 0.8453
+      public static final PIDConstants PID = new PIDConstants(7, 0, 0.3); // p: 6.1297, d: 0.8453
       public static final SystemConstants FF =
           new SystemConstants(0.1542, 0.6, 0.91, 0.038046); // v =  0.87884
 
@@ -148,8 +148,9 @@ public final class Constants {
             .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
     // units field for sysid is 0.1143
 
-    public static final PIDConstants PID = new PIDConstants(45, 0, 1);
-    public static final SystemConstants FF = new SystemConstants(0.20619, 0.069335, 33.25, 1.5514);
+    public static final PIDConstants PID = new PIDConstants(50, 0, 1);
+    public static final SystemConstants FF = new SystemConstants(0.4, 0.069335, 33.25, 1.5514);
+    // s = 0.20619
 
     public static final int SAMPLE_SIZE_TAPS = 5;
     public static final int CURRENT_SPIKE_THRESHOLD = 3;

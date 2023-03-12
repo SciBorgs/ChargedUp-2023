@@ -91,6 +91,7 @@ public class RobotContainer {
 
     operator.leftBumper().onTrue(intake.start(false)).onFalse(intake.stop());
     operator.rightBumper().onTrue(intake.start(true)).onFalse(intake.stop());
+    operator.y().onTrue(elevator.setGoal(Constants.Elevator.OFFSET));
 
     // TODO: not a todo but use this??
     // operator.leftBumper().onTrue(intake.intake());
