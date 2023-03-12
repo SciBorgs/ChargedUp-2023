@@ -72,9 +72,7 @@ public class Scoring {
     if (height == ScoringHeight.HIGH && side == Side.FRONT && gamePiece == GamePiece.CONE) {
       throw new RuntimeException("cannot score a cone high in the front");
     }
-    return placement
-        .toState(scoringState(gamePiece, height, side))
-        .andThen(intake.outtake());
+    return placement.toState(scoringState(gamePiece, height, side)).andThen(intake.outtake());
   }
 
   // TODO leds!
