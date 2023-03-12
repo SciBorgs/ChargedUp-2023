@@ -92,27 +92,25 @@ public class Autos implements Loggable {
   }
 
   private Command allignScore() {
-    return scoring.setGamePiece(GamePiece.CONE)
+    return scoring
+        .setGamePiece(GamePiece.CONE)
         .andThen(scoring.odometryAlign(Side.BACK, Alliance.BLUE))
-        .andThen(scoring.score(ScoringHeight.HIGH, Side.BACK)); 
+        .andThen(scoring.score(ScoringHeight.HIGH, Side.BACK));
   }
 
   private Command highConeScore() {
-    return scoring.setGamePiece(GamePiece.CONE).andThen(
-           scoring.score(ScoringHeight.HIGH, Side.BACK));
+    return scoring
+        .setGamePiece(GamePiece.CONE)
+        .andThen(scoring.score(ScoringHeight.HIGH, Side.BACK));
   }
 
   // TODO jasdfhjisauhg
   /** score cube low, intake cube, score cube low, intake cube */
   private Command twoCubesLow() {
-    Pose2d scoringPose1 =
-        new Pose2d(Field.SCORING_POINTS.get(1), Rotation2d.fromRadians(0));
-    Pose2d intakePose1 =
-        new Pose2d(Field.INTAKE_POINTS.get(1), Rotation2d.fromRadians(Math.PI));
-    Pose2d scoringPose2 =
-        new Pose2d(Field.SCORING_POINTS.get(2), Rotation2d.fromRadians(0));
-    Pose2d intakePose2 =
-        new Pose2d(Field.INTAKE_POINTS.get(2), Rotation2d.fromRadians(Math.PI));
+    Pose2d scoringPose1 = new Pose2d(Field.SCORING_POINTS.get(1), Rotation2d.fromRadians(0));
+    Pose2d intakePose1 = new Pose2d(Field.INTAKE_POINTS.get(1), Rotation2d.fromRadians(Math.PI));
+    Pose2d scoringPose2 = new Pose2d(Field.SCORING_POINTS.get(2), Rotation2d.fromRadians(0));
+    Pose2d intakePose2 = new Pose2d(Field.INTAKE_POINTS.get(2), Rotation2d.fromRadians(Math.PI));
     return scoring
         .setGamePiece(GamePiece.CUBE)
         .andThen(drive.driveToPose(scoringPose1))
