@@ -94,7 +94,6 @@ public class RobotContainer {
 
     operator.x().onTrue(placement.safeToState(Positions.STOW));
     operator.y().onTrue(placement.safeToState(Positions.SINGLE_SUBSTATION_CONE));
-    operator.rightStick().onTrue(arm.setWristGoal(new State(1, 0)));
     // angery
     // stop fucking my wires up
     // no

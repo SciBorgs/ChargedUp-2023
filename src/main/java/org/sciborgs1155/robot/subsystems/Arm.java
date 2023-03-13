@@ -225,9 +225,9 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     wrist.setVoltage(wristFB + wristFF);
 
     visualizer.setElbow(
-        getElbowPosition(), Rotation2d.fromRadians(elbowFeedback.getGoal().position));
+        getElbowPosition(), Rotation2d.fromRadians(elbowFeedback.getSetpoint().position));
     visualizer.setWrist(
-        getRelativeWristPosition(), Rotation2d.fromRadians(wristFeedback.getGoal().position));
+        getRelativeWristPosition(), Rotation2d.fromRadians(wristFeedback.getSetpoint().position));
 
     SmartDashboard.putNumber("elbow angle", getElbowPosition().getRadians());
     SmartDashboard.putNumber("relative wrist angle", getRelativeWristPosition().getRadians());

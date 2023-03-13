@@ -123,7 +123,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
       hasSpiked = true;
     }
 
-    visualizer.setElevator(getPosition(), pid.getGoal().position);
+    visualizer.setElevator(getPosition(), pid.getSetpoint().position);
 
     SmartDashboard.putNumber("elevator position", this.getPosition());
   }
