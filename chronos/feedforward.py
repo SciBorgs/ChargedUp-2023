@@ -3,6 +3,8 @@
 
 from dataclasses import dataclass
 
+import math
+
 from casadi import *
 
 class DCMotor:
@@ -88,118 +90,53 @@ class PlacementFeedforward:
         self._elbow = elbow
         self._wrist = wrist
 
+    # position: [height, elbow angle, wrist angle (absolute)]
     def calculate(self, position, velocity, acceleration):
-        M = [[0, 0], [0, 0], [0, 0]]
-        C = [[0, 0], [0, 0], [0, 0]]
+        M = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+
+        M[0][1] = (self._elbow.cgRadius * self._elbow.mass + self._elbow.length * self._wrist.mass) * cos(position[1])
+        M[1][0] = (self._elbow.cgRadius * self._elbow.mass + self._elbow.length * self._wrist.mass) * cos(position[1])
+
+        M[0][2] = self._wrist.cgRadius * self._wrist.mass * cos(position[2])
+        M[2][0] = self._wrist.cgRadius * self._wrist.mass * cos(position[2])
+
+        M[1][2] = self._elbow.length * self._wrist.cgRadius * self._wrist.mass * cos(position[2] - position[1])
+        M[2][1] = self._elbow.length * self._wrist.cgRadius * self._wrist.mass * cos(position[2] - position[1])
+
+        M[0][0] = self._elevator.mass + self._elbow.mass + self._wrist.mass
+        M[1][1] = self._elbow.moi + self._wrist.mass * self._elbow.length ** 2 + self._elbow.mass * self._elbow.cgRadius ** 2
+        M[2][2] = self._wrist.moi + self._wrist.mass * self._wrist.cgRadius ** 2
+
+        C = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+
+        C[0][1] = -(self._elbow.cgRadius * self._elbow.mass + self._elbow.length * self._wrist.mass) * sin(position[1]) * velocity[1]
+        C[0][2] = -self._wrist.cgRadius * self._wrist.mass * sin(position[2]) * velocity[2]
+        C[1][2] = -self._wrist.mass * self._elbow.length * self._wrist.cgRadius * sin(position[2] - position[1]) * velocity[2]
+        C[2][1] = self._wrist.mass * self._elbow.length * self._wrist.cgRadius * sin(position[2] - position[1]) * velocity[1]
+
         Tg = [0, 0, 0]
-
-        M[0][0] = (
-            self._shoulder.mass * (self._shoulder.cgRadius**2.0)
-            + self._elbow.mass
-            * ((self._shoulder.length**2.0) + (self._elbow.cgRadius**2.0))
-            + self._shoulder.moi
-            + self._elbow.moi
-            + 2
-            * self._elbow.mass
-            * self._shoulder.length
-            * self._elbow.cgRadius
-            * cos(position[1])
-        )
-        M[1][0] = (
-            self._elbow.mass * (self._elbow.cgRadius**2)
-            + self._elbow.moi
-            + self._elbow.mass
-            * self._shoulder.length
-            * self._elbow.cgRadius
-            * cos(position[1])
-        )
-        M[0][1] = (
-            self._elbow.mass * (self._elbow.cgRadius**2)
-            + self._elbow.moi
-            + self._elbow.mass
-            * self._shoulder.length
-            * self._elbow.cgRadius
-            * cos(position[1])
-        )
-        M[1][1] = self._elbow.mass * (self._elbow.cgRadius**2) + self._elbow.moi
-
-        C[0][0] = (
-            -self._elbow.mass
-            * self._shoulder.length
-            * self._elbow.cgRadius
-            * sin(position[1])
-            * velocity[1]
-        )
-        C[1][0] = (
-            self._elbow.mass
-            * self._shoulder.length
-            * self._elbow.cgRadius
-            * sin(position[1])
-            * velocity[0]
-        )
-        C[0][1] = (
-            -self._elbow.mass
-            * self._shoulder.length
-            * self._elbow.cgRadius
-            * sin(position[1])
-            * (velocity[0] + velocity[1])
-        )
-
-        Tg[0] = (
-            self._shoulder.mass * self._shoulder.cgRadius
-            + self._elbow.mass * self._shoulder.length
-        ) * self._g * cos(
-            position[0]
-        ) + self._elbow.mass * self._elbow.cgRadius * self._g * cos(
-            position[0] + position[1]
-        )
-        Tg[1] = (
-            self._elbow.mass
-            * self._elbow.cgRadius
-            * self._g
-            * cos(position[0] + position[1])
-        )
+        
+        Tg[0] = self._g * (self._elevator.mass + self._elbow.mass + self._wrist.mass)
+        Tg[1] = self._g * (self._elbow.cgRadius * self._elbow.mass + self._elbow.length * self._wrist.mass) * cos(position[1])
+        Tg[1] = self._g * self._wrist.cgRadius * self._wrist.mass * cos(position[2])
 
         M_times_acceleration = (
-            M[0][0] * acceleration[0] + M[0][1] * acceleration[1],
-            M[1][0] * acceleration[0] + M[1][1] * acceleration[1],
+            M[0][0] * acceleration[0] + M[0][1] * acceleration[1] + M[0][2] * acceleration[2],
+            M[1][0] * acceleration[0] + M[1][1] * acceleration[1] + M[1][2] * acceleration[2],
+            M[2][0] * acceleration[0] + M[2][1] * acceleration[1] + M[2][2] * acceleration[2],
         )
         C_times_velocity = (
-            C[0][0] * velocity[0] + C[0][1] * velocity[1],
-            C[1][0] * velocity[0] + C[1][1] * velocity[1],
+            C[0][0] * velocity[0] + C[0][1] * velocity[1] + C[0][2] * velocity[2],
+            C[1][0] * velocity[0] + C[1][1] * velocity[1] + C[1][2] * velocity[2],
+            C[2][0] * velocity[0] + C[2][1] * velocity[1] + C[2][2] * velocity[2],
         )
         torque = (
             M_times_acceleration[0] + C_times_velocity[0] + Tg[0],
             M_times_acceleration[1] + C_times_velocity[1] + Tg[1],
+            M_times_acceleration[2] + C_times_velocity[2] + Tg[2],
         )
         return (
-            self._shoulder.motor.getVoltage(torque[0], velocity[0]),
+            self._elevator.motor.getVoltage(torque[0], velocity[0]),
             self._elbow.motor.getVoltage(torque[1], velocity[1]),
+            self._wrist.motor.getVoltage(torque[2], velocity[2]),
         )
-    
-    def gravity(self, pos):
-        '''
-        Gravity vector for this system: gravity for elevator, torque for elbow and wrist
-        '''
-        g = [0, 0, 0]
-
-        g[0] = (
-            self._g * (self._elevator.mass + self._elbow.mass + self._wrist.mass)
-        )
-
-        g[2] = (
-            self._elbow.mass
-            * self._elbow.cgRadius
-            * self._g
-            * cos(pos[1] + pos[2])
-        )
-    
-        g[1] = (
-            self._elbow.mass * self._elbow.cgRadius
-            + self._wrist.mass * self._elbow.length
-        ) * self._g * cos(
-            pos[1]
-        ) + g[2]
-
-        return g
-        

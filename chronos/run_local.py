@@ -1,19 +1,20 @@
 # Copyright (c) 2023 FRC 6328
 # http://github.com/Mechanical-Advantage
 
-import json
+import yaml
 from math import pi
 
 from plotter import plot
 from solver import Solver
 
 if __name__ == "__main__":
-    config = json.loads(open("src/main/deploy/arm_config.json", "r").read())
+    with open("src/main/deploy/placement_config.yaml", "r") as f:
+        config = yaml.safe_load(f)
     solver = Solver(config)
 
     request = {
-        "initial": [pi - (pi / 2.5), pi / 2],
-        "final": [pi / 2.5, 3 * pi / 2],
+        "initial": [0.2, 0, 7*pi/8],
+        "final": [0.2, pi, pi],
         "constraintOverrides": [],
     }
     result = solver.solve(request)

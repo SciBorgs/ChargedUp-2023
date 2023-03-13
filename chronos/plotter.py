@@ -14,7 +14,7 @@ def plot(result, config):
     animation_points = []
     current_time = 0
     for i in range(len(result[1])):
-        animation_points.append((current_time, result[1][i], result[2][i]))
+        animation_points.append((current_time, result[1][i], result[2][i], result[3][i]))
         current_time += dt
 
     # Set up plot
@@ -38,22 +38,25 @@ def plot(result, config):
         t = (current_time - last_point[0]) / (next_point[0] - last_point[0])
         t = 1 if t > 1 else t
         t = 0 if t < 0 else t
-        theta_1 = (next_point[1] - last_point[1]) * t + last_point[1]
-        theta_2 = (next_point[2] - last_point[2]) * t + last_point[2]
+        height = (next_point[1] - last_point[1]) * t + last_point[1]
+        theta_1 = (next_point[2] - last_point[2]) * t + last_point[2]
+        theta_2 = (next_point[3] - last_point[3]) * t + last_point[3]
 
         x = [
             config["origin"][0],
-            config["origin"][0] + config["shoulder"]["length"] * math.cos(theta_1),
+            config["origin"][0],
+            config["origin"][0] + config["elbow"]["length"] * math.cos(theta_1),
             config["origin"][0]
-            + config["shoulder"]["length"] * math.cos(theta_1)
-            + config["elbow"]["length"] * math.cos(theta_1 + theta_2),
+            + config["elbow"]["length"] * math.cos(theta_1)
+            + config["wrist"]["length"] * math.cos(theta_2),
         ]
         y = [
             config["origin"][1],
-            config["origin"][1] + config["shoulder"]["length"] * math.sin(theta_1),
-            config["origin"][1]
-            + config["shoulder"]["length"] * math.sin(theta_1)
-            + config["elbow"]["length"] * math.sin(theta_1 + theta_2),
+            config["origin"][1] + height,
+            config["origin"][1] + height + config["elbow"]["length"] * math.sin(theta_1),
+            config["origin"][1] + height
+            + config["elbow"]["length"] * math.sin(theta_1)
+            + config["wrist"]["length"] * math.sin(theta_2),
         ]
         ax.clear()
         ax.plot([-2, 2], [0, 0])

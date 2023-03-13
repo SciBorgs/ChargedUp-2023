@@ -21,36 +21,31 @@ class Solver:
 
         # Get constants from config
         n = config["solver"]["interiorPoints"]
-        max_voltage_shoulder = config["solver"]["maxVoltageShoulder"]
+        max_voltage_lift = config["solver"]["maxVoltageLift"]
         max_voltage_elbow = config["solver"]["maxVoltageElbow"]
-        max_acceleration_shoulder = config["solver"]["maxAccelerationShoulder"]
+        max_voltage_wrist = config["solver"]["maxVoltageWrist"]
+        max_acceleration_lift = config["solver"]["maxAccelerationLift"]
         max_acceleration_elbow = config["solver"]["maxAccelerationElbow"]
+        max_acceleration_wrist = config["solver"]["maxAccelerationWrist"]
         max_jerk = config["solver"]["maxJerk"]
-        elbow_cg_radius = (
-            config["elbow"]["cgRadius"] * config["elbow"]["mass"]
-            + (config["elbow"]["length"] + config["wrist"]["cgRadius"])
-            * config["wrist"]["mass"]
-        ) / (config["elbow"]["mass"] + config["wrist"]["mass"])
-        elbow_moi = config["elbow"]["mass"] * math.pow(
-            config["elbow"]["cgRadius"] - elbow_cg_radius, 2.0
-        ) + config["wrist"]["mass"] * math.pow(
-            config["elbow"]["length"] + config["wrist"]["cgRadius"] - elbow_cg_radius,
-            2.0,
-        )
-        ff_model = ArmFeedforward(
-            JointConfig(
-                config["shoulder"]["mass"],
-                config["shoulder"]["length"],
-                config["shoulder"]["moi"],
-                config["shoulder"]["cgRadius"],
-                self._get_motor(config["shoulder"]["motor"]),
+        ff_model = PlacementFeedforward(
+            LiftConfig(
+                config["lift"]["mass"],
+                self._get_motor(config["lift"]["motor"])
             ),
             JointConfig(
-                config["elbow"]["mass"] + config["wrist"]["mass"],
-                config["elbow"]["length"] + config["wrist"]["length"],
-                elbow_moi,
-                elbow_cg_radius,
+                config["elbow"]["mass"],
+                config["elbow"]["length"],
+                config["elbow"]["moi"],
+                config["elbow"]["cgRadius"],
                 self._get_motor(config["elbow"]["motor"]),
+            ),
+            JointConfig(
+                config["wrist"]["mass"],
+                config["wrist"]["length"],
+                config["wrist"]["moi"],
+                config["wrist"]["cgRadius"],
+                self._get_motor(config["wrist"]["motor"]),
             ),
         )
 
@@ -62,26 +57,36 @@ class Solver:
         opti.minimize(self._total_time)
 
         # Create theta points
-        theta_points = []
-        self._theta_points = theta_points
-        theta_points.append([opti.parameter(), opti.parameter()])
+        positions = []
+        self._positions = positions
+        positions.append([opti.parameter(), opti.parameter(), opti.parameter()])
         for _ in range(n):
+            height = opti.variable()
             theta_0 = opti.variable()
             theta_1 = opti.variable()
             opti.subject_to(
                 opti.bounded(
-                    config["shoulder"]["minAngle"],
-                    theta_0,
-                    config["shoulder"]["maxAngle"],
+                    config["lift"]["minHeight"],
+                    height,
+                    config["lift"]["maxHeight"]
                 )
             )
             opti.subject_to(
                 opti.bounded(
-                    config["elbow"]["minAngle"], theta_1, config["elbow"]["maxAngle"]
+                    config["elbow"]["minAngle"],
+                    theta_0,
+                    config["elbow"]["maxAngle"],
                 )
             )
-            theta_points.append([theta_0, theta_1])
-        theta_points.append([opti.parameter(), opti.parameter()])
+            opti.subject_to(
+                opti.bounded(
+                    config["wrist"]["minRelAngle"], 
+                    theta_1 - theta_0, 
+                    config["wrist"]["maxRelAngle"]
+                )
+            )
+            positions.append([height, theta_0, theta_1])
+        positions.append([opti.parameter(), opti.parameter(), opti.parameter()])
 
         # Create constraint parameters (0 = disabled, 1 = enabled)
         self._constraint_parameters = {}
@@ -91,77 +96,107 @@ class Solver:
         # Apply point constraints
         for i in range(n + 2):
             # Get surrounding points
-            last_theta_2 = theta_points[i if i <= 1 else i - 2]
-            last_theta = theta_points[i if i == 0 else i - 1]
-            current_theta = theta_points[i]
-            next_theta = theta_points[i if i == n + 1 else i + 1]
+            last_theta_2 = positions[i if i <= 1 else i - 2]
+            last_theta = positions[i if i == 0 else i - 1]
+            current_theta = positions[i]
+            next_theta = positions[i if i == n + 1 else i + 1]
 
             # Apply voltage constraints
             last_velocity_2 = (
                 (last_theta[0] - last_theta_2[0]) / dt,
                 (last_theta[1] - last_theta_2[1]) / dt,
+                (last_theta[2] - last_theta_2[2]) / dt,
             )
             last_velocity = (
                 (current_theta[0] - last_theta[0]) / dt,
                 (current_theta[1] - last_theta[1]) / dt,
+                (current_theta[2] - last_theta[2]) / dt,
             )
             next_velocity = (
                 (next_theta[0] - current_theta[0]) / dt,
                 (next_theta[1] - current_theta[1]) / dt,
+                (next_theta[2] - current_theta[2]) / dt,
             )
             last_acceleration = (
                 (last_velocity[0] - last_velocity_2[0]) / dt,
                 (last_velocity[1] - last_velocity_2[1]) / dt,
+                (last_velocity[2] - last_velocity_2[2]) / dt,
             )
             acceleration = (
                 (next_velocity[0] - last_velocity[0]) / dt,
                 (next_velocity[1] - last_velocity[1]) / dt,
+                (next_velocity[2] - last_velocity[2]) / dt,
             )
             jerk = (
                 (acceleration[0] - last_acceleration[0]) / (2 * dt),
                 (acceleration[1] - last_acceleration[1]) / (2 * dt),
+                (acceleration[2] - last_acceleration[2]) / (2 * dt),
             )
             opti.subject_to(
                 opti.bounded(
-                    -max_acceleration_shoulder,
-                    acceleration[0],
-                    max_acceleration_shoulder,
+                    -max_acceleration_lift, 
+                    acceleration[0], 
+                    max_acceleration_lift
                 )
             )
             opti.subject_to(
                 opti.bounded(
-                    -max_acceleration_elbow, acceleration[1], max_acceleration_elbow
+                    -max_acceleration_elbow,
+                    acceleration[1],
+                    max_acceleration_elbow,
+                )
+            )
+            opti.subject_to(
+                opti.bounded(
+                    -max_acceleration_wrist, 
+                    acceleration[2], 
+                    max_acceleration_wrist
                 )
             )
             voltage = ff_model.calculate(current_theta, last_velocity, acceleration)
             opti.subject_to(
-                opti.bounded(-max_voltage_shoulder, voltage[0], max_voltage_shoulder)
+                opti.bounded(-max_voltage_lift, voltage[0], max_voltage_lift)
             )
             opti.subject_to(
                 opti.bounded(-max_voltage_elbow, voltage[1], max_voltage_elbow)
             )
+            opti.subject_to(
+                opti.bounded(-max_voltage_wrist, voltage[2], max_voltage_wrist)
+            )
             opti.subject_to(opti.bounded(-max_jerk, jerk[0], max_jerk))
             opti.subject_to(opti.bounded(-max_jerk, jerk[1], max_jerk))
+            opti.subject_to(opti.bounded(-max_jerk, jerk[2], max_jerk))
 
             # Apply position constraints
             if i != 0 and i != n + 1:
-                x = (
-                    config["origin"][0]
-                    + config["shoulder"]["length"] * cos(current_theta[0])
-                    + config["elbow"]["length"]
-                    * cos(current_theta[0] + current_theta[1])
+                points = {}
+                points["origin"] = tuple(config["origin"])
+                points["elbow"] = (
+                    config["origin"][0],
+                    config["origin"][1] + current_theta[0]
                 )
-                y = (
+                points["wrist"] = (
+                    config["origin"][0]
+                    + config["elbow"]["length"] * cos(current_theta[1]),
                     config["origin"][1]
-                    + config["shoulder"]["length"] * sin(current_theta[0])
-                    + config["elbow"]["length"]
-                    * sin(current_theta[0] + current_theta[1])
+                    + current_theta[0]
+                    + config["elbow"]["length"] * sin(current_theta[1])
+                )
+                points["end"] = (
+                    config["origin"][0]
+                    + config["elbow"]["length"] * cos(current_theta[1])
+                    + config["wrist"]["length"] * cos(current_theta[2]),
+                    config["origin"][1]
+                    + current_theta[0]
+                    + config["elbow"]["length"] * sin(current_theta[1])
+                    + config["wrist"]["length"] * sin(current_theta[2])
                 )
 
                 for (constraint_key, constraint) in config["constraints"].items():
                     enabled = self._constraint_parameters[constraint_key]
                     type = constraint["type"]
                     args = constraint["args"]
+                    x, y = points[constraint["point"]]
                     if type == "minX":
                         opti.subject_to(x >= args[0] - ((1 - enabled) * 1000))
 
@@ -208,19 +243,19 @@ class Solver:
 
     def solve(self, parameters):
         opti = self._opti
-        theta_points = self._theta_points
+        positions = self._positions
 
         # Update position parameters
         opti.set_value(
-            theta_points[0][0],
+            positions[0][0],
             self._clamp(
                 parameters["initial"][0],
-                self._config["shoulder"]["minAngle"],
-                self._config["shoulder"]["maxAngle"],
+                self._config["lift"]["minHeight"],
+                self._config["lift"]["maxHeight"],
             ),
         )
         opti.set_value(
-            theta_points[0][1],
+            positions[0][1],
             self._clamp(
                 parameters["initial"][1],
                 self._config["elbow"]["minAngle"],
@@ -228,59 +263,90 @@ class Solver:
             ),
         )
         opti.set_value(
-            theta_points[len(theta_points) - 1][0],
+            positions[0][2],
             self._clamp(
-                parameters["final"][0],
-                self._config["shoulder"]["minAngle"],
-                self._config["shoulder"]["maxAngle"],
+                parameters["initial"][1],
+                self._config["elbow"]["minAngle"],
+                self._config["elbow"]["maxAngle"],
+            ) + self._clamp(
+                parameters["initial"][2] - parameters["initial"][1],
+                self._config["wrist"]["minRelAngle"],
+                self._config["wrist"]["maxRelAngle"],
             ),
         )
         opti.set_value(
-            theta_points[len(theta_points) - 1][1],
+            positions[len(positions) - 1][0],
+            self._clamp(
+                parameters["final"][0],
+                self._config["lift"]["minHeight"],
+                self._config["lift"]["maxHeight"],
+            ),
+        )
+        opti.set_value(
+            positions[len(positions) - 1][1],
             self._clamp(
                 parameters["final"][1],
                 self._config["elbow"]["minAngle"],
                 self._config["elbow"]["maxAngle"],
             ),
         )
+        opti.set_value(
+            positions[len(positions) - 1][2],
+            self._clamp(
+                parameters["final"][1],
+                self._config["elbow"]["minAngle"],
+                self._config["elbow"]["maxAngle"],
+            ) + self._clamp(
+                parameters["final"][2] - parameters["final"][1],
+                self._config["wrist"]["minRelAngle"],
+                self._config["wrist"]["maxRelAngle"],
+            ),
+        )
 
         # Set initial values
         opti.set_initial(self._total_time, 1)
-        n = len(theta_points) - 2
+        n = len(positions) - 2
         for i in range(1, n + 1):
             opti.set_initial(
-                theta_points[i][0],
+                positions[i][0],
                 (parameters["final"][0] - parameters["initial"][0]) * (i / (n + 2))
                 + parameters["initial"][0],
             )
             opti.set_initial(
-                theta_points[i][1],
+                positions[i][1],
                 (parameters["final"][1] - parameters["initial"][1]) * (i / (n + 2))
                 + parameters["initial"][1],
             )
+            opti.set_initial(
+                positions[i][2],
+                (parameters["final"][2] - parameters["initial"][2]) * (i / (n + 2))
+                + parameters["initial"][2],
+            )
 
         # Set constraint parameters
-        inital_theta = (opti.value(theta_points[0][0]), opti.value(theta_points[0][1]))
-        final_theta = (opti.value(theta_points[-1][0]), opti.value(theta_points[-1][1]))
+        inital_theta = (opti.value(positions[0][0]), opti.value(positions[0][1]), opti.value(positions[0][2]))
+        final_theta = (opti.value(positions[-1][0]), opti.value(positions[-1][1]), opti.value(positions[-1][2]))
         start_x = (
             self._config["origin"][0]
-            + self._config["shoulder"]["length"] * cos(inital_theta[0])
-            + self._config["elbow"]["length"] * cos(inital_theta[0] + inital_theta[1])
+            + self._config["elbow"]["length"] * cos(inital_theta[1])
+            + self._config["wrist"]["length"] * cos(inital_theta[2])
         )
         start_y = (
             self._config["origin"][1]
-            + self._config["shoulder"]["length"] * sin(inital_theta[0])
-            + self._config["elbow"]["length"] * sin(inital_theta[0] + inital_theta[1])
+            + inital_theta[0]
+            + self._config["elbow"]["length"] * sin(inital_theta[1])
+            + self._config["wrist"]["length"] * sin(inital_theta[2])
         )
         final_x = (
             self._config["origin"][0]
-            + self._config["shoulder"]["length"] * cos(final_theta[0])
-            + self._config["elbow"]["length"] * cos(final_theta[0] + final_theta[1])
+            + self._config["elbow"]["length"] * cos(final_theta[1])
+            + self._config["wrist"]["length"] * cos(final_theta[2])
         )
         final_y = (
             self._config["origin"][1]
-            + self._config["shoulder"]["length"] * sin(final_theta[0])
-            + self._config["elbow"]["length"] * sin(final_theta[0] + final_theta[1])
+            + final_theta[0]
+            + self._config["elbow"]["length"] * sin(final_theta[1])
+            + self._config["wrist"]["length"] * sin(final_theta[2])
         )
         for (
             constraint_key,
@@ -332,16 +398,14 @@ class Solver:
                 opti.set_value(constraint_parameter, 1)
 
         # Solve
-        try:
-            opti.solve()
-        except:
-            return None
+        opti.solve()
 
         # Get results
-        result = (opti.value(self._total_time), [], [])
-        for theta in theta_points:
+        result = (opti.value(self._total_time), [], [], [])
+        for theta in positions:
             result[1].append(opti.value(theta[0]))
             result[2].append(opti.value(theta[1]))
+            result[3].append(opti.value(theta[2]))
         return result
 
     def _clamp(self, value, min_value, max_value):

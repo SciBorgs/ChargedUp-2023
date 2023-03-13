@@ -42,6 +42,7 @@ def request_update(event):
         for i in range(len(result[1])):
             points.append(result[1][i])
             points.append(result[2][i])
+            points.append(result[3][i])
         result_pub.set(points)
     else:
         print("Trajectory generation failed")
@@ -51,7 +52,7 @@ if __name__ == "__main__":
     # Set up NT instance
     nt_inst = ntcore.NetworkTableInstance.getDefault()
     nt_inst.setServer(SERVER_IP)
-    nt_inst.startClient4("kairos_" + str(DEVICE_ID))
+    nt_inst.startClient4("chronos_" + str(DEVICE_ID))
 
     # Create subscribers and publisher
     config_sub = nt_inst.getStringTopic("/kairos/config").subscribe(

@@ -1,0 +1,57 @@
+origin: [ 0.0, 0.2 ]
+
+solver:
+  interiorPoints: 20
+  maxVoltageElbow: 5
+  maxVoltageWrist: 5
+  maxVoltageLift: 5
+  maxAccelerationElbow: 1
+  maxAccelerationWrist: 2
+  maxAccelerationLift: 1
+  maxJerk: 1
+
+lift:
+  mass: 1.0 # estimated
+  minHeight: 0
+  maxHeight: 0.66
+  motor:
+    type: neo
+    count: 3
+    reduction: 63.75
+
+elbow:
+  mass: 1.374
+  length: 1.04
+  cgRadius: 0.52
+  moi: 0.1427
+  minAngle: -1.0472 # -60 degrees
+  maxAngle: 4.1015 # 235 degrees
+  motor:
+    type: neo
+    count: 2
+    reduction: 53.125
+
+wrist:
+  mass: 2.372
+  length: 0.508
+  cgRadius: 0.16 # estimated
+  moi: 0.0435
+  minRelAngle: -1.5707
+  maxRelAngle: 3.1415
+  motor:
+    type: neo
+    count: 1
+    reduction: 5.0
+
+constraints:
+  floor:
+    type: minY,
+    point: end
+    args: [ 0.2 ]
+  robotBody:
+    type: rectangle
+    point: wrist
+    args: [
+      -0.2, 0,
+      0.2, 1.5 # experimental constraint
+    ]

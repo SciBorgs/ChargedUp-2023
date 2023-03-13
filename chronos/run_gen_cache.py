@@ -7,8 +7,9 @@ import os
 import sys
 import tempfile
 import time
+import yaml
 
-from Solver import Solver
+from solver import Solver
 
 solver = None
 
@@ -18,9 +19,8 @@ def calculate_func(trajectory):
 
     # Create solver on first run
     if solver == None:
-        config = json.loads(
-            open(os.path.join("src", "main", "deploy", "arm_config.json"), "r").read()
-        )
+        with open(os.path.join("src", "main", "deploy", "placement_config.yaml"), "r") as f:
+            config = yaml.safe_load(f)
         solver = Solver(config, silence=True)
 
     # Generate trajectory
@@ -59,6 +59,7 @@ if __name__ == "__main__":
             for i in range(len(result[1])):
                 trajectory["points"].append(result[1][i])
                 trajectory["points"].append(result[2][i])
+                trajectory["points"].append(result[3][i])
 
     # Save to JSON file
     if fail_count == 0:
