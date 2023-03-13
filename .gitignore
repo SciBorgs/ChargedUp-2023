@@ -5,6 +5,8 @@
 include/
 optimization/lib*
 
+# python
+__pycache__/
 
 # log files
 *.wpilog
