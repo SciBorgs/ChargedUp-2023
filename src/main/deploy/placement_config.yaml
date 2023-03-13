@@ -5,9 +5,9 @@ solver:
   maxVoltageElbow: 5
   maxVoltageWrist: 5
   maxVoltageLift: 5
-  maxAccelerationElbow: 1
-  maxAccelerationWrist: 2
-  maxAccelerationLift: 1
+  maxAccelerationElbow: 0.4
+  maxAccelerationWrist: 0.3
+  maxAccelerationLift: 2.0
   maxJerk: 1
 
 lift:
@@ -48,9 +48,16 @@ constraints:
     type: minY,
     point: end
     args: [ 0.2 ]
-  robotBody:
+  robotFrameWrist:
     type: rectangle
     point: wrist
+    args: [
+      -0.2, 0,
+      0.2, 1.5 # experimental constraint
+    ]
+  robotFrameEnd:
+    type: rectangle
+    point: end
     args: [
       -0.2, 0,
       0.2, 1.5 # experimental constraint
