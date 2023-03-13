@@ -1,12 +1,11 @@
 # This gitignore has been specially created by the WPILib team.
 # If you remove items from this file, intellisense might break.
 
-# python venv
-include/
-optimization/lib*
 
 # python
 __pycache__/
+include/
+venv
 
 # log files
 *.wpilog
