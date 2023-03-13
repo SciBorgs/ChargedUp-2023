@@ -48,54 +48,72 @@ public class Scoring {
     return drive.driveToPose(shiftScoringTarget(side, color, direction));
   }
 
-  // TODO fix
+  // TODO msomebody pleasse make this look presentable
+  // Works on blue, seems not to work on red side???
+  // (sth to do with fact pv doesn't recognize middle tag as bestTarget for some reason (goofy))
   public Pose2d shiftScoringTarget(Side side, Color color, Direction direction) {
     ArrayList<Translation2d> scoringPoints =
         new ArrayList<>(List.copyOf(Constants.Field.SCORING_TAGS.values()));
+    ArrayList<Translation2d> disposable =
+        new ArrayList<>(List.copyOf(Constants.Field.SCORING_TAGS.values()));
+
     PhotonTrackedTarget[] tags = vision.getBestTag();
-    PhotonTrackedTarget closest = vision.compareTags(tags);
-    Translation2d closest2 = new Translation2d();
-    Translation2d closest3 = new Translation2d();
-    Translation2d robotTrans = new Translation2d();
-    var tagPose =
-        vision.getTagPose(closest).get().toPose2d().getTranslation().nearest(scoringPoints);
+    PhotonTrackedTarget closestTag = vision.compareTags(tags);
+
+    var tagPose = vision.getTagPose(closestTag).get();
+    Translation2d tagPoseTrans = tagPose.toPose2d().getTranslation().nearest(disposable);
     Translation2d robotPos =
-        // tagPose.transformBy(closest.getBestCameraToTarget()).toPose2d().getTranslation();
-        drive.getPose().getTranslation();
-    double rotationRad = (side.rads() + color.rads()) % (2 * Math.PI);
-    scoringPoints.remove(tagPose);
+        tagPose.transformBy(closestTag.getBestCameraToTarget()).toPose2d().getTranslation();
 
-    for (Translation2d tag : scoringPoints) {
-      double distance = robotPos.getDistance(tag);
-      // System.out.println(robotPos.getDistance(tag));
-      if (robotPos.getDistance(tag) > 5) { // somehow this does nothing, even if val > 10
-        if (robotPos.getDistance(tag) < robotPos.getDistance(closest2)) {
-          closest2 = tag;
-          System.out.println(closest2.toString());
-        } else if (distance <= robotPos.getDistance(closest3)) {
-          // System.out.println(robotPos.getDistance(closest3));
-          closest3 = tag;
-        }
-      }
-      switch (direction) { // relative to driver direction, works because of iteration order
-        case LEFT:
-          robotTrans = closest3;
-        case RIGHT:
-          robotTrans = closest2;
-      }
+    Translation2d closer = new Translation2d();
+    Translation2d farthest = new Translation2d();
+    Translation2d robotTrans = new Translation2d();
 
-      // Pose3d one = new Pose3d(new Translation3d(tagPose.getX(), tagPose.getY(), 0.462788), new
-      // Rotation3d());
-      // Pose3d two =
-      //     new Pose3d(new Translation3d(closest2.getX(), closest2.getY(), 0.462788), new
-      // Rotation3d());
-      // Pose3d three =
-      //     new Pose3d(new Translation3d(closest3.getX(), closest3.getY(), 0.462788), new
-      // Rotation3d());
-      //
-      // SmartDashboard.putNumberArray(
-      //     "targetable targets", vision.createObjects(new Pose3d[] {one, two, three}));
+    double inaccuracyThreshold = 5;
+    boolean secondTag = false;
+
+    disposable.remove(tagPoseTrans);
+
+    if (robotPos.getDistance(tagPoseTrans.nearest(disposable)) < inaccuracyThreshold) {
+      closer = tagPoseTrans.nearest(disposable);
+      disposable.remove(closer);
+      secondTag = true;
     }
+
+    if (robotPos.getDistance(tagPoseTrans.nearest(disposable)) < inaccuracyThreshold && secondTag) {
+      farthest = tagPoseTrans.nearest(disposable);
+    }
+
+    int closest = scoringPoints.indexOf(tagPoseTrans);
+
+    if (closest == 1 || closest == 4) {
+      switch (direction) { // 1 and 4 are middle tags
+        case RIGHT:
+          robotTrans = closer;
+          break;
+        case LEFT:
+          robotTrans = farthest;
+      }
+    } else if (closest == 0 || closest == 3) { // 0 and 3 are tags on left
+      switch (direction) {
+        case RIGHT:
+          // TODO how to handle these? should right loop back around to opposite side or not do
+          // anything?
+          robotTrans = farthest;
+          break;
+        case LEFT:
+          robotTrans = closer;
+      }
+    } else {
+      switch (direction) { // tags on far right
+        case RIGHT:
+          robotTrans = closer;
+          break;
+        case LEFT:
+          robotTrans = farthest;
+      }
+    }
+    double rotationRad = (side.rads() + color.rads()) % (2 * Math.PI);
     return new Pose2d(robotTrans, Rotation2d.fromRadians(rotationRad));
   }
   // TODO vision alignment

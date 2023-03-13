@@ -288,11 +288,11 @@ public final class Constants {
             Map.entry("R1", new Pose2d(new Translation2d(0.36195, 6.749796), new Rotation2d())));
     public static final Map<String, Translation2d> SCORING_TAGS =
         Map.ofEntries(
-            Map.entry("R1", new Translation2d(15.513558, 4.424426)),
-            Map.entry("R2", new Translation2d(15.513558, 2.748026)),
-            Map.entry("R3", new Translation2d(15.513558, 1.071626)),
             Map.entry("B6", new Translation2d(1.02743, 4.424426)),
             Map.entry("B7", new Translation2d(1.02743, 2.748026)),
-            Map.entry("B8", new Translation2d(1.02743, 1.071626)));
+            Map.entry("B8", new Translation2d(1.02743, 1.071626)),
+            Map.entry("R3", new Translation2d(15.513558, 1.071626)),
+            Map.entry("R2", new Translation2d(15.513558, 2.748026)),
+            Map.entry("R1", new Translation2d(15.513558, 4.424426)));
   }
 }
