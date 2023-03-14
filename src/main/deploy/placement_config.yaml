@@ -8,7 +8,7 @@ solver:
   maxAccelerationElbow: 1.5
   maxAccelerationWrist: 1.4
   maxAccelerationLift: 1.2
-  maxJerk: 0.1
+  maxJerk: 1
 
 lift:
   mass: 1.0 # estimated
@@ -47,14 +47,26 @@ constraints:
   floor:
     type: minY,
     point: end
+<<<<<<< HEAD
     args: [ 0 ]
   heightLimit:
     type: maxY
     point: end
     args: [ 1.98 ]
   robotBody:
+=======
+    args: [ 0.2 ]
+  robotFrameWrist:
+>>>>>>> 8254ce48bc85e1499057e0bec71508329d9e6532
     type: rectangle
     point: wrist
+    args: [
+      -0.2, 0,
+      0.2, 1.5 # experimental constraint
+    ]
+  robotFrameEnd:
+    type: rectangle
+    point: end
     args: [
       -0.2, 0,
       0.2, 1.5 # experimental constraint

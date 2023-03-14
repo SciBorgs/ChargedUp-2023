@@ -93,32 +93,23 @@ class PlacementFeedforward:
     # position: [height, elbow angle, wrist angle (absolute)]
     def calculate(self, position, velocity, acceleration):
         M = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-
-        M[0][1] = (self._elbow.cgRadius * self._elbow.mass + self._elbow.length * self._wrist.mass) * cos(position[1])
-        M[1][0] = (self._elbow.cgRadius * self._elbow.mass + self._elbow.length * self._wrist.mass) * cos(position[1])
-
-        M[0][2] = self._wrist.cgRadius * self._wrist.mass * cos(position[2])
-        M[2][0] = self._wrist.cgRadius * self._wrist.mass * cos(position[2])
-
-        M[1][2] = self._elbow.length * self._wrist.cgRadius * self._wrist.mass * cos(position[2] - position[1])
-        M[2][1] = self._elbow.length * self._wrist.cgRadius * self._wrist.mass * cos(position[2] - position[1])
-
+        M[0][1] = M[1][0] = (self._elbow.cgRadius * self._elbow.mass + self._elbow.length * self._wrist.mass) * cos(position[1])
+        M[0][2] = M[2][0] = self._wrist.cgRadius * self._wrist.mass * cos(position[2])
+        M[1][2] = M[2][1] = self._elbow.length * self._wrist.cgRadius * self._wrist.mass * cos(position[2] - position[1])
         M[0][0] = self._elevator.mass + self._elbow.mass + self._wrist.mass
         M[1][1] = self._elbow.moi + self._wrist.mass * self._elbow.length ** 2 + self._elbow.mass * self._elbow.cgRadius ** 2
         M[2][2] = self._wrist.moi + self._wrist.mass * self._wrist.cgRadius ** 2
 
         C = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-
         C[0][1] = -(self._elbow.cgRadius * self._elbow.mass + self._elbow.length * self._wrist.mass) * sin(position[1]) * velocity[1]
         C[0][2] = -self._wrist.cgRadius * self._wrist.mass * sin(position[2]) * velocity[2]
         C[1][2] = -self._wrist.mass * self._elbow.length * self._wrist.cgRadius * sin(position[2] - position[1]) * velocity[2]
         C[2][1] = self._wrist.mass * self._elbow.length * self._wrist.cgRadius * sin(position[2] - position[1]) * velocity[1]
 
         Tg = [0, 0, 0]
-        
         Tg[0] = self._g * (self._elevator.mass + self._elbow.mass + self._wrist.mass)
         Tg[1] = self._g * (self._elbow.cgRadius * self._elbow.mass + self._elbow.length * self._wrist.mass) * cos(position[1])
-        Tg[1] = self._g * self._wrist.cgRadius * self._wrist.mass * cos(position[2])
+        Tg[2] = self._g * self._wrist.cgRadius * self._wrist.mass * cos(position[2])
 
         M_times_acceleration = (
             M[0][0] * acceleration[0] + M[0][1] * acceleration[1] + M[0][2] * acceleration[2],
