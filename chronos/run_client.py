@@ -9,7 +9,6 @@ import ntcore
 from solver import Solver
 
 SERVER_IP = "127.0.0.1"
-DEVICE_ID = 0
 
 solver = None
 result_pub = None
@@ -52,7 +51,7 @@ if __name__ == "__main__":
     # Set up NT instance
     nt_inst = ntcore.NetworkTableInstance.getDefault()
     nt_inst.setServer(SERVER_IP)
-    nt_inst.startClient4("chronos_" + str(DEVICE_ID))
+    nt_inst.startClient4("chronos")
 
     # Create subscribers and publisher
     config_sub = nt_inst.getStringTopic("/chronos/config").subscribe(
@@ -62,9 +61,9 @@ if __name__ == "__main__":
         "", ntcore.PubSubOptions(periodic=0)
     )
     result_pub = nt_inst.getDoubleArrayTopic(
-        "/chronos/result/" + str(DEVICE_ID)
+        "/chronos/result"
     ).publish(ntcore.PubSubOptions(periodic=0))
-    ping_pub = nt_inst.getIntegerTopic("/chronos/ping/" + str(DEVICE_ID)).publish(
+    ping_pub = nt_inst.getIntegerTopic("/chronos/ping").publish(
         ntcore.PubSubOptions()
     )
 
