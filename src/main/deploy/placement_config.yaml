@@ -47,17 +47,12 @@ constraints:
   floor:
     type: minY,
     point: end
-<<<<<<< HEAD
     args: [ 0 ]
   heightLimit:
     type: maxY
     point: end
     args: [ 1.98 ]
   robotBody:
-=======
-    args: [ 0.2 ]
-  robotFrameWrist:
->>>>>>> 8254ce48bc85e1499057e0bec71508329d9e6532
     type: rectangle
     point: wrist
     args: [
