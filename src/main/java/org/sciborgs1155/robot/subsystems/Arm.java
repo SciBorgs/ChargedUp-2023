@@ -27,8 +27,8 @@ import java.util.function.DoubleSupplier;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
-import org.sciborgs1155.robot.subsystems.placement.Visualizer;
 import org.sciborgs1155.robot.Robot;
+import org.sciborgs1155.robot.subsystems.placement.Visualizer;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 

@@ -5,17 +5,10 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.numbers.N6;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import org.sciborgs1155.robot.Constants.Dimensions;
 
 /** ArmState class to store relative angles for the arm. */
-public record State(
-    double elevatorHeight,
-    Rotation2d elbowAngle,
-    Rotation2d wristAngle) {
+public record State(double elevatorHeight, Rotation2d elbowAngle, Rotation2d wristAngle) {
 
   /** Represents the side of the robot the arm is on */
   public enum Side {
@@ -24,11 +17,10 @@ public record State(
   }
 
   /**
-   * Returns a new {@link State} from angles in radians, with the wrist state relative to
-   * the chassis
+   * Returns a new {@link State} from angles in radians, with the wrist state relative to the
+   * chassis
    */
-  public static State fromAbsolute(
-      double elevatorHeight, double elbowAngle, double wristAngle) {
+  public static State fromAbsolute(double elevatorHeight, double elbowAngle, double wristAngle) {
     return new State(
         elevatorHeight,
         Rotation2d.fromRadians(elbowAngle),
@@ -36,11 +28,10 @@ public record State(
   }
 
   /**
-   * Returns a new {@link State} from angles in radians, with the wrist state relative to
-   * the forearm
+   * Returns a new {@link State} from angles in radians, with the wrist state relative to the
+   * forearm
    */
-  public static State fromRelative(
-      double elevatorHeight, double elbowAngle, double wristAngle) {
+  public static State fromRelative(double elevatorHeight, double elbowAngle, double wristAngle) {
     return new State(
         elevatorHeight, Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle));
   }
@@ -55,10 +46,7 @@ public record State(
 
   /** Returns a 6d vector representation of the state */
   public Vector<N3> toVec() {
-    return VecBuilder.fill(
-        elevatorHeight,
-        elbowAngle.getRadians(),
-        wristAngle.getRadians());
+    return VecBuilder.fill(elevatorHeight, elbowAngle.getRadians(), wristAngle.getRadians());
   }
 
   /** The side of the robot the arm is on */

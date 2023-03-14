@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants.*;
 import org.sciborgs1155.robot.subsystems.Drive;

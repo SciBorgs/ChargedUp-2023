@@ -233,12 +233,10 @@ public final class Constants {
     // tested
     public static final State STOW =
         State.fromRelative(0, 2.467 + Elbow.ELBOW_OFFSET, Math.PI / 2.0);
-    public static final State BACK_HIGH_CONE =
-        State.fromAbsolute(0.521769, 3.04, 2.74);
+    public static final State BACK_HIGH_CONE = State.fromAbsolute(0.521769, 3.04, 2.74);
     public static final State FRONT_INTAKE =
         State.fromAbsolute(0.44, 0.137803 + Elbow.ELBOW_OFFSET, 0.1);
-    public static final State PASS_OVER =
-        State.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0);
+    public static final State PASS_OVER = State.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0);
 
     // untested
 
