@@ -25,10 +25,10 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.function.DoubleSupplier;
 import org.sciborgs1155.lib.Derivative;
-import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Robot;
+import org.sciborgs1155.robot.util.Visualizer;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
@@ -111,9 +111,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     wrist.burnFlash();
 
     this.visualizer = visualizer;
-
-    elbowFeedback.setGoal(getElbowPosition().getRadians());
-    wristFeedback.setGoal(Math.PI);
   }
 
   /** Elbow position relative to the chassis */
