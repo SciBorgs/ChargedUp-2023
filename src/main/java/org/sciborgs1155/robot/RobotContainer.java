@@ -41,7 +41,6 @@ public class RobotContainer {
   private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
 
   // command factories
-  private final Placement placement = new Placement(arm, elevator);
   private final Autos autos = new Autos(drive, placement, vision, intake);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */

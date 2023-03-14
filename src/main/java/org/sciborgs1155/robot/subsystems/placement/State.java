@@ -12,7 +12,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import org.sciborgs1155.robot.Constants.Dimensions;
 
 /** ArmState class to store relative angles for the arm. */
-public record PlacementState(
+public record State(
     double elevatorHeight,
     Rotation2d elbowAngle,
     Rotation2d wristAngle) {
@@ -24,30 +24,30 @@ public record PlacementState(
   }
 
   /**
-   * Returns a new {@link PlacementState} from angles in radians, with the wrist state relative to
+   * Returns a new {@link State} from angles in radians, with the wrist state relative to
    * the chassis
    */
-  public static PlacementState fromAbsolute(
+  public static State fromAbsolute(
       double elevatorHeight, double elbowAngle, double wristAngle) {
-    return new PlacementState(
+    return new State(
         elevatorHeight,
         Rotation2d.fromRadians(elbowAngle),
         Rotation2d.fromRadians(wristAngle - elbowAngle));
   }
 
   /**
-   * Returns a new {@link PlacementState} from angles in radians, with the wrist state relative to
+   * Returns a new {@link State} from angles in radians, with the wrist state relative to
    * the forearm
    */
-  public static PlacementState fromRelative(
+  public static State fromRelative(
       double elevatorHeight, double elbowAngle, double wristAngle) {
-    return new PlacementState(
+    return new State(
         elevatorHeight, Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle));
   }
 
   /** Creates a PlacementState from a 6d vector */
-  public static PlacementState fromVec(Vector<N3> state) {
-    return new PlacementState(
+  public static State fromVec(Vector<N3> state) {
+    return new State(
         state.get(0, 0),
         Rotation2d.fromRadians(state.get(1, 0)),
         Rotation2d.fromRadians(state.get(2, 0)));
@@ -70,7 +70,7 @@ public record PlacementState(
    * Returns the corresponding arm state given a target Math can be found {@link
    * https://robotacademy.net.au/lesson/inverse-kinematics-for-a-2-joint-robot-arm-using-geometry}
    */
-  public static PlacementState fromIK(Translation3d target, double height) {
+  public static State fromIK(Translation3d target, double height) {
     double wristAngle =
         -Math.acos(
             (Math.pow(target.getY(), 2)
@@ -88,7 +88,7 @@ public record PlacementState(
     return fromAbsolute(elbowAngle, wristAngle, 0);
   }
 
-  public boolean roughlyEquals(PlacementState other, double margin) {
+  public boolean roughlyEquals(State other, double margin) {
     var v1 = this.toVec();
     var v2 = other.toVec();
     for (int i = 0; i < v1.getNumCols(); i++) {

@@ -37,7 +37,7 @@ public class Visualizer implements Sendable {
             new MechanismLigament2d("Wrist Position", Dimensions.CLAW_LENGTH, 0, WEIGHT, color));
   }
 
-  public void setState(PlacementState state) {
+  public void setState(State state) {
     elevator.setLength(state.elevatorHeight());
     forearm.setAngle(state.elbowAngle().minus(RIGHT_ANGLE));
     claw.setAngle(state.wristAngle());

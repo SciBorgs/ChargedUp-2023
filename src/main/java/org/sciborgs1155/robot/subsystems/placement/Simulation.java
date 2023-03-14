@@ -11,7 +11,7 @@ import org.sciborgs1155.robot.Constants.Arm.Elbow;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Elevator;
 
-public class PlacementSim {
+public class Simulation {
 
   private final ElevatorSim elevator =
       new ElevatorSim(
