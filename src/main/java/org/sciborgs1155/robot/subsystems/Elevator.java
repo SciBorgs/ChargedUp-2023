@@ -23,7 +23,7 @@ import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
-import org.sciborgs1155.robot.util.Visualizer;
+import org.sciborgs1155.robot.subsystems.placement.Visualizer;
 
 public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 

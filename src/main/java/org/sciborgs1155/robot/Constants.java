@@ -9,7 +9,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import java.util.Map;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.sciborgs1155.lib.PlacementState;
 import org.sciborgs1155.lib.constants.Conversion;
 import org.sciborgs1155.lib.constants.Conversion.PulsesPerRev;
 import org.sciborgs1155.lib.constants.MotorConfig;
@@ -17,6 +16,7 @@ import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants.Arm.Elbow;
+import org.sciborgs1155.robot.subsystems.placement.PlacementState;
 
 /**
  * Constants is a globally accessible class for storing immutable values. Every value should be

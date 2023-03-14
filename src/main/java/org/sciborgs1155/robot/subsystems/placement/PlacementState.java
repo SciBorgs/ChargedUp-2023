@@ -1,9 +1,10 @@
-package org.sciborgs1155.lib;
+package org.sciborgs1155.robot.subsystems.placement;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.Sendable;
@@ -14,21 +15,12 @@ import org.sciborgs1155.robot.Constants.Dimensions;
 public record PlacementState(
     double elevatorHeight,
     Rotation2d elbowAngle,
-    Rotation2d wristAngle,
-    double elevatorVelocity,
-    double elbowAngularVelocity,
-    double wristAngularVelocity)
-    implements Sendable {
+    Rotation2d wristAngle) {
 
   /** Represents the side of the robot the arm is on */
   public enum Side {
     FRONT,
     BACK;
-  }
-
-  /** Creates a new PlacementState with velocities of 0 */
-  public PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d wristAngle) {
-    this(elevatorHeight, elbowAngle, wristAngle, 0, 0, 0);
   }
 
   /**
@@ -54,40 +46,19 @@ public record PlacementState(
   }
 
   /** Creates a PlacementState from a 6d vector */
-  public static PlacementState fromVec(Vector<N6> state) {
+  public static PlacementState fromVec(Vector<N3> state) {
     return new PlacementState(
         state.get(0, 0),
         Rotation2d.fromRadians(state.get(1, 0)),
-        Rotation2d.fromRadians(state.get(2, 0)),
-        state.get(3, 0),
-        state.get(4, 0),
-        state.get(5, 0));
+        Rotation2d.fromRadians(state.get(2, 0)));
   }
 
   /** Returns a 6d vector representation of the state */
-  public Vector<N6> toVec() {
+  public Vector<N3> toVec() {
     return VecBuilder.fill(
         elevatorHeight,
         elbowAngle.getRadians(),
-        wristAngle.getRadians(),
-        elevatorVelocity,
-        elbowAngularVelocity,
-        wristAngularVelocity);
-  }
-
-  /** Returns an elevator state for use with trapezoid profiles */
-  public TrapezoidProfile.State elevatorState() {
-    return new TrapezoidProfile.State(elevatorHeight, elevatorVelocity);
-  }
-
-  /** Returns an elbow state for use with trapezoid profiles */
-  public TrapezoidProfile.State elbowState() {
-    return new TrapezoidProfile.State(elbowAngle.getRadians(), elbowAngularVelocity);
-  }
-
-  /** Returns an wrist state for use with trapezoid profiles */
-  public TrapezoidProfile.State wristState() {
-    return new TrapezoidProfile.State(wristAngle.getRadians(), wristAngularVelocity);
+        wristAngle.getRadians());
   }
 
   /** The side of the robot the arm is on */
@@ -126,17 +97,5 @@ public record PlacementState(
       }
     }
     return true;
-  }
-
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.addDoubleProperty("elevator height", this::elevatorHeight, null);
-    builder.addDoubleProperty("elbow angle", () -> elbowAngle().getDegrees(), null);
-    builder.addDoubleProperty("relative wrist angle", () -> wristAngle().getDegrees(), null);
-    builder.addDoubleProperty(
-        "absolute wrist angle", () -> elbowAngle().plus(wristAngle()).getDegrees(), null);
-    builder.addDoubleProperty("elevator velocity", this::elevatorVelocity, null);
-    builder.addDoubleProperty("elbow angular velocity", this::elbowAngularVelocity, null);
-    builder.addDoubleProperty("wrist angular velocity", this::wristAngularVelocity, null);
   }
 }

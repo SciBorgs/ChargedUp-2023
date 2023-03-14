@@ -8,11 +8,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.sciborgs1155.lib.PlacementState;
+
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants.*;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
+import org.sciborgs1155.robot.subsystems.placement.PlacementState;
 
 public class Scoring {
   private final Intake intake;

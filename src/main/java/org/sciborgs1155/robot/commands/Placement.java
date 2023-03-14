@@ -3,10 +3,11 @@ package org.sciborgs1155.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import org.sciborgs1155.lib.PlacementState;
+
 import org.sciborgs1155.robot.Constants.Positions;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Elevator;
+import org.sciborgs1155.robot.subsystems.placement.PlacementState;
 
 /** Placement command factories */
 public class Placement {

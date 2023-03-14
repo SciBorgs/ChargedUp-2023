@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.util;
+package org.sciborgs1155.robot.subsystems.placement;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.util.sendable.Sendable;
@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import org.sciborgs1155.lib.PlacementState;
+
 import org.sciborgs1155.robot.Constants.Dimensions;
 
 /** Visualization class specific for our charged up bot */

@@ -16,7 +16,7 @@ import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
-import org.sciborgs1155.robot.util.Visualizer;
+import org.sciborgs1155.robot.subsystems.placement.Visualizer;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
