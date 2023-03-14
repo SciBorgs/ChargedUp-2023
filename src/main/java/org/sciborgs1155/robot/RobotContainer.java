@@ -1,7 +1,7 @@
 package org.sciborgs1155.robot;
 
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -46,6 +46,16 @@ public class RobotContainer {
   private final Placement placement = new Placement(arm, elevator);
   private final Scoring scoring = new Scoring(drive, placement, intake, vision);
   private final Autos autos = new Autos(drive, placement, vision, intake, scoring);
+
+  private enum ButtonProfile {
+    PRESET,
+    SETPOINT,
+    VOLTAGE
+  }
+
+  private ButtonProfile getProfile() {
+    return ButtonProfile.PRESET;
+  }  
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -99,6 +109,7 @@ public class RobotContainer {
     // no
     operator.leftBumper().onTrue(intake.intakeTmp()).onFalse(intake.stop());
     operator.rightBumper().onTrue(intake.outtake()).onFalse(intake.stop());
+
 
     // TODO: not a todo but use this??
     // operator.leftBumper().onTrue(intake.intake());

@@ -289,4 +289,5 @@ public final class Constants {
     public static final Map<Integer, Translation2d> BALANCE_POINTS =
         Map.ofEntries(Map.entry(1, new Translation2d(3, 5)), Map.entry(2, new Translation2d(1, 5)));
   }
+
 }
