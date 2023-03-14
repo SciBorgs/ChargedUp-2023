@@ -47,7 +47,7 @@ public class Placement extends SubsystemBase implements Loggable, AutoCloseable 
     }
 
     public void setSetpoint(Vector<N3> setpoint) {
-
+        
     }
 
     public void setSetpoint(State setpoint) {
