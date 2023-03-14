@@ -45,20 +45,20 @@ public final class Constants {
 
   public static final class Dimensions {
     public static final double ELEVATOR_MIN_HEIGHT = 0;
-    public static final double ELEVATOR_MAX_HEIGHT = 0.6; // m
+    public static final double ELEVATOR_MAX_HEIGHT = 0.65; // m
 
     public static final double ELBOW_MIN_ANGLE = -Math.PI / 2.0;
     public static final double ELBOW_MAX_ANGLE = 3.0 * Math.PI / 2.0;
     public static final double WRIST_MIN_ANGLE = -Math.PI;
     public static final double WRIST_MAX_ANGLE = Math.PI;
 
-    public static final double CLAW_LENGTH = Units.inchesToMeters(20);
+    public static final double CLAW_LENGTH = Units.inchesToMeters(11.5);
     public static final double CLAW_MASS = 3.6; // var used to say 4.4, also could be 3.62874
     public static final double CLAW_MOI =
         1.0 / 12.0 * CLAW_MASS * CLAW_LENGTH * CLAW_LENGTH; // moi about center point
     public static final double CLAW_RADIUS = CLAW_LENGTH / 2.0;
 
-    public static final double FOREARM_LENGTH = Units.inchesToMeters(41);
+    public static final double FOREARM_LENGTH = Units.inchesToMeters(36);
     public static final double FOREARM_MASS = Units.lbsToKilograms(4.2);
     public static final double FOREARM_MOI =
         1. / 12 * FOREARM_MASS * FOREARM_LENGTH * FOREARM_LENGTH;
