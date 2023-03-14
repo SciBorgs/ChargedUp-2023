@@ -54,10 +54,12 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
       new ArmFeedforward(Wrist.FF.s(), Wrist.FF.g(), Wrist.FF.v(), Wrist.FF.a());
 
   @Log(name = "elbow feedback")
+  @Log(name = "elbow at goal", methodName = "atGoal")
   private final ProfiledPIDController elbowFeedback =
       new ProfiledPIDController(Elbow.PID.p(), Elbow.PID.i(), Elbow.PID.d(), Elbow.CONSTRAINTS);
 
   @Log(name = "wrist feedback")
+  @Log(name = "wrist at goal", methodName = "atGoal")
   private final ProfiledPIDController wristFeedback =
       new ProfiledPIDController(Wrist.PID.p(), Wrist.PID.i(), Wrist.PID.d(), Wrist.CONSTRAINTS);
 
@@ -114,6 +116,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
     elbowFeedback.setGoal(getElbowPosition().getRadians());
     wristFeedback.setGoal(Math.PI);
+    wristFeedback.setTolerance(0.1);
   }
 
   /** Elbow position relative to the chassis */
@@ -222,9 +225,9 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     wrist.setVoltage(wristFB + wristFF);
 
     visualizer.setElbow(
-        getElbowPosition(), Rotation2d.fromRadians(elbowFeedback.getGoal().position));
+        getElbowPosition(), Rotation2d.fromRadians(elbowFeedback.getSetpoint().position));
     visualizer.setWrist(
-        getRelativeWristPosition(), Rotation2d.fromRadians(wristFeedback.getGoal().position));
+        getRelativeWristPosition(), Rotation2d.fromRadians(wristFeedback.getSetpoint().position));
 
     SmartDashboard.putNumber("elbow angle", getElbowPosition().getRadians());
     SmartDashboard.putNumber("relative wrist angle", getRelativeWristPosition().getRadians());

@@ -43,6 +43,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   @Log private boolean hasSpiked = false;
 
   @Log
+  @Log(name = "at goal", methodName = "atGoal")
   private final ProfiledPIDController pid =
       new ProfiledPIDController(PID.p(), PID.i(), PID.d(), CONSTRAINTS);
 
@@ -73,6 +74,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
     this.visualizer = visualizer;
 
+    // pid.setTolerance(0.0);
     pid.setGoal(getPosition());
   }
 
@@ -119,10 +121,9 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
     hasSpiked = filter.calculate(lead.getOutputCurrent()) >= CURRENT_SPIKE_THRESHOLD;
 
-    visualizer.setElevator(getPosition(), pid.getGoal().position);
+    visualizer.setElevator(getPosition(), pid.getSetpoint().position);
 
-    SmartDashboard.putNumber("setpoint", pid.getSetpoint().position);
-    SmartDashboard.putNumber("position", this.getPosition());
+    SmartDashboard.putNumber("elevator position", this.getPosition());
   }
 
   @Override

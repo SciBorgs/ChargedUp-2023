@@ -1,6 +1,8 @@
 package org.sciborgs1155.robot;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -12,6 +14,7 @@ import org.sciborgs1155.robot.Constants.Positions;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Placement;
+import org.sciborgs1155.robot.commands.Scoring;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
@@ -42,12 +45,30 @@ public class RobotContainer {
 
   // command factories
   private final Placement placement = new Placement(arm, elevator);
-  private final Autos autos = new Autos(drive, placement, vision, intake);
+  private final Scoring scoring = new Scoring(drive, placement, intake, vision);
+  private final Autos autos = new Autos(drive, placement, vision, intake, scoring);
+
+  // Operator Profiles
+  private enum ButtonProfile {
+    PRESET,
+    SETPOINT,
+    VOLTAGE
+  }
+
+  private final SendableChooser<ButtonProfile> profileChooser = new SendableChooser<ButtonProfile>();
+
+  private ButtonProfile getProfile() {
+    return profileChooser.getSelected();
+  }  
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the oblog logger
     Logger.configureLoggingAndConfig(this, false);
+    // Set up profile chooser
+    profileChooser.setDefaultOption("Preset Control", ButtonProfile.PRESET);
+    profileChooser.addOption("Setpoint Control", ButtonProfile.SETPOINT);
+    profileChooser.addOption("Voltage Control", ButtonProfile.VOLTAGE);
     // Configure the trigger bindings
     configureBindings();
     // Configure subsystem default commands
@@ -81,14 +102,26 @@ public class RobotContainer {
     // rightJoystick.trigger().onTrue(intake.start(false)).onFalse(intake.stop());
     // rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
 
+    driver.b().onTrue(drive.zeroHeading());
     // xbox.a().onTrue(elevator.setGoal(0.3));
     // xbox.b().onTrue(elevator.setGoal(0));
-    operator.a().onTrue(placement.safeToState(Positions.FRONT_INTAKE));
-    operator.b().onTrue(placement.safeToState(Positions.BACK_HIGH_CONE));
-    operator.x().onTrue(placement.safeToState(Positions.STOW));
+    operator.povLeft().onTrue(placement.safeToState(Positions.FRONT_INTAKE));
+    operator.povUp().onTrue(placement.safeToState(Positions.BACK_HIGH_CONE));
+    operator.povRight().onTrue(placement.safeToState(Positions.FRONT_MID_CONE));
+    
 
-    operator.leftBumper().onTrue(intake.start(false)).onFalse(intake.stop());
-    operator.rightBumper().onTrue(intake.start(true)).onFalse(intake.stop());
+    operator.x().onTrue(placement.safeToState(Positions.STOW));
+    operator.y().onTrue(placement.safeToState(Positions.SINGLE_SUBSTATION_CONE));
+    // angery
+    // stop fucking my wires up
+    // no
+    operator.leftBumper().onTrue(intake.intakeTmp()).onFalse(intake.stop());
+    operator.rightBumper().onTrue(intake.outtake()).onFalse(intake.stop());
+
+
+    // TODO: not a todo but use this??
+    // operator.leftBumper().onTrue(intake.intake());
+    // operator.rightBumper().onTrue(intake.stop());
 
     // xbox.povLeft().onTrue(arm.setElbowGoal(new State(0, 0)));
     // xbox.povUp().onTrue(arm.setElbowGoal(new State(1.57, 0)));
@@ -109,9 +142,12 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    // drive.resetOdometry(new Pose2d(3, 5, Rotation2d.fromDegrees(0)));
     // return drive.follow("PRAY", true, true);
     return autos.get();
     // return arm.setElbowGoal(new TrapezoidProfile.State(0.75 * Math.PI, 0));
-    // return autos.get();
+    // return scoring
+    //     .odometryAlign(Side.FRONT, Alliance.BLUE)
+    //     .andThen(scoring.score(ScoringHeight.LOW, Side.FRONT));
   }
 }

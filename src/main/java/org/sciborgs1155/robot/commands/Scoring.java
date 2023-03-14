@@ -15,6 +15,41 @@ import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 
 public class Scoring {
+  public enum Side {
+    BACK,
+    FRONT;
+
+    public double rads() {
+      if (this == BACK) {
+        return Math.PI;
+      }
+      return 0;
+    }
+  }
+
+  public enum Alliance {
+    RED,
+    BLUE;
+
+    public double rads() {
+      if (this == RED) {
+        return Math.PI;
+      } else return 0;
+    }
+  }
+
+  public enum GamePiece {
+    NONE,
+    CONE,
+    CUBE
+  }
+
+  public enum ScoringHeight {
+    HIGH,
+    MID,
+    LOW
+  }
+
   private final Intake intake;
   private final Drive drive;
   private final Placement placement;
@@ -27,6 +62,8 @@ public class Scoring {
     this.drive = drive;
     this.placement = placement;
     this.vision = vision;
+
+    this.gamePiece = GamePiece.CUBE;
   }
 
   public Command score(ScoringHeight height, Side side) {
@@ -37,11 +74,7 @@ public class Scoring {
     if (height == ScoringHeight.HIGH && side == Side.FRONT && gamePiece == GamePiece.CONE) {
       throw new RuntimeException("cannot score a cone high in the front");
     }
-    return placement
-        .toState(scoringState(gamePiece, height, side))
-        .andThen(intake.start(true))
-        .andThen(Commands.waitSeconds(3))
-        .andThen(intake.stop());
+    return placement.toState(scoringState(gamePiece, height, side)).andThen(intake.outtake());
   }
 
   // TODO leds!
@@ -57,15 +90,15 @@ public class Scoring {
   }
 
   // TODO make it take gamePiece into account
-  public Command odometryAlign(Side side, Color color) {
-    return drive.driveToPose(closestScoringPoint(side, color));
+  public Command odometryAlign(Side side, Alliance color) {
+    return drive.driveToPose(drive.getPose(), closestScoringPoint(side, color));
   }
 
   // TODO make commands to go to the next scoring poses to the left and right
 
   // TODO vision alignment
 
-  private Pose2d closestScoringPoint(Side side, Color color) {
+  private Pose2d closestScoringPoint(Side side, Alliance color) {
     Collection<Translation2d> scoringPoints = Field.SCORING_POINTS.values();
     Translation2d point =
         drive
@@ -76,48 +109,13 @@ public class Scoring {
     return new Pose2d(point, Rotation2d.fromRadians(rotationRad));
   }
 
-  // TODO make it stop once intaking has occured but we need to have the voltage thing first
   public Command intake(Side side, GamePiece gamePiece) {
-    return placement.toState(intakeState(gamePiece, side)).andThen(intake.start(false));
+    return placement.toState(intakeState(gamePiece, side)).andThen(intake.intake());
   }
 
   // this might end up being the right thing to do
   public Command intake(PlacementState intakeState) {
-    return placement.toState(intakeState).andThen(intake.start(false));
-  }
-
-  public enum Side {
-    BACK,
-    FRONT;
-
-    public double rads() {
-      if (this == BACK) {
-        return Math.PI;
-      }
-      return 0;
-    }
-  }
-
-  public enum Color {
-    RED,
-    BLUE;
-
-    public double rads() {
-      if (this == RED) {
-        return Math.PI;
-      } else return 0;
-    }
-  }
-
-  public enum GamePiece {
-    CONE,
-    CUBE
-  }
-
-  public enum ScoringHeight {
-    HIGH,
-    MID,
-    LOW
+    return placement.toState(intakeState).andThen(intake.intake());
   }
 
   public static PlacementState scoringState(GamePiece gamePiece, ScoringHeight height, Side side) {
