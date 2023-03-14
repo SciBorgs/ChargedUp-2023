@@ -34,7 +34,8 @@ public class Autos implements Loggable {
     this.scoring = scoring;
 
     autoChooser = new SendableChooser<Command>();
-    autoChooser.setDefaultOption("simple drive", simpleDrive());
+    autoChooser.setDefaultOption("simplest drive", simplestDrive());
+    autoChooser.addOption("simple drive", simpleDrive());
     autoChooser.addOption("meandering drive", meanderingDrive());
     autoChooser.addOption("balance", balance());
     autoChooser.addOption("goofy", goofy());
@@ -51,6 +52,10 @@ public class Autos implements Loggable {
     return drive
         .driveToPose(end)
         .andThen(drive.driveToPose(end, new Pose2d(0, 0, Rotation2d.fromDegrees(0))));
+  }
+
+  private Command simplestDrive() {
+    return drive.driveToPose(new Pose2d(0, 5, Rotation2d.fromDegrees(0)));
   }
 
   private Command meanderingDrive() {
