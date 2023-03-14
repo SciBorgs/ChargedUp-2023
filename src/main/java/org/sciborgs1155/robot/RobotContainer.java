@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -47,20 +48,27 @@ public class RobotContainer {
   private final Scoring scoring = new Scoring(drive, placement, intake, vision);
   private final Autos autos = new Autos(drive, placement, vision, intake, scoring);
 
+  // Operator Profiles
   private enum ButtonProfile {
     PRESET,
     SETPOINT,
     VOLTAGE
   }
 
+  private final SendableChooser<ButtonProfile> profileChooser = new SendableChooser<ButtonProfile>();
+
   private ButtonProfile getProfile() {
-    return ButtonProfile.PRESET;
+    return profileChooser.getSelected();
   }  
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the oblog logger
     Logger.configureLoggingAndConfig(this, false);
+    // Set up profile chooser
+    profileChooser.setDefaultOption("Preset Control", ButtonProfile.PRESET);
+    profileChooser.addOption("Setpoint Control", ButtonProfile.SETPOINT);
+    profileChooser.addOption("Voltage Control", ButtonProfile.VOLTAGE);
     // Configure the trigger bindings
     configureBindings();
     // Configure subsystem default commands
