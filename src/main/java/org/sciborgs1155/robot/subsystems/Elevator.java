@@ -40,7 +40,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   private final LinearFilter filter = LinearFilter.movingAverage(SAMPLE_SIZE_TAPS);
 
-  @Log private Boolean hasSpiked = false;
+  @Log private boolean hasSpiked = false;
 
   @Log
   private final ProfiledPIDController pid =
@@ -117,9 +117,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
     lead.setVoltage(fbOutput + ffOutput);
 
-    if (filter.calculate(lead.getOutputCurrent()) >= CURRENT_SPIKE_THRESHOLD) {
-      hasSpiked = true;
-    }
+    hasSpiked = filter.calculate(lead.getOutputCurrent()) >= CURRENT_SPIKE_THRESHOLD;
 
     visualizer.setElevator(getPosition(), pid.getGoal().position);
 
