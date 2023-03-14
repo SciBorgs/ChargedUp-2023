@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -101,6 +102,13 @@ public class RobotContainer {
     // xbox.p.onTrue(arm.setVoltage(3)).onFalse(arm.setVoltage(0));
     // xbox.povDownovUp()().onTrue(arm.setVoltage(-3)).onFalse(arm.setVoltage(0));
 
+  }
+
+  /** A command to run when the robot is enabled */
+  public Command getEnableCommand() {
+    return Commands.parallel(
+        elevator.setGoal(elevator.getPosition()),
+        arm.setGoals(arm.getElbowPosition(), arm.getRelativeWristPosition()));
   }
 
   /**
