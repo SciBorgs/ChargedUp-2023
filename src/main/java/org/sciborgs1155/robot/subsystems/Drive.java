@@ -127,9 +127,7 @@ public class Drive extends SubsystemBase implements Loggable {
     var speeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
 
     if (fieldRelative) {
-      speeds =
-          ChassisSpeeds.fromFieldRelativeSpeeds(
-              speeds, odometry.getEstimatedPosition().getRotation());
+      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getHeading());
     }
 
     setModuleStates(kinematics.toSwerveModuleStates(speeds));
