@@ -55,16 +55,16 @@ if __name__ == "__main__":
     nt_inst.startClient4("chronos_" + str(DEVICE_ID))
 
     # Create subscribers and publisher
-    config_sub = nt_inst.getStringTopic("/kairos/config").subscribe(
+    config_sub = nt_inst.getStringTopic("/chronos/config").subscribe(
         "", ntcore.PubSubOptions(periodic=0)
     )
-    request_sub = nt_inst.getStringTopic("/kairos/request").subscribe(
+    request_sub = nt_inst.getStringTopic("/chronos/request").subscribe(
         "", ntcore.PubSubOptions(periodic=0)
     )
     result_pub = nt_inst.getDoubleArrayTopic(
-        "/kairos/result/" + str(DEVICE_ID)
+        "/chronos/result/" + str(DEVICE_ID)
     ).publish(ntcore.PubSubOptions(periodic=0))
-    ping_pub = nt_inst.getIntegerTopic("/kairos/ping/" + str(DEVICE_ID)).publish(
+    ping_pub = nt_inst.getIntegerTopic("/chronos/ping/" + str(DEVICE_ID)).publish(
         ntcore.PubSubOptions()
     )
 
