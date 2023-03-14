@@ -14,4 +14,5 @@ public class Trajectory {
   public List<State> getStates() {
     return states;
   }
+  
 }
