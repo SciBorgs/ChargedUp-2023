@@ -252,8 +252,10 @@ public final class Constants {
     public static final PlacementState BACK_LOW_CONE = PlacementState.fromAbsolute(0, 0.1, 0);
     public static final PlacementState BACK_MID_CONE = PlacementState.fromAbsolute(0, 0.2, 0.6);
 
-    public static final PlacementState FRONT_MID_CUBE = PlacementState.fromAbsolute(0.11362, 0.458149, 0.353288);
-    public static final PlacementState FRONT_HIGH_CUBE = PlacementState.fromAbsolute(0.113502, 0.333258, 0.353208);
+    public static final PlacementState FRONT_MID_CUBE =
+        PlacementState.fromAbsolute(0.11362, 0.458149, 0.353288);
+    public static final PlacementState FRONT_HIGH_CUBE =
+        PlacementState.fromAbsolute(0.113502, 0.333258, 0.353208);
 
     public static final PlacementState BACK_LOW_CUBE = PlacementState.fromAbsolute(0, 0.1, 0);
     public static final PlacementState BACK_MID_CUBE = PlacementState.fromAbsolute(0, 0.2, 0.6);
@@ -261,12 +263,14 @@ public final class Constants {
 
     // intaking
     public static final PlacementState BACK_INTAKE = PlacementState.fromAbsolute(0, 0, 0);
-    
+
     public static final PlacementState FRONT_SINGLE_SUBSTATION_CONE =
         PlacementState.fromAbsolute(0.425006, 0.128855, -0.305); // wrist: -0.292673
-        public static final PlacementState FRONT_SINGLE_SUBSTATION_CUBE = PlacementState.fromAbsolute(0.543571, -0.367516, 0.445646);
-      
-    public static final PlacementState BACK_DOUBLE_SUBSTATION = PlacementState.fromAbsolute(0, 2.753496, -3.042500);
+    public static final PlacementState FRONT_SINGLE_SUBSTATION_CUBE =
+        PlacementState.fromAbsolute(0.543571, -0.367516, 0.445646);
+
+    public static final PlacementState BACK_DOUBLE_SUBSTATION =
+        PlacementState.fromAbsolute(0, 2.753496, -3.042500);
   }
 
   // TODO make this less horrable
