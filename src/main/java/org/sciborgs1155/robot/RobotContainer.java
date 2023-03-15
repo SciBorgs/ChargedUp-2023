@@ -2,7 +2,6 @@ package org.sciborgs1155.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -55,11 +54,12 @@ public class RobotContainer {
     VOLTAGE
   }
 
-  private final SendableChooser<ButtonProfile> profileChooser = new SendableChooser<ButtonProfile>();
+  private final SendableChooser<ButtonProfile> profileChooser =
+      new SendableChooser<ButtonProfile>();
 
   private ButtonProfile getProfile() {
     return profileChooser.getSelected();
-  }  
+  }
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -108,7 +108,6 @@ public class RobotContainer {
     operator.povLeft().onTrue(placement.safeToState(Positions.FRONT_INTAKE));
     operator.povUp().onTrue(placement.safeToState(Positions.BACK_HIGH_CONE));
     operator.povRight().onTrue(placement.safeToState(Positions.FRONT_MID_CONE));
-    
 
     operator.x().onTrue(placement.safeToState(Positions.STOW));
     operator.y().onTrue(placement.safeToState(Positions.SINGLE_SUBSTATION_CONE));
@@ -117,7 +116,6 @@ public class RobotContainer {
     // no
     operator.leftBumper().onTrue(intake.intakeTmp()).onFalse(intake.stop());
     operator.rightBumper().onTrue(intake.outtake()).onFalse(intake.stop());
-
 
     // TODO: not a todo but use this??
     // operator.leftBumper().onTrue(intake.intake());
