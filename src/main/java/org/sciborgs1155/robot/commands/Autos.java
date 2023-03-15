@@ -12,10 +12,7 @@ import java.util.List;
 import java.util.Map;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.commands.Scoring.Alliance;
-import org.sciborgs1155.robot.commands.Scoring.GamePiece;
-import org.sciborgs1155.robot.commands.Scoring.ScoringHeight;
-import org.sciborgs1155.robot.commands.Scoring.Side;
+import org.sciborgs1155.robot.commands.Scoring.*;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 
@@ -202,14 +199,12 @@ public class Autos implements Loggable {
         Constants.Field.SCORING_POINTS.get(scoringPointNum), new Rotation2d(side.rads()));
   }
 
-  record ScoringState(Pose2d pose, ScoringHeight height, Side side) {}
-
   private Command intakeScore(Pose2d startPose, Pose2d intakePose, ScoringState scoringState) {
     return drive
         .driveToPose(startPose, intakePose)
         .andThen(autoIntake())
-        .andThen(drive.driveToPose(intakePose, scoringState.pose))
-        .andThen(scoring.score(scoringState.height, scoringState.side));
+        .andThen(drive.driveToPose(intakePose, scoringState.pose()))
+        .andThen(scoring.score(scoringState));
   }
 
   /** returns currently selected auto command */
