@@ -17,6 +17,7 @@
       "/Shuffleboard/Autos/Drive/field2d": "Field2d",
       "/Shuffleboard/Autos/Drive/imu": "Gyro",
       "/Shuffleboard/Autos/autoChooser": "String Chooser",
+      "/Shuffleboard/Autos/startingPosChooser": "String Chooser",
       "/Shuffleboard/Drive/field2d": "Field2d",
       "/Shuffleboard/Drive/imu": "Gyro",
       "/Shuffleboard/RobotContainer/visualizer": "Mechanism2d",
@@ -24,27 +25,17 @@
       "/SmartDashboard/frontPhotonVision Sim Field": "Field2d"
     },
     "windows": {
-      "/Shuffleboard/Autos/Drive/field2d": {
-        "window": {
-          "visible": true
-        }
-      },
       "/Shuffleboard/Autos/autoChooser": {
         "window": {
           "visible": true
         }
       },
-      "/Shuffleboard/RobotContainer/visualizer": {
+      "/Shuffleboard/Autos/startingPosChooser": {
         "window": {
           "visible": true
         }
       },
       "/SmartDashboard/backPhotonVision Sim Field": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/frontPhotonVision Sim Field": {
         "window": {
           "visible": true
         }

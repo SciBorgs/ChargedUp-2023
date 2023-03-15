@@ -21,7 +21,15 @@ import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 
 public class Autos implements Loggable {
+
+  public enum StartingPos {
+    LEFT,
+    CENTER,
+    RIGHT
+  }
+
   @Log private final SendableChooser<Command> autoChooser;
+  @Log private final SendableChooser<StartingPos> startingPosChooser;
 
   private final Drive drive;
   private final Placement placement;
@@ -52,7 +60,11 @@ public class Autos implements Loggable {
             eventMarkers,
             true,
             drive);
-    // commands
+
+    startingPosChooser = new SendableChooser<StartingPos>();
+    startingPosChooser.setDefaultOption("left", StartingPos.LEFT);
+    startingPosChooser.addOption("right", StartingPos.RIGHT);
+    startingPosChooser.addOption("center", StartingPos.CENTER);
 
     autoChooser = new SendableChooser<Command>();
     autoChooser.setDefaultOption("simplest drive", simplestDrive());
@@ -64,7 +76,7 @@ public class Autos implements Loggable {
     autoChooser.addOption("score", highConeScore());
     autoChooser.addOption("align score", allignScore());
     autoChooser.addOption("intake", autoIntake(Constants.Positions.FRONT_INTAKE));
-    autoChooser.addOption("cone, cube, engage", coneCubeEngage());
+    autoChooser.addOption("cone, cube, engage", coneCubeEngage(startingPosChooser.getSelected()));
   }
 
   private Map<String, Command> genEventMarkers() {
@@ -94,10 +106,14 @@ public class Autos implements Loggable {
         PathPlanner.loadPath(pathName, Constants.Drive.CONSTRAINTS));
   }
 
-  private Command coneCubeEngage() {
-    return followAutoPath("cone score to intake")
+  private Command coneCubeEngage(StartingPos startingPos) {
+    if (startingPos == StartingPos.CENTER) {
+      throw new RuntimeException("cannot do cone cube engage auto path from center");
+    }
+    String pathNameSuffix = startingPos == StartingPos.LEFT ? " 2" : "";
+    return followAutoPath("cone score to intake" + pathNameSuffix)
         .andThen(autoIntake(Constants.Positions.FRONT_INTAKE))
-        .andThen(followAutoPath("intake to cube score to balance"))
+        .andThen(followAutoPath("intake to cube score to balance" + pathNameSuffix))
         .andThen(balance());
   }
 
