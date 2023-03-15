@@ -1,6 +1,6 @@
 package org.sciborgs1155.robot.commands;
 
-import static org.sciborgs1155.robot.Constants.Positions.*;
+import static org.sciborgs1155.robot.Constants.POSITIONS;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -43,6 +43,6 @@ public class Placement {
 
   public Command safeToState(PlacementState state) {
     return new ConditionalCommand(
-        toState(PASS_OVER, state), toState(state), () -> state.side() != state().side());
+        toState(POSITIONS.get("PASS_OVER"), state), toState(state), () -> state.side() != state().side());
   }
 }

@@ -75,7 +75,7 @@ public class Autos implements Loggable {
     autoChooser.addOption("goofyApp", goofyApp());
     autoChooser.addOption("score", highConeScore());
     autoChooser.addOption("align score", allignScore());
-    autoChooser.addOption("intake", autoIntake(Constants.Positions.FRONT_INTAKE));
+    autoChooser.addOption("intake", autoIntake(Constants.POSITIONS.get("FRONT_INTAKE")));
     autoChooser.addOption("cone, cube, engage", coneCubeEngage(startingPosChooser.getSelected()));
   }
 
@@ -86,19 +86,19 @@ public class Autos implements Loggable {
             scoring
                 .setGamePiece(GamePiece.CONE)
                 .andThen(scoring.score(ScoringHeight.HIGH, Side.BACK))
-                .andThen(placement.safeToState(Constants.Positions.STOW))),
+                .andThen(placement.safeToState(Constants.POSITIONS.get("STOW")))),
         Map.entry(
             "frontHighCube",
             scoring
                 .setGamePiece(GamePiece.CUBE)
                 .andThen(scoring.score(ScoringHeight.HIGH, Side.FRONT))
-                .andThen(placement.safeToState(Constants.Positions.STOW))),
+                .andThen(placement.safeToState(Constants.POSITIONS.get("STOW")))),
         Map.entry(
             "backHighCube",
             scoring
                 .setGamePiece(GamePiece.CUBE)
                 .andThen(scoring.score(ScoringHeight.HIGH, Side.BACK))
-                .andThen(placement.safeToState(Constants.Positions.STOW))));
+                .andThen(placement.safeToState(Constants.POSITIONS.get("STOW")))));
   }
 
   private Command followAutoPath(String pathName) {
@@ -112,7 +112,7 @@ public class Autos implements Loggable {
     }
     String pathNameSuffix = startingPos == StartingPos.LEFT ? " 2" : "";
     return followAutoPath("cone score to intake" + pathNameSuffix)
-        .andThen(autoIntake(Constants.Positions.FRONT_INTAKE))
+        .andThen(autoIntake(Constants.POSITIONS.get("PASS_OVER")))
         .andThen(followAutoPath("intake to cube score to balance" + pathNameSuffix))
         .andThen(balance());
   }

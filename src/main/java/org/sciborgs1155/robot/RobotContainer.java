@@ -9,7 +9,7 @@ import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.Visualizer;
-import org.sciborgs1155.robot.Constants.Positions;
+import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Placement;
@@ -39,8 +39,8 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
   private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
-  private final CommandJoystick leftJoystick = new CommandJoystick(OI.LEFT_STICK);
-  private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
+  // private final CommandJoystick leftJoystick = new CommandJoystick(OI.LEFT_STICK);
+  // private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
 
   // command factories
   private final Placement placement = new Placement(arm, elevator);
@@ -60,6 +60,9 @@ public class RobotContainer {
   private ButtonProfile getProfile() {
     return profileChooser.getSelected();
   }
+
+  private String gamepiece = "CUBE";
+  private String side = "BACK";
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -91,6 +94,8 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    driver.b().onTrue(drive.zeroHeading());
+    
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     // new Trigger(m_exampleSubsystem::exampleCondition)
     // .onTrue(new ExampleCommand(m_exampleSubsystem));
@@ -102,12 +107,13 @@ public class RobotContainer {
     // rightJoystick.trigger().onTrue(intake.start(false)).onFalse(intake.stop());
     // rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
 
-    driver.b().onTrue(drive.zeroHeading());
     // xbox.a().onTrue(elevator.setGoal(0.3));
     // xbox.b().onTrue(elevator.setGoal(0));
     // operator.povLeft().onTrue(placement.safeToState(Positions.FRONT_INTAKE));
     // operator.povUp().onTrue(placement.safeToState(Positions.BACK_HIGH_CONE));
     // operator.povRight().onTrue(placement.safeToState(Positions.FRONT_MID_CONE));
+
+    
 
     operator.povUp().onTrue(placement.safeToState(Positions.FRONT_HIGH_CUBE));
     operator.povRight().onTrue(placement.safeToState(Positions.FRONT_MID_CUBE));

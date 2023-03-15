@@ -10,9 +10,11 @@ import java.util.Collection;
 import java.util.List;
 import org.sciborgs1155.lib.PlacementState;
 import org.sciborgs1155.lib.Vision;
+import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.*;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
+
 
 public class Scoring {
   public enum Side {
@@ -123,35 +125,35 @@ public class Scoring {
       case CONE:
         switch (height) {
           case HIGH:
-            return Positions.BACK_HIGH_CONE;
+            return Constants.POSITIONS.get("BACK_HIGH_CONE");
           case MID:
             switch (side) {
               case FRONT:
-                return Positions.FRONT_MID_CONE;
+                return Constants.POSITIONS.get("FRONT_MID_CONE");
               case BACK:
-                return Positions.BACK_MID_CONE;
+                return Constants.POSITIONS.get("BACK_MID_CONE");
             }
           case LOW:
-            return Positions.BACK_LOW_CONE;
+            return Constants.POSITIONS.get("BACK_LOW_CONE");
         }
       case CUBE:
         switch (height) {
           case HIGH:
             switch (side) {
               case FRONT:
-                return Positions.FRONT_HIGH_CUBE;
+                return Constants.POSITIONS.get("FRONT_HIGH_CUBE");
               case BACK:
-                return Positions.BACK_HIGH_CUBE;
+                return Constants.POSITIONS.get("BACK_HIGH_CUBE");
             }
           case MID:
             switch (side) {
               case FRONT:
-                return Positions.FRONT_MID_CUBE;
+                return Constants.POSITIONS.get("FRONT_MID_CUBE");
               case BACK:
-                return Positions.BACK_MID_CUBE;
+                return Constants.POSITIONS.get("BACK_MID_CUBE");
             }
           case LOW:
-            return Positions.BACK_LOW_CUBE;
+            return Constants.POSITIONS.get("BACK_LOW_CUBE");
         }
     }
     throw new RuntimeException(
@@ -169,9 +171,9 @@ public class Scoring {
     // TODO either get rid of this or make it actually correct
     switch (side) {
       case BACK:
-        return Positions.BACK_INTAKE;
+        return Constants.POSITIONS.get("BACK_INTAKE");
       case FRONT:
-        return Positions.FRONT_INTAKE;
+        return Constants.POSITIONS.get("FRONT_INTAKE");
     }
     throw new RuntimeException(
         "intakeState was not called on a valid arguments. \n"
