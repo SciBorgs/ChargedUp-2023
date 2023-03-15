@@ -7,15 +7,22 @@ import edu.wpi.first.wpilibj2.command.Command;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
+import java.util.Map;
+
 import org.sciborgs1155.lib.PlacementState;
 import org.sciborgs1155.lib.Vision;
-import org.sciborgs1155.robot.Constants.*;
+import org.sciborgs1155.lib.constants.PIDConstants;
+import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.Constants.Positions;
 import org.sciborgs1155.robot.commands.Scoring.Alliance;
 import org.sciborgs1155.robot.commands.Scoring.GamePiece;
 import org.sciborgs1155.robot.commands.Scoring.ScoringHeight;
 import org.sciborgs1155.robot.commands.Scoring.Side;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
+
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 public class Autos implements Loggable {
   @Log private final SendableChooser<Command> autoChooser;
@@ -26,12 +33,29 @@ public class Autos implements Loggable {
   private final Intake intake;
   private final Scoring scoring;
 
+  public final Map<String, Command> eventMarkers;
+  public final SwerveAutoBuilder autoBuilder;
+
+
   public Autos(Drive drive, Placement placement, Vision vision, Intake intake, Scoring scoring) {
     this.drive = drive;
     this.vision = vision;
     this.intake = intake;
     this.placement = placement;
     this.scoring = scoring;
+
+    eventMarkers = genEventMarkers();
+
+    this.autoBuilder = new SwerveAutoBuilder(
+      drive::getPose, // Pose2d supplier
+      drive::resetOdometry, // Pose2d consumer, used to reset odometry at the beginning of auto
+      drive.kinematics, // SwerveDriveKinematics
+      new com.pathplanner.lib.auto.PIDConstants(5.0, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
+      new com.pathplanner.lib.auto.PIDConstants(0.5, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
+      drive::setModuleStates, // Module states consumer used to output to the drive subsystem
+      eventMarkers,
+      true, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+      drive); // The drive subsystem. Used to properly set the requirements of path following commands
 
     autoChooser = new SendableChooser<Command>();
     autoChooser.setDefaultOption("simplest drive", simplestDrive());
@@ -40,11 +64,34 @@ public class Autos implements Loggable {
     autoChooser.addOption("balance", balance());
     autoChooser.addOption("goofy", goofy());
     autoChooser.addOption("goofyApp", goofyApp());
-    autoChooser.addOption("2 cubes low", twoCubesLow());
-    autoChooser.addOption("2 cubes engage", twoCubesEngage());
     autoChooser.addOption("score", highConeScore());
     autoChooser.addOption("align score", allignScore());
-    autoChooser.addOption("intake", autoIntake(Positions.FRONT_INTAKE));
+    autoChooser.addOption("intake", autoIntake(Constants.Positions.FRONT_INTAKE));
+    autoChooser.addOption("cone, cube, engage", coneCubeEngage());
+  }
+
+  private Map<String, Command> genEventMarkers() {
+    return Map.ofEntries(
+      Map.entry("backHighCone", scoring.setGamePiece(GamePiece.CONE).andThen(
+                                scoring.score(ScoringHeight.HIGH, Side.BACK)).andThen(
+                                placement.safeToState(Constants.Positions.STOW))),
+      Map.entry("frontHighCube", scoring.setGamePiece(GamePiece.CUBE).andThen(
+                                 scoring.score(ScoringHeight.HIGH, Side.FRONT)).andThen(
+                                 placement.safeToState(Constants.Positions.STOW))),
+      Map.entry("backHighCube", scoring.setGamePiece(GamePiece.CUBE).andThen(
+                                scoring.score(ScoringHeight.HIGH, Side.BACK)).andThen(
+                                placement.safeToState(Constants.Positions.STOW))));
+  }
+
+  private Command followAutoPath(String pathName) {
+    return autoBuilder.followPathWithEvents(PathPlanner.loadPath(pathName, Constants.Drive.CONSTRAINTS));
+  }
+
+  private Command coneCubeEngage() {
+    return followAutoPath("cone score to intake")
+          .andThen(autoIntake(Constants.Positions.FRONT_INTAKE))
+          .andThen(followAutoPath("intake to cube score to balance"))
+          .andThen(balance());
   }
 
   private Command simpleDrive() {
@@ -110,40 +157,32 @@ public class Autos implements Loggable {
         .andThen(scoring.score(ScoringHeight.HIGH, Side.BACK));
   }
 
-  // TODO jasdfhjisauhg
-  /** score cube low, intake cube, score cube low, intake cube */
-  private Command twoCubesLow() {
-    Pose2d startingPose = new Pose2d(Field.SCORING_POINTS.get(1), Rotation2d.fromRadians(0));
-    Pose2d intakePose1 = new Pose2d(Field.INTAKE_POINTS.get(1), Rotation2d.fromRadians(Math.PI));
-    Pose2d scoringPose2 = new Pose2d(Field.SCORING_POINTS.get(2), Rotation2d.fromRadians(0));
-    Pose2d intakePose2 = new Pose2d(Field.INTAKE_POINTS.get(2), Rotation2d.fromRadians(Math.PI));
-    return scoring
-        .setGamePiece(GamePiece.CUBE)
-        .andThen(scoring.score(ScoringHeight.LOW, Side.FRONT))
-        .andThen(drive.driveToPose(startingPose, intakePose1))
-        .andThen(autoIntake(Positions.BACK_INTAKE))
-        .andThen(drive.driveToPose(intakePose1, scoringPose2))
-        .andThen(scoring.score(ScoringHeight.LOW, Side.FRONT))
-        .andThen(drive.driveToPose(scoringPose2, intakePose2))
-        .andThen(autoIntake(Positions.BACK_INTAKE));
+  // private Command intakeScore(Pose2d startingPos, int intakingPos, int scoringPos, GamePiece gamePiece) {
+  //   return
+  //     drive.driveToPose(startingPos, )
+  // }
+
+  private Pose2d intakePose(int intakePointNum, Side side) {
+    return new Pose2d(Constants.Field.INTAKE_POINTS.get(intakePointNum), new Rotation2d(Math.PI - side.rads()));
   }
 
-  // TODO make accurate
-  private Command twoCubesEngage() {
-    Pose2d startPose = new Pose2d(Field.SCORING_POINTS.get(1), Rotation2d.fromRadians(Math.PI));
-    Pose2d intakePose = new Pose2d(Field.INTAKE_POINTS.get(1), Rotation2d.fromRadians(Math.PI));
-    Pose2d scorePose = new Pose2d(Field.INTAKE_POINTS.get(2), Rotation2d.fromRadians(Math.PI));
-    Pose2d balancePose = new Pose2d(Field.BALANCE_POINTS.get(1), Rotation2d.fromRadians(Math.PI));
-    return scoring
-        .setGamePiece(GamePiece.CUBE)
-        .andThen(scoring.score(ScoringHeight.HIGH, Side.BACK))
-        .andThen(drive.driveToPose(startPose, intakePose))
-        .andThen(autoIntake(Positions.FRONT_INTAKE))
-        .andThen(drive.driveToPose(intakePose, scorePose))
-        .andThen(scoring.score(ScoringHeight.HIGH, Side.BACK))
-        .andThen(drive.driveToPose(scorePose, balancePose))
-        .andThen(balance());
+  private Pose2d scoringPose(int scoringPointNum, Side side) {
+    return new Pose2d(Constants.Field.SCORING_POINTS.get(scoringPointNum), new Rotation2d(side.rads()));
   }
+
+  record ScoringState(Pose2d pose, ScoringHeight height, Side side) {}
+
+  record IntakeState(Pose2d pose, PlacementState state) {}
+
+  private Command intakeScore(Pose2d startPose, IntakeState intakeState, ScoringState scoringState) {
+    return
+      drive.driveToPose(startPose, intakeState.pose)
+      .andThen(autoIntake(intakeState.state))
+      .andThen(drive.driveToPose(intakeState.pose, scoringState.pose))
+      .andThen(scoring.score(scoringState.height, scoringState.side));
+  }
+
+
 
   /** returns currently selected auto command */
   public Command get() {

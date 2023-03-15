@@ -38,6 +38,16 @@
         "window": {
           "visible": true
         }
+      },
+      "/SmartDashboard/backPhotonVision Sim Field": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/frontPhotonVision Sim Field": {
+        "window": {
+          "visible": true
+        }
       }
     }
   },

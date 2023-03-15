@@ -58,7 +58,7 @@ public class Drive extends SubsystemBase implements Loggable {
 
   @Log private final WPI_PigeonIMU imu = new WPI_PigeonIMU(PIGEON);
 
-  private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
+  public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
   // Odometry and pose estimation
   private final Vision vision;
