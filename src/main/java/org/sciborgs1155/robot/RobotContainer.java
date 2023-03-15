@@ -7,6 +7,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
+
+import javax.swing.text.Position;
+
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants.Positions;
@@ -105,12 +108,17 @@ public class RobotContainer {
     driver.b().onTrue(drive.zeroHeading());
     // xbox.a().onTrue(elevator.setGoal(0.3));
     // xbox.b().onTrue(elevator.setGoal(0));
-    operator.povLeft().onTrue(placement.safeToState(Positions.FRONT_INTAKE));
-    operator.povUp().onTrue(placement.safeToState(Positions.BACK_HIGH_CONE));
-    operator.povRight().onTrue(placement.safeToState(Positions.FRONT_MID_CONE));
+    // operator.povLeft().onTrue(placement.safeToState(Positions.FRONT_INTAKE));
+    // operator.povUp().onTrue(placement.safeToState(Positions.BACK_HIGH_CONE));
+    // operator.povRight().onTrue(placement.safeToState(Positions.FRONT_MID_CONE));
+
+    operator.povUp().onTrue(placement.safeToState(Positions.FRONT_HIGH_CUBE));
+    operator.povRight().onTrue(placement.safeToState(Positions.FRONT_MID_CUBE));
+    operator.povLeft().onTrue(placement.safeToState(Positions.BACK_DOUBLE_SUBSTATION));
+    operator.povDown().onTrue(placement.safeToState(Positions.FRONT_SINGLE_SUBSTATION_CUBE));
 
     operator.x().onTrue(placement.safeToState(Positions.STOW));
-    operator.y().onTrue(placement.safeToState(Positions.SINGLE_SUBSTATION_CONE));
+    operator.y().onTrue(placement.safeToState(Positions.FRONT_SINGLE_SUBSTATION_CONE));
     // angery
     // stop fucking my wires up
     // no

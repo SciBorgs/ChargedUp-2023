@@ -119,9 +119,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
     lead.setVoltage(fbOutput + ffOutput);
 
-    if (filter.calculate(lead.getOutputCurrent()) >= CURRENT_SPIKE_THRESHOLD) {
-      hasSpiked = true;
-    }
+    hasSpiked = filter.calculate(lead.getOutputCurrent()) >= CURRENT_SPIKE_THRESHOLD;
 
     visualizer.setElevator(getPosition(), pid.getSetpoint().position);
 
