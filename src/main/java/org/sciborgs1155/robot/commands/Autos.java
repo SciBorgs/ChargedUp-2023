@@ -10,7 +10,6 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import java.util.Map;
-import org.sciborgs1155.lib.PlacementState;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.commands.Scoring.Alliance;
@@ -70,12 +69,12 @@ public class Autos implements Loggable {
     autoChooser.setDefaultOption("simplest drive", simplestDrive());
     autoChooser.addOption("simple drive", simpleDrive());
     autoChooser.addOption("meandering drive", meanderingDrive());
-    autoChooser.addOption("balance", balance());
+    autoChooser.addOption("balance", balance(Rotation2d.fromRadians(Math.PI)));
     autoChooser.addOption("goofy", goofy());
     autoChooser.addOption("goofyApp", goofyApp());
     autoChooser.addOption("score", highConeScore());
     autoChooser.addOption("align score", allignScore());
-    autoChooser.addOption("intake", autoIntake(Constants.POSITIONS.get("FRONT_INTAKE")));
+    autoChooser.addOption("intake", autoIntake());
     autoChooser.addOption("cone, cube, engage", coneCubeEngage(startingPosChooser.getSelected()));
   }
 
@@ -112,9 +111,9 @@ public class Autos implements Loggable {
     }
     String pathNameSuffix = startingPos == StartingPos.LEFT ? " 2" : "";
     return followAutoPath("cone score to intake" + pathNameSuffix)
-        .andThen(autoIntake(Constants.POSITIONS.get("PASS_OVER")))
+        // .andThen(autoIntake(Constants.POSITIONS.get("PASS_OVER")))
         .andThen(followAutoPath("intake to cube score to balance" + pathNameSuffix))
-        .andThen(balance());
+        .andThen(balance(Rotation2d.fromRadians(0)));
   }
 
   private Command simpleDrive() {
@@ -125,6 +124,7 @@ public class Autos implements Loggable {
   }
 
   private Command simplestDrive() {
+    drive.resetOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
     return drive.driveToPose(new Pose2d(0, 5, Rotation2d.fromDegrees(0)));
   }
 
@@ -139,9 +139,16 @@ public class Autos implements Loggable {
     return drive.driveToPoses(poses).andThen(drive.driveToPose(transitionPose, endPose));
   }
 
-  private Command balance() {
+  private Command justBalance() {
+    if (startingPosChooser.getSelected() != StartingPos.CENTER) {
+      throw new RuntimeException("just balance path can only be done from center");
+    }
+    return balance(Rotation2d.fromRadians(Math.PI));
+  }
+
+  private Command balance(Rotation2d rot) {
     return drive
-        .drive(() -> 0.5, () -> 0, () -> 0, true)
+        .drive(() -> 0.5, () -> 0, () -> rot.getRadians(), true)
         .withTimeout(0.6)
         .andThen(drive.balanceOrthogonal());
   }
@@ -159,10 +166,9 @@ public class Autos implements Loggable {
     return drive.follow("goofy", true, false);
   }
 
-  // i kind of hate having this here but oh well
-  private Command autoIntake(PlacementState placementState) {
+  private Command autoIntake() {
     return scoring
-        .intake(placementState)
+        .intake(Constants.POSITIONS.get("FRONT_INTAKE"))
         .alongWith(drive.drive(() -> 0.1, () -> 0.1, () -> 0, false))
         .until(intake::isHoldingItem);
   }
@@ -198,14 +204,11 @@ public class Autos implements Loggable {
 
   record ScoringState(Pose2d pose, ScoringHeight height, Side side) {}
 
-  record IntakeState(Pose2d pose, PlacementState state) {}
-
-  private Command intakeScore(
-      Pose2d startPose, IntakeState intakeState, ScoringState scoringState) {
+  private Command intakeScore(Pose2d startPose, Pose2d intakePose, ScoringState scoringState) {
     return drive
-        .driveToPose(startPose, intakeState.pose)
-        .andThen(autoIntake(intakeState.state))
-        .andThen(drive.driveToPose(intakeState.pose, scoringState.pose))
+        .driveToPose(startPose, intakePose)
+        .andThen(autoIntake())
+        .andThen(drive.driveToPose(intakePose, scoringState.pose))
         .andThen(scoring.score(scoringState.height, scoringState.side));
   }
 
