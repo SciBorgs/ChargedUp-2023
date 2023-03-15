@@ -4,20 +4,17 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.sciborgs1155.robot.commands.Scoring.*;
 
-public class LED {
-  private AddressableLED led;
-  private AddressableLEDBuffer ledBuffer;
-
-  public LED(AddressableLED led, AddressableLEDBuffer ledBuffer) {
-    this.led = new AddressableLED(0);
-    this.ledBuffer = new AddressableLEDBuffer(0);
-  }
+public class LED extends SubsystemBase {
+  private AddressableLED led = new AddressableLED(0);
+  private AddressableLEDBuffer ledBuffer = new AddressableLEDBuffer(0);
 
   public void coneLED() {
     for (int i = 0; i < ledBuffer.getLength(); i++) {
-      ledBuffer.setHSV(i, 57, 94, 98);
+      ledBuffer.setRGB(i, 226, 248, 31);
+      ;
     }
     led.setData(ledBuffer);
     led.start();
@@ -32,7 +29,7 @@ public class LED {
 
   public void cubeLED() {
     for (int i = 0; i < ledBuffer.getLength(); i++) {
-      ledBuffer.setHSV(i, 236, 100, 100);
+      ledBuffer.setRGB(i, 0, 17, 255);
     }
     led.setData(ledBuffer);
     led.start();
