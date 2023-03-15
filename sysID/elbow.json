@@ -19,7 +19,7 @@
     "SPARK MAX (Brushless)",
     "SPARK MAX (Brushless)"
   ],
-  "number of samples per average": 8,
+  "number of samples per average": 20,
   "primary encoder inverted": false,
   "primary encoder ports": [
     8,

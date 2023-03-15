@@ -1,10 +1,5 @@
 {
   "HALProvider": {
-    "DIO": {
-      "window": {
-        "visible": true
-      }
-    },
     "Other Devices": {
       "ADIS16470[0]": {
         "header": {
@@ -45,6 +40,9 @@
       "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
       "/LiveWindow/Ungrouped/Pigeon IMU [2]": "Gyro",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
+      "/Shuffleboard/Autos/Drive/field2d": "Field2d",
+      "/Shuffleboard/Autos/Drive/imu": "Gyro",
+      "/Shuffleboard/Autos/autoChooser": "String Chooser",
       "/Shuffleboard/Drive/field2d": "Field2d",
       "/Shuffleboard/Drive/gyro": "Gyro",
       "/Shuffleboard/Drive/imu": "Gyro",
@@ -61,6 +59,11 @@
       "/SmartDashboard/photonvision Sim Field": "Field2d"
     },
     "windows": {
+      "/Shuffleboard/Autos/autoChooser": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Shuffleboard/Drive/field2d": {
         "Cam Est Pose": {
           "color": [
@@ -350,6 +353,15 @@
         "Drive": {
           "gyro": {
             "open": true
+          },
+          "moduleDrivePID": {
+            "open": true
+          },
+          "moduleTurnPID": {
+            "open": true
+          },
+          "rearLeft": {
+            "open": true
           }
         },
         "Elevator": {
@@ -419,7 +431,7 @@
               "autoFit": true
             }
           ],
-          "height": 295,
+          "height": 8,
           "series": [
             {
               "color": [
@@ -443,7 +455,8 @@
         }
       ],
       "window": {
-        "name": "angle"
+        "name": "angle",
+        "visible": false
       }
     },
     "Plot <1>": {
@@ -454,7 +467,7 @@
               "autoFit": true
             }
           ],
-          "height": 295,
+          "height": 248,
           "series": [
             {
               "color": [

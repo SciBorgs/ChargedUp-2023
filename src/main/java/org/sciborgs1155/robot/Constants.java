@@ -5,68 +5,46 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import java.util.Map;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.sciborgs1155.lib.MotorConfig;
-import org.sciborgs1155.lib.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.PlacementState;
+import org.sciborgs1155.lib.constants.Conversion;
+import org.sciborgs1155.lib.constants.Conversion.PulsesPerRev;
+import org.sciborgs1155.lib.constants.MotorConfig;
+import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
+import org.sciborgs1155.lib.constants.PIDConstants;
+import org.sciborgs1155.lib.constants.SystemConstants;
 
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants. This class should not be used for any other purpose. All constants should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
+ * Constants is a globally accessible class for storing immutable values. Every value should be
+ * <code>public static final</code>.
  *
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
- * constants are needed, to reduce verbosity. <b>Units</b>
+ * constants are needed, to reduce verbosity.
+ *
+ * <p><b>Units</b>
  *
  * <ul>
  *   <li>length: meters
- *   <li>time: seconds, minutes
+ *   <li>time: seconds
  *   <li>angle: radians
  * </ul>
+ *
+ * @see MotorConfig
+ * @see Conversion
+ * @see PIDConstants
+ * @see Constraints
  */
 public final class Constants {
 
   public static final double RATE = 0.02; // roborio tickrate (s)
   public static final double DEADBAND = 0.1;
-  public static final int THROUGH_BORE_CPP = 2048;
-
-  public static final class Motors {
-    public static final MotorConfig DRIVE =
-        MotorConfig.base()
-            .withBurnFlash(false)
-            .withNeutralBehavior(NeutralBehavior.BRAKE)
-            .withCurrentLimit(50);
-
-    public static final MotorConfig TURN =
-        MotorConfig.base()
-            .withBurnFlash(false)
-            .withNeutralBehavior(NeutralBehavior.BRAKE)
-            .withCurrentLimit(20);
-
-    public static final MotorConfig ELEVATOR =
-        MotorConfig.base()
-            .withBurnFlash(false)
-            .withNeutralBehavior(NeutralBehavior.BRAKE)
-            .withCurrentLimit(40);
-
-    public static final MotorConfig ELBOW =
-        MotorConfig.base()
-            .withBurnFlash(false)
-            .withNeutralBehavior(NeutralBehavior.BRAKE)
-            .withCurrentLimit(50);
-
-    public static final MotorConfig WRIST =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
-
-    public static final MotorConfig INTAKE =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
-  }
 
   public static final class Dimensions {
     public static final double ELEVATOR_MIN_HEIGHT = 0;
-    public static final double ELEVATOR_MAX_HEIGHT = 0.7; // m
+    public static final double ELEVATOR_MAX_HEIGHT = 0.6; // m
 
     public static final double ELBOW_MIN_ANGLE = -Math.PI / 2.0;
     public static final double ELBOW_MAX_ANGLE = 3.0 * Math.PI / 2.0;
@@ -93,10 +71,6 @@ public final class Constants {
     // Distance between centers of right and left wheels on robot
     public static final double WHEEL_BASE = Units.inchesToMeters(24);
     // Distance between front and back wheels on robot
-
-    // Field dimensions
-    public static final double FIELD_LENGTH = Units.feetToMeters(54);
-    public static final double FIELD_WIDTH = Units.feetToMeters(27);
   }
 
   public static final class Vision {
@@ -129,69 +103,66 @@ public final class Constants {
 
   public static final class Arm {
     public static final class Wrist {
-      public static final double kP = 0.6;
-      public static final double kI = 0;
-      public static final double kD = 0;
+      public static final MotorConfig MOTOR =
+          MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withInvert(true);
 
-      public static final double kS = 0;
-      public static final double kG = 0;
-      public static final double kV = 0;
-      public static final double kA = 0;
+      public static final Conversion CONVERSION =
+          Conversion.base().withUnits(Conversion.Units.RADIANS);
 
-      public static final double MAX_VELOCITY = 3; // radians / s
-      public static final double MAX_ACCEL = 3; // radians / s^2
-      public static final TrapezoidProfile.Constraints CONSTRAINTS =
-          new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
+      public static final PIDConstants PID = new PIDConstants(4, 0, 0.1); // p: 6.1297, d: 0.8453
+      public static final SystemConstants FF =
+          new SystemConstants(0.1542, 0.53127, 0.87884, 0.038046);
+
+      public static final Constraints CONSTRAINTS = new Constraints(1.2, 0.6);
     }
 
     public static final class Elbow {
-      public static final double GEARING = 12.0 / 72.0; // rot
-      public static final double CONVERSION = GEARING * 2.0 * Math.PI; // rad
-      public static final double ENCODER_FACTOR = CONVERSION / Constants.THROUGH_BORE_CPP;
+      public static final MotorConfig MOTOR =
+          MotorConfig.base().withNeutralBehavior(NeutralBehavior.COAST).withCurrentLimit(50);
 
-      // public static final double kP = 8.0252;
-      public static final double kP = 2;
-      public static final double kI = 0;
-      public static final double kD = 0.2;
+      public static final Conversion CONVERSION =
+          Conversion.base()
+              .multiplyGearing(12)
+              .divideGearing(72)
+              .withUnits(Conversion.Units.RADIANS)
+              .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
 
-      public static final double kS = 0.12117;
-      public static final double kG = 0.48397;
-      public static final double kV = 1.1967;
-      public static final double kA = 0.23693;
+      public static final PIDConstants PID = new PIDConstants(9, 0, 1); // d = 2.18954
+      public static final SystemConstants FF =
+          new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
-      public static final double MAX_VELOCITY = 1; // rad / s
-      public static final double MAX_ACCEL = 0.5; // rad / s^2
-      public static final TrapezoidProfile.Constraints CONSTRAINTS =
-          new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCEL);
+      public static final Constraints CONSTRAINTS = new Constraints(1.3, 0.75);
     }
   }
 
   public static final class Elevator {
-    public static final double SPROCKET_RADIUS = Units.inchesToMeters(0.716);
-    public static final double CONVERSION = 2.0 * Math.PI * SPROCKET_RADIUS; // m
-    public static final double ENCODER_FACTOR = CONVERSION / Constants.THROUGH_BORE_CPP;
+    public static final MotorConfig MOTOR =
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(40);
 
-    public static final double MAX_SPEED = 20; // m/s
-    public static final double MAX_ACCEL = 8; // m/s^2
-    public static final double kP = 45; // 384.48
-    public static final double kI = 0;
-    public static final double kD = 1; // 47.131
+    public static final Conversion CONVERSION =
+        Conversion.base()
+            .multiplyRadius(0.0181864)
+            .withUnits(Conversion.Units.RADIANS)
+            .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
+    // units field for sysid is 0.1143
 
-    public static final double kS = 0.39974;
-    public static final double kG = 0.060732;
-    public static final double kV = 29.798;
-    public static final double kA = 2.554;
-    public static final TrapezoidProfile.Constraints CONSTRAINTS =
-        new TrapezoidProfile.Constraints(MAX_SPEED, MAX_ACCEL);
+    public static final PIDConstants PID = new PIDConstants(45, 0, 1);
+    public static final SystemConstants FF = new SystemConstants(0.20619, 0.069335, 33.25, 1.5514);
+
+    public static final Constraints CONSTRAINTS = new Constraints(1, 1);
   }
 
   public static final class Intake {
+    public static final MotorConfig MOTOR =
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
+
     public static final double WHEEL_SPEED = 0.4;
   }
 
   public static final class Drive {
     public static final double MAX_SPEED = 7; // m / s
     public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
+    public static final double MAX_ACCEL = 8; // m / s^2
 
     public static final Translation2d[] MODULE_OFFSET = {
       new Translation2d(Dimensions.WHEEL_BASE / 2, Dimensions.TRACK_WIDTH / 2), // front left
@@ -209,56 +180,45 @@ public final class Constants {
       Math.PI / 2 // rear right
     };
 
-    public static final double MAX_RATE = 12; // m / s^2
-    // limits open loop accel, used to prevent tipping
+    public static final PIDConstants CARTESIAN = new PIDConstants(1.2, 0, 0);
+    public static final PIDConstants ANGULAR = new PIDConstants(1.2, 0, 1);
+    public static final PIDConstants BALANCE = new PIDConstants(1, 0, 0);
+
+    public static final PathConstraints CONSTRAINTS = new PathConstraints(MAX_SPEED, MAX_ACCEL);
   }
 
   public static final class SwerveModule {
-    // we use a 14T pinion
-    public static final int PINION_TEETH = 14;
-
-    public static final double WHEEL_DIAMETER = 0.0762;
-
-    // 45 teeth on the wheel's bevel gear
-    // 22 teeth on the first-stage spur gear
-    // 15 teeth on the bevel pinion
-    public static final double DRIVING_MOTOR_REDUCTION = (45.0 * 22) / (PINION_TEETH * 15);
-
     public static final class Driving {
-      public static final double ENCODER_POSITION_FACTOR =
-          (WHEEL_DIAMETER * Math.PI) / DRIVING_MOTOR_REDUCTION; // m
-      public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0; // m/s
+      public static final MotorConfig MOTOR =
+          MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
 
-      public static final double kP = 0.07;
-      public static final double kI = 0;
-      public static final double kD = 0.06;
+      public static final Conversion CONVERSION =
+          Conversion.base()
+              .multiplyRadius(0.0381)
+              .withUnits(Conversion.Units.RADIANS)
+              .divideGearing(45.0)
+              .divideGearing(22.0)
+              .multiplyGearing(15.0)
+              .multiplyGearing(14.0); // pinion teeth
 
-      public static final double kS = 0.27;
-      public static final double kV = 0.4;
-      public static final double kA = 0.2;
+      public static final PIDConstants PID = new PIDConstants(0.07, 0, 0.06);
+      public static final SystemConstants FF = new SystemConstants(0.27, 0.4, 0.2);
     }
 
     public static final class Turning {
-      public static final double ENCODER_POSITION_FACTOR = (2 * Math.PI); // rad
-      public static final double ENCODER_VELOCITY_FACTOR =
-          ENCODER_POSITION_FACTOR / 60.0; // rad / s
+      public static final MotorConfig MOTOR =
+          MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(20);
+
+      public static final Conversion CONVERSION =
+          Conversion.base()
+              .withUnits(Conversion.Units.RADIANS)
+              .withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
+
       public static final boolean ENCODER_INVERTED = true;
 
-      public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
-      public static final double MAX_ANGULAR_ACCELERATION = 2 * Math.PI; // rad / s^2
-
-      public static final double kP = 1.7;
-      public static final double kI = 0;
-      public static final double kD = 0.1;
-
-      // feedforward constants for simulation
-      public static final double kS = 0;
-      public static final double kV = 0.25;
-      public static final double kA = 0.015;
-
-      // pid wrapping
-      public static final double MIN_INPUT = 0;
-      public static final double MAX_INPUT = ENCODER_POSITION_FACTOR;
+      public static final PIDConstants PID = new PIDConstants(1.7, 0, 0.1);
+      // system constants only used in simulation
+      public static final SystemConstants FF = new SystemConstants(0, 0.25, 0.015);
     }
   }
 
@@ -283,21 +243,38 @@ public final class Constants {
     public static final PlacementState BACK_HIGH_CUBE = PlacementState.fromAbsolute(0, 1, 1.1);
   }
 
-  public static final class Auto {
-    public static final class Cartesian {
-      public static final double kP = 1.2;
-      public static final double kI = 0;
-      public static final double kD = 0;
-    }
+  // TODO make this less horrable
+  public static final class Field {
+    public static final Map<String, Translation2d> INTAKE_POINTS =
+        Map.ofEntries(
+            Map.entry("B1", new Translation2d()),
+            Map.entry("B2", new Translation2d()),
+            Map.entry("B3", new Translation2d()),
+            Map.entry("B4", new Translation2d()),
+            Map.entry("R1", new Translation2d()),
+            Map.entry("R2", new Translation2d()),
+            Map.entry("R3", new Translation2d()),
+            Map.entry("R4", new Translation2d()));
 
-    public static final class Angular {
-      public static final double kP = 1.2;
-      public static final double kI = 0;
-      public static final double kD = 1;
-    }
-
-    public static final double MAX_SPEED = Drive.MAX_SPEED; // m/s
-    public static final double MAX_ACCEL = 4; // m/s^2
-    public static final PathConstraints CONSTRAINTS = new PathConstraints(RATE, RATE);
+    public static final Map<String, Translation2d> SCORING_POINTS =
+        Map.ofEntries(
+            Map.entry("B1", new Translation2d()),
+            Map.entry("B2", new Translation2d()),
+            Map.entry("B3", new Translation2d()),
+            Map.entry("B4", new Translation2d()),
+            Map.entry("B5", new Translation2d()),
+            Map.entry("B6", new Translation2d()),
+            Map.entry("B7", new Translation2d()),
+            Map.entry("B8", new Translation2d()),
+            Map.entry("B9", new Translation2d()),
+            Map.entry("R1", new Translation2d()),
+            Map.entry("R2", new Translation2d()),
+            Map.entry("R3", new Translation2d()),
+            Map.entry("R4", new Translation2d()),
+            Map.entry("R5", new Translation2d()),
+            Map.entry("R6", new Translation2d()),
+            Map.entry("R7", new Translation2d()),
+            Map.entry("R8", new Translation2d(10, 3)),
+            Map.entry("R9", new Translation2d()));
   }
 }

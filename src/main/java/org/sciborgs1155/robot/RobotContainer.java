@@ -39,8 +39,8 @@ public class RobotContainer {
   private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
 
   // command factories
-  @Log private final Autos autos = new Autos(drive, vision);
   private final Placement placement = new Placement(arm, elevator);
+  private final Autos autos = new Autos(drive, placement, vision, intake);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -53,8 +53,10 @@ public class RobotContainer {
   }
 
   private void configureSubsystemDefaults() {
-    drive.setDefaultCommand(drive.drive(leftJoystick, rightJoystick, true));
-    arm.setDefaultCommand(arm.setVoltage(() -> xbox.getRightY() * 3, () -> xbox.getLeftY() * 3));
+    drive.setDefaultCommand(
+        drive.drive(
+            () -> -xbox.getLeftX(), () -> -leftJoystick.getX(), () -> -rightJoystick.getY(), true));
+    // arm.setDefaultCommand(arm.setVoltage(() -> xbox.getRightY() * 3, () -> xbox.getLeftY() * 3));
   }
 
   /**
@@ -78,10 +80,17 @@ public class RobotContainer {
     rightJoystick.trigger().onTrue(intake.start(false)).onFalse(intake.stop());
     // rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
 
-    xbox.a().onTrue(elevator.setGoal(0.55));
+    xbox.a().onTrue(elevator.setGoal(0.3));
     xbox.b().onTrue(elevator.setGoal(0));
     xbox.x().onTrue(intake.start(false)).onFalse(intake.stop());
     xbox.y().onTrue(intake.start(true)).onFalse(intake.stop());
+
+    // xbox.povLeft().onTrue(arm.setElbowGoal(new State(0, 0)));
+    // xbox.povUp().onTrue(arm.setElbowGoal(new State(1.57, 0)));
+    // xbox.povRight().onTrue(arm.setElbowGoal(new State(3.14, 0)));
+
+    // xbox.povUp().onTrue(arm.set)
+
     // xbox.povUp().onTrue(arm.setGoals(Rotation2d.fromDegrees(5), Rotation2d.fromDegrees(0)));
     // xbox.povDown().onTrue(arm.setGoals(Rotation2d.fromDegrees(-5), Rotation2d.fromDegrees(0)));
     // xbox.p.onTrue(arm.setVoltage(3)).onFalse(arm.setVoltage(0));
