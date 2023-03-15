@@ -50,6 +50,8 @@ public class Scoring {
     LOW
   }
 
+  public static record ScoringState(Pose2d pose, ScoringHeight height, Side side) {}
+
   private final Intake intake;
   private final Drive drive;
   private final Placement placement;
@@ -68,6 +70,10 @@ public class Scoring {
 
   public Command score(ScoringHeight height, Side side) {
     return score(gamePiece, height, side);
+  }
+
+  public Command score(ScoringState scoringState) {
+    return score(scoringState.height, scoringState.side);
   }
 
   private Command score(GamePiece gamePiece, ScoringHeight height, Side side) {
