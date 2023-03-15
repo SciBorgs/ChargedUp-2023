@@ -1,15 +1,16 @@
 package org.sciborgs1155.robot;
 
+import static org.sciborgs1155.robot.Constants.POSITIONS;
+
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.Visualizer;
-import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Placement;
@@ -64,6 +65,10 @@ public class RobotContainer {
   private String gamepiece = "CUBE";
   private String side = "BACK";
 
+  private String scorePosition(String location) {
+    return side + "_" + location + "_" + gamepiece;
+  }
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the oblog logger
@@ -95,7 +100,7 @@ public class RobotContainer {
    */
   private void configureBindings() {
     driver.b().onTrue(drive.zeroHeading());
-    
+
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     // new Trigger(m_exampleSubsystem::exampleCondition)
     // .onTrue(new ExampleCommand(m_exampleSubsystem));
@@ -107,24 +112,26 @@ public class RobotContainer {
     // rightJoystick.trigger().onTrue(intake.start(false)).onFalse(intake.stop());
     // rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
 
-    // xbox.a().onTrue(elevator.setGoal(0.3));
-    // xbox.b().onTrue(elevator.setGoal(0));
-    // operator.povLeft().onTrue(placement.safeToState(Positions.FRONT_INTAKE));
-    // operator.povUp().onTrue(placement.safeToState(Positions.BACK_HIGH_CONE));
-    // operator.povRight().onTrue(placement.safeToState(Positions.FRONT_MID_CONE));
+    // STATE SWITCHING
+    operator.b().onTrue(Commands.run(() -> side = "FRONT"));
+    operator.x().onTrue(Commands.run(() -> side = "BACK"));
+    operator.a().onTrue(Commands.run(() -> gamepiece = "CUBE"));
+    operator.y().onTrue(Commands.run(() -> gamepiece = "CONE"));
 
-    
+    // SCORING
+    operator.povUp().onTrue(placement.safeToState(POSITIONS.get(scorePosition("HIGH"))));
+    operator.povRight().onTrue(placement.safeToState(POSITIONS.get(scorePosition("MID"))));
+    operator.povDown().onTrue(placement.safeToState(POSITIONS.get(side + "_INTAKE")));
+    operator.povLeft().onTrue(placement.safeToState(POSITIONS.get("STOW")));
 
-    operator.povUp().onTrue(placement.safeToState(Positions.FRONT_HIGH_CUBE));
-    operator.povRight().onTrue(placement.safeToState(Positions.FRONT_MID_CUBE));
-    operator.povLeft().onTrue(placement.safeToState(Positions.BACK_DOUBLE_SUBSTATION));
-    operator.povDown().onTrue(placement.safeToState(Positions.FRONT_SINGLE_SUBSTATION_CUBE));
+    operator
+        .povUpLeft()
+        .onTrue(placement.safeToState(POSITIONS.get(scorePosition("SINGLE_SUBSTATION"))));
+    operator
+        .povDownLeft()
+        .onTrue(placement.safeToState(POSITIONS.get(side + "_DOUBLE_SUBSTATION")));
 
-    operator.x().onTrue(placement.safeToState(Positions.STOW));
-    operator.y().onTrue(placement.safeToState(Positions.FRONT_SINGLE_SUBSTATION_CONE));
-    // angery
-    // stop fucking my wires up
-    // no
+    // Intaking
     operator.leftBumper().onTrue(intake.intakeTmp()).onFalse(intake.stop());
     operator.rightBumper().onTrue(intake.outtake()).onFalse(intake.stop());
 

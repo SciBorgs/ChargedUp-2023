@@ -43,6 +43,8 @@ public class Placement {
 
   public Command safeToState(PlacementState state) {
     return new ConditionalCommand(
-        toState(POSITIONS.get("PASS_OVER"), state), toState(state), () -> state.side() != state().side());
+        toState(POSITIONS.get("PASS_OVER"), state),
+        toState(state),
+        () -> state.side() != state().side());
   }
 }

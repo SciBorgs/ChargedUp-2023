@@ -15,7 +15,6 @@ import org.sciborgs1155.robot.Constants.*;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 
-
 public class Scoring {
   public enum Side {
     BACK,
