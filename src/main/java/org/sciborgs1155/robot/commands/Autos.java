@@ -20,9 +20,15 @@ import org.sciborgs1155.robot.subsystems.Intake;
 public class Autos implements Loggable {
 
   public enum StartingPos {
-    LEFT,
-    CENTER,
-    RIGHT
+    LEFT(" l"),
+    CENTER(" c"),
+    RIGHT(" r");
+
+    public final String suffix;
+
+    StartingPos(String suffix) {
+      this.suffix = suffix;
+    }
   }
 
   @Log private final SendableChooser<Command> autoChooser;
@@ -71,13 +77,14 @@ public class Autos implements Loggable {
     autoChooser.setDefaultOption("simplest drive", simplestDrive());
     autoChooser.addOption("simple drive", simpleDrive());
     autoChooser.addOption("meandering drive", meanderingDrive());
-    autoChooser.addOption("balance", balance(Rotation2d.fromRadians(Math.PI)));
+    autoChooser.addOption("balance", justBalance());
     autoChooser.addOption("goofy", goofy());
     autoChooser.addOption("goofyApp", goofyApp());
     autoChooser.addOption("score", highConeScore());
     autoChooser.addOption("align score", allignScore());
     autoChooser.addOption("intake", autoIntake());
     autoChooser.addOption("cone, cube, engage", coneCubeEngage(startingPosChooser.getSelected()));
+    autoChooser.addOption("cone, cube, intake", coneCubeIntake(startingPosChooser.getSelected()));
   }
 
   private Map<String, Command> genEventMarkers() {
@@ -111,11 +118,20 @@ public class Autos implements Loggable {
     if (startingPos == StartingPos.CENTER) {
       throw new RuntimeException("cannot do cone cube engage auto path from center");
     }
-    String pathNameSuffix = startingPos == StartingPos.LEFT ? " 2" : "";
-    return followAutoPath("cone score to intake" + pathNameSuffix)
-        // .andThen(autoIntake(Constants.POSITIONS.get("PASS_OVER")))
-        .andThen(followAutoPath("intake to cube score to balance" + pathNameSuffix))
+    return followAutoPath("cone score to intake" + startingPos.suffix)
+        .andThen(autoIntake())
+        .andThen(followAutoPath("intake to cube score to balance" + startingPos.suffix))
         .andThen(balance(Rotation2d.fromRadians(0)));
+  }
+
+  private Command coneCubeIntake(StartingPos startingPos) {
+    if (startingPos == StartingPos.CENTER) {
+      throw new RuntimeException("cannot do cone cube intake auto path from center");
+    }
+    return followAutoPath("cone score to intake" + startingPos.suffix)
+        .andThen(autoIntake())
+        .andThen(followAutoPath("intake to cube score to intake" + startingPos.suffix))
+        .andThen(autoIntake());
   }
 
   private Command simpleDrive() {
