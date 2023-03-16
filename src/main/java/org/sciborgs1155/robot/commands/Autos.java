@@ -1,11 +1,13 @@
 package org.sciborgs1155.robot.commands;
 
 import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
@@ -70,7 +72,7 @@ public class Autos implements Loggable {
             drive);
 
     startingPosChooser = new SendableChooser<StartingPos>();
-    startingPosChooser.setDefaultOption("left", StartingPos.LEFT);
+    startingPosChooser.addOption("left", StartingPos.LEFT);
     startingPosChooser.addOption("right", StartingPos.RIGHT);
     startingPosChooser.addOption("center", StartingPos.CENTER);
 
@@ -110,9 +112,12 @@ public class Autos implements Loggable {
                 .andThen(placement.safeToState(Constants.POSITIONS.get("STOW")))));
   }
 
-  private Command followAutoPath(String pathName) {
-    return autoBuilder.followPathWithEvents(
-        PathPlanner.loadPath(pathName, Constants.Drive.CONSTRAINTS));
+  private Command followAutoPath(String pathName, boolean resetOdometry) {
+    PathPlannerTrajectory trajectory = PathPlanner.loadPath(pathName, Constants.Drive.CONSTRAINTS);
+    Command reset = resetOdometry ? autoBuilder.resetPose(trajectory) : Commands.none();
+    return reset.andThen(
+        autoBuilder.followPathWithEvents(
+            PathPlanner.loadPath(pathName, Constants.Drive.CONSTRAINTS)));
   }
 
   private Command coneCubeEngage() {
@@ -120,9 +125,9 @@ public class Autos implements Loggable {
     if (startingPos == StartingPos.CENTER) {
       throw new RuntimeException("cannot do cone cube engage auto path from center");
     }
-    return followAutoPath("cone score to intake" + startingPos.suffix)
+    return followAutoPath("cone score to intake" + startingPos.suffix, true)
         .andThen(autoIntake())
-        .andThen(followAutoPath("intake to cube score to balance" + startingPos.suffix))
+        .andThen(followAutoPath("intake to cube score to balance" + startingPos.suffix, false))
         .andThen(balance(Rotation2d.fromRadians(0)));
   }
 
@@ -131,9 +136,9 @@ public class Autos implements Loggable {
     if (startingPos == StartingPos.CENTER) {
       throw new RuntimeException("cannot do cone cube intake auto path from center");
     }
-    return followAutoPath("cone score to intake" + startingPos.suffix)
+    return followAutoPath("cone score to intake" + startingPos.suffix, true)
         .andThen(autoIntake())
-        .andThen(followAutoPath("intake to cube score to intake" + startingPos.suffix))
+        .andThen(followAutoPath("intake to cube score to intake" + startingPos.suffix, false))
         .andThen(autoIntake());
   }
 
@@ -233,6 +238,9 @@ public class Autos implements Loggable {
 
   /** returns currently selected auto command */
   public Command get() {
+    if (autoChooser.getSelected() == null) {
+      throw new RuntimeException("no starting position selected!");
+    }
     return autoChooser.getSelected().get();
   }
 }
