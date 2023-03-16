@@ -10,6 +10,8 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
+
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.Constants;
@@ -31,7 +33,7 @@ public class Autos implements Loggable {
     }
   }
 
-  @Log private final SendableChooser<Command> autoChooser;
+  @Log private final SendableChooser<Supplier<Command>> autoChooser;
   @Log private final SendableChooser<StartingPos> startingPosChooser;
 
   private final Drive drive;
@@ -73,18 +75,18 @@ public class Autos implements Loggable {
     startingPosChooser.addOption("right", StartingPos.RIGHT);
     startingPosChooser.addOption("center", StartingPos.CENTER);
 
-    autoChooser = new SendableChooser<Command>();
-    autoChooser.setDefaultOption("simplest drive", simplestDrive());
-    autoChooser.addOption("simple drive", simpleDrive());
-    autoChooser.addOption("meandering drive", meanderingDrive());
-    autoChooser.addOption("balance", justBalance());
-    autoChooser.addOption("goofy", goofy());
-    autoChooser.addOption("goofyApp", goofyApp());
-    autoChooser.addOption("score", highConeScore());
-    autoChooser.addOption("align score", allignScore());
-    autoChooser.addOption("intake", autoIntake());
-    autoChooser.addOption("cone, cube, engage", coneCubeEngage(startingPosChooser.getSelected()));
-    autoChooser.addOption("cone, cube, intake", coneCubeIntake(startingPosChooser.getSelected()));
+    autoChooser = new SendableChooser<Supplier<Command>>();
+    autoChooser.setDefaultOption("simplest drive", this::simplestDrive);
+    autoChooser.addOption("simple drive", this::simpleDrive);
+    autoChooser.addOption("meandering drive", this::meanderingDrive);
+    autoChooser.addOption("balance", this::justBalance);
+    autoChooser.addOption("goofy", this::goofy);
+    autoChooser.addOption("goofyApp", this::goofyApp);
+    autoChooser.addOption("score", this::highConeScore);
+    autoChooser.addOption("align score", this::allignScore);
+    autoChooser.addOption("intake", this::autoIntake);
+    autoChooser.addOption("cone, cube, engage", this::coneCubeEngage);
+    autoChooser.addOption("cone, cube, intake", this::coneCubeIntake);
   }
 
   private Map<String, Command> genEventMarkers() {
@@ -114,7 +116,8 @@ public class Autos implements Loggable {
         PathPlanner.loadPath(pathName, Constants.Drive.CONSTRAINTS));
   }
 
-  private Command coneCubeEngage(StartingPos startingPos) {
+  private Command coneCubeEngage() {
+    StartingPos startingPos = startingPosChooser.getSelected();
     if (startingPos == StartingPos.CENTER) {
       throw new RuntimeException("cannot do cone cube engage auto path from center");
     }
@@ -124,7 +127,8 @@ public class Autos implements Loggable {
         .andThen(balance(Rotation2d.fromRadians(0)));
   }
 
-  private Command coneCubeIntake(StartingPos startingPos) {
+  private Command coneCubeIntake() {
+    StartingPos startingPos = startingPosChooser.getSelected();
     if (startingPos == StartingPos.CENTER) {
       throw new RuntimeException("cannot do cone cube intake auto path from center");
     }
@@ -230,6 +234,6 @@ public class Autos implements Loggable {
 
   /** returns currently selected auto command */
   public Command get() {
-    return autoChooser.getSelected();
+    return autoChooser.getSelected().get();
   }
 }
