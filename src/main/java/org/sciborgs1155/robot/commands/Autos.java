@@ -11,6 +11,7 @@ import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import java.util.Map;
 import org.sciborgs1155.lib.Vision;
+import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.commands.Scoring.*;
 import org.sciborgs1155.robot.subsystems.Drive;
@@ -36,6 +37,10 @@ public class Autos implements Loggable {
   public final Map<String, Command> eventMarkers;
   public final SwerveAutoBuilder autoBuilder;
 
+  public static com.pathplanner.lib.auto.PIDConstants PIDSciToPPL(PIDConstants pid) {
+    return new com.pathplanner.lib.auto.PIDConstants(pid.p(), pid.i(), pid.d());
+  }
+
   public Autos(Drive drive, Placement placement, Vision vision, Intake intake, Scoring scoring) {
     this.drive = drive;
     this.vision = vision;
@@ -50,8 +55,8 @@ public class Autos implements Loggable {
             drive::getPose,
             drive::resetOdometry,
             drive.kinematics,
-            new com.pathplanner.lib.auto.PIDConstants(5.0, 0.0, 0.0),
-            new com.pathplanner.lib.auto.PIDConstants(0.5, 0.0, 0.0),
+            PIDSciToPPL(Constants.Drive.CARTESIAN),
+            PIDSciToPPL(Constants.Drive.ANGULAR),
             drive::setModuleStates,
             eventMarkers,
             true,
