@@ -1,17 +1,25 @@
 package org.sciborgs1155.robot;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
+import io.github.oblarg.oblog.annotations.Log;
+import org.sciborgs1155.lib.PlacementState;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants.Positions;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.Placement;
+import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
+import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
+import org.sciborgs1155.robot.subsystems.placement.Visualizer;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -22,11 +30,13 @@ import org.sciborgs1155.robot.subsystems.Intake;
 public class RobotContainer {
 
   private final Vision vision = new Vision();
+  @Log private final Visualizer position = new Visualizer(new Color8Bit(255, 0, 0));
+  @Log private final Visualizer setpoint = new Visualizer(new Color8Bit(0, 0, 255));
 
   // The robot's subsystems and commands are defined here...
   private final Drive drive = new Drive(vision);
-  // private final Elevator elevator = new Elevator(visualizer);
-  // private final Arm arm = new Arm(visualizer);
+  private final Elevator elevator = new Elevator(position, setpoint);
+  private final Arm arm = new Arm(position, setpoint);
   private final Intake intake = new Intake();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -36,6 +46,7 @@ public class RobotContainer {
   private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
 
   // command factories
+  private final Placement placement = new Placement(arm, elevator);
   private final Autos autos = new Autos(drive, placement, vision, intake);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -111,7 +122,9 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // return drive.follow("PRAY", true, true);
-    return autos.get();
+    // return autos.get();
+    return placement.toState(PlacementState.fromIK(new Translation2d(1, 0.1)).get());
+    // return placement.toState(PlacementState.fromRelative(0, 0, 0));
     // return arm.setElbowGoal(new TrapezoidProfile.State(0.75 * Math.PI, 0));
     // return autos.get();
   }

@@ -8,11 +8,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.sciborgs1155.lib.PlacementState;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants.*;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
-import org.sciborgs1155.robot.subsystems.placement.State;
 
 public class Scoring {
   private final Intake intake;
@@ -82,7 +82,7 @@ public class Scoring {
   }
 
   // this might end up being the right thing to do
-  public Command intake(State intakeState) {
+  public Command intake(PlacementState intakeState) {
     return placement.toState(intakeState).andThen(intake.start(false));
   }
 
@@ -120,7 +120,7 @@ public class Scoring {
     LOW
   }
 
-  public static State scoringState(GamePiece gamePiece, ScoringHeight height, Side side) {
+  public static PlacementState scoringState(GamePiece gamePiece, ScoringHeight height, Side side) {
     switch (gamePiece) {
       case CONE:
         switch (height) {
@@ -167,7 +167,7 @@ public class Scoring {
   }
 
   // we probably don't need this
-  public static State intakeState(GamePiece gamePiece, Side side) {
+  public static PlacementState intakeState(GamePiece gamePiece, Side side) {
     // TODO either get rid of this or make it actually correct
     switch (side) {
       case BACK:

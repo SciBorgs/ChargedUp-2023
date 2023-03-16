@@ -51,6 +51,8 @@
       "/Shuffleboard/Elevator/limitSwitchTwo": "Digital Input",
       "/Shuffleboard/Placement/visualizer": "Mechanism2d",
       "/Shuffleboard/RobotContainer/autos": "String Chooser",
+      "/Shuffleboard/RobotContainer/position": "Mechanism2d",
+      "/Shuffleboard/RobotContainer/setpoint": "Mechanism2d",
       "/Shuffleboard/RobotContainer/visualizer": "Mechanism2d",
       "/SmartDashboard/backCam Sim Field": "Field2d",
       "/SmartDashboard/backPhotonVision Sim Field": "Field2d",
@@ -273,7 +275,12 @@
           "visible": true
         }
       },
-      "/Shuffleboard/RobotContainer/visualizer": {
+      "/Shuffleboard/RobotContainer/position": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/RobotContainer/setpoint": {
         "window": {
           "visible": true
         }
@@ -327,6 +334,9 @@
     }
   },
   "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
     "Retained Values": {
       "open": false
     },
@@ -396,6 +406,9 @@
             "open": true
           }
         },
+        "open": true
+      },
+      "SmartDashboard": {
         "open": true
       },
       "photonvision": {

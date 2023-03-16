@@ -30,16 +30,19 @@ public class Visualizer implements Sendable {
     forearm =
         elevator.append(
             new MechanismLigament2d(
-                "Forearm Position", Dimensions.FOREARM_LENGTH, 0, WEIGHT, color));
+                "Forearm Position", Dimensions.FOREARM_LENGTH, 90, WEIGHT, color));
     claw =
         forearm.append(
             new MechanismLigament2d("Wrist Position", Dimensions.CLAW_LENGTH, 0, WEIGHT, color));
   }
 
-  public void setState(State state) {
-    elevator.setLength(state.elevatorHeight());
-    forearm.setAngle(state.elbowAngle().minus(RIGHT_ANGLE));
-    claw.setAngle(state.wristAngle());
+  public void setArmAngles(Rotation2d elbowAngle, Rotation2d wristAngle) {
+    forearm.setAngle(elbowAngle.minus(RIGHT_ANGLE));
+    claw.setAngle(wristAngle);
+  }
+
+  public void setElevatorHeight(double height) {
+    elevator.setLength(height);
   }
 
   @Override

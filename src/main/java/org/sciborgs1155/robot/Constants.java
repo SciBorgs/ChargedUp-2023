@@ -9,6 +9,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import java.util.Map;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.sciborgs1155.lib.PlacementState;
 import org.sciborgs1155.lib.constants.Conversion;
 import org.sciborgs1155.lib.constants.Conversion.PulsesPerRev;
 import org.sciborgs1155.lib.constants.MotorConfig;
@@ -16,7 +17,6 @@ import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants.Arm.Elbow;
-import org.sciborgs1155.robot.subsystems.placement.State;
 
 /**
  * Constants is a globally accessible class for storing immutable values. Every value should be
@@ -231,30 +231,32 @@ public final class Constants {
 
   public static final class Positions {
     // tested
-    public static final State STOW =
-        State.fromRelative(0, 2.467 + Elbow.ELBOW_OFFSET, Math.PI / 2.0);
-    public static final State BACK_HIGH_CONE = State.fromAbsolute(0.521769, 3.04, 2.74);
-    public static final State FRONT_INTAKE =
-        State.fromAbsolute(0.44, 0.137803 + Elbow.ELBOW_OFFSET, 0.1);
-    public static final State PASS_OVER = State.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0);
+    public static final PlacementState STOW =
+        PlacementState.fromRelative(0, 2.467 + Elbow.ELBOW_OFFSET, Math.PI / 2.0);
+    public static final PlacementState BACK_HIGH_CONE =
+        PlacementState.fromAbsolute(0.521769, 3.04, 2.74);
+    public static final PlacementState FRONT_INTAKE =
+        PlacementState.fromAbsolute(0.44, 0.137803 + Elbow.ELBOW_OFFSET, 0.1);
+    public static final PlacementState PASS_OVER =
+        PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0);
 
     // untested
 
     // scoring
-    public static final State FRONT_MID_CONE = State.fromAbsolute(0, 0.2, 0.6);
-    public static final State BACK_LOW_CONE = State.fromAbsolute(0, 0.1, 0);
-    public static final State BACK_MID_CONE = State.fromAbsolute(0, 0.2, 0.6);
+    public static final PlacementState FRONT_MID_CONE = PlacementState.fromAbsolute(0, 0.2, 0.6);
+    public static final PlacementState BACK_LOW_CONE = PlacementState.fromAbsolute(0, 0.1, 0);
+    public static final PlacementState BACK_MID_CONE = PlacementState.fromAbsolute(0, 0.2, 0.6);
 
-    public static final State FRONT_MID_CUBE = State.fromAbsolute(0, 0.2, 0.6);
-    public static final State FRONT_HIGH_CUBE = State.fromAbsolute(0, 1, 1.1);
+    public static final PlacementState FRONT_MID_CUBE = PlacementState.fromAbsolute(0, 0.2, 0.6);
+    public static final PlacementState FRONT_HIGH_CUBE = PlacementState.fromAbsolute(0, 1, 1.1);
 
-    public static final State BACK_LOW_CUBE = State.fromAbsolute(0, 0.1, 0);
-    public static final State BACK_MID_CUBE = State.fromAbsolute(0, 0.2, 0.6);
-    public static final State BACK_HIGH_CUBE = State.fromAbsolute(0, 1, 1.1);
+    public static final PlacementState BACK_LOW_CUBE = PlacementState.fromAbsolute(0, 0.1, 0);
+    public static final PlacementState BACK_MID_CUBE = PlacementState.fromAbsolute(0, 0.2, 0.6);
+    public static final PlacementState BACK_HIGH_CUBE = PlacementState.fromAbsolute(0, 1, 1.1);
 
     // intaking
 
-    public static final State BACK_INTAKE = State.fromAbsolute(0, 0, 0);
+    public static final PlacementState BACK_INTAKE = PlacementState.fromAbsolute(0, 0, 0);
   }
 
   // TODO make this less horrable
