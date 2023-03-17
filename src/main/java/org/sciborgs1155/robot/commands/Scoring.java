@@ -1,5 +1,7 @@
 package org.sciborgs1155.robot.commands;
 
+import static org.sciborgs1155.robot.Constants.Positions.*;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -10,12 +12,12 @@ import java.util.Collection;
 import java.util.List;
 import org.sciborgs1155.lib.PlacementState;
 import org.sciborgs1155.lib.Vision;
-import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.*;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 
 public class Scoring {
+
   public enum Side {
     BACK,
     FRONT;
@@ -28,60 +30,32 @@ public class Scoring {
     }
   }
 
-  public enum Alliance {
-    RED,
-    BLUE;
-
-    public double rads() {
-      if (this == RED) {
-        return Math.PI;
-      } else return 0;
-    }
-  }
-
   public enum GamePiece {
-    NONE,
     CONE,
-    CUBE
+    CUBE,
   }
 
-  public enum ScoringHeight {
+  public enum Level {
     HIGH,
     MID,
-    LOW
+    LOW,
+    SINGLE_SUBSTATION,
+    DOUBLE_SUBSTATION,
   }
-
-  public static record ScoringState(Pose2d pose, ScoringHeight height, Side side) {}
 
   private final Intake intake;
   private final Drive drive;
   private final Placement placement;
   private final Vision vision;
 
-  private GamePiece gamePiece;
+  private Side side = Side.FRONT;
+  private GamePiece gamePiece = GamePiece.CUBE;
 
   public Scoring(Drive drive, Placement placement, Intake intake, Vision vision) {
     this.intake = intake;
     this.drive = drive;
     this.placement = placement;
     this.vision = vision;
-
-    this.gamePiece = GamePiece.CUBE;
-  }
-
-  public Command score(ScoringHeight height, Side side) {
-    return score(gamePiece, height, side);
-  }
-
-  public Command score(ScoringState scoringState) {
-    return score(scoringState.height, scoringState.side);
-  }
-
-  private Command score(GamePiece gamePiece, ScoringHeight height, Side side) {
-    if (height == ScoringHeight.HIGH && side == Side.FRONT && gamePiece == GamePiece.CONE) {
-      throw new RuntimeException("cannot score a cone high in the front");
-    }
-    return placement.toState(scoringState(gamePiece, height, side)).andThen(intake.outtake());
   }
 
   // TODO leds!
@@ -89,35 +63,28 @@ public class Scoring {
     return Commands.runOnce(() -> this.gamePiece = gamePiece);
   }
 
-  // not sure if this is more helpful
-  public Command toggleGamePiece() {
-    return gamePiece == GamePiece.CONE
-        ? setGamePiece(GamePiece.CUBE)
-        : setGamePiece(GamePiece.CONE);
+  public Command setSide(Side side) {
+    return Commands.runOnce(() -> this.side = side);
   }
 
   // TODO make it take gamePiece into account
-  public Command odometryAlign(Side side, Alliance color) {
-    return drive.driveToPose(drive.getPose(), closestScoringPoint(side, color));
+  public Command odometryAlign(Side side) {
+    return drive.driveToPose(drive.getPose(), closestScoringPoint(side));
   }
 
   // TODO make commands to go to the next scoring poses to the left and right
 
   // TODO vision alignment
 
-  private Pose2d closestScoringPoint(Side side, Alliance color) {
+  private Pose2d closestScoringPoint(Side side) {
     Collection<Translation2d> scoringPoints = Field.SCORING_POINTS.values();
     Translation2d point =
         drive
             .getPose()
             .getTranslation()
             .nearest(new ArrayList<Translation2d>(List.copyOf(scoringPoints)));
-    double rotationRad = (side.rads() + color.rads()) % (2 * Math.PI);
+    double rotationRad = (side.rads() /* TODO use path planner flip color.rads()*/) % (2 * Math.PI);
     return new Pose2d(point, Rotation2d.fromRadians(rotationRad));
-  }
-
-  public Command intake(Side side, GamePiece gamePiece) {
-    return placement.toState(intakeState(gamePiece, side)).andThen(intake.intake());
   }
 
   // this might end up being the right thing to do
@@ -125,66 +92,38 @@ public class Scoring {
     return placement.toState(intakeState).andThen(intake.intake());
   }
 
-  public static PlacementState scoringState(GamePiece gamePiece, ScoringHeight height, Side side) {
-    switch (gamePiece) {
-      case CONE:
-        switch (height) {
-          case HIGH:
-            return Constants.POSITIONS.get("BACK_HIGH_CONE");
-          case MID:
-            switch (side) {
-              case FRONT:
-                return Constants.POSITIONS.get("FRONT_MID_CONE");
-              case BACK:
-                return Constants.POSITIONS.get("BACK_MID_CONE");
-            }
-          case LOW:
-            return Constants.POSITIONS.get("BACK_LOW_CONE");
-        }
-      case CUBE:
-        switch (height) {
-          case HIGH:
-            switch (side) {
-              case FRONT:
-                return Constants.POSITIONS.get("FRONT_HIGH_CUBE");
-              case BACK:
-                return Constants.POSITIONS.get("BACK_HIGH_CUBE");
-            }
-          case MID:
-            switch (side) {
-              case FRONT:
-                return Constants.POSITIONS.get("FRONT_MID_CUBE");
-              case BACK:
-                return Constants.POSITIONS.get("BACK_MID_CUBE");
-            }
-          case LOW:
-            return Constants.POSITIONS.get("BACK_LOW_CUBE");
-        }
-    }
-    throw new RuntimeException(
-        "scoringState was not called on a valid arguments. \n"
-            + "gamePiece: "
-            + gamePiece
-            + "; height: "
-            + height
-            + "; side: "
-            + side);
+  public Command goTo(Level height) {
+    return placement.safeToState(scoringState(height));
   }
 
-  // we probably don't need this
-  public static PlacementState intakeState(GamePiece gamePiece, Side side) {
-    // TODO either get rid of this or make it actually correct
-    switch (side) {
-      case BACK:
-        return Constants.POSITIONS.get("BACK_INTAKE");
-      case FRONT:
-        return Constants.POSITIONS.get("FRONT_INTAKE");
-    }
-    throw new RuntimeException(
-        "intakeState was not called on a valid arguments. \n"
-            + "gamePiece: "
-            + gamePiece
-            + "; side: "
-            + side);
+  public PlacementState scoringState(Level height) {
+    return switch (height) {
+      case LOW -> switch (side) {
+        case FRONT -> FRONT_INTAKE;
+        case BACK -> BACK_INTAKE;
+      };
+      case MID -> switch (gamePiece) {
+        case CONE -> switch (side) {
+          case FRONT -> FRONT_MID_CONE;
+          case BACK -> BACK_MID_CONE;
+        };
+        case CUBE -> switch (side) {
+          case FRONT -> FRONT_MID_CUBE;
+          case BACK -> BACK_MID_CUBE;
+        };
+      };
+      case HIGH -> switch (gamePiece) {
+        case CONE -> BACK_HIGH_CONE;
+        case CUBE -> switch (side) {
+          case FRONT -> FRONT_HIGH_CUBE;
+          case BACK -> BACK_HIGH_CUBE;
+        };
+      };
+      case SINGLE_SUBSTATION -> switch (gamePiece) {
+        case CONE -> FRONT_SINGLE_SUBSTATION_CONE;
+        case CUBE -> FRONT_SINGLE_SUBSTATION_CUBE;
+      };
+      case DOUBLE_SUBSTATION -> BACK_DOUBLE_SUBSTATION;
+    };
   }
 }

@@ -231,34 +231,38 @@ public final class Constants {
     }
   }
 
-  public static final Map<String, PlacementState> POSITIONS =
-      Map.ofEntries(
-          // Misc States
-          Map.entry(
-              "STOW", PlacementState.fromRelative(0, 2.467 + Elbow.ELBOW_OFFSET, Math.PI / 2.0)),
-          Map.entry("PASS_OVER", PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0)),
+  public static final class Positions {
 
-          // Front States
-          Map.entry("FRONT_INTAKE", PlacementState.fromAbsolute(0.44, -0.983, -0.09)),
-          Map.entry("FRONT_MID_CONE", PlacementState.fromAbsolute(0.061612, 0.493303, 0.001378)),
-          Map.entry("FRONT_MID_CUBE", PlacementState.fromAbsolute(0.11362, 0.458149, 0.353288)),
-          Map.entry("FRONT_HIGH_CUBE", PlacementState.fromAbsolute(0.113502, 0.333258, 0.353208)),
-          Map.entry(
-              "FRONT_SINGLE_SUBSTATION_CONE",
-              PlacementState.fromAbsolute(0.425006, 0.128855, -0.305)),
-          Map.entry(
-              "FRONT_SINGLE_SUBSTATION_CUBE",
-              PlacementState.fromAbsolute(0.543571, -0.367516, 0.445646)),
+    public static final PlacementState STOW =
+        PlacementState.fromRelative(0, 2.467 + Elbow.ELBOW_OFFSET, Math.PI / 2.0);
+    public static final PlacementState PASS_OVER =
+        PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0);
 
-          // Back States
-          Map.entry("BACK_INTAKE", PlacementState.fromAbsolute(0, 0, 0)),
-          Map.entry("BACK_LOW_CONE", PlacementState.fromAbsolute(0, 0.1, 0)),
-          Map.entry("BACK_MID_CONE", PlacementState.fromAbsolute(0, 0.2, 0.6)),
-          Map.entry("BACK_HIGH_CONE", PlacementState.fromAbsolute(0.31, 3.034, 2.59)),
-          Map.entry("BACK_LOW_CUBE", PlacementState.fromAbsolute(0, 0.1, 0)),
-          Map.entry("BACK_MID_CUBE", PlacementState.fromAbsolute(0, 0.2, 0.6)),
-          Map.entry("BACK_HIGH_CUBE", PlacementState.fromAbsolute(0.31, 3.034, 2.59)),
-          Map.entry("BACK_DOUBLE_SUBSTATION", PlacementState.fromAbsolute(0, 2.753496, -3.042500)));
+    public static final PlacementState FRONT_INTAKE =
+        PlacementState.fromAbsolute(0.44, -0.983, -0.09);
+    public static final PlacementState FRONT_MID_CONE =
+        PlacementState.fromAbsolute(0.061612, 0.493303, 0.001378);
+    public static final PlacementState FRONT_MID_CUBE =
+        PlacementState.fromAbsolute(0.11362, 0.458149, 0.353288);
+    public static final PlacementState FRONT_HIGH_CUBE =
+        PlacementState.fromAbsolute(0.113502, 0.333258, 0.353208);
+    public static final PlacementState FRONT_SINGLE_SUBSTATION_CONE =
+        PlacementState.fromAbsolute(0.425006, 0.128855, -0.305);
+    public static final PlacementState FRONT_SINGLE_SUBSTATION_CUBE =
+        PlacementState.fromAbsolute(0.543571, -0.367516, 0.445646);
+
+    public static final PlacementState BACK_INTAKE = PlacementState.fromAbsolute(0, 0, 0);
+    public static final PlacementState BACK_LOW_CONE = PlacementState.fromAbsolute(0, 0.1, 0);
+    public static final PlacementState BACK_MID_CONE = PlacementState.fromAbsolute(0, 0.2, 0.6);
+    public static final PlacementState BACK_HIGH_CONE =
+        PlacementState.fromAbsolute(0.31, 3.034, 2.59);
+    public static final PlacementState BACK_LOW_CUBE = PlacementState.fromAbsolute(0, 0.1, 0);
+    public static final PlacementState BACK_MID_CUBE = PlacementState.fromAbsolute(0, 0.2, 0.6);
+    public static final PlacementState BACK_HIGH_CUBE =
+        PlacementState.fromAbsolute(0.31, 3.034, 2.59);
+    public static final PlacementState BACK_DOUBLE_SUBSTATION =
+        PlacementState.fromAbsolute(0, 2.753496, -3.042500);
+  }
 
   // TODO make this less horrable
   public static final class Field {

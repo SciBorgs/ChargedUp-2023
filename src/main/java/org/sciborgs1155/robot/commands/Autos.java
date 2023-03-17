@@ -1,5 +1,7 @@
 package org.sciborgs1155.robot.commands;
 
+import static org.sciborgs1155.robot.Constants.Positions.*;
+
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
@@ -84,7 +86,6 @@ public class Autos implements Loggable {
     autoChooser.addOption("goofy", this::goofy);
     autoChooser.addOption("goofyApp", this::goofyApp);
     autoChooser.addOption("score", this::highConeScore);
-    autoChooser.addOption("align score", this::allignScore);
     autoChooser.addOption("intake", this::autoIntake);
     autoChooser.addOption("cone, cube, engage", this::coneCubeEngage);
     autoChooser.addOption("cone, cube, intake", this::coneCubeIntake);
@@ -97,20 +98,23 @@ public class Autos implements Loggable {
             "backHighCone",
             scoring
                 .setGamePiece(GamePiece.CONE)
-                .andThen(scoring.score(ScoringHeight.HIGH, Side.BACK))
-                .andThen(placement.safeToState(Constants.POSITIONS.get("STOW")))),
+                .andThen(scoring.setSide(Side.BACK))
+                .andThen(scoring.goTo(Level.HIGH))
+                .andThen(placement.safeToState(STOW))),
         Map.entry(
             "frontHighCube",
             scoring
                 .setGamePiece(GamePiece.CUBE)
-                .andThen(scoring.score(ScoringHeight.HIGH, Side.FRONT))
-                .andThen(placement.safeToState(Constants.POSITIONS.get("STOW")))),
+                .andThen(scoring.setSide(Side.FRONT))
+                .andThen(scoring.goTo(Level.HIGH))
+                .andThen(placement.safeToState(STOW))),
         Map.entry(
             "backHighCube",
             scoring
                 .setGamePiece(GamePiece.CUBE)
-                .andThen(scoring.score(ScoringHeight.HIGH, Side.BACK))
-                .andThen(placement.safeToState(Constants.POSITIONS.get("STOW")))));
+                .andThen(scoring.setSide(Side.BACK))
+                .andThen(scoring.goTo(Level.HIGH))
+                .andThen(placement.safeToState(STOW))));
   }
 
   private Command followAutoPath(String pathName, boolean resetOdometry) {
@@ -180,22 +184,16 @@ public class Autos implements Loggable {
 
   private Command autoIntake() {
     return scoring
-        .intake(Constants.POSITIONS.get("FRONT_INTAKE"))
+        .intake(FRONT_INTAKE)
         .alongWith(drive.drive(() -> 0.1, () -> 0.1, () -> 0, false))
         .until(intake::isHoldingItem);
-  }
-
-  private Command allignScore() {
-    return scoring
-        .setGamePiece(GamePiece.CONE)
-        .andThen(scoring.odometryAlign(Side.BACK, Alliance.BLUE))
-        .andThen(scoring.score(ScoringHeight.HIGH, Side.BACK));
   }
 
   private Command highConeScore() {
     return scoring
         .setGamePiece(GamePiece.CONE)
-        .andThen(scoring.score(ScoringHeight.HIGH, Side.BACK));
+        .andThen(scoring.setSide(Side.BACK))
+        .andThen(scoring.goTo(Level.HIGH));
   }
 
   private Command simpleDrive() {
@@ -237,13 +235,13 @@ public class Autos implements Loggable {
         Constants.Field.SCORING_POINTS.get(scoringPointNum), new Rotation2d(side.rads()));
   }
 
-  private Command intakeScore(Pose2d startPose, Pose2d intakePose, ScoringState scoringState) {
-    return drive
-        .driveToPose(startPose, intakePose)
-        .andThen(autoIntake())
-        .andThen(drive.driveToPose(intakePose, scoringState.pose()))
-        .andThen(scoring.score(scoringState));
-  }
+  // private Command intakeScore(Pose2d startPose, Pose2d intakePose, ScoringState scoringState) {
+  //   return drive
+  //       .driveToPose(startPose, intakePose)
+  //       .andThen(autoIntake())
+  //       .andThen(drive.driveToPose(intakePose, scoringState.pose()))
+  //       .andThen(scoring.goTo(scoringState));
+  // }
 
   /** returns currently selected auto command */
   public Command get() {

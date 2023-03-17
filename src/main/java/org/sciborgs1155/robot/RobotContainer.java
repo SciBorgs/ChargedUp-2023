@@ -1,7 +1,5 @@
 package org.sciborgs1155.robot;
 
-import static org.sciborgs1155.robot.Constants.POSITIONS;
-
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -11,10 +9,14 @@ import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.Visualizer;
+import org.sciborgs1155.robot.Constants.Positions;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Placement;
 import org.sciborgs1155.robot.commands.Scoring;
+import org.sciborgs1155.robot.commands.Scoring.GamePiece;
+import org.sciborgs1155.robot.commands.Scoring.Level;
+import org.sciborgs1155.robot.commands.Scoring.Side;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
@@ -62,13 +64,6 @@ public class RobotContainer {
     return profileChooser.getSelected();
   }
 
-  private String gamepiece = "CUBE";
-  private String side = "BACK";
-
-  private String scorePosition(String location) {
-    return side + "_" + location + "_" + gamepiece;
-  }
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the oblog logger
@@ -113,23 +108,19 @@ public class RobotContainer {
     // rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
 
     // STATE SWITCHING
-    operator.b().onTrue(Commands.run(() -> side = "FRONT"));
-    operator.x().onTrue(Commands.run(() -> side = "BACK"));
-    operator.a().onTrue(Commands.run(() -> gamepiece = "CUBE"));
-    operator.y().onTrue(Commands.run(() -> gamepiece = "CONE"));
+    operator.b().onTrue(scoring.setSide(Side.FRONT));
+    operator.x().onTrue(scoring.setSide(Side.BACK));
+    operator.a().onTrue(scoring.setGamePiece(GamePiece.CUBE));
+    operator.y().onTrue(scoring.setGamePiece(GamePiece.CONE));
 
     // SCORING
-    operator.povUp().onTrue(placement.safeToState(POSITIONS.get(scorePosition("HIGH"))));
-    operator.povRight().onTrue(placement.safeToState(POSITIONS.get(scorePosition("MID"))));
-    operator.povDown().onTrue(placement.safeToState(POSITIONS.get(side + "_INTAKE")));
-    operator.povLeft().onTrue(placement.safeToState(POSITIONS.get("STOW")));
+    operator.povUp().onTrue(scoring.goTo(Level.HIGH));
+    operator.povRight().onTrue(scoring.goTo(Level.MID));
+    operator.povDown().onTrue(scoring.goTo(Level.LOW));
+    operator.povLeft().onTrue(placement.safeToState(Positions.STOW));
 
-    operator
-        .povUpLeft()
-        .onTrue(placement.safeToState(POSITIONS.get(scorePosition("SINGLE_SUBSTATION"))));
-    operator
-        .povDownLeft()
-        .onTrue(placement.safeToState(POSITIONS.get(side + "_DOUBLE_SUBSTATION")));
+    operator.povUpLeft().onTrue(scoring.goTo(Level.SINGLE_SUBSTATION));
+    operator.povDownLeft().onTrue(scoring.goTo(Level.DOUBLE_SUBSTATION));
 
     // Intaking
     operator.leftBumper().onTrue(intake.intakeTmp()).onFalse(intake.stop());
@@ -170,6 +161,6 @@ public class RobotContainer {
     // return arm.setElbowGoal(new TrapezoidProfile.State(0.75 * Math.PI, 0));
     // return scoring
     //     .odometryAlign(Side.FRONT, Alliance.BLUE)
-    //     .andThen(scoring.score(ScoringHeight.LOW, Side.FRONT));
+    //     .andThen(scoring.score(Level.LOW, Side.FRONT));
   }
 }
