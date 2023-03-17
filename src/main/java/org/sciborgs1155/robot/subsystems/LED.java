@@ -15,10 +15,12 @@ public class LED extends SubsystemBase {
   private static AddressableLEDBuffer led1Buffer;
   // private static AddressableLEDBuffer led2Buffer;
 
-  private int rainbowFirstPixelHue;
+  private static int rainbowFirstPixelHue;
 
   private LEDColor currColor;
 
+  // note: why is the maidens one called pg (purple green) and the sciborgs one called sb (sciborgs
+  // i assume)?
   public enum LEDColor {
     RAINBOW,
     PG,
@@ -32,6 +34,7 @@ public class LED extends SubsystemBase {
     led1.setLength(led1Buffer.getLength());
     led1.setData(led1Buffer);
     led1.start();
+    // note: what are you trying to do with this led sim?
     new AddressableLEDSim(led1);
 
     // led2 = new AddressableLED(Ports.LED.led2);
@@ -57,6 +60,8 @@ public class LED extends SubsystemBase {
     }
   }
 
+  // note: is there a reason that you're using setRGB now instead of setLED?
+  // from looking at the source code, it seems like if setRGB works, setLED should work too
   public static void coneLED() {
     for (int i = 0; i < led1Buffer.getLength(); i++) {
       led1Buffer.setRGB(i, led.yellow.getRed(), led.yellow.getGreen(), led.yellow.getBlue());
@@ -66,6 +71,10 @@ public class LED extends SubsystemBase {
     // led2.setData(led2Buffer);
   }
 
+  // note: there's block of code for setting the leds to a color (the for loop) that you're
+  // rewriting a few times
+  // it might be a good idea to write a separate function that takes in a Color and sets all the
+  // leds in the strip to that color
   public static void cubeLED() {
     for (int i = 0; i < led1Buffer.getLength(); i++) {
       led1Buffer.setRGB(i, led.blue.getRed(), led.blue.getGreen(), led.blue.getBlue());
@@ -114,6 +123,11 @@ public class LED extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // note:
+    // you're setting the color here, but also in setColor()
+    // do you need to set it every tick?
+    // if you do: in setColor, all you need to do is set currColor to desiredColor
+    // if you don't: there's no need for this switch statement here
     switch (currColor) {
       case RAINBOW:
         rainbow();
