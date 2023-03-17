@@ -10,14 +10,14 @@
         "x": 1.8182838032342732,
         "y": 2.704732567451246
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": 180.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "backHighCone"
+          "frontHighCube"
         ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
@@ -34,7 +34,7 @@
         "y": 2.7325667897863575
       },
       "nextControl": null,
-      "holonomicAngle": 0,
+      "holonomicAngle": 180.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
