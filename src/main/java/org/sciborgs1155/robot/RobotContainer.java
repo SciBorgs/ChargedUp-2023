@@ -152,6 +152,13 @@ public class RobotContainer {
 
   }
 
+  /** A command to run when the robot is enabled */
+  public Command getEnableCommand() {
+    return Commands.parallel(
+        elevator.setGoal(elevator.getPosition()),
+        arm.setGoals(arm.getElbowPosition(), arm.getRelativeWristPosition()));
+  }
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
