@@ -153,7 +153,7 @@ public final class Constants {
     // s = 0.20619
 
     public static final int SAMPLE_SIZE_TAPS = 5;
-    public static final int CURRENT_SPIKE_THRESHOLD = 3;
+    public static final int CURRENT_SPIKE_THRESHOLD = 20;
 
     public static final Constraints CONSTRAINTS = new Constraints(1, 1);
 
