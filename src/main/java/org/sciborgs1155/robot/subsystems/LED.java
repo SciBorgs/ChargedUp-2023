@@ -83,7 +83,7 @@ public class LED extends SubsystemBase {
     } else if (gamePiece == GamePiece.CUBE) {
       return Commands.run(() -> cubeLED());
     }
-    return pgLED();
+    return sbLED();
   }
 
   public void rainbow() {
@@ -112,7 +112,7 @@ public class LED extends SubsystemBase {
   }
 
   /** Purple and green */
-  public static Command pgLED() {
+  public static void pgLED() {
     for (int i = 0; i < led1Buffer.getLength(); i++) {
       led1Buffer.setRGB(
           i, led.lightPurple.getRed(), led.lightPurple.getGreen(), led.lightPurple.getBlue());
@@ -123,8 +123,6 @@ public class LED extends SubsystemBase {
     //   led2Buffer.setLED(i, Color.kLimeGreen);
     // }
     // led2.setData(led2Buffer);
-
-    return Commands.run(() -> pgLED());
   }
 
   @Override
