@@ -25,12 +25,27 @@
       "/SmartDashboard/frontPhotonVision Sim Field": "Field2d"
     },
     "windows": {
+      "/Shuffleboard/Autos/Drive/field2d": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Shuffleboard/Autos/autoChooser": {
         "window": {
           "visible": true
         }
       },
       "/Shuffleboard/Autos/startingPosChooser": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/backPhotonVision Sim Field": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/frontPhotonVision Sim Field": {
         "window": {
           "visible": true
         }

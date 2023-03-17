@@ -88,6 +88,7 @@ public class Autos implements Loggable {
     autoChooser.addOption("intake", this::autoIntake);
     autoChooser.addOption("cone, cube, engage", this::coneCubeEngage);
     autoChooser.addOption("cone, cube, intake", this::coneCubeIntake);
+    autoChooser.addOption("cone, balance", this::coneBalance);
   }
 
   private Map<String, Command> genEventMarkers() {
@@ -142,27 +143,12 @@ public class Autos implements Loggable {
         .andThen(autoIntake());
   }
 
-  private Command simpleDrive() {
-    Pose2d end = new Pose2d(0, 5, Rotation2d.fromDegrees(0));
-    return drive
-        .driveToPose(end)
-        .andThen(drive.driveToPose(end, new Pose2d(0, 0, Rotation2d.fromDegrees(0))));
-  }
-
-  private Command simplestDrive() {
-    drive.resetOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
-    return drive.driveToPose(new Pose2d(0, 5, Rotation2d.fromDegrees(0)));
-  }
-
-  private Command meanderingDrive() {
-    Pose2d transitionPose = new Pose2d(15, 7, Rotation2d.fromDegrees(0));
-    List<Pose2d> poses =
-        List.of(
-            new Pose2d(7, 2, Rotation2d.fromDegrees(0)),
-            new Pose2d(7, 7, Rotation2d.fromDegrees(75)),
-            transitionPose);
-    Pose2d endPose = new Pose2d(1, 7, Rotation2d.fromDegrees(20));
-    return drive.driveToPoses(poses).andThen(drive.driveToPose(transitionPose, endPose));
+  private Command coneBalance() {
+    if (startingPosChooser.getSelected() != StartingPos.CENTER) {
+      throw new RuntimeException("cone balance path can only be done from center");
+    }
+    return followAutoPath("cone score to balance", true)
+        .andThen(balance(Rotation2d.fromRadians(Math.PI)));
   }
 
   private Command justBalance() {
@@ -210,6 +196,29 @@ public class Autos implements Loggable {
     return scoring
         .setGamePiece(GamePiece.CONE)
         .andThen(scoring.score(ScoringHeight.HIGH, Side.BACK));
+  }
+
+  private Command simpleDrive() {
+    Pose2d end = new Pose2d(0, 5, Rotation2d.fromDegrees(0));
+    return drive
+        .driveToPose(end)
+        .andThen(drive.driveToPose(end, new Pose2d(0, 0, Rotation2d.fromDegrees(0))));
+  }
+
+  private Command simplestDrive() {
+    drive.resetOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
+    return drive.driveToPose(new Pose2d(0, 5, Rotation2d.fromDegrees(0)));
+  }
+
+  private Command meanderingDrive() {
+    Pose2d transitionPose = new Pose2d(15, 7, Rotation2d.fromDegrees(0));
+    List<Pose2d> poses =
+        List.of(
+            new Pose2d(7, 2, Rotation2d.fromDegrees(0)),
+            new Pose2d(7, 7, Rotation2d.fromDegrees(75)),
+            transitionPose);
+    Pose2d endPose = new Pose2d(1, 7, Rotation2d.fromDegrees(20));
+    return drive.driveToPoses(poses).andThen(drive.driveToPose(transitionPose, endPose));
   }
 
   // private Command intakeScore(Pose2d startingPos, int intakingPos, int scoringPos, GamePiece
