@@ -3,13 +3,10 @@ package org.sciborgs1155.robot.subsystems;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.simulation.AddressableLEDSim;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.led;
 import org.sciborgs1155.robot.Ports;
-import org.sciborgs1155.robot.commands.Scoring.*;
 
 public class LED extends SubsystemBase {
 
@@ -30,9 +27,10 @@ public class LED extends SubsystemBase {
   }
 
   public LED() {
-    led1 = new AddressableLED(Ports.LED.led1);
+    led1 = new AddressableLED(Ports.Led.led1);
     led1Buffer = new AddressableLEDBuffer(Constants.led.buffer1Length);
     led1.setLength(led1Buffer.getLength());
+    led1.setData(led1Buffer);
     led1.start();
     new AddressableLEDSim(led1);
 
@@ -77,15 +75,6 @@ public class LED extends SubsystemBase {
     // led2.setData(led2Buffer);
   }
 
-  public Command gamepiece(GamePiece gamePiece) {
-    if (gamePiece == GamePiece.CONE) {
-      return Commands.run(() -> coneLED());
-    } else if (gamePiece == GamePiece.CUBE) {
-      return Commands.run(() -> cubeLED());
-    }
-    return sbLED();
-  }
-
   public void rainbow() {
     for (var i = 0; i < led1Buffer.getLength(); i++) {
       final var hue = (rainbowFirstPixelHue + (i * 180 / led1Buffer.getLength())) % 180;
@@ -97,7 +86,7 @@ public class LED extends SubsystemBase {
   }
 
   /** Black and Yellow */
-  public static Command sbLED() {
+  public static void sbLED() {
     for (int i = 0; i < led1Buffer.getLength(); i++) {
       led1Buffer.setRGB(i, led.yellow.getRed(), led.yellow.getGreen(), led.yellow.getBlue());
     }
@@ -107,8 +96,6 @@ public class LED extends SubsystemBase {
     //   led2Buffer.setLED(i, Color.kYellow);
     // }
     // led2.setData(led2Buffer);
-
-    return Commands.runOnce(() -> sbLED());
   }
 
   /** Purple and green */

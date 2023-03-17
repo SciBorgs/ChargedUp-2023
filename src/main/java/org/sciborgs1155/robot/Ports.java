@@ -44,7 +44,7 @@ public final class Ports {
     public static final int WHEEL_MOTOR = 6;
   }
 
-  public static final class LED {
+  public static final class Led {
     public static final int led1 = 9;
     // on the robot before putting it on chassis the port # was 7
     public static final int led2 = 8;
