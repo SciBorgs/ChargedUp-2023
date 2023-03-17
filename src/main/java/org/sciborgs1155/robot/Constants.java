@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import java.awt.Color;
 import java.util.Map;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.PlacementState;
@@ -279,10 +280,14 @@ public final class Constants {
   }
 
   public static final class led {
-    public static final int led1Lenght = 60;
-    public static final int led1Buffer = 60;
+    public static final int buffer1Length = 60;
 
-    public static final int led2Lenght = 60;
-    public static final int led2Buffer = 60;
+    public static final int buffer2Length = 60;
+
+    // RGB COLORS
+    public static Color lightPurple = new Color(147, 112, 219);
+    public static Color yellow = new Color(237, 237, 12);
+    public static Color blue = new Color(0, 0, 228);
+    public static Color rainbow1stPixel = new Color(255, 0, 0);
   }
 }

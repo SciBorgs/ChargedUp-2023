@@ -1,6 +1,8 @@
 package org.sciborgs1155.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -9,12 +11,7 @@ import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Ports.OI;
-import org.sciborgs1155.robot.commands.Autos;
-import org.sciborgs1155.robot.commands.Placement;
-import org.sciborgs1155.robot.subsystems.Arm;
-import org.sciborgs1155.robot.subsystems.Drive;
-import org.sciborgs1155.robot.subsystems.Elevator;
-import org.sciborgs1155.robot.subsystems.Intake;
+import org.sciborgs1155.robot.subsystems.LED;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -28,10 +25,11 @@ public class RobotContainer {
   @Log private final Visualizer visualizer = new Visualizer();
 
   // The robot's subsystems and commands are defined here...
-  private final Drive drive = new Drive(vision);
-  private final Elevator elevator = new Elevator(visualizer);
-  private final Arm arm = new Arm(visualizer);
-  private final Intake intake = new Intake();
+  // private final Drive drive = new Drive(vision);
+  // private final Elevator elevator = new Elevator(visualizer);
+  // private final Arm arm = new Arm(visualizer);
+  // private final Intake intake = new Intake();
+  private final LED led = new LED();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController xbox = new CommandXboxController(OI.XBOX);
@@ -39,9 +37,8 @@ public class RobotContainer {
   private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
 
   // command factories
-  private final Placement placement = new Placement(arm, elevator);
-  private final Autos autos = new Autos(drive, placement, vision, intake);
-
+  // private final Placement placement = new Placement(arm, elevator);
+  // private final Autos autos = new Autos(drive, placement, vision, intake);
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the oblog logger
@@ -53,9 +50,11 @@ public class RobotContainer {
   }
 
   private void configureSubsystemDefaults() {
-    drive.setDefaultCommand(
-        drive.drive(
-            () -> -xbox.getLeftX(), () -> -leftJoystick.getX(), () -> -rightJoystick.getY(), true));
+    // drive.setDefaultCommand(
+    //     drive.drive(
+    //         () -> -xbox.getLeftX(), () -> -leftJoystick.getX(), () -> -rightJoystick.getY(),
+    // true));
+    CommandScheduler.getInstance().schedule(Commands.run(LED::coneLED));
     // arm.setDefaultCommand(arm.setVoltage(() -> xbox.getRightY() * 3, () -> xbox.getLeftY() * 3));
   }
 
@@ -77,13 +76,13 @@ public class RobotContainer {
     // pressed,
     // cancelling on release.
     // xbox.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
-    rightJoystick.trigger().onTrue(intake.start(false)).onFalse(intake.stop());
-    // rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
+    // rightJoystick.trigger().onTrue(intake.start(false)).onFalse(intake.stop());
+    // // rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
 
-    xbox.a().onTrue(elevator.setGoal(0.3));
-    xbox.b().onTrue(elevator.setGoal(0));
-    xbox.x().onTrue(intake.start(false)).onFalse(intake.stop());
-    xbox.y().onTrue(intake.start(true)).onFalse(intake.stop());
+    // xbox.a().onTrue(elevator.setGoal(0.3));
+    // xbox.b().onTrue(elevator.setGoal(0));
+    // xbox.x().onTrue(intake.start(false)).onFalse(intake.stop());
+    // xbox.y().onTrue(intake.start(true)).onFalse(intake.stop());
 
     // xbox.povLeft().onTrue(arm.setElbowGoal(new State(0, 0)));
     // xbox.povUp().onTrue(arm.setElbowGoal(new State(1.57, 0)));
@@ -104,8 +103,9 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    return Commands.none();
     // return drive.follow("PRAY", true, true);
-    return autos.get();
+    // return led.pgLED();
     // return arm.setElbowGoal(new TrapezoidProfile.State(0.75 * Math.PI, 0));
     // return autos.get();
   }
