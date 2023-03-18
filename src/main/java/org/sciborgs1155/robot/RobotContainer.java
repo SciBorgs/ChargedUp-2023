@@ -149,7 +149,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return Commands.none();
+    return autos.get();
     // return drive.follow("PRAY", true, true);
     // return led.pgLED();
     // return arm.setElbowGoal(new TrapezoidProfile.State(0.75 * Math.PI, 0));

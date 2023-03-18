@@ -6,9 +6,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import io.github.oblarg.oblog.Logger;
 import org.sciborgs1155.lib.CustomPeriodRunnables;
-import org.sciborgs1155.robot.subsystems.LED;
-import org.sciborgs1155.robot.subsystems.LED.*;
-
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -16,7 +13,6 @@ import org.sciborgs1155.robot.subsystems.LED.*;
  * project.
  */
 public class Robot extends TimedRobot {
-  private LED led = new LED();
 
   private Command m_autonomousCommand;
 
