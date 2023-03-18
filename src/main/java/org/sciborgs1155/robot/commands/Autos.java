@@ -4,7 +4,6 @@ import static org.sciborgs1155.robot.Constants.Positions.*;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,8 +12,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -56,7 +53,7 @@ public final class Autos implements Loggable {
     this.intake = intake;
     this.placement = placement;
     this.scoring = scoring;
-    
+
     eventMarkers = genEventMarkers();
 
     this.autoBuilder =
@@ -107,19 +104,14 @@ public final class Autos implements Loggable {
                 .setGamePiece(GamePiece.CUBE)
                 .andThen(scoring.setSide(Side.BACK))
                 .andThen(scoring.goTo(Level.HIGH))),
-        Map.entry(
-            "outtake",
-            intake.outtake().withTimeout(1)),
+        Map.entry("outtake", intake.outtake().withTimeout(1)),
         Map.entry(
             "intake",
             placement
                 .safeToState(Constants.Positions.FRONT_INTAKE)
                 .andThen(intake.intake())
-                .withTimeout(3)
-        ),
-        Map.entry(
-            "stow",
-            placement.safeToState(STOW)));
+                .withTimeout(3)),
+        Map.entry("stow", placement.safeToState(STOW)));
   }
 
   private Command followAutoPath(String pathName, boolean resetOdometry) {
@@ -173,11 +165,10 @@ public final class Autos implements Loggable {
         .withTimeout(0.6)
         .andThen(drive.balanceOrthogonal());
   }
-  
+
   private Command highConeScore() {
     return Commands.sequence(
-      scoring
-        .setGamePiece(GamePiece.CONE),
+        scoring.setGamePiece(GamePiece.CONE),
         scoring.setSide(Side.BACK),
         scoring.goTo(Level.HIGH),
         intake.outtake().withTimeout(2));

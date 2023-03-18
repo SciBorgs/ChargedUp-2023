@@ -93,26 +93,14 @@ public final class Scoring {
 
   public PlacementState scoringState(Level height) {
     return switch (height) {
-      case LOW -> switch (side) {
-        case FRONT -> FRONT_INTAKE;
-        case BACK -> BACK_INTAKE;
-      };
+      case LOW -> side == Side.FRONT ? FRONT_INTAKE : BACK_INTAKE;
       case MID -> switch (gamePiece) {
-        case CONE -> switch (side) {
-          case FRONT -> FRONT_MID_CONE;
-          case BACK -> BACK_MID_CONE;
-        };
-        case CUBE -> switch (side) {
-          case FRONT -> FRONT_MID_CUBE;
-          case BACK -> BACK_MID_CUBE;
-        };
+        case CONE -> side == Side.FRONT ? FRONT_MID_CONE : BACK_MID_CONE;
+        case CUBE -> side == Side.FRONT ? FRONT_MID_CUBE : BACK_MID_CUBE;
       };
       case HIGH -> switch (gamePiece) {
         case CONE -> BACK_HIGH_CONE;
-        case CUBE -> switch (side) {
-          case FRONT -> FRONT_HIGH_CUBE;
-          case BACK -> BACK_HIGH_CUBE;
-        };
+        case CUBE -> side == Side.FRONT ? FRONT_HIGH_CUBE : BACK_HIGH_CUBE;
       };
       case SINGLE_SUBSTATION -> switch (gamePiece) {
         case CONE -> FRONT_SINGLE_SUBSTATION_CONE;
