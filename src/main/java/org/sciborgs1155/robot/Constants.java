@@ -139,7 +139,7 @@ public final class Constants {
 
   public static final class Elevator {
     public static final MotorConfig MOTOR =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.COAST).withCurrentLimit(40);
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(40);
 
     public static final Conversion CONVERSION =
         Conversion.base()
