@@ -5,15 +5,20 @@
         "visible": true
       }
     },
-    "Encoders": {
+    "Timing": {
       "window": {
-        "visible": true
+        "visible": false
       }
     }
   },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
+      "/LiveWindow/Ungrouped/Pigeon IMU [42]": "Gyro",
+      "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/Shuffleboard/Autos/Drive/field2d": "Field2d",
       "/Shuffleboard/Autos/Drive/imu": "Gyro",
       "/Shuffleboard/Autos/autoChooser": "String Chooser",
@@ -40,6 +45,16 @@
           "visible": true
         }
       },
+      "/Shuffleboard/Drive/field2d": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/RobotContainer/visualizer": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/backPhotonVision Sim Field": {
         "window": {
           "visible": true
@@ -55,14 +70,16 @@
   "NetworkTables": {
     "transitory": {
       "Shuffleboard": {
-        "Arm": {
-          "open": true
-        },
         "Elevator": {
           "encoder": {
             "open": true
-          },
-          "open": true
+          }
+        },
+        "RobotContainer": {
+          "open": true,
+          "scoring": {
+            "open": true
+          }
         },
         "open": true
       },

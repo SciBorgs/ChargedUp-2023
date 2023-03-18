@@ -5,8 +5,13 @@ import static org.sciborgs1155.robot.Constants.Positions.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
+import edu.wpi.first.wpilibj2.command.WrapperCommand;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -16,7 +21,7 @@ import org.sciborgs1155.robot.Constants.*;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 
-public final class Scoring {
+public final class Scoring implements Sendable {
 
   public enum Side {
     BACK,
@@ -32,7 +37,7 @@ public final class Scoring {
 
   public enum GamePiece {
     CONE,
-    CUBE,
+    CUBE;
   }
 
   public enum Level {
@@ -48,8 +53,8 @@ public final class Scoring {
   private final Placement placement;
   private final Vision vision;
 
-  private Side side = Side.FRONT;
-  private GamePiece gamePiece = GamePiece.CUBE;
+  private Side side = Side.BACK;
+  private GamePiece gamePiece = GamePiece.CONE;
 
   public Scoring(Drive drive, Placement placement, Intake intake, Vision vision) {
     this.intake = intake;
@@ -88,7 +93,7 @@ public final class Scoring {
   }
 
   public Command goTo(Level height) {
-    return placement.safeToState(scoringState(height));
+    return new ProxyCommand(() -> placement.safeToState(scoringState(height)));
   }
 
   public PlacementState scoringState(Level height) {
@@ -108,5 +113,11 @@ public final class Scoring {
       };
       case DOUBLE_SUBSTATION -> BACK_DOUBLE_SUBSTATION;
     };
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+      builder.addStringProperty("Game Piece", () -> gamePiece.name(), null);
+      builder.addStringProperty("Side", () -> side.name(), null);
   }
 }

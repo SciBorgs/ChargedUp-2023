@@ -47,7 +47,7 @@ public class RobotContainer {
 
   // command factories
   private final Placement placement = new Placement(arm, elevator);
-  private final Scoring scoring = new Scoring(drive, placement, intake, vision);
+  @Log private final Scoring scoring = new Scoring(drive, placement, intake, vision);
   private final Autos autos = new Autos(drive, placement, vision, intake, scoring);
 
   // Operator Profiles
@@ -96,17 +96,6 @@ public class RobotContainer {
   private void configureBindings() {
     driver.b().onTrue(drive.zeroHeading());
 
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    // new Trigger(m_exampleSubsystem::exampleCondition)
-    // .onTrue(new ExampleCommand(m_exampleSubsystem));
-
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is
-    // pressed,
-    // cancelling on release.
-    // xbox.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
-    // rightJoystick.trigger().onTrue(intake.start(false)).onFalse(intake.stop());
-    // rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
-
     // STATE SWITCHING
     operator.b().onTrue(scoring.setSide(Side.FRONT));
     operator.x().onTrue(scoring.setSide(Side.BACK));
@@ -119,8 +108,10 @@ public class RobotContainer {
     operator.povDown().onTrue(scoring.goTo(Level.LOW));
     operator.povLeft().onTrue(placement.safeToState(Positions.STOW));
 
-    operator.povUpLeft().onTrue(scoring.goTo(Level.SINGLE_SUBSTATION));
-    operator.povDownLeft().onTrue(scoring.goTo(Level.DOUBLE_SUBSTATION));
+    operator.leftTrigger().onTrue(scoring.goTo(Level.SINGLE_SUBSTATION));
+    operator.rightTrigger().onTrue(scoring.goTo(Level.DOUBLE_SUBSTATION));
+    // operator.povDownRight().onTrue(elevator.setGoal(0));
+    // operator.povUpRight().onTrue(elevator.setGoal(.5));
 
     // Intaking
     operator.leftBumper().onTrue(intake.intakeTmp()).onFalse(intake.stop());
