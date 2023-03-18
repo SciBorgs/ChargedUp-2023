@@ -37,7 +37,7 @@
       "holonomicAngle": 0,
       "isReversal": false,
       "velOverride": null,
-      "isLocked": false,
+      "isLocked": true,
       "isStopPoint": false,
       "stopEvent": {
         "names": [],
