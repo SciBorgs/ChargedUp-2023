@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
@@ -37,7 +38,12 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   private final ElevatorFeedforward ff = new ElevatorFeedforward(FF.s(), FF.g(), FF.v(), FF.a());
 
+  private final LinearFilter filter = LinearFilter.movingAverage(SAMPLE_SIZE_TAPS);
+
+  @Log private boolean hasSpiked = false;
+
   @Log
+  @Log(name = "at goal", methodName = "atGoal")
   private final ProfiledPIDController pid =
       new ProfiledPIDController(PID.p(), PID.i(), PID.d(), CONSTRAINTS);
 
@@ -67,11 +73,14 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     right.burnFlash();
 
     this.visualizer = visualizer;
+
+    // pid.setTolerance(0.0);
+    pid.setGoal(getPosition());
   }
 
   /** Returns the height of the elevator, in meters */
   public double getPosition() {
-    return encoder.getDistance();
+    return encoder.getDistance() + OFFSET;
   }
 
   /** Returns the goal of the elevator, in meters */
@@ -110,16 +119,18 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
     lead.setVoltage(fbOutput + ffOutput);
 
-    visualizer.setElevator(getPosition(), pid.getGoal().position);
+    hasSpiked = filter.calculate(lead.getOutputCurrent()) >= CURRENT_SPIKE_THRESHOLD;
 
-    SmartDashboard.putNumber("setpoint", pid.getSetpoint().position);
+    visualizer.setElevator(getPosition(), pid.getSetpoint().position);
+
+    SmartDashboard.putNumber("elevator position", this.getPosition());
   }
 
   @Override
   public void simulationPeriodic() {
     sim.setInputVoltage(lead.getAppliedOutput());
     sim.update(Constants.RATE);
-    simEncoder.setDistance(sim.getPositionMeters());
+    simEncoder.setDistance(sim.getPositionMeters() - OFFSET);
     simEncoder.setRate(sim.getVelocityMetersPerSecond());
   }
 

@@ -68,8 +68,10 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-
     led.setColor(LEDColor.RAINBOW);
+    
+    // Resets goal positions to ensure safety of nearby humans...
+    m_robotContainer.getEnableCommand().schedule();
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -93,6 +95,9 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    // Resets goal positions to ensure safety of nearby humans...
+    m_robotContainer.getEnableCommand().schedule();
   }
 
   /** This function is called periodically during operator control. */

@@ -133,7 +133,7 @@ spotless {
     format 'xml', {
         target fileTree('.') {
             include '**/*.xml'
-            exclude '**/build/**', '**/build-*/**'
+            exclude '**/build/**', '**/build-*/**', '**/venv/**'
         }
         eclipseWtp('xml')
         trimTrailingWhitespace()
@@ -143,7 +143,7 @@ spotless {
     format 'misc', {
         target fileTree('.') {
             include '**/*.md', '**/.gitignore'
-            exclude '**/build/**', '**/build-*/**'
+            exclude '**/build/**', '**/build-*/**', '**/venv/**'
         }
         trimTrailingWhitespace()
         indentWithSpaces(4)

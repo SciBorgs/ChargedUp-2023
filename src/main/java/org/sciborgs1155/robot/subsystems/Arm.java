@@ -17,6 +17,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -53,10 +54,12 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
       new ArmFeedforward(Wrist.FF.s(), Wrist.FF.g(), Wrist.FF.v(), Wrist.FF.a());
 
   @Log(name = "elbow feedback")
+  @Log(name = "elbow at goal", methodName = "atGoal")
   private final ProfiledPIDController elbowFeedback =
       new ProfiledPIDController(Elbow.PID.p(), Elbow.PID.i(), Elbow.PID.d(), Elbow.CONSTRAINTS);
 
   @Log(name = "wrist feedback")
+  @Log(name = "wrist at goal", methodName = "atGoal")
   private final ProfiledPIDController wristFeedback =
       new ProfiledPIDController(Wrist.PID.p(), Wrist.PID.i(), Wrist.PID.d(), Wrist.CONSTRAINTS);
 
@@ -111,12 +114,14 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
     this.visualizer = visualizer;
 
-    // wristFeedback.setGoal(Math.PI);
+    elbowFeedback.setGoal(getElbowPosition().getRadians());
+    wristFeedback.setGoal(Math.PI);
+    wristFeedback.setTolerance(0.1);
   }
 
   /** Elbow position relative to the chassis */
   public Rotation2d getElbowPosition() {
-    return Rotation2d.fromRadians(elbowEncoder.getDistance());
+    return Rotation2d.fromRadians(elbowEncoder.getDistance() + Elbow.ELBOW_OFFSET);
   }
 
   /** Wrist position relative to the forearm */
@@ -216,12 +221,17 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             wristFeedback.getSetpoint().position + elbowFeedback.getSetpoint().position,
             wristFeedback.getSetpoint().velocity,
             wristAccel.calculate(wristFeedback.getSetpoint().velocity));
+    // System.out.println("v: " + wristFB);
     wrist.setVoltage(wristFB + wristFF);
 
     visualizer.setElbow(
-        getElbowPosition(), Rotation2d.fromRadians(elbowFeedback.getGoal().position));
+        getElbowPosition(), Rotation2d.fromRadians(elbowFeedback.getSetpoint().position));
     visualizer.setWrist(
-        getRelativeWristPosition(), Rotation2d.fromRadians(wristFeedback.getGoal().position));
+        getRelativeWristPosition(), Rotation2d.fromRadians(wristFeedback.getSetpoint().position));
+
+    SmartDashboard.putNumber("elbow angle", getElbowPosition().getRadians());
+    SmartDashboard.putNumber("relative wrist angle", getRelativeWristPosition().getRadians());
+    SmartDashboard.putNumber("absolute wrist angle", getAbsoluteWristPosition().getRadians());
   }
 
   @Override

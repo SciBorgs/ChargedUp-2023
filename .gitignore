@@ -2,9 +2,9 @@
 # If you remove items from this file, intellisense might break.
 
 # python venv
+__pycache__/
 include/
-optimization/lib*
-
+venv
 
 # log files
 *.wpilog

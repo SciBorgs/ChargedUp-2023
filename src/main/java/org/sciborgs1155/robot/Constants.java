@@ -68,9 +68,9 @@ public final class Constants {
 
     public static final double ELEVATOR_MASS = 4;
 
-    public static final double TRACK_WIDTH = Units.inchesToMeters(24);
+    public static final double TRACK_WIDTH = 0.5715;
     // Distance between centers of right and left wheels on robot
-    public static final double WHEEL_BASE = Units.inchesToMeters(24);
+    public static final double WHEEL_BASE = 0.5715;
     // Distance between front and back wheels on robot
   }
 
@@ -110,16 +110,16 @@ public final class Constants {
       public static final Conversion CONVERSION =
           Conversion.base().withUnits(Conversion.Units.RADIANS);
 
-      public static final PIDConstants PID = new PIDConstants(4, 0, 0.1); // p: 6.1297, d: 0.8453
+      public static final PIDConstants PID = new PIDConstants(5.5, 0, 0.1); // p: 6.1297, d: 0.8453
       public static final SystemConstants FF =
-          new SystemConstants(0.1542, 0.53127, 0.87884, 0.038046);
+          new SystemConstants(0.1542, 0.6, 0.91, 0.038046); // v =  0.87884
 
-      public static final Constraints CONSTRAINTS = new Constraints(1.2, 0.6);
+      public static final Constraints CONSTRAINTS = new Constraints(1.4, 1.3);
     }
 
     public static final class Elbow {
       public static final MotorConfig MOTOR =
-          MotorConfig.base().withNeutralBehavior(NeutralBehavior.COAST).withCurrentLimit(50);
+          MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
 
       public static final Conversion CONVERSION =
           Conversion.base()
@@ -132,7 +132,8 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
-      public static final Constraints CONSTRAINTS = new Constraints(1.3, 0.75);
+      public static final Constraints CONSTRAINTS = new Constraints(1.5, 1.2);
+      public static final double ELBOW_OFFSET = -1.248660;
     }
   }
 
@@ -147,17 +148,24 @@ public final class Constants {
             .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
     // units field for sysid is 0.1143
 
-    public static final PIDConstants PID = new PIDConstants(45, 0, 1);
-    public static final SystemConstants FF = new SystemConstants(0.20619, 0.069335, 33.25, 1.5514);
+    public static final PIDConstants PID = new PIDConstants(50, 0, 1);
+    public static final SystemConstants FF = new SystemConstants(0.4, 0.069335, 33.25, 1.5514);
+    // s = 0.20619
+
+    public static final int SAMPLE_SIZE_TAPS = 5;
+    public static final int CURRENT_SPIKE_THRESHOLD = 20;
 
     public static final Constraints CONSTRAINTS = new Constraints(1, 1);
+
+    public static final double OFFSET = 0.618420;
   }
 
   public static final class Intake {
     public static final MotorConfig MOTOR =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withInvert(true);
 
-    public static final double WHEEL_SPEED = 0.4;
+    public static final double INTAKE_SPEED = 0.4;
+    public static final double OUTTAKE_SPEED = -0.25;
   }
 
   public static final class Drive {
@@ -224,59 +232,62 @@ public final class Constants {
   }
 
   public static final class Positions {
-    // tested
 
-    // untested
-    public static final PlacementState SAFE = PlacementState.fromAbsolute(0, Math.PI / 2.0, 0);
+    public static final PlacementState STOW =
+        PlacementState.fromRelative(0, 1.21834, Math.PI / 2.0);
+    public static final PlacementState PASS_OVER =
+        PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0);
 
-    public static final PlacementState FRONT_MID_CONE = PlacementState.fromAbsolute(0, 0.2, 0.6);
-    public static final PlacementState FRONT_HIGH_CONE = PlacementState.fromAbsolute(0, 1, 1.1);
+    public static final PlacementState FRONT_INTAKE =
+        PlacementState.fromAbsolute(0.44, -0.983, -0.09);
+    public static final PlacementState BACK_INTAKE = STOW; // TODO
 
-    public static final PlacementState BACK_LOW_CONE = PlacementState.fromAbsolute(0, 0.1, 0);
-    public static final PlacementState BACK_MID_CONE = PlacementState.fromAbsolute(0, 0.2, 0.6);
-    public static final PlacementState BACK_HIGH_CONE = PlacementState.fromAbsolute(0, 1, 1.1);
+    public static final PlacementState FRONT_SINGLE_SUBSTATION_CONE =
+        PlacementState.fromAbsolute(0.425006, 0.128855, -0.305);
+    public static final PlacementState FRONT_SINGLE_SUBSTATION_CUBE =
+        PlacementState.fromAbsolute(0.543571, -0.367516, 0.445646);
+    public static final PlacementState BACK_DOUBLE_SUBSTATION =
+        PlacementState.fromAbsolute(0, 2.753496, -3.042500);
 
-    public static final PlacementState FRONT_MID_CUBE = PlacementState.fromAbsolute(0, 0.2, 0.6);
-    public static final PlacementState FRONT_HIGH_CUBE = PlacementState.fromAbsolute(0, 1, 1.1);
+    public static final PlacementState FRONT_MID_CONE =
+        PlacementState.fromAbsolute(0.061612, 0.493303, 0.001378);
 
-    public static final PlacementState BACK_LOW_CUBE = PlacementState.fromAbsolute(0, 0.1, 0);
-    public static final PlacementState BACK_MID_CUBE = PlacementState.fromAbsolute(0, 0.2, 0.6);
-    public static final PlacementState BACK_HIGH_CUBE = PlacementState.fromAbsolute(0, 1, 1.1);
+    public static final PlacementState BACK_MID_CONE = STOW; // TODO
+    public static final PlacementState BACK_HIGH_CONE =
+        PlacementState.fromAbsolute(0.31, 3.034, 2.59);
+
+    public static final PlacementState FRONT_MID_CUBE =
+        PlacementState.fromAbsolute(0.11362, 0.458149, 0.353288);
+    public static final PlacementState FRONT_HIGH_CUBE =
+        PlacementState.fromAbsolute(0.113502, 0.333258, 0.353208);
+
+    public static final PlacementState BACK_MID_CUBE = FRONT_MID_CUBE; // TODO
+    public static final PlacementState BACK_HIGH_CUBE = FRONT_HIGH_CUBE; // TODO
   }
 
   // TODO make this less horrable
   public static final class Field {
-    public static final Map<String, Translation2d> INTAKE_POINTS =
+    public static final Map<Integer, Translation2d> INTAKE_POINTS =
         Map.ofEntries(
-            Map.entry("B1", new Translation2d()),
-            Map.entry("B2", new Translation2d()),
-            Map.entry("B3", new Translation2d()),
-            Map.entry("B4", new Translation2d()),
-            Map.entry("R1", new Translation2d()),
-            Map.entry("R2", new Translation2d()),
-            Map.entry("R3", new Translation2d()),
-            Map.entry("R4", new Translation2d()));
+            Map.entry(1, new Translation2d(5, 2)),
+            Map.entry(2, new Translation2d(5, 3)),
+            Map.entry(3, new Translation2d(5, 4)),
+            Map.entry(4, new Translation2d(5, 5)));
 
-    public static final Map<String, Translation2d> SCORING_POINTS =
+    public static final Map<Integer, Translation2d> SCORING_POINTS =
         Map.ofEntries(
-            Map.entry("B1", new Translation2d()),
-            Map.entry("B2", new Translation2d()),
-            Map.entry("B3", new Translation2d()),
-            Map.entry("B4", new Translation2d()),
-            Map.entry("B5", new Translation2d()),
-            Map.entry("B6", new Translation2d()),
-            Map.entry("B7", new Translation2d()),
-            Map.entry("B8", new Translation2d()),
-            Map.entry("B9", new Translation2d()),
-            Map.entry("R1", new Translation2d()),
-            Map.entry("R2", new Translation2d()),
-            Map.entry("R3", new Translation2d()),
-            Map.entry("R4", new Translation2d()),
-            Map.entry("R5", new Translation2d()),
-            Map.entry("R6", new Translation2d()),
-            Map.entry("R7", new Translation2d()),
-            Map.entry("R8", new Translation2d(10, 3)),
-            Map.entry("R9", new Translation2d()));
+            Map.entry(1, new Translation2d(1, 2)),
+            Map.entry(2, new Translation2d(1, 3)),
+            Map.entry(3, new Translation2d(1, 4)),
+            Map.entry(4, new Translation2d(1, 5)),
+            Map.entry(5, new Translation2d(1, 6)),
+            Map.entry(6, new Translation2d(1, 7)),
+            Map.entry(7, new Translation2d(1, 8)),
+            Map.entry(8, new Translation2d(1, 9)),
+            Map.entry(9, new Translation2d(1, 10)));
+
+    public static final Map<Integer, Translation2d> BALANCE_POINTS =
+        Map.ofEntries(Map.entry(1, new Translation2d(3, 5)), Map.entry(2, new Translation2d(1, 5)));
   }
 
   public static final class led {
