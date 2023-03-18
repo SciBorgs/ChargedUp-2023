@@ -68,9 +68,9 @@ public final class Constants {
 
     public static final double ELEVATOR_MASS = 4;
 
-    public static final double TRACK_WIDTH = 0.577;
+    public static final double TRACK_WIDTH = 0.5715;
     // Distance between centers of right and left wheels on robot
-    public static final double WHEEL_BASE = Units.inchesToMeters(24);
+    public static final double WHEEL_BASE = 0.5715;
     // Distance between front and back wheels on robot
   }
 
