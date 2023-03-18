@@ -74,14 +74,12 @@ public final class Autos implements Loggable {
     startingPosChooser.addOption("center", StartingPos.CENTER);
 
     autoChooser = new SendableChooser<Supplier<Command>>();
-    autoChooser.setDefaultOption("simplest drive", this::simplestDrive);
-    autoChooser.addOption("simple drive", this::simpleDrive);
-    autoChooser.addOption("meandering drive", this::meanderingDrive);
     autoChooser.addOption("balance", this::justBalance);
-    autoChooser.addOption("score", this::highConeScore);
-    // autoChooser.addOption("cone, cube, engage", this::coneCubeEngage);
-    // autoChooser.addOption("cone, cube, intake", this::coneCubeIntake);
-    autoChooser.addOption("cone, balance", this::coneBalance);
+    autoChooser.addOption("cone score", this::highConeScore);
+    autoChooser.addOption("cube score", this::highCubeScore);
+    autoChooser.addOption("cone, cube, engage", this::coneCubeEngage);
+    autoChooser.addOption("cone, cube, intake", this::coneCubeIntake);
+    autoChooser.addOption("cube, balance", this::cubeBalance);
   }
 
   private Map<String, Command> genEventMarkers() {
@@ -106,11 +104,19 @@ public final class Autos implements Loggable {
                 .andThen(scoring.goTo(Level.HIGH))),
         Map.entry("outtake", intake.outtake().withTimeout(1)),
         Map.entry(
-            "intake",
+            "frontIntake",
             placement
                 .safeToState(Constants.Positions.FRONT_INTAKE)
                 .andThen(intake.intake())
-                .withTimeout(3)),
+                .withTimeout(4)
+                .andThen(intake.stop())),
+        Map.entry(
+            "backIntake",
+            placement
+                .safeToState(Constants.Positions.BACK_INTAKE)
+                .andThen(intake.intake())
+                .withTimeout(4)
+                .andThen(intake.stop())),
         Map.entry("stow", placement.safeToState(STOW)));
   }
 
@@ -122,54 +128,51 @@ public final class Autos implements Loggable {
             PathPlanner.loadPath(pathName, Constants.Drive.CONSTRAINTS)));
   }
 
-  // private Command coneCubeEngage() {
-  //   StartingPos startingPos = startingPosChooser.getSelected();
-  //   if (startingPos == StartingPos.CENTER) {
-  //     throw new RuntimeException("cannot do cone cube engage auto path from center");
-  //   }
-  //   return followAutoPath("cone score to intake" + startingPos.suffix, true)
-  //       .andThen(autoIntake())
-  //       .andThen(followAutoPath("intake to cube score to balance" + startingPos.suffix, false))
-  //       .andThen(balance(Rotation2d.fromRadians(0)));
-  // }
-
-  // private Command coneCubeIntake() {
-  //   StartingPos startingPos = startingPosChooser.getSelected();
-  //   if (startingPos == StartingPos.CENTER) {
-  //     throw new RuntimeException("cannot do cone cube intake auto path from center");
-  //   }
-  //   return followAutoPath("cone score to intake" + startingPos.suffix, true)
-  //       .andThen(autoIntake())
-  //       .andThen(followAutoPath("intake to cube score to intake" + startingPos.suffix, false))
-  //       .andThen(autoIntake());
-  // }
-
-  private Command coneBalance() {
-    if (startingPosChooser.getSelected() != StartingPos.CENTER) {
-      throw new RuntimeException("cone balance path can only be done from center");
+  private Command coneCubeEngage() {
+    StartingPos startingPos = startingPosChooser.getSelected();
+    if (startingPos == StartingPos.CENTER) {
+      throw new RuntimeException("cannot do cone cube engage auto path from center");
     }
-    return followAutoPath("cone score to balance", true)
-        .andThen(balance(Rotation2d.fromRadians(Math.PI)));
+    return Commands.sequence(
+        intake.intake().withTimeout(0.5).andThen(intake.stop()),
+        followAutoPath("cone cube balance" + startingPos.suffix, true),
+        drive.balanceOrthogonal());
+  }
+
+  private Command coneCubeIntake() {
+    StartingPos startingPos = startingPosChooser.getSelected();
+    if (startingPos == StartingPos.CENTER) {
+      throw new RuntimeException("cannot do cone cube intake auto path from center");
+    }
+    return followAutoPath("cone cube intake" + startingPos.suffix, true);
+  }
+
+  private Command cubeBalance() {
+    if (startingPosChooser.getSelected() != StartingPos.CENTER) {
+      throw new RuntimeException("cube balance path can only be done from center");
+    }
+    return followAutoPath("cube score to balance", true).andThen(drive.balanceOrthogonal());
   }
 
   private Command justBalance() {
     if (startingPosChooser.getSelected() != StartingPos.CENTER) {
       throw new RuntimeException("just balance path can only be done from center");
     }
-    return balance(Rotation2d.fromRadians(Math.PI));
-  }
-
-  private Command balance(Rotation2d rot) {
-    return drive
-        .drive(() -> 0.5, () -> 0, rot::getRadians, true)
-        .withTimeout(0.6)
-        .andThen(drive.balanceOrthogonal());
+    return followAutoPath("balance", true).andThen(drive.balanceOrthogonal());
   }
 
   private Command highConeScore() {
     return Commands.sequence(
         scoring.setGamePiece(GamePiece.CONE),
         scoring.setSide(Side.BACK),
+        scoring.goTo(Level.HIGH),
+        intake.outtake().withTimeout(2));
+  }
+
+  private Command highCubeScore() {
+    return Commands.sequence(
+        scoring.setGamePiece(GamePiece.CUBE),
+        scoring.setSide(Side.FRONT),
         scoring.goTo(Level.HIGH),
         intake.outtake().withTimeout(2));
   }

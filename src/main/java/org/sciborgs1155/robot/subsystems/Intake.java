@@ -24,7 +24,8 @@ public class Intake extends SubsystemBase implements Loggable, AutoCloseable {
   @Log private double outtakeSpeed = OUTTAKE_SPEED;
 
   public Command intake() {
-    return run(() -> wheels.set(intakeSpeed)).until(this::isHoldingItem).andThen(wheels::stopMotor);
+    return run(
+        () -> wheels.set(intakeSpeed)); // .until(this::isHoldingItem).andThen(wheels::stopMotor);
   }
 
   public Command intakeTmp() {
