@@ -81,6 +81,7 @@ public final class Autos implements Loggable {
     autoChooser.addOption("cone, cube, intake", this::coneCubeIntake);
     autoChooser.addOption("cube, balance", this::cubeBalance);
     autoChooser.addOption("cone leave", this::coneLeave);
+    autoChooser.addOption("cube leave", this::cubeLeave);
   }
 
   private Map<String, Command> genEventMarkers() {
@@ -159,13 +160,22 @@ public final class Autos implements Loggable {
   }
 
   private Command coneLeave() {
-    if (startingPosChooser.getSelected() != StartingPos.LEFT) {
-      throw new RuntimeException("cone leave path can only be done from left");
+    StartingPos startingPos = startingPosChooser.getSelected();
+    if (startingPos == StartingPos.CENTER) {
+      throw new RuntimeException("cone leave path cannot be done from the center");
     }
     return Commands.sequence(
       intake.intake().withTimeout(0.5).andThen(intake.stop()),
-      followAutoPath("cone leaveComm", true)
+      followAutoPath("cone leaveComm" + startingPos.suffix, true)
     );
+  }
+
+  private Command cubeLeave() {
+    StartingPos startingPos = startingPosChooser.getSelected();
+    if (startingPos == StartingPos.CENTER) {
+      throw new RuntimeException("cone leave path cannot be done from the center");
+    }
+    return followAutoPath("cube leaveComm" + startingPos.suffix, true);
   }
 
   private Command justBalance() {
