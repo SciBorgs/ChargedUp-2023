@@ -10,7 +10,7 @@ import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Elevator;
 
 /** Placement command factories */
-public class Placement {
+public final class Placement {
 
   private final Arm arm;
   private final Elevator elevator;

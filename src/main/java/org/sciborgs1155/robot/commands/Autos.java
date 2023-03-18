@@ -4,6 +4,7 @@ import static org.sciborgs1155.robot.Constants.Positions.*;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,13 +17,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import org.sciborgs1155.lib.Vision;
-import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.commands.Scoring.*;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 
-public class Autos implements Loggable {
+public final class Autos implements Loggable {
 
   public enum StartingPos {
     LEFT(" l"),
@@ -48,17 +48,13 @@ public class Autos implements Loggable {
   public final Map<String, Command> eventMarkers;
   public final SwerveAutoBuilder autoBuilder;
 
-  public static com.pathplanner.lib.auto.PIDConstants PIDSciToPPL(PIDConstants pid) {
-    return new com.pathplanner.lib.auto.PIDConstants(pid.p(), pid.i(), pid.d());
-  }
-
   public Autos(Drive drive, Placement placement, Vision vision, Intake intake, Scoring scoring) {
     this.drive = drive;
     this.vision = vision;
     this.intake = intake;
     this.placement = placement;
     this.scoring = scoring;
-
+    
     eventMarkers = genEventMarkers();
 
     this.autoBuilder =
@@ -66,8 +62,8 @@ public class Autos implements Loggable {
             drive::getPose,
             drive::resetOdometry,
             drive.kinematics,
-            PIDSciToPPL(Constants.Drive.CARTESIAN),
-            PIDSciToPPL(Constants.Drive.ANGULAR),
+            Constants.Drive.CARTESIAN.toPPL(),
+            Constants.Drive.ANGULAR.toPPL(),
             drive::setModuleStates,
             eventMarkers,
             true,
@@ -83,10 +79,7 @@ public class Autos implements Loggable {
     autoChooser.addOption("simple drive", this::simpleDrive);
     autoChooser.addOption("meandering drive", this::meanderingDrive);
     autoChooser.addOption("balance", this::justBalance);
-    autoChooser.addOption("goofy", this::goofy);
-    autoChooser.addOption("goofyApp", this::goofyApp);
     autoChooser.addOption("score", this::highConeScore);
-    autoChooser.addOption("intake", this::autoIntake);
     autoChooser.addOption("cone, cube, engage", this::coneCubeEngage);
     autoChooser.addOption("cone, cube, intake", this::coneCubeIntake);
     autoChooser.addOption("cone, balance", this::coneBalance);
@@ -164,36 +157,18 @@ public class Autos implements Loggable {
 
   private Command balance(Rotation2d rot) {
     return drive
-        .drive(() -> 0.5, () -> 0, () -> rot.getRadians(), true)
+        .drive(() -> 0.5, () -> 0, rot::getRadians, true)
         .withTimeout(0.6)
         .andThen(drive.balanceOrthogonal());
   }
-
-  private Command goofy() {
-    drive.resetOdometry(new Pose2d(1, 3, Rotation2d.fromDegrees(0)));
-    return drive.driveToPoses(
-        List.of(
-            new Pose2d(1.87, 3.79, Rotation2d.fromDegrees(180)),
-            new Pose2d(2.84, 4.76, Rotation2d.fromDegrees(0)),
-            new Pose2d(2.05, 1.99, Rotation2d.fromDegrees(180))));
-  }
-
-  private Command goofyApp() {
-    return drive.follow("goofy", true, false);
-  }
-
-  private Command autoIntake() {
-    return scoring
-        .intake(FRONT_INTAKE)
-        .alongWith(drive.drive(() -> 0.1, () -> 0.1, () -> 0, false))
-        .until(intake::isHoldingItem);
-  }
-
+  
   private Command highConeScore() {
-    return scoring
-        .setGamePiece(GamePiece.CONE)
-        .andThen(scoring.setSide(Side.BACK))
-        .andThen(scoring.goTo(Level.HIGH));
+    return Commands.sequence(
+      scoring
+        .setGamePiece(GamePiece.CONE),
+        scoring.setSide(Side.BACK),
+        scoring.goTo(Level.HIGH),
+        intake.outtake().withTimeout(2));
   }
 
   private Command simpleDrive() {

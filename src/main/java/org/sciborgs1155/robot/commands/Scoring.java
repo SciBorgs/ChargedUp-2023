@@ -16,7 +16,7 @@ import org.sciborgs1155.robot.Constants.*;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 
-public class Scoring {
+public final class Scoring {
 
   public enum Side {
     BACK,
@@ -85,11 +85,6 @@ public class Scoring {
             .nearest(new ArrayList<Translation2d>(List.copyOf(scoringPoints)));
     double rotationRad = (side.rads() /* TODO use path planner flip color.rads()*/) % (2 * Math.PI);
     return new Pose2d(point, Rotation2d.fromRadians(rotationRad));
-  }
-
-  // this might end up being the right thing to do
-  public Command intake(PlacementState intakeState) {
-    return placement.toState(intakeState).andThen(intake.intake());
   }
 
   public Command goTo(Level height) {
