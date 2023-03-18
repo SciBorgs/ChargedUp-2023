@@ -68,8 +68,6 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    led.setColor(LEDColor.RAINBOW);
-    
     // Resets goal positions to ensure safety of nearby humans...
     m_robotContainer.getEnableCommand().schedule();
 
@@ -87,7 +85,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    led.setColor(LEDColor.YELLOW);
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove

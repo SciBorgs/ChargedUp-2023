@@ -2,10 +2,7 @@ package org.sciborgs1155.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
@@ -14,7 +11,6 @@ import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants.Positions;
 import org.sciborgs1155.robot.Ports.OI;
-import org.sciborgs1155.robot.subsystems.LED;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Placement;
 import org.sciborgs1155.robot.commands.Scoring;
@@ -25,6 +21,7 @@ import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
+import org.sciborgs1155.robot.subsystems.LED;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -52,7 +49,7 @@ public class RobotContainer {
 
   // command factories
   private final Placement placement = new Placement(arm, elevator);
-  private final Scoring scoring = new Scoring(drive, placement, intake, vision);
+  private final Scoring scoring = new Scoring(drive, placement, intake, vision, led);
   private final Autos autos = new Autos(drive, placement, vision, intake, scoring);
 
   // Operator Profiles
@@ -100,8 +97,6 @@ public class RobotContainer {
    */
   private void configureBindings() {
     driver.b().onTrue(drive.zeroHeading());
-    driver.back().onTrue(new RunCommand(LED::cubeLED));
-    driver.start().onTrue(new RunCommand(LED::coneLED));
 
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     // new Trigger(m_exampleSubsystem::exampleCondition)

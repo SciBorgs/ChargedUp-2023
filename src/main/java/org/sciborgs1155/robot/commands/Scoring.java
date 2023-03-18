@@ -15,6 +15,7 @@ import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants.*;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
+import org.sciborgs1155.robot.subsystems.LED;
 
 public final class Scoring {
 
@@ -47,20 +48,23 @@ public final class Scoring {
   private final Drive drive;
   private final Placement placement;
   private final Vision vision;
+  private final LED led;
 
   private Side side = Side.FRONT;
   private GamePiece gamePiece = GamePiece.CUBE;
 
-  public Scoring(Drive drive, Placement placement, Intake intake, Vision vision) {
+  public Scoring(Drive drive, Placement placement, Intake intake, Vision vision, LED led) {
     this.intake = intake;
     this.drive = drive;
     this.placement = placement;
     this.vision = vision;
+    this.led = led;
   }
 
   // TODO leds!
   public Command setGamePiece(GamePiece gamePiece) {
-    return Commands.runOnce(() -> this.gamePiece = gamePiece);
+    return Commands.runOnce(() -> this.gamePiece = gamePiece)
+        .alongWith(led.gamePieceLED(gamePiece));
   }
 
   public Command setSide(Side side) {
