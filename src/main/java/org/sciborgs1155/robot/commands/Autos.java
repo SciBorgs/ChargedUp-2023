@@ -80,6 +80,7 @@ public final class Autos implements Loggable {
     autoChooser.addOption("cone, cube, engage", this::coneCubeEngage);
     autoChooser.addOption("cone, cube, intake", this::coneCubeIntake);
     autoChooser.addOption("cube, balance", this::cubeBalance);
+    autoChooser.addOption("cone leave", this::coneLeave);
   }
 
   private Map<String, Command> genEventMarkers() {
@@ -144,7 +145,10 @@ public final class Autos implements Loggable {
     if (startingPos == StartingPos.CENTER) {
       throw new RuntimeException("cannot do cone cube intake auto path from center");
     }
-    return followAutoPath("cone cube intake" + startingPos.suffix, true);
+    return Commands.sequence(
+      intake.intake().withTimeout(0.5).andThen(intake.stop()),
+      followAutoPath("cone cube intake" + startingPos.suffix, true)
+    );
   }
 
   private Command cubeBalance() {
@@ -152,6 +156,16 @@ public final class Autos implements Loggable {
       throw new RuntimeException("cube balance path can only be done from center");
     }
     return followAutoPath("cube score to balance", true).andThen(drive.balanceOrthogonal());
+  }
+
+  private Command coneLeave() {
+    if (startingPosChooser.getSelected() != StartingPos.LEFT) {
+      throw new RuntimeException("cone leave path can only be done from left");
+    }
+    return Commands.sequence(
+      intake.intake().withTimeout(0.5).andThen(intake.stop()),
+      followAutoPath("cone leaveComm", true)
+    );
   }
 
   private Command justBalance() {
@@ -163,6 +177,7 @@ public final class Autos implements Loggable {
 
   private Command highConeScore() {
     return Commands.sequence(
+        intake.intake().withTimeout(0.5).andThen(intake.stop()),
         scoring.setGamePiece(GamePiece.CONE),
         scoring.setSide(Side.BACK),
         scoring.goTo(Level.HIGH),

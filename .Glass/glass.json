@@ -9,13 +9,13 @@
           "elbow feedback": {
             "open": true
           },
-          "elbowEncoder": {
+          "open": true
+        },
+        "Drive": {
+          "frontLeft": {
             "open": true
           },
-          "open": true,
-          "wrist feedback": {
-            "open": true
-          }
+          "open": true
         },
         "Drivetrain": {
           "frontLeft": {
@@ -38,7 +38,10 @@
           }
         },
         "RobotContainer": {
-          "open": true
+          "open": true,
+          "scoring": {
+            "open": true
+          }
         },
         "open": true
       }
@@ -48,6 +51,7 @@
       "/Shuffleboard/Autos/Drive/field2d": "Field2d",
       "/Shuffleboard/Autos/Drive/imu": "Gyro",
       "/Shuffleboard/Autos/autoChooser": "String Chooser",
+      "/Shuffleboard/Autos/startingPosChooser": "String Chooser",
       "/Shuffleboard/Drive/field2d": "Field2d",
       "/Shuffleboard/Drive/gyro": "Gyro",
       "/Shuffleboard/Drive/imu": "Gyro",
@@ -107,7 +111,7 @@
               "autoFit": true
             }
           ],
-          "height": 330,
+          "height": 248,
           "series": [
             {
               "color": [
@@ -172,7 +176,7 @@
     "Plot <3>": {
       "plots": [
         {
-          "height": 260,
+          "height": 315,
           "series": [
             {
               "color": [
@@ -258,6 +262,47 @@
                 1.0
               ],
               "id": "NT:/Shuffleboard/Arm/elbowEncoder/Distance"
+            }
+          ]
+        }
+      ]
+    },
+    "Plot <6>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 338,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Drive/frontLeft/current position"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Drive/frontLeft/target velocity"
+            },
+            {
+              "color": [
+                0.3333333432674408,
+                0.658823549747467,
+                0.4078431725502014,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Drive/frontLeft/current velocity"
             }
           ]
         }

@@ -155,7 +155,7 @@ public final class Constants {
     public static final int SAMPLE_SIZE_TAPS = 5;
     public static final int CURRENT_SPIKE_THRESHOLD = 20;
 
-    public static final Constraints CONSTRAINTS = new Constraints(1, 1);
+    public static final Constraints CONSTRAINTS = new Constraints(1.6, 1);
 
     public static final double OFFSET = 0.618420;
   }
@@ -169,9 +169,9 @@ public final class Constants {
   }
 
   public static final class Drive {
-    public static final double MAX_SPEED = 7; // m / s
+    public static final double MAX_SPEED = 4.8; // m / s
     public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
-    public static final double MAX_ACCEL = 8; // m / s^2
+    public static final double MAX_ACCEL = 9; // m / s^2
 
     public static final Translation2d[] MODULE_OFFSET = {
       new Translation2d(Dimensions.WHEEL_BASE / 2, Dimensions.TRACK_WIDTH / 2), // front left
@@ -210,8 +210,8 @@ public final class Constants {
               .multiplyGearing(15.0)
               .multiplyGearing(14.0); // pinion teeth
 
-      public static final PIDConstants PID = new PIDConstants(0.07, 0, 0.06);
-      public static final SystemConstants FF = new SystemConstants(0.27, 0.4, 0.2);
+      public static final PIDConstants PID = new PIDConstants(0.1, 0, 0.06);
+      public static final SystemConstants FF = new SystemConstants(0.3, 0.65, 0.25);
     }
 
     public static final class Turning {
@@ -247,14 +247,14 @@ public final class Constants {
     public static final PlacementState FRONT_SINGLE_SUBSTATION_CUBE =
         PlacementState.fromAbsolute(0.543571, -0.367516, 0.445646);
     public static final PlacementState BACK_DOUBLE_SUBSTATION =
-        PlacementState.fromAbsolute(0, 2.753496, -3.042500);
+        PlacementState.fromAbsolute(0, 2.8, Math.PI);
 
     public static final PlacementState FRONT_MID_CONE =
         PlacementState.fromAbsolute(0.061612, 0.493303, 0.001378);
 
     public static final PlacementState BACK_MID_CONE = STOW; // TODO
     public static final PlacementState BACK_HIGH_CONE =
-        PlacementState.fromAbsolute(0.31, 3.034, 2.59);
+        PlacementState.fromAbsolute(0.31, 2.9, 2.7);
 
     public static final PlacementState FRONT_MID_CUBE =
         PlacementState.fromAbsolute(0.11362, 0.458149, 0.353288);
