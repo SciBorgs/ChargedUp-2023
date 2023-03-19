@@ -46,6 +46,13 @@
         }
       },
       "/Shuffleboard/Drive/field2d": {
+        "image": "./field/2023-field.png",
+        "window": {
+          "name": "sus",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Drive/imu": {
         "window": {
           "visible": true
         }
@@ -76,7 +83,6 @@
           }
         },
         "RobotContainer": {
-          "open": true,
           "scoring": {
             "open": true
           }
@@ -131,7 +137,7 @@
               "autoFit": true
             }
           ],
-          "height": 0,
+          "height": 295,
           "series": [
             {
               "color": [

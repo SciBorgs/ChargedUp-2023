@@ -7,7 +7,6 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -83,7 +82,16 @@ public final class Autos implements Loggable {
     autoChooser.addOption("cube, balance", this::cubeBalance);
     autoChooser.addOption("cone leave", this::coneLeave);
     autoChooser.addOption("cube leave", this::cubeLeave);
-    autoChooser.setDefaultOption("cone/cube leave (no ppl)", () -> this.highConeScore().andThen(drive.driveToPose(new Pose2d(drive.getPose().getX() + 7, drive.getPose().getY(), drive.getPose().getRotation()))));
+    autoChooser.setDefaultOption(
+        "cone/cube leave (no ppl)",
+        () ->
+            this.highConeScore()
+                .andThen(
+                    drive.driveToPose(
+                        new Pose2d(
+                            drive.getPose().getX() + 7,
+                            drive.getPose().getY(),
+                            drive.getPose().getRotation()))));
   }
 
   private Map<String, Command> genEventMarkers() {
@@ -149,9 +157,8 @@ public final class Autos implements Loggable {
       throw new RuntimeException("cannot do cone cube intake auto path from center");
     }
     return Commands.sequence(
-      intake.intake().withTimeout(0.5).andThen(intake.stop()),
-      followAutoPath("cone cube intake" + startingPos.suffix, true)
-    );
+        intake.intake().withTimeout(0.5).andThen(intake.stop()),
+        followAutoPath("cone cube intake" + startingPos.suffix, true));
   }
 
   private Command cubeBalance() {
@@ -167,9 +174,8 @@ public final class Autos implements Loggable {
       throw new RuntimeException("cone leave path cannot be done from the center");
     }
     return Commands.sequence(
-      intake.intake().withTimeout(0.5).andThen(intake.stop()),
-      followAutoPath("cone leaveComm" + startingPos.suffix, true)
-    );
+        intake.intake().withTimeout(0.5).andThen(intake.stop()),
+        followAutoPath("cone leaveComm" + startingPos.suffix, true));
   }
 
   private Command cubeLeave() {

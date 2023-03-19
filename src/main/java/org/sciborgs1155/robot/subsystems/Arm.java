@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-import java.util.function.DoubleSupplier;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
@@ -89,8 +88,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
           false);
 
   private final Visualizer visualizer;
-
-  private double elbowV, wristV;
 
   public Arm(Visualizer visualizer) {
     elbowLeft.follow(elbow);
@@ -188,18 +185,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     return setGoals(elbowGoal, wristGoal).andThen(Commands.waitUntil(this::atGoal));
   }
 
-  public Command setVoltage(DoubleSupplier v, DoubleSupplier wristV) {
-    return run(
-        () -> {
-          this.elbowV = v.getAsDouble();
-          this.wristV = wristV.getAsDouble();
-        });
-  }
-
-  public Command setWristVoltage(DoubleSupplier v) {
-    return run(() -> this.wristV = v.getAsDouble());
-  }
-
   @Override
   public void periodic() {
     double elbowFB = elbowFeedback.calculate(getElbowPosition().getRadians());
@@ -221,7 +206,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             wristFeedback.getSetpoint().position + elbowFeedback.getSetpoint().position,
             wristFeedback.getSetpoint().velocity,
             wristAccel.calculate(wristFeedback.getSetpoint().velocity));
-    // System.out.println("v: " + wristFB);
     wrist.setVoltage(wristFB + wristFF);
 
     visualizer.setElbow(

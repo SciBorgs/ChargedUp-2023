@@ -118,22 +118,6 @@ public class RobotContainer {
     // Intaking
     operator.leftBumper().onTrue(intake.intakeTmp()).onFalse(intake.stop());
     operator.rightBumper().onTrue(intake.outtake()).onFalse(intake.stop());
-
-    // TODO: not a todo but use this??
-    // operator.leftBumper().onTrue(intake.intake());
-    // operator.rightBumper().onTrue(intake.stop());
-
-    // xbox.povLeft().onTrue(arm.setElbowGoal(new State(0, 0)));
-    // xbox.povUp().onTrue(arm.setElbowGoal(new State(1.57, 0)));
-    // xbox.povRight().onTrue(arm.setElbowGoal(new State(3.14, 0)));
-
-    // xbox.povUp().onTrue(arm.set)
-
-    // xbox.povUp().onTrue(arm.setGoals(Rotation2d.fromDegrees(5), Rotation2d.fromDegrees(0)));
-    // xbox.povDown().onTrue(arm.setGoals(Rotation2d.fromDegrees(-5), Rotation2d.fromDegrees(0)));
-    // xbox.p.onTrue(arm.setVoltage(3)).onFalse(arm.setVoltage(0));
-    // xbox.povDownovUp()().onTrue(arm.setVoltage(-3)).onFalse(arm.setVoltage(0));
-
   }
 
   /** A command to run when the robot is enabled */
@@ -150,11 +134,5 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autos.get();
-    // return drive.follow("PRAY", true, true);
-    // return led.pgLED();
-    // return arm.setElbowGoal(new TrapezoidProfile.State(0.75 * Math.PI, 0));
-    // return scoring
-    //     .odometryAlign(Side.FRONT, Alliance.BLUE)
-    //     .andThen(scoring.score(Level.LOW, Side.FRONT));
   }
 }

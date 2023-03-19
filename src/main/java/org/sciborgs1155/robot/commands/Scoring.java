@@ -10,8 +10,6 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
-import edu.wpi.first.wpilibj2.command.WrapperCommand;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -121,7 +119,7 @@ public final class Scoring implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-      builder.addStringProperty("Game Piece", () -> gamePiece.name(), null);
-      builder.addStringProperty("Side", () -> side.name(), null);
+    builder.addStringProperty("Game Piece", () -> gamePiece.name(), null);
+    builder.addStringProperty("Side", () -> side.name(), null);
   }
 }
