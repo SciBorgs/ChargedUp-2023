@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-
 import java.util.Map;
 import java.util.function.Supplier;
 import org.sciborgs1155.lib.Vision;
@@ -90,28 +89,28 @@ public final class Autos implements Loggable {
         Map.entry(
             "backHighCone",
             Commands.sequence(
-              scoring.setGamePiece(GamePiece.CONE),
-              scoring.setSide(Side.BACK),
-              scoring.goTo(Level.HIGH))),
+                scoring.setGamePiece(GamePiece.CONE),
+                scoring.setSide(Side.BACK),
+                scoring.goTo(Level.HIGH))),
         Map.entry(
             "frontHighCube",
             Commands.sequence(
-              scoring.setGamePiece(GamePiece.CUBE),
-              scoring.setSide(Side.FRONT),
-              scoring.goTo(Level.HIGH))),
+                scoring.setGamePiece(GamePiece.CUBE),
+                scoring.setSide(Side.FRONT),
+                scoring.goTo(Level.HIGH))),
         Map.entry("score", intake.outtake().withTimeout(0.3).andThen(intake.stop())),
         Map.entry(
             "frontIntake",
             Commands.sequence(
-              placement.safeToState(Constants.Positions.FRONT_INTAKE),
-              intake.intake().withTimeout(4),
-              intake.stop())), 
+                placement.safeToState(Constants.Positions.FRONT_INTAKE),
+                intake.intake().withTimeout(4),
+                intake.stop())),
         Map.entry(
             "backIntake",
             Commands.sequence(
-              placement.safeToState(Constants.Positions.BACK_INTAKE),
-              intake.intake().withTimeout(4),
-              intake.stop())),
+                placement.safeToState(Constants.Positions.BACK_INTAKE),
+                intake.intake().withTimeout(4),
+                intake.stop())),
         Map.entry("stow", placement.safeToState(STOW)),
         Map.entry("initialIntake", intake.intake().withTimeout(0.5).andThen(intake.stop())));
   }
@@ -126,8 +125,7 @@ public final class Autos implements Loggable {
       throw new RuntimeException("cannot do cone cube engage auto path from center");
     }
     return Commands.sequence(
-        followAutoPath( "cone cube balance" + startingPos.suffix),
-        drive.balanceOrthogonal());
+        followAutoPath("cone cube balance" + startingPos.suffix), drive.balanceOrthogonal());
   }
 
   private Command coneCubeIntake() {
@@ -152,9 +150,7 @@ public final class Autos implements Loggable {
     if (startingPosChooser.getSelected() != StartingPos.CENTER) {
       throw new RuntimeException("cube balance path can only be done from center");
     }
-    return Commands.sequence(
-        followAutoPath("cube balance"),
-        drive.balanceOrthogonal());
+    return Commands.sequence(followAutoPath("cube balance"), drive.balanceOrthogonal());
   }
 
   private Command coneLeave() {
@@ -177,9 +173,7 @@ public final class Autos implements Loggable {
     if (startingPosChooser.getSelected() != StartingPos.CENTER) {
       throw new RuntimeException("just balance path can only be done from center");
     }
-    return Commands.sequence(
-        followAutoPath("balance"),
-        drive.balanceOrthogonal());
+    return Commands.sequence(followAutoPath("balance"), drive.balanceOrthogonal());
   }
 
   // private Command highConeScore() {
