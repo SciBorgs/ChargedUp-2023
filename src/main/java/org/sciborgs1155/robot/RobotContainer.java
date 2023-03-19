@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
+import java.util.function.Supplier;
 import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants.Positions;
@@ -31,53 +32,57 @@ import org.sciborgs1155.robot.subsystems.LED;
  */
 public class RobotContainer {
 
+  // Vision instance
   private final Vision vision = new Vision();
+
+  // Placement visualizer
   @Log private final Visualizer visualizer = new Visualizer();
 
-  // The robot's subsystems and commands are defined here...
+  // Subsystems
   private final Drive drive = new Drive(vision);
   private final Elevator elevator = new Elevator(visualizer);
   private final Arm arm = new Arm(visualizer);
   private final Intake intake = new Intake();
   private final LED led = new LED();
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
+  // Input devices
   private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
   private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
-  // private final CommandJoystick leftJoystick = new CommandJoystick(OI.LEFT_STICK);
-  // private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
 
-  // command factories
+  // Command factories
   private final Placement placement = new Placement(arm, elevator);
   private final Scoring scoring = new Scoring(drive, placement, intake, vision, led);
-  private final Autos autos = new Autos(drive, placement, vision, intake, scoring);
 
-  // Operator Profiles
-  private enum ButtonProfile {
-    PRESET,
-    SETPOINT,
-    VOLTAGE
-  }
+  @Log(name = "starting position chooser")
+  private final Autos autos = new Autos(drive, placement, intake);
 
-  private final SendableChooser<ButtonProfile> profileChooser =
-      new SendableChooser<ButtonProfile>();
-
-  private ButtonProfile getProfile() {
-    return profileChooser.getSelected();
-  }
+  // Auto choosers
+  @Log(name = "auto path chooser")
+  private final SendableChooser<Supplier<Command>> autoChooser = new SendableChooser<>();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the oblog logger
     Logger.configureLoggingAndConfig(this, false);
-    // Set up profile chooser
-    profileChooser.setDefaultOption("Preset Control", ButtonProfile.PRESET);
-    profileChooser.addOption("Setpoint Control", ButtonProfile.SETPOINT);
-    profileChooser.addOption("Voltage Control", ButtonProfile.VOLTAGE);
+    // Configure auto chooser options
+    configureAutoChoosers();
     // Configure the trigger bindings
     configureBindings();
     // Configure subsystem default commands
     configureSubsystemDefaults();
+  }
+
+  private void configureAutoChoosers() {
+    autoChooser.addOption("balance", autos::justBalance);
+    autoChooser.addOption("cone score", autos::highConeScore);
+    autoChooser.addOption("back cube score", autos::backHighCubeScore);
+    autoChooser.addOption("front cube score", autos::frontHighCubeScore);
+    autoChooser.addOption("cone, cube, engage", autos::coneCubeEngage);
+    autoChooser.addOption("cone, cube, intake", autos::coneCubeIntake);
+    autoChooser.addOption("cube, balance", autos::cubeBalance);
+    autoChooser.addOption("cone leave", autos::coneLeave);
+    autoChooser.addOption("cube leave", autos::cubeLeave);
+    autoChooser.addOption("cone/cube leave (no ppl)", autos::scoreLeaveNoPPL);
   }
 
   private void configureSubsystemDefaults() {
@@ -115,7 +120,7 @@ public class RobotContainer {
     // operator.povDownRight().onTrue(elevator.setGoal(0));
     // operator.povUpRight().onTrue(elevator.setGoal(.5));
 
-    // Intaking
+    // INTAKING
     operator.leftBumper().onTrue(intake.intakeTmp()).onFalse(intake.stop());
     operator.rightBumper().onTrue(intake.outtake()).onFalse(intake.stop());
   }
@@ -133,6 +138,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autos.get();
+    return autoChooser.getSelected().get();
   }
 }

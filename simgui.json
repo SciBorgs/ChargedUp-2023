@@ -15,27 +15,27 @@
       "/Shuffleboard/Autos/startingPosChooser": "String Chooser",
       "/Shuffleboard/Drive/field2d": "Field2d",
       "/Shuffleboard/Drive/imu": "Gyro",
+      "/Shuffleboard/RobotContainer/auto path chooser": "String Chooser",
+      "/Shuffleboard/RobotContainer/autoChooser": "String Chooser",
+      "/Shuffleboard/RobotContainer/autos": "String Chooser",
+      "/Shuffleboard/RobotContainer/starting position chooser": "String Chooser",
       "/Shuffleboard/RobotContainer/visualizer": "Mechanism2d",
       "/SmartDashboard/backPhotonVision Sim Field": "Field2d",
       "/SmartDashboard/frontPhotonVision Sim Field": "Field2d"
     },
     "windows": {
-      "/Shuffleboard/Autos/Drive/field2d": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/Shuffleboard/Autos/autoChooser": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/Shuffleboard/Autos/startingPosChooser": {
-        "window": {
-          "visible": true
-        }
-      },
       "/Shuffleboard/Drive/field2d": {
+        "image": "./field/2023-field.png",
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/RobotContainer/auto path chooser": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/RobotContainer/starting position chooser": {
         "window": {
           "visible": true
         }
