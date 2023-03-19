@@ -3,7 +3,6 @@ package org.sciborgs1155.robot.commands;
 import static org.sciborgs1155.robot.Constants.Positions.*;
 
 import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -12,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
+
 import java.util.Map;
 import java.util.function.Supplier;
 import org.sciborgs1155.lib.Vision;
@@ -82,46 +82,42 @@ public final class Autos implements Loggable {
     autoChooser.addOption("cube, balance", this::cubeBalance);
     autoChooser.addOption("cone leave", this::coneLeave);
     autoChooser.addOption("cube leave", this::cubeLeave);
-    autoChooser.setDefaultOption("cone/cube leave (no ppl)", this::scoreLeaveNoPPL);
+    autoChooser.addOption("cone/cube leave (no ppl)", this::scoreLeaveNoPPL);
   }
 
   private Map<String, Command> genEventMarkers() {
     return Map.ofEntries(
         Map.entry(
             "backHighCone",
-            scoring
-                .setGamePiece(GamePiece.CONE)
-                .andThen(scoring.setSide(Side.BACK))
-                .andThen(scoring.goTo(Level.HIGH))),
+            Commands.sequence(
+              scoring.setGamePiece(GamePiece.CONE),
+              scoring.setSide(Side.BACK),
+              scoring.goTo(Level.HIGH))),
         Map.entry(
             "frontHighCube",
-            scoring
-                .setGamePiece(GamePiece.CUBE)
-                .andThen(scoring.setSide(Side.FRONT))
-                .andThen(scoring.goTo(Level.HIGH))),
+            Commands.sequence(
+              scoring.setGamePiece(GamePiece.CUBE),
+              scoring.setSide(Side.FRONT),
+              scoring.goTo(Level.HIGH))),
         Map.entry("score", intake.outtake().withTimeout(0.3).andThen(intake.stop())),
         Map.entry(
             "frontIntake",
-            placement
-                .safeToState(Constants.Positions.FRONT_INTAKE)
-                .andThen(intake.intake())
-                .withTimeout(4)
-                .andThen(intake.stop())),
+            Commands.sequence(
+              placement.safeToState(Constants.Positions.FRONT_INTAKE),
+              intake.intake().withTimeout(4),
+              intake.stop())), 
         Map.entry(
             "backIntake",
-            placement
-                .safeToState(Constants.Positions.BACK_INTAKE)
-                .andThen(intake.intake())
-                .withTimeout(4)
-                .andThen(intake.stop())),
+            Commands.sequence(
+              placement.safeToState(Constants.Positions.BACK_INTAKE),
+              intake.intake().withTimeout(4),
+              intake.stop())),
         Map.entry("stow", placement.safeToState(STOW)),
         Map.entry("initialIntake", intake.intake().withTimeout(0.5).andThen(intake.stop())));
   }
 
-  private Command followAutoPath(String pathName, boolean resetOdometry) {
-    PathPlannerTrajectory trajectory = PathPlanner.loadPath(pathName, Constants.Drive.CONSTRAINTS);
-    Command reset = resetOdometry ? autoBuilder.resetPose(trajectory) : Commands.none();
-    return reset.andThen(autoBuilder.followPathWithEvents(trajectory));
+  private Command followAutoPath(String pathName) {
+    return autoBuilder.fullAuto(PathPlanner.loadPathGroup(pathName, Constants.Drive.CONSTRAINTS));
   }
 
   private Command coneCubeEngage() {
@@ -130,8 +126,7 @@ public final class Autos implements Loggable {
       throw new RuntimeException("cannot do cone cube engage auto path from center");
     }
     return Commands.sequence(
-        highConeScore(),
-        followAutoPath("cone cube balance" + startingPos.suffix, true),
+        followAutoPath( "cone cube balance" + startingPos.suffix),
         drive.balanceOrthogonal());
   }
 
@@ -140,8 +135,7 @@ public final class Autos implements Loggable {
     if (startingPos == StartingPos.CENTER) {
       throw new RuntimeException("cannot do cone cube intake auto path from center");
     }
-    return Commands.sequence(
-        highConeScore(), followAutoPath("cone cube intake" + startingPos.suffix, true));
+    return followAutoPath("cone cube intake" + startingPos.suffix);
   }
 
   private Command scoreLeaveNoPPL() {
@@ -159,9 +153,7 @@ public final class Autos implements Loggable {
       throw new RuntimeException("cube balance path can only be done from center");
     }
     return Commands.sequence(
-        frontHighCubeScore(),
-        eventMarkers.get("stow"),
-        followAutoPath("cube balance", true),
+        followAutoPath("cube balance"),
         drive.balanceOrthogonal());
   }
 
@@ -170,8 +162,7 @@ public final class Autos implements Loggable {
     if (startingPos == StartingPos.CENTER) {
       throw new RuntimeException("cone leave path cannot be done from the center");
     }
-    return Commands.sequence(
-        highConeScore(), followAutoPath("cone leaveComm" + startingPos.suffix, true));
+    return followAutoPath("cone leaveComm" + startingPos.suffix);
   }
 
   private Command cubeLeave() {
@@ -179,8 +170,7 @@ public final class Autos implements Loggable {
     if (startingPos == StartingPos.CENTER) {
       throw new RuntimeException("cube leave path cannot be done from the center");
     }
-    return Commands.sequence(
-        frontHighCubeScore(), followAutoPath("cube leaveComm" + startingPos.suffix, true));
+    return followAutoPath("cube leaveComm" + startingPos.suffix);
   }
 
   private Command justBalance() {
@@ -188,7 +178,8 @@ public final class Autos implements Loggable {
       throw new RuntimeException("just balance path can only be done from center");
     }
     return Commands.sequence(
-        eventMarkers.get("stow"), followAutoPath("balance", true), drive.balanceOrthogonal());
+        followAutoPath("balance"),
+        drive.balanceOrthogonal());
   }
 
   // private Command highConeScore() {
