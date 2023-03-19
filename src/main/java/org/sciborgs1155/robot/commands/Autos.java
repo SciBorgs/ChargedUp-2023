@@ -7,7 +7,6 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -143,9 +142,8 @@ public final class Autos implements Loggable {
       throw new RuntimeException("cannot do cone cube intake auto path from center");
     }
     return Commands.sequence(
-      intake.intake().withTimeout(0.5).andThen(intake.stop()),
-      followAutoPath("cone cube intake" + startingPos.suffix, true)
-    );
+        intake.intake().withTimeout(0.5).andThen(intake.stop()),
+        followAutoPath("cone cube intake" + startingPos.suffix, true));
   }
 
   private Command scoreLeaveNoPPL() {
@@ -169,9 +167,8 @@ public final class Autos implements Loggable {
       throw new RuntimeException("cone leave path cannot be done from the center");
     }
     return Commands.sequence(
-      intake.intake().withTimeout(0.5).andThen(intake.stop()),
-      followAutoPath("cone leaveComm" + startingPos.suffix, true)
-    );
+        intake.intake().withTimeout(0.5).andThen(intake.stop()),
+        followAutoPath("cone leaveComm" + startingPos.suffix, true));
   }
 
   private Command cubeLeave() {

@@ -45,6 +45,21 @@
           "visible": true
         }
       },
+<<<<<<< HEAD
+=======
+      "/Shuffleboard/Drive/field2d": {
+        "image": "./field/2023-field.png",
+        "window": {
+          "name": "sus",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Drive/imu": {
+        "window": {
+          "visible": true
+        }
+      },
+>>>>>>> fabff8afda9ceca34b5d67caaced6f361552c14c
       "/Shuffleboard/RobotContainer/visualizer": {
         "window": {
           "visible": true
@@ -71,7 +86,6 @@
           }
         },
         "RobotContainer": {
-          "open": true,
           "scoring": {
             "open": true
           }
@@ -126,7 +140,7 @@
               "autoFit": true
             }
           ],
-          "height": 0,
+          "height": 295,
           "series": [
             {
               "color": [
