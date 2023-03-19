@@ -121,8 +121,7 @@ public final class Autos implements Loggable {
     PathPlannerTrajectory trajectory = PathPlanner.loadPath(pathName, Constants.Drive.CONSTRAINTS);
     Command reset = resetOdometry ? autoBuilder.resetPose(trajectory) : Commands.none();
     return reset.andThen(
-        autoBuilder.followPathWithEvents(
-            PathPlanner.loadPath(pathName, Constants.Drive.CONSTRAINTS)));
+        autoBuilder.followPathWithEvents(trajectory));
   }
 
   private Command coneCubeEngage() {
