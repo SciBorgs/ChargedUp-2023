@@ -1,6 +1,8 @@
 package org.sciborgs1155.robot.commands;
 
 import static org.sciborgs1155.robot.Constants.Positions.*;
+import static org.sciborgs1155.robot.Constants.Field.*;
+
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,12 +15,11 @@ import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.sciborgs1155.lib.PlacementState;
-import org.sciborgs1155.lib.Vision;
-import org.sciborgs1155.robot.Constants.*;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.subsystems.LED;
+import org.sciborgs1155.robot.util.PlacementState;
+import org.sciborgs1155.robot.util.Vision;
 
 public final class Scoring implements Sendable {
 
@@ -84,7 +85,7 @@ public final class Scoring implements Sendable {
   // TODO vision alignment
 
   private Pose2d closestScoringPoint(Side side) {
-    Collection<Translation2d> scoringPoints = Field.SCORING_POINTS.values();
+    Collection<Translation2d> scoringPoints = SCORING_POINTS.values();
     Translation2d point =
         drive
             .getPose()

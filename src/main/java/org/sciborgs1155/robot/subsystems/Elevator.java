@@ -14,16 +14,15 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Derivative;
-import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
+import org.sciborgs1155.robot.util.Visualizer;
 
 public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
@@ -74,11 +73,11 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
     this.visualizer = visualizer;
 
-    // pid.setTolerance(0.0);
     pid.setGoal(getPosition());
   }
 
   /** Returns the height of the elevator, in meters */
+  @Log(name = "position")
   public double getPosition() {
     return encoder.getDistance() + OFFSET;
   }
@@ -122,8 +121,6 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     hasSpiked = filter.calculate(lead.getOutputCurrent()) >= CURRENT_SPIKE_THRESHOLD;
 
     visualizer.setElevator(getPosition(), pid.getSetpoint().position);
-
-    SmartDashboard.putNumber("elevator position", this.getPosition());
   }
 
   @Override

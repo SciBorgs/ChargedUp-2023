@@ -32,9 +32,9 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
+import org.sciborgs1155.robot.util.Vision;
 
 public class Drive extends SubsystemBase implements Loggable {
 

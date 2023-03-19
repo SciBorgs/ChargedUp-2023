@@ -23,12 +23,12 @@
           "visible": true
         }
       },
-      "/Shuffleboard/RobotContainer/autoChooser": {
+      "/Shuffleboard/RobotContainer/auto path chooser": {
         "window": {
           "visible": true
         }
       },
-      "/Shuffleboard/RobotContainer/autos": {
+      "/Shuffleboard/RobotContainer/starting position chooser": {
         "window": {
           "visible": true
         }
@@ -40,7 +40,22 @@
       }
     }
   },
-  "NetworkTables View": {
-    "visible": false
+  "NetworkTables": {
+    "transitory": {
+      "Shuffleboard": {
+        "Arm": {
+          "elbow feedback": {
+            "open": true
+          },
+          "open": true
+        },
+        "Elevator": {
+          "pid": {
+            "open": true
+          }
+        },
+        "open": true
+      }
+    }
   }
 }
