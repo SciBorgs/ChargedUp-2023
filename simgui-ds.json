@@ -4,6 +4,11 @@
       "visible": false
     }
   },
+  "Joysticks": {
+    "window": {
+      "visible": false
+    }
+  },
   "keyboardJoysticks": [
     {
       "axisConfig": [

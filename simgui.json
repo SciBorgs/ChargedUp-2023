@@ -45,11 +45,6 @@
           "visible": true
         }
       },
-      "/Shuffleboard/Drive/field2d": {
-        "window": {
-          "visible": true
-        }
-      },
       "/Shuffleboard/RobotContainer/visualizer": {
         "window": {
           "visible": true

@@ -83,7 +83,7 @@ public final class Autos implements Loggable {
     autoChooser.addOption("cube, balance", this::cubeBalance);
     autoChooser.addOption("cone leave", this::coneLeave);
     autoChooser.addOption("cube leave", this::cubeLeave);
-    autoChooser.setDefaultOption("cone/cube leave (no ppl)", () -> this.highConeScore().andThen(drive.driveToPose(new Pose2d(drive.getPose().getX() + 7, drive.getPose().getY(), drive.getPose().getRotation()))));
+    autoChooser.setDefaultOption("cone/cube leave (no ppl)", this::scoreLeaveNoPPL);
   }
 
   private Map<String, Command> genEventMarkers() {
@@ -99,12 +99,6 @@ public final class Autos implements Loggable {
             scoring
                 .setGamePiece(GamePiece.CUBE)
                 .andThen(scoring.setSide(Side.FRONT))
-                .andThen(scoring.goTo(Level.HIGH))),
-        Map.entry(
-            "backHighCube",
-            scoring
-                .setGamePiece(GamePiece.CUBE)
-                .andThen(scoring.setSide(Side.BACK))
                 .andThen(scoring.goTo(Level.HIGH))),
         Map.entry("score", intake.outtake().withTimeout(0.5).andThen(intake.stop())),
         Map.entry(
@@ -154,11 +148,19 @@ public final class Autos implements Loggable {
     );
   }
 
+  private Command scoreLeaveNoPPL() {
+    return this.highConeScore().andThen(
+        drive.driveToPose(new Pose2d(
+          drive.getPose().getX() + 6,
+          drive.getPose().getY(), 
+          drive.getPose().getRotation())));
+  }
+
   private Command cubeBalance() {
     if (startingPosChooser.getSelected() != StartingPos.CENTER) {
       throw new RuntimeException("cube balance path can only be done from center");
     }
-    return followAutoPath("cube score to balance", true).andThen(drive.balanceOrthogonal());
+    return followAutoPath("cube balance", true).andThen(drive.balanceOrthogonal());
   }
 
   private Command coneLeave() {
