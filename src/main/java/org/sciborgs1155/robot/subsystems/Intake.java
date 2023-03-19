@@ -41,8 +41,7 @@ public class Intake extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   public boolean isHoldingItem() {
-    double threshold = 0.5; // TODO: Change this, probably move to constants as well?
-    return wheels.getOutputCurrent() > threshold;
+    return wheels.getOutputCurrent() > THRESHOLD;
   }
 
   @Override

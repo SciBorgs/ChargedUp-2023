@@ -166,6 +166,8 @@ public final class Constants {
 
     public static final double INTAKE_SPEED = 0.4;
     public static final double OUTTAKE_SPEED = -0.25;
+
+    public static final double THRESHOLD = 0.5;
   }
 
   public static final class Drive {
@@ -264,7 +266,6 @@ public final class Constants {
     public static final PlacementState BACK_HIGH_CUBE = FRONT_HIGH_CUBE; // TODO
   }
 
-  // TODO make this less horrable
   public static final class Field {
     public static final Map<Integer, Translation2d> INTAKE_POINTS =
         Map.ofEntries(

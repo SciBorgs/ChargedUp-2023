@@ -1,8 +1,7 @@
 package org.sciborgs1155.robot.commands;
 
-import static org.sciborgs1155.robot.Constants.Positions.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
-
+import static org.sciborgs1155.robot.Constants.Positions.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,10 +15,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.sciborgs1155.robot.subsystems.Drive;
-import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.subsystems.LED;
 import org.sciborgs1155.robot.util.PlacementState;
-import org.sciborgs1155.robot.util.Vision;
 
 public final class Scoring implements Sendable {
 
@@ -48,24 +45,19 @@ public final class Scoring implements Sendable {
     DOUBLE_SUBSTATION,
   }
 
-  private final Intake intake;
   private final Drive drive;
   private final Placement placement;
-  private final Vision vision;
   private final LED led;
 
   private Side side = Side.BACK;
   private GamePiece gamePiece = GamePiece.CONE;
 
-  public Scoring(Drive drive, Placement placement, Intake intake, Vision vision, LED led) {
-    this.intake = intake;
+  public Scoring(Drive drive, Placement placement, LED led) {
     this.drive = drive;
     this.placement = placement;
-    this.vision = vision;
     this.led = led;
   }
 
-  // TODO leds!
   public Command setGamePiece(GamePiece gamePiece) {
     return Commands.runOnce(() -> this.gamePiece = gamePiece)
         .alongWith(led.gamePieceLED(gamePiece));

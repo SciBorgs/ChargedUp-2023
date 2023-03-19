@@ -16,7 +16,11 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
+        "names": [
+          "initialIntake",
+          "backHighCone",
+          "score"
+        ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
@@ -110,7 +114,7 @@
     {
       "position": 1.3166548295454539,
       "names": [
-        "frontHighCone"
+        "frontHighCube"
       ]
     },
     {

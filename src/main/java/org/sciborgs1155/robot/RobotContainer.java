@@ -51,7 +51,7 @@ public class RobotContainer {
 
   // Command factories
   private final Placement placement = new Placement(arm, elevator);
-  private final Scoring scoring = new Scoring(drive, placement, intake, vision, led);
+  private final Scoring scoring = new Scoring(drive, placement, led);
 
   @Log(name = "starting position chooser")
   private final Autos autos = new Autos(drive, placement, intake);
@@ -82,7 +82,7 @@ public class RobotContainer {
     autoChooser.addOption("cube, balance", autos::cubeBalance);
     autoChooser.addOption("cone leave", autos::coneLeave);
     autoChooser.addOption("cube leave", autos::cubeLeave);
-    autoChooser.setDefaultOption("cone/cube leave (no ppl)", autos::scoreLeaveNoPPL);
+    autoChooser.addOption("cone/cube leave (no ppl)", autos::scoreLeaveNoPPL);
   }
 
   private void configureSubsystemDefaults() {
