@@ -7,20 +7,18 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
 import java.util.Map;
-import java.util.function.Supplier;
-import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.commands.Scoring.*;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 
-public final class Autos implements Loggable {
+public final class Autos implements Sendable {
 
   public enum StartingPos {
     LEFT(" l"),
@@ -34,28 +32,23 @@ public final class Autos implements Loggable {
     }
   }
 
-  @Log private final SendableChooser<Supplier<Command>> autoChooser;
-  @Log private final SendableChooser<StartingPos> startingPosChooser;
-
   private final Drive drive;
   private final Placement placement;
-  private final Vision vision;
   private final Intake intake;
-  private final Scoring scoring;
 
-  public final Map<String, Command> eventMarkers;
-  public final SwerveAutoBuilder autoBuilder;
+  private final Map<String, Command> eventMarkers;
+  private final SendableChooser<StartingPos> startingPosChooser;
 
-  public Autos(Drive drive, Placement placement, Vision vision, Intake intake, Scoring scoring) {
+  private final SwerveAutoBuilder autoBuilder;
+
+  public Autos(Drive drive, Placement placement, Intake intake) {
     this.drive = drive;
-    this.vision = vision;
     this.intake = intake;
     this.placement = placement;
-    this.scoring = scoring;
 
     eventMarkers = genEventMarkers();
 
-    this.autoBuilder =
+    autoBuilder =
         new SwerveAutoBuilder(
             drive::getPose,
             drive::resetOdometry,
@@ -67,39 +60,17 @@ public final class Autos implements Loggable {
             true,
             drive);
 
-    startingPosChooser = new SendableChooser<StartingPos>();
+    startingPosChooser = new SendableChooser<>();
     startingPosChooser.setDefaultOption("left", StartingPos.LEFT);
     startingPosChooser.addOption("right", StartingPos.RIGHT);
     startingPosChooser.addOption("center", StartingPos.CENTER);
-
-    autoChooser = new SendableChooser<Supplier<Command>>();
-    autoChooser.addOption("balance", this::justBalance);
-    autoChooser.addOption("cone score", this::highConeScore);
-    autoChooser.addOption("back cube score", this::backHighCubeScore);
-    autoChooser.addOption("front cube score", this::frontHighCubeScore);
-    autoChooser.addOption("cone, cube, engage", this::coneCubeEngage);
-    autoChooser.addOption("cone, cube, intake", this::coneCubeIntake);
-    autoChooser.addOption("cube, balance", this::cubeBalance);
-    autoChooser.addOption("cone leave", this::coneLeave);
-    autoChooser.addOption("cube leave", this::cubeLeave);
-    autoChooser.setDefaultOption("cone/cube leave (no ppl)", this::scoreLeaveNoPPL);
   }
 
   private Map<String, Command> genEventMarkers() {
     return Map.ofEntries(
-        Map.entry(
-            "backHighCone",
-            scoring
-                .setGamePiece(GamePiece.CONE)
-                .andThen(scoring.setSide(Side.BACK))
-                .andThen(scoring.goTo(Level.HIGH))),
-        Map.entry(
-            "frontHighCube",
-            scoring
-                .setGamePiece(GamePiece.CUBE)
-                .andThen(scoring.setSide(Side.FRONT))
-                .andThen(scoring.goTo(Level.HIGH))),
-        Map.entry("score", intake.outtake().withTimeout(0.3).andThen(intake.stop())),
+        Map.entry("backHighCone", placement.safeToState(BACK_HIGH_CONE)),
+        Map.entry("frontHighCube", placement.safeToState(FRONT_HIGH_CUBE)),
+        Map.entry("score", intake.outtake().withTimeout(1).andThen(intake.stop())),
         Map.entry(
             "frontIntake",
             placement
@@ -118,13 +89,13 @@ public final class Autos implements Loggable {
         Map.entry("initialIntake", intake.intake().withTimeout(0.5).andThen(intake.stop())));
   }
 
-  private Command followAutoPath(String pathName, boolean resetOdometry) {
+  public Command followAutoPath(String pathName, boolean resetOdometry) {
     PathPlannerTrajectory trajectory = PathPlanner.loadPath(pathName, Constants.Drive.CONSTRAINTS);
     Command reset = resetOdometry ? autoBuilder.resetPose(trajectory) : Commands.none();
     return reset.andThen(autoBuilder.followPathWithEvents(trajectory));
   }
 
-  private Command coneCubeEngage() {
+  public Command coneCubeEngage() {
     StartingPos startingPos = startingPosChooser.getSelected();
     if (startingPos == StartingPos.CENTER) {
       throw new RuntimeException("cannot do cone cube engage auto path from center");
@@ -135,7 +106,7 @@ public final class Autos implements Loggable {
         drive.balanceOrthogonal());
   }
 
-  private Command coneCubeIntake() {
+  public Command coneCubeIntake() {
     StartingPos startingPos = startingPosChooser.getSelected();
     if (startingPos == StartingPos.CENTER) {
       throw new RuntimeException("cannot do cone cube intake auto path from center");
@@ -144,7 +115,7 @@ public final class Autos implements Loggable {
         highConeScore(), followAutoPath("cone cube intake" + startingPos.suffix, true));
   }
 
-  private Command scoreLeaveNoPPL() {
+  public Command scoreLeaveNoPPL() {
     return this.highConeScore()
         .andThen(
             drive.driveToPose(
@@ -154,7 +125,7 @@ public final class Autos implements Loggable {
                     drive.getPose().getRotation())));
   }
 
-  private Command cubeBalance() {
+  public Command cubeBalance() {
     if (startingPosChooser.getSelected() != StartingPos.CENTER) {
       throw new RuntimeException("cube balance path can only be done from center");
     }
@@ -165,7 +136,7 @@ public final class Autos implements Loggable {
         drive.balanceOrthogonal());
   }
 
-  private Command coneLeave() {
+  public Command coneLeave() {
     StartingPos startingPos = startingPosChooser.getSelected();
     if (startingPos == StartingPos.CENTER) {
       throw new RuntimeException("cone leave path cannot be done from the center");
@@ -174,7 +145,7 @@ public final class Autos implements Loggable {
         highConeScore(), followAutoPath("cone leaveComm" + startingPos.suffix, true));
   }
 
-  private Command cubeLeave() {
+  public Command cubeLeave() {
     StartingPos startingPos = startingPosChooser.getSelected();
     if (startingPos == StartingPos.CENTER) {
       throw new RuntimeException("cube leave path cannot be done from the center");
@@ -183,7 +154,7 @@ public final class Autos implements Loggable {
         frontHighCubeScore(), followAutoPath("cube leaveComm" + startingPos.suffix, true));
   }
 
-  private Command justBalance() {
+  public Command justBalance() {
     if (startingPosChooser.getSelected() != StartingPos.CENTER) {
       throw new RuntimeException("just balance path can only be done from center");
     }
@@ -191,7 +162,7 @@ public final class Autos implements Loggable {
         eventMarkers.get("stow"), followAutoPath("balance", true), drive.balanceOrthogonal());
   }
 
-  // private Command highConeScore() {
+  // public Command highConeScore() {
   //   return Commands.sequence(
   //       intake.intake().withTimeout(0.5).andThen(intake.stop()),
   //       scoring.setGamePiece(GamePiece.CONE),
@@ -200,14 +171,14 @@ public final class Autos implements Loggable {
   //       intake.outtake().withTimeout(0.3).andThen(intake.stop()));
   // }
 
-  private Command highConeScore() {
+  public Command highConeScore() {
     return Commands.sequence(
         eventMarkers.get("initialIntake"),
         eventMarkers.get("backHighCone"),
         eventMarkers.get("score"));
   }
 
-  // private Command highCubeScore() {
+  // public Command highCubeScore() {
   //   return Commands.sequence(
   //       scoring.setGamePiece(GamePiece.CUBE),
   //       scoring.setSide(Side.FRONT),
@@ -215,11 +186,11 @@ public final class Autos implements Loggable {
   //       intake.outtake().withTimeout(2).andThen(intake.stop()));
   // }
 
-  private Command backHighCubeScore() {
+  public Command backHighCubeScore() {
     return Commands.sequence(eventMarkers.get("backHighCone"), eventMarkers.get("score"));
   }
 
-  private Command frontHighCubeScore() {
+  public Command frontHighCubeScore() {
     return Commands.sequence(eventMarkers.get("frontHighCube"), eventMarkers.get("score"));
   }
 
@@ -239,7 +210,7 @@ public final class Autos implements Loggable {
         Constants.Field.SCORING_POINTS.get(scoringPointNum), new Rotation2d(side.rads()));
   }
 
-  // private Command intakeScore(Pose2d startPose, Pose2d intakePose, ScoringState scoringState) {
+  // public Command intakeScore(Pose2d startPose, Pose2d intakePose, ScoringState scoringState) {
   //   return drive
   //       .driveToPose(startPose, intakePose)
   //       .andThen(autoIntake())
@@ -247,11 +218,8 @@ public final class Autos implements Loggable {
   //       .andThen(scoring.goTo(scoringState));
   // }
 
-  /** returns currently selected auto command */
-  public Command get() {
-    if (autoChooser.getSelected() == null) {
-      throw new RuntimeException("no starting position selected!");
-    }
-    return autoChooser.getSelected().get();
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    startingPosChooser.initSendable(builder);
   }
 }
