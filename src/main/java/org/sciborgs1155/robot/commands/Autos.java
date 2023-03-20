@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -93,7 +94,10 @@ public final class Autos implements Sendable {
   public Command coneCubeEngage() {
     StartingPos startingPos = startingPosChooser.getSelected();
     if (startingPos == StartingPos.CENTER) {
-      throw new RuntimeException("cannot do cone cube engage auto path from center");
+      DriverStation.reportError(
+          "Error encountered when attempting to generate auto command: Cannot do cone cube engage auto path from center",
+          true);
+      return Commands.none();
     }
     return Commands.sequence(
         followAutoPath("cone cube balance" + startingPos.suffix), drive.balanceOrthogonal());
@@ -102,7 +106,10 @@ public final class Autos implements Sendable {
   public Command coneCubeIntake() {
     StartingPos startingPos = startingPosChooser.getSelected();
     if (startingPos == StartingPos.CENTER) {
-      throw new RuntimeException("cannot do cone cube intake auto path from center");
+      DriverStation.reportError(
+          "Error encountered when attempting to generate auto command: Cannot do cone cube intake auto path from center",
+          true);
+      return Commands.none();
     }
     return followAutoPath("cone cube intake" + startingPos.suffix);
   }
@@ -119,7 +126,10 @@ public final class Autos implements Sendable {
 
   public Command cubeBalance() {
     if (startingPosChooser.getSelected() != StartingPos.CENTER) {
-      throw new RuntimeException("cube balance path can only be done from center");
+      DriverStation.reportError(
+          "Error encountered when attempting to generate auto command: Cube balance path can only be done from center",
+          true);
+      return Commands.none();
     }
     return Commands.sequence(followAutoPath("cube balance"), drive.balanceOrthogonal());
   }
@@ -127,7 +137,10 @@ public final class Autos implements Sendable {
   public Command coneLeave() {
     StartingPos startingPos = startingPosChooser.getSelected();
     if (startingPos == StartingPos.CENTER) {
-      throw new RuntimeException("cone leave path cannot be done from the center");
+      DriverStation.reportError(
+          "Error encountered when attempting to generate auto command: Cone leave path cannot be done from the center",
+          true);
+      return Commands.none();
     }
     return followAutoPath("cone leaveComm" + startingPos.suffix);
   }
@@ -135,14 +148,20 @@ public final class Autos implements Sendable {
   public Command cubeLeave() {
     StartingPos startingPos = startingPosChooser.getSelected();
     if (startingPos == StartingPos.CENTER) {
-      throw new RuntimeException("cube leave path cannot be done from the center");
+      DriverStation.reportError(
+          "Error encountered when attempting to generate auto command: Cube leave path cannot be done from the center",
+          true);
+      return Commands.none();
     }
     return followAutoPath("cube leaveComm" + startingPos.suffix);
   }
 
   public Command justBalance() {
     if (startingPosChooser.getSelected() != StartingPos.CENTER) {
-      throw new RuntimeException("just balance path can only be done from center");
+      DriverStation.reportError(
+          "Error encountered when attempting to generate auto command: Just balance path can only be done from center",
+          true);
+      return Commands.none();
     }
     return Commands.sequence(followAutoPath("balance"), drive.balanceOrthogonal());
   }
