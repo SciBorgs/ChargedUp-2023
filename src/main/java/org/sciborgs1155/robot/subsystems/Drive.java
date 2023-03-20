@@ -320,7 +320,7 @@ public class Drive extends SubsystemBase implements Loggable {
       points.add(new PathPoint(rawPose.getTranslation(), heading.apply(i), rawPose.getRotation()));
     }
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(CONSTRAINTS, points);
-    return follow(trajectory, false, false);
+    return follow(trajectory, false, true);
   }
 
   /** Creates and follows trajectory for swerve, starting at startPose, through all desired poses */
