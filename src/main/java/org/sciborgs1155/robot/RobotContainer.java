@@ -75,7 +75,7 @@ public class RobotContainer implements Loggable {
 
   private void configureAutoChoosers() {
     autoChooser.addOption("balance", autos::justBalance);
-    autoChooser.addOption("cone score", autos::highConeScore);
+    autoChooser.setDefaultOption("cone score", autos::highConeScore);
     autoChooser.addOption("back cube score", autos::backHighCubeScore);
     autoChooser.addOption("front cube score", autos::frontHighCubeScore);
     autoChooser.addOption("cone, cube, engage", autos::coneCubeEngage);

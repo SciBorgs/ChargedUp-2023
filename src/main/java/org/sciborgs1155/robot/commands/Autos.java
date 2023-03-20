@@ -20,9 +20,9 @@ import org.sciborgs1155.robot.subsystems.Intake;
 public final class Autos implements Sendable {
 
   public enum StartingPos {
-    LEFT(" l"),
+    SUBSTATION(" l"),
     CENTER(" c"),
-    RIGHT(" r");
+    CORNER(" r");
 
     public final String suffix;
 
@@ -60,8 +60,8 @@ public final class Autos implements Sendable {
             drive);
 
     startingPosChooser = new SendableChooser<StartingPos>();
-    startingPosChooser.setDefaultOption("left", StartingPos.LEFT);
-    startingPosChooser.addOption("right", StartingPos.RIGHT);
+    startingPosChooser.setDefaultOption("substation", StartingPos.SUBSTATION);
+    startingPosChooser.addOption("corner", StartingPos.CORNER);
     startingPosChooser.addOption("center", StartingPos.CENTER);
   }
 
@@ -158,9 +158,31 @@ public final class Autos implements Sendable {
 
   public Command highConeScore() {
     return Commands.sequence(
+        defaultOdometryReset(GamePiece.CONE, Rotation2d.fromRadians(0)),
         eventMarkers.get("initialIntake"),
         eventMarkers.get("backHighCone"),
         eventMarkers.get("score"));
+  }
+
+  public Command defaultOdometryReset(GamePiece gamePiece, Rotation2d rotation) {
+    return Commands.runOnce(
+        () ->
+            drive.resetOdometry(
+                switch (startingPosChooser.getSelected()) {
+                  case SUBSTATION -> switch (gamePiece) {
+                    case CONE -> new Pose2d(1.83, 5.0, rotation);
+                    case CUBE -> new Pose2d(1.83, 4.42, rotation);
+                  };
+                  case CENTER -> switch (gamePiece) {
+                    case CONE -> new Pose2d(1.83, 3.29, rotation);
+                    case CUBE -> new Pose2d(1.83, 2.75, rotation);
+                  };
+                  case CORNER -> switch (gamePiece) {
+                    case CONE -> new Pose2d(1.83, 0.51, rotation);
+                    case CUBE -> new Pose2d(1.83, 1.06, rotation);
+                  };
+                }),
+        drive);
   }
 
   // public Command highCubeScore() {
@@ -172,11 +194,17 @@ public final class Autos implements Sendable {
   // }
 
   public Command backHighCubeScore() {
-    return Commands.sequence(eventMarkers.get("backHighCone"), eventMarkers.get("score"));
+    return Commands.sequence(
+        defaultOdometryReset(GamePiece.CUBE, Rotation2d.fromRadians(0)),
+        eventMarkers.get("backHighCone"),
+        eventMarkers.get("score"));
   }
 
   public Command frontHighCubeScore() {
-    return Commands.sequence(eventMarkers.get("frontHighCube"), eventMarkers.get("score"));
+    return Commands.sequence(
+        defaultOdometryReset(GamePiece.CUBE, Rotation2d.fromRadians(Math.PI)),
+        eventMarkers.get("frontHighCube"),
+        eventMarkers.get("score"));
   }
 
   // private Command intakeScore(Pose2d startingPos, int intakingPos, int scoringPos, GamePiece
@@ -185,15 +213,16 @@ public final class Autos implements Sendable {
   //     drive.driveToPose(startingPos, )
   // }
 
-  private Pose2d intakePose(int intakePointNum, Side side) {
-    return new Pose2d(
-        Constants.Field.INTAKE_POINTS.get(intakePointNum), new Rotation2d(Math.PI - side.rads()));
-  }
+  // private Pose2d intakePose(int intakePointNum, Side side) {
+  //   return new Pose2d(
+  //       Constants.Field.INTAKE_POINTS.get(intakePointNum), new Rotation2d(Math.PI -
+  // side.rads()));
+  // }
 
-  private Pose2d scoringPose(int scoringPointNum, Side side) {
-    return new Pose2d(
-        Constants.Field.SCORING_POINTS.get(scoringPointNum), new Rotation2d(side.rads()));
-  }
+  // private Pose2d scoringPose(int scoringPointNum, Side side) {
+  //   return new Pose2d(
+  //       Constants.Field.SCORING_POINTS.get(scoringPointNum), new Rotation2d(side.rads()));
+  // }
 
   // public Command intakeScore(Pose2d startPose, Pose2d intakePose, ScoringState scoringState) {
   //   return drive
