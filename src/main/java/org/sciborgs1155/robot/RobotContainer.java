@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.function.Supplier;
@@ -30,7 +31,7 @@ import org.sciborgs1155.robot.util.Visualizer;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-public class RobotContainer {
+public class RobotContainer implements Loggable {
 
   // Vision instance
   private final Vision vision = new Vision();
@@ -39,11 +40,11 @@ public class RobotContainer {
   @Log private final Visualizer visualizer = new Visualizer();
 
   // Subsystems
-  private final Drive drive = new Drive(vision);
-  private final Elevator elevator = new Elevator(visualizer);
-  private final Arm arm = new Arm(visualizer);
-  private final Intake intake = new Intake();
-  private final LED led = new LED();
+  @Log private final Drive drive = new Drive(vision);
+  @Log private final Elevator elevator = new Elevator(visualizer);
+  @Log private final Arm arm = new Arm(visualizer);
+  @Log private final Intake intake = new Intake();
+  @Log private final LED led = new LED();
 
   // Input devices
   private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
@@ -51,7 +52,7 @@ public class RobotContainer {
 
   // Command factories
   private final Placement placement = new Placement(arm, elevator);
-  private final Scoring scoring = new Scoring(drive, placement, led);
+  @Log private final Scoring scoring = new Scoring(drive, placement, led);
 
   @Log(name = "starting position chooser")
   private final Autos autos = new Autos(drive, placement, intake);
@@ -87,8 +88,10 @@ public class RobotContainer {
 
   private void configureSubsystemDefaults() {
     drive.setDefaultCommand(
-        drive.drive(
-            () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX(), true));
+        drive
+            .drive(
+                () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX(), true)
+            .withName("teleop driving"));
   }
 
   /**
@@ -121,7 +124,7 @@ public class RobotContainer {
     // operator.povUpRight().onTrue(elevator.setGoal(.5));
 
     // INTAKING
-    operator.leftBumper().onTrue(intake.intakeTmp()).onFalse(intake.stop());
+    operator.leftBumper().onTrue(intake.intake()).onFalse(intake.stop());
     operator.rightBumper().onTrue(intake.outtake()).onFalse(intake.stop());
   }
 

@@ -42,7 +42,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log private final Encoder elbowEncoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
   private final EncoderSim elbowEncoderSim = new EncoderSim(elbowEncoder);
 
-  @Log(name = "wrist position", methodName = "getPosition")
   @Log(name = "wrist velocity", methodName = "getVelocity")
   private final AbsoluteEncoder wristEncoder = wrist.getAbsoluteEncoder(Type.kDutyCycle);
 
@@ -116,13 +115,13 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Elbow position relative to the chassis */
-  @Log(name = "elbow position", methodName = "getRadians")
+  @Log(name = "elbow position", methodName = "getDegrees")
   public Rotation2d getElbowPosition() {
     return Rotation2d.fromRadians(elbowEncoder.getDistance() + Elbow.ELBOW_OFFSET);
   }
 
   /** Wrist position relative to the forearm */
-  @Log(name = "relative wrist position", methodName = "getRadians")
+  @Log(name = "relative wrist position", methodName = "getDegrees")
   public Rotation2d getRelativeWristPosition() {
     // encoder is zeroed fully folded in, which is actually PI, so we offset by -PI
     return Rotation2d.fromRadians(
@@ -130,7 +129,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Wrist position relative to chassis */
-  @Log(name = "absolute wrist position", methodName = "getRadians")
+  @Log(name = "absolute wrist position", methodName = "getDegrees")
   public Rotation2d getAbsoluteWristPosition() {
     return getRelativeWristPosition().plus(getElbowPosition());
   }

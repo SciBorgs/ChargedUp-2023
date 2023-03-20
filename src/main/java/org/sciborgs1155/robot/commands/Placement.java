@@ -30,8 +30,9 @@ public final class Placement {
   /** Runs elevator and arm to a state, which can include velocity */
   public Command toState(PlacementState state) {
     return Commands.parallel(
-        elevator.runToGoal(state.elevatorState()),
-        arm.runToGoals(state.elbowState(), state.wristState()));
+            elevator.runToGoal(state.elevatorState()),
+            arm.runToGoals(state.elbowState(), state.wristState()))
+        .withName("placement to state");
   }
 
   /** Runs elevator and arm between multiple states, uses {@link #toState(PlacementState)} */
