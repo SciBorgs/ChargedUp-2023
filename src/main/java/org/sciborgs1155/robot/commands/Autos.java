@@ -39,26 +39,12 @@ public final class Autos implements Sendable {
   private final Map<String, Command> eventMarkers;
   private final SendableChooser<StartingPos> startingPosChooser;
 
-  private final SwerveAutoBuilder autoBuilder;
-
   public Autos(Drive drive, Placement placement, Intake intake) {
     this.drive = drive;
     this.intake = intake;
     this.placement = placement;
 
     eventMarkers = genEventMarkers();
-
-    autoBuilder =
-        new SwerveAutoBuilder(
-            drive::getPose,
-            drive::resetOdometry,
-            drive.kinematics,
-            Constants.Drive.CARTESIAN.toPPL(),
-            Constants.Drive.ANGULAR.toPPL(),
-            drive::setModuleStates,
-            eventMarkers,
-            true,
-            drive);
 
     startingPosChooser = new SendableChooser<StartingPos>();
     startingPosChooser.setDefaultOption("substation", StartingPos.SUBSTATION);
@@ -88,7 +74,19 @@ public final class Autos implements Sendable {
   }
 
   private Command followAutoPath(String pathName) {
-    return autoBuilder.fullAuto(PathPlanner.loadPathGroup(pathName, Constants.Drive.CONSTRAINTS));
+    var builder =
+        new SwerveAutoBuilder(
+            drive::getPose,
+            drive::resetOdometry,
+            drive.kinematics,
+            Constants.Drive.CARTESIAN.toPPL(),
+            Constants.Drive.ANGULAR.toPPL(),
+            drive::setModuleStates,
+            eventMarkers,
+            true,
+            drive);
+
+    return builder.fullAuto(PathPlanner.loadPathGroup(pathName, Constants.Drive.CONSTRAINTS));
   }
 
   public Command coneCubeEngage() {

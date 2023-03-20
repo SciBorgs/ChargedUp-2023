@@ -16,9 +16,9 @@ import org.sciborgs1155.lib.CustomPeriodRunnables;
  */
 public class Robot extends TimedRobot {
 
-  private Command m_autonomousCommand;
+  private Command autonomousCommand;
 
-  private RobotContainer m_robotContainer;
+  private RobotContainer robotContainer;
 
   public Robot() {
     super(Constants.RATE);
@@ -32,7 +32,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    m_robotContainer = new RobotContainer();
+    robotContainer = new RobotContainer();
     // Start networktables logger
     DataLogManager.start();
     // binds FunctionRegistry to be ran at 0.01 hertz
@@ -71,13 +71,13 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     // Resets goal positions to ensure safety of nearby humans...
-    m_robotContainer.getEnableCommand().schedule();
+    robotContainer.getEnableCommand().schedule();
 
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+    if (autonomousCommand != null) {
+      autonomousCommand.schedule();
     }
   }
 
@@ -91,12 +91,12 @@ public class Robot extends TimedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+    if (autonomousCommand != null) {
+      autonomousCommand.cancel();
     }
 
     // Resets goal positions to ensure safety of nearby humans...
-    m_robotContainer.getEnableCommand().schedule();
+    robotContainer.getEnableCommand().schedule();
   }
 
   /** This function is called periodically during operator control. */
