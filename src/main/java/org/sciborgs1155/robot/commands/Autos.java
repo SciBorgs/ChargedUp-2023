@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -185,31 +184,33 @@ public final class Autos implements Sendable {
   public Command defaultOdometryReset(GamePiece gamePiece, Rotation2d rotation) {
     return Commands.runOnce(
         () ->
-            drive.resetOdometry(new Pose2d(
-              switch (DriverStation.getAlliance()) {
-                case Blue -> 1.83;
-                case Red -> 14.67;
-                case Invalid -> -1; // should never happen!
-              },
-              switch (startingPosChooser.getSelected()) {
-                case SUBSTATION -> switch (gamePiece) {
-                  case CONE -> 5.0;
-                  case CUBE -> 4.42;
-                };
-                case CENTER -> switch (gamePiece) {
-                  case CONE -> 3.29;
-                  case CUBE -> 2.75;
-                };
-                case CORNER -> switch (gamePiece) {
-                  case CONE -> 0.51;
-                  case CUBE -> 1.06;
-                };
-              },
-              switch (DriverStation.getAlliance()) {
-                case Blue -> rotation;
-                case Red -> Rotation2d.fromRadians(Math.PI - rotation.getRadians());
-                case Invalid -> rotation; // should never happen!
-              })), drive);
+            drive.resetOdometry(
+                new Pose2d(
+                    switch (DriverStation.getAlliance()) {
+                      case Blue -> 1.83;
+                      case Red -> 14.67;
+                      case Invalid -> -1; // should never happen!
+                    },
+                    switch (startingPosChooser.getSelected()) {
+                      case SUBSTATION -> switch (gamePiece) {
+                        case CONE -> 5.0;
+                        case CUBE -> 4.42;
+                      };
+                      case CENTER -> switch (gamePiece) {
+                        case CONE -> 3.29;
+                        case CUBE -> 2.75;
+                      };
+                      case CORNER -> switch (gamePiece) {
+                        case CONE -> 0.51;
+                        case CUBE -> 1.06;
+                      };
+                    },
+                    switch (DriverStation.getAlliance()) {
+                      case Blue -> rotation;
+                      case Red -> Rotation2d.fromRadians(Math.PI - rotation.getRadians());
+                      case Invalid -> rotation; // should never happen!
+                    })),
+        drive);
   }
 
   // public Command highCubeScore() {
