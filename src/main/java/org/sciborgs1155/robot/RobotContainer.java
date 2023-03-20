@@ -142,6 +142,7 @@ public class RobotContainer implements Loggable {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected().get();
+    // return autoChooser.getSelected().get();
+    return drive.balanceOrthogonal();
   }
 }
