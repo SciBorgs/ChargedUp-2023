@@ -98,7 +98,7 @@ public final class Autos implements Sendable {
       return Commands.none();
     }
     return Commands.sequence(
-        followAutoPath("cone cube balance" + startingPos.suffix), drive.balanceOrthogonal());
+        followAutoPath("cone cube balance" + startingPos.suffix), drive.balance());
   }
 
   public Command coneCubeIntake() {
@@ -136,7 +136,17 @@ public final class Autos implements Sendable {
           true);
       return Commands.none();
     }
-    return Commands.sequence(followAutoPath("cube balance"), drive.balanceOrthogonal());
+    return Commands.sequence(followAutoPath("cube balance"), drive.balance());
+  }
+
+  public Command coneBalance() {
+    if (startingPosChooser.getSelected() != StartingPos.CENTER) {
+      DriverStation.reportError(
+          "Error encountered when attempting to generate auto command: Cone balance path can only be done from center",
+          true);
+      return Commands.none();
+    }
+    return Commands.sequence(followAutoPath("cone balance"), drive.balance());
   }
 
   public Command coneLeave() {
@@ -168,7 +178,11 @@ public final class Autos implements Sendable {
           true);
       return Commands.none();
     }
-    return Commands.sequence(followAutoPath("balance"), drive.balanceOrthogonal());
+    return Commands.sequence(followAutoPath("balance"), drive.balance());
+  }
+
+  public Command cubeIntake() {
+    return followAutoPath("cube intake");
   }
 
   // public Command highConeScore() {
@@ -181,12 +195,11 @@ public final class Autos implements Sendable {
   // }
 
   public Command highConeScore() {
-    return
-    // return Commands.sequence(
-    defaultOdometryReset(GamePiece.CONE, Rotation2d.fromRadians(0));
-    // eventMarkers.get("initialIntake"),
-    // eventMarkers.get("backHighCone"),
-    // eventMarkers.get("score"));
+    return Commands.sequence(
+        defaultOdometryReset(GamePiece.CONE, Rotation2d.fromRadians(0)),
+        eventMarkers.get("initialIntake"),
+        eventMarkers.get("backHighCone"),
+        eventMarkers.get("score"));
   }
 
   public Command defaultOdometryReset(GamePiece gamePiece, Rotation2d rotation) {

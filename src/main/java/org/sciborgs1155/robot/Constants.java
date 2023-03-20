@@ -193,7 +193,8 @@ public final class Constants {
 
     public static final PIDConstants CARTESIAN = new PIDConstants(1.2, 0, 0);
     public static final PIDConstants ANGULAR = new PIDConstants(1.2, 0, 1);
-    public static final PIDConstants BALANCE = new PIDConstants(1, 0, 0);
+    public static final PIDConstants BALANCE = new PIDConstants(0.02, 0, 0);
+    public static final double PITCH_TOLERANCE = 4; // deg
 
     public static final PathConstraints CONSTRAINTS = new PathConstraints(MAX_SPEED, MAX_ACCEL);
   }
@@ -255,7 +256,7 @@ public final class Constants {
         PlacementState.fromAbsolute(0.061612, 0.493303, 0.001378);
 
     public static final PlacementState BACK_MID_CONE = STOW; // TODO
-    public static final PlacementState BACK_HIGH_CONE = PlacementState.fromAbsolute(0.31, 2.9, 2.7);
+    public static final PlacementState BACK_HIGH_CONE = PlacementState.fromAbsolute(0.25, 2.7, 3.1);
 
     public static final PlacementState FRONT_MID_CUBE =
         PlacementState.fromAbsolute(0.11362, 0.458149, 0.353288);

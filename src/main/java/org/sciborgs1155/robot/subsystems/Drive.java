@@ -274,19 +274,22 @@ public class Drive extends SubsystemBase implements Loggable {
 
   public Command balance() {
     PIDController controller = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
+    controller.setTolerance(PITCH_TOLERANCE);
     return run(() -> drive(controller.calculate(getPitch()), 0, 0, true))
         .until(controller::atSetpoint)
         .andThen(lock());
   }
 
-  public Command balanceOrthogonal() {
-    PIDController x = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
-    PIDController y = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
-    return run(() -> drive(x.calculate(getPitch()), y.calculate(getRoll()), 0, false))
-        .until(() -> x.atSetpoint() && y.atSetpoint())
-        .andThen(lock());
-    // TODO see if pitch and yaw have to be switched
-  }
+  // public Command balanceOrthogonal() {
+  //   PIDController x = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
+  //   PIDController y = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
+  //   x.setTolerance(PITCH_TOLERANCE);
+  //   y.setTolerance(PITCH_TOLERANCE);
+  //   return run(() -> drive(x.calculate(getPitch()), y.calculate(getRoll()), 0, false))
+  //       .until(() -> x.atSetpoint() && y.atSetpoint())
+  //       .andThen(lock());
+  //   // TODO see if pitch and yaw have to be switched
+  // }
 
   /** Stops drivetrain */
   public Command stop() {
