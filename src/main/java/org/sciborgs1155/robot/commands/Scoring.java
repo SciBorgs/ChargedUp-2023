@@ -69,7 +69,7 @@ public final class Scoring implements Sendable {
 
   // TODO make it take gamePiece into account
   public Command odometryAlign(Side side) {
-    return drive.driveToPose(drive.getPose(), closestScoringPoint(side));
+    return drive.driveToPose(drive.getPose(), closestScoringPoint(side), true);
   }
 
   // TODO make commands to go to the next scoring poses to the left and right

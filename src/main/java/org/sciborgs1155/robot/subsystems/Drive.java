@@ -306,7 +306,7 @@ public class Drive extends SubsystemBase implements Loggable {
             desiredPose.getY() - currentPose.getY(), desiredPose.getX() - currentPose.getX()));
   }
 
-  private Command driveToPosesHelper(List<Pose2d> desiredPoses) {
+  private Command driveToPosesHelper(List<Pose2d> desiredPoses, boolean useAllianceColor) {
     List<PathPoint> points = new ArrayList<PathPoint>();
     Function<Integer, Rotation2d> heading =
         (i) ->
@@ -320,11 +320,12 @@ public class Drive extends SubsystemBase implements Loggable {
       points.add(new PathPoint(rawPose.getTranslation(), heading.apply(i), rawPose.getRotation()));
     }
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(CONSTRAINTS, points);
-    return follow(trajectory, false, true);
+    return follow(trajectory, false, useAllianceColor);
   }
 
   /** Creates and follows trajectory for swerve, starting at startPose, through all desired poses */
-  public Command driveToPoses(Pose2d startPose, List<Pose2d> desiredPoses) {
+  public Command driveToPoses(
+      Pose2d startPose, List<Pose2d> desiredPoses, boolean useAllianceColor) {
     BooleanSupplier closeEnough =
         () -> {
           Transform2d transform = getPose().minus(desiredPoses.get(desiredPoses.size() - 1));
@@ -334,24 +335,24 @@ public class Drive extends SubsystemBase implements Loggable {
         };
     List<Pose2d> posesWithStart =
         Stream.concat(Stream.of(startPose), desiredPoses.stream()).toList();
-    return driveToPosesHelper(posesWithStart).until(closeEnough);
+    return driveToPosesHelper(posesWithStart, useAllianceColor).until(closeEnough);
   }
 
   /**
    * Creates and follows trajectory for swerve, starting at curent pose, through all desired //
    * poses
    */
-  public Command driveToPoses(List<Pose2d> desiredPoses) {
-    return driveToPoses(getPose(), desiredPoses);
+  public Command driveToPoses(List<Pose2d> desiredPoses, boolean useAllianceColor) {
+    return driveToPoses(getPose(), desiredPoses, useAllianceColor);
   }
 
   /** Creates and follows trajectroy for swerve from startPose to desiredPose */
-  public Command driveToPose(Pose2d startPose, Pose2d desiredPose) {
-    return driveToPoses(startPose, List.of(desiredPose));
+  public Command driveToPose(Pose2d startPose, Pose2d desiredPose, boolean useAllianceColor) {
+    return driveToPoses(startPose, List.of(desiredPose), useAllianceColor);
   }
 
   /** Creates and follows trajectory for swerve from current pose to desiredPose */
-  public Command driveToPose(Pose2d desiredPose) {
-    return driveToPose(getPose(), desiredPose);
+  public Command driveToPose(Pose2d desiredPose, boolean useAllianceColor) {
+    return driveToPose(getPose(), desiredPose, useAllianceColor);
   }
 }

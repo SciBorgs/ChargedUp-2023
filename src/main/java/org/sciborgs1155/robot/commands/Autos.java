@@ -113,13 +113,20 @@ public final class Autos implements Sendable {
   }
 
   public Command scoreLeaveNoPPL() {
+    double offset =
+        switch (DriverStation.getAlliance()) {
+          case Blue -> 6;
+          case Red -> -6;
+          case Invalid -> 0;
+        };
     return this.highConeScore()
         .andThen(
             drive.driveToPose(
                 new Pose2d(
-                    drive.getPose().getX() + 6,
+                    drive.getPose().getX() + offset,
                     drive.getPose().getY(),
-                    drive.getPose().getRotation())));
+                    drive.getPose().getRotation()),
+                false));
   }
 
   public Command cubeBalance() {
@@ -174,11 +181,12 @@ public final class Autos implements Sendable {
   // }
 
   public Command highConeScore() {
-    return Commands.sequence(
-        defaultOdometryReset(GamePiece.CONE, Rotation2d.fromRadians(0)),
-        eventMarkers.get("initialIntake"),
-        eventMarkers.get("backHighCone"),
-        eventMarkers.get("score"));
+    return
+    // return Commands.sequence(
+    defaultOdometryReset(GamePiece.CONE, Rotation2d.fromRadians(0));
+    // eventMarkers.get("initialIntake"),
+    // eventMarkers.get("backHighCone"),
+    // eventMarkers.get("score"));
   }
 
   public Command defaultOdometryReset(GamePiece gamePiece, Rotation2d rotation) {
