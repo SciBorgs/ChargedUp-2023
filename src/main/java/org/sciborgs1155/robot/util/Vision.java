@@ -133,12 +133,12 @@ public class Vision {
         .toArray(EstimatedRobotPose[]::new);
     // var frontCamEstimate =
     //     frontEstimator.update(
-    //         toPipelineResult(
+    //         new PhotonPipelineResult(
     //             frontCam.getLatestResult().getLatencyMillis(),
     //             filterTargets(frontCam)));
     // var backCamEstimate =
     //     backEstimator.update(
-    //         toPipelineResult(
+    //         new PhotonPipelineResult(
     //             backCam.getLatestResult().getLatencyMillis(),
     //             filterTargets(backCam)));
     // return new EstimatedRobotPose[] {frontCamEstimate.get(), backCamEstimate.get()};
@@ -157,11 +157,6 @@ public class Vision {
       }
     }
     return targets;
-  }
-
-  private PhotonPipelineResult toPipelineResult(
-      double latencyMillis, List<PhotonTrackedTarget> targets) {
-    return new PhotonPipelineResult(latencyMillis, targets);
   }
 
   public void updateSeenTags() {
