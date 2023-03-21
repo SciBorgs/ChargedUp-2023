@@ -115,7 +115,7 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.1542, 0.6, 0.91, 0.038046); // v =  0.87884
 
-      public static final Constraints CONSTRAINTS = new Constraints(1.5, 1.3);
+      public static final Constraints CONSTRAINTS = new Constraints(1.7, 1.5);
     }
 
     public static final class Elbow {
@@ -133,7 +133,7 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
-      public static final Constraints CONSTRAINTS = new Constraints(1.8, 1.2);
+      public static final Constraints CONSTRAINTS = new Constraints(1.9, 1.5);
       public static final double ELBOW_OFFSET = -1.248660;
     }
   }
@@ -158,7 +158,7 @@ public final class Constants {
     public static final int SAMPLE_SIZE_TAPS = 5;
     public static final int CURRENT_SPIKE_THRESHOLD = 20;
 
-    public static final Constraints CONSTRAINTS = new Constraints(1.8, 1.4);
+    public static final Constraints CONSTRAINTS = new Constraints(1.8, 1.7);
 
     public static final double ZERO_OFFSET = 0.603467;
   }
@@ -167,16 +167,28 @@ public final class Constants {
     public static final MotorConfig MOTOR =
         MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withInvert(true);
 
-    public static final double INTAKE_SPEED = 0.4;
+    public static final double INTAKE_SPEED = 0.6;
     public static final double OUTTAKE_SPEED = -0.25;
 
     public static final double THRESHOLD = 0.5;
   }
 
   public static final class Drive {
-    public static final double MAX_SPEED = 4.8; // m / s
+    public enum SpeedMultiplier {
+      MAX(1),
+      NORMAL(0.5),
+      SLOW(0.33);
+
+      public final double multiplier;
+
+      private SpeedMultiplier(double multiplier) {
+        this.multiplier = multiplier;
+      }
+    }
+
+    public static final double MAX_SPEED = 3; // m / s
     public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
-    public static final double MAX_ACCEL = 9; // m / s^2
+    public static final double MAX_ACCEL = 8; // m / s^2
 
     public static final Translation2d[] MODULE_OFFSET = {
       new Translation2d(Dimensions.WHEEL_BASE / 2, Dimensions.TRACK_WIDTH / 2), // front left
@@ -196,8 +208,10 @@ public final class Constants {
 
     public static final PIDConstants CARTESIAN = new PIDConstants(1.2, 0, 0);
     public static final PIDConstants ANGULAR = new PIDConstants(1.2, 0, 1);
-    public static final PIDConstants BALANCE = new PIDConstants(0.016, 0, 0);
-    public static final double PITCH_TOLERANCE = 10; // deg
+    public static final PIDConstants BALANCE = new PIDConstants(0.017, 0, 0);
+    public static final double PITCH_TOLERANCE = 11.5; // 11.5; // deg
+    public static final double THRESHOLD = 5; // deg
+    public static final double BALANCE_SPEED = 0.55; // m / s
 
     public static final PathConstraints CONSTRAINTS = new PathConstraints(MAX_SPEED, MAX_ACCEL);
   }
@@ -216,8 +230,13 @@ public final class Constants {
               .multiplyGearing(15.0)
               .multiplyGearing(14.0); // pinion teeth
 
-      public static final PIDConstants PID = new PIDConstants(0.5, 0, 0.05);
-      public static final SystemConstants FF = new SystemConstants(0.3, 2.5, 0.25);
+      // OLD (WORKING)
+      //   public static final PIDConstants PID = new PIDConstants(0.1, 0, 0.06);
+      //   public static final SystemConstants FF = new SystemConstants(0.3, 0.65, 0.25);
+
+      // TESTING
+      public static final PIDConstants PID = new PIDConstants(0.11, 0, 0.06);
+      public static final SystemConstants FF = new SystemConstants(0.3, 2.7, 0.25);
     }
 
     public static final class Turning {
@@ -267,7 +286,7 @@ public final class Constants {
 
     public static final PlacementState BACK_MID_CONE = STOW; // TODO
     public static final PlacementState BACK_HIGH_CONE =
-        PlacementState.fromAbsolute(0.253, 3.072, 2.868);
+        PlacementState.fromAbsolute(0.253, 3.072, 2.5);
     // ele 0.2475
     public static final PlacementState FRONT_MID_CUBE =
         PlacementState.fromAbsolute(0.11362, 0.458149, 0.353288);
@@ -275,7 +294,8 @@ public final class Constants {
         PlacementState.fromAbsolute(0.113502, 0.333258, 0.353208);
 
     public static final PlacementState BACK_MID_CUBE = FRONT_MID_CUBE; // TODO
-    public static final PlacementState BACK_HIGH_CUBE = FRONT_HIGH_CUBE; // TODO
+    public static final PlacementState BACK_HIGH_CUBE =
+        PlacementState.fromAbsolute(0.253, 3.072, 2.868);
   }
 
   public static final class Field {

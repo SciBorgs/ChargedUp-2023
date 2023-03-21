@@ -17,7 +17,7 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "backHighCone",
+          "backHighCube",
           "score",
           "stow"
         ],

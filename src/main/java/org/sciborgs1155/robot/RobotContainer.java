@@ -9,6 +9,7 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.function.Supplier;
+import org.sciborgs1155.robot.Constants.Drive.SpeedMultiplier;
 import org.sciborgs1155.robot.Constants.Positions;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
@@ -81,8 +82,8 @@ public class RobotContainer implements Loggable {
     autoChooser.addOption("back high cube -> intake", autos::cubeIntake);
     autoChooser.addOption("score cone, score cube, engage", autos::coneCubeEngage);
     autoChooser.addOption("score cone, score cube, intake", autos::coneCubeIntake);
-    autoChooser.setDefaultOption("back high cube -> engage", autos::cubeBalance);
-    autoChooser.addOption("high cone -> leave comm", autos::coneLeave);
+    autoChooser.addOption("back high cube -> engage", autos::cubeBalance);
+    autoChooser.setDefaultOption("high cone -> leave comm", autos::coneLeave);
     autoChooser.addOption("back high cube -> leave comm", autos::cubeLeave);
     autoChooser.addOption("no ppl: back high cone/cube -> leave comm", autos::scoreLeaveNoPPL);
     autoChooser.addOption("none", Commands::none);
@@ -107,6 +108,16 @@ public class RobotContainer implements Loggable {
    */
   private void configureBindings() {
     driver.b().onTrue(drive.zeroHeading());
+
+    // SPEED SWITCHING
+    driver
+        .leftBumper()
+        .onTrue(drive.setSpeedMultiplier(SpeedMultiplier.SLOW))
+        .onFalse(drive.setSpeedMultiplier(SpeedMultiplier.NORMAL));
+    driver
+        .rightBumper()
+        .onTrue(drive.setSpeedMultiplier(SpeedMultiplier.MAX))
+        .onFalse(drive.setSpeedMultiplier(SpeedMultiplier.NORMAL));
 
     // STATE SWITCHING
     operator.b().onTrue(scoring.setSide(Side.FRONT));
@@ -145,6 +156,6 @@ public class RobotContainer implements Loggable {
    */
   public Command getAutonomousCommand() {
     return autoChooser.getSelected().get();
-    // return drive.balance();
+    // return drive.bangBangBalance();
   }
 }

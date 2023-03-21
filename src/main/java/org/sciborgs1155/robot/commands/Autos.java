@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Map;
 import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.Constants.Drive.*;
 import org.sciborgs1155.robot.commands.Scoring.*;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
@@ -55,8 +56,9 @@ public final class Autos implements Sendable {
   private Map<String, Command> genEventMarkers() {
     return Map.ofEntries(
         Map.entry("backHighCone", placement.safeToState(BACK_HIGH_CONE)),
+        Map.entry("backHighCube", placement.safeToState(BACK_HIGH_CUBE)),
         Map.entry("frontHighCube", placement.safeToState(FRONT_HIGH_CUBE)),
-        Map.entry("score", intake.outtake().withTimeout(1).andThen(intake.stop())),
+        Map.entry("score", intake.outtake().withTimeout(3).andThen(intake.stop())),
         Map.entry(
             "frontIntake",
             Commands.sequence(
@@ -70,7 +72,7 @@ public final class Autos implements Sendable {
                 intake.intake().withTimeout(4),
                 intake.stop())),
         Map.entry("stow", placement.safeToState(STOW)),
-        Map.entry("initialIntake", intake.intake().withTimeout(0.5).andThen(intake.stop())));
+        Map.entry("initialIntake", intake.intake().withTimeout(0.6).andThen(intake.stop())));
   }
 
   private Command followAutoPath(String pathName) {
@@ -88,6 +90,17 @@ public final class Autos implements Sendable {
 
     return builder.fullAuto(PathPlanner.loadPathGroup(pathName, Constants.Drive.CONSTRAINTS));
   }
+
+  // public Command oneMeterTest() {
+  //   ProfiledPIDController controller =
+  //     new ProfiledPIDController(
+  //       Constants.Drive.CARTESIAN.p(),
+  //       Constants.Drive.CARTESIAN.i(),
+  //       Constants.Drive.CARTESIAN.d(),
+  //       new Constraints(
+  //         Constants.Drive.CONSTRAINTS.maxVelocity,
+  //         Constants.Drive.CONSTRAINTS.maxAcceleration));
+  // }
 
   public Command coneCubeEngage() {
     StartingPos startingPos = startingPosChooser.getSelected();
@@ -184,7 +197,7 @@ public final class Autos implements Sendable {
     // be done from center",
     //       true);
     //   return Commands.none();
-    // }
+    //
     return Commands.sequence(followAutoPath("balance"), drive.balance());
   }
 

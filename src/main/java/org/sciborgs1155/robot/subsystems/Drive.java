@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import org.sciborgs1155.robot.Constants;
@@ -72,6 +73,8 @@ public class Drive extends SubsystemBase implements Loggable {
   private final SlewRateLimiter xLimiter = new SlewRateLimiter(MAX_ACCEL);
   private final SlewRateLimiter yLimiter = new SlewRateLimiter(MAX_ACCEL);
 
+  @Log private double speedMultiplier = SpeedMultiplier.NORMAL.multiplier;
+
   public Drive(Vision vision) {
     this.vision = vision;
 
@@ -108,7 +111,7 @@ public class Drive extends SubsystemBase implements Loggable {
   }
 
   private double scale(double input) {
-    return Math.sqrt(Math.pow(Math.abs(input), 3)) * Math.signum(input);
+    return Math.copySign(input * input, input);
   }
 
   /**
@@ -120,9 +123,9 @@ public class Drive extends SubsystemBase implements Loggable {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    xSpeed = xLimiter.calculate(scale(xSpeed) * MAX_SPEED);
-    ySpeed = yLimiter.calculate(scale(ySpeed) * MAX_SPEED);
-    rot = scale(rot) * MAX_ANGULAR_SPEED;
+    xSpeed = xLimiter.calculate(scale(xSpeed) * MAX_SPEED * speedMultiplier);
+    ySpeed = yLimiter.calculate(scale(ySpeed) * MAX_SPEED * speedMultiplier);
+    rot = scale(rot) * MAX_ANGULAR_SPEED * speedMultiplier;
 
     var speeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
 
@@ -130,6 +133,10 @@ public class Drive extends SubsystemBase implements Loggable {
       speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getHeading());
     }
 
+    setSpeeds(speeds);
+  }
+
+  public void setSpeeds(ChassisSpeeds speeds) {
     setModuleStates(kinematics.toSwerveModuleStates(speeds));
   }
 
@@ -166,16 +173,6 @@ public class Drive extends SubsystemBase implements Loggable {
 
   private SwerveModulePosition[] getModulePositions() {
     return modules.stream().map(SwerveModule::getPosition).toArray(SwerveModulePosition[]::new);
-  }
-
-  /**
-   * Returns the turn rate of the robot.
-   *
-   * @return The turn rate of the robot, in degrees per second
-   */
-  @Log
-  public double getTurnRate() {
-    return imu.getRate();
   }
 
   /**
@@ -228,6 +225,11 @@ public class Drive extends SubsystemBase implements Loggable {
     vision.updateSeenTags();
   }
 
+  /** Sets a new speed multiplier for the robot, this affects max cartesian and angular speeds */
+  public Command setSpeedMultiplier(SpeedMultiplier multiplier) {
+    return runOnce(() -> speedMultiplier = multiplier.multiplier);
+  }
+
   /**
    * Follows a path on the field.
    *
@@ -275,8 +277,17 @@ public class Drive extends SubsystemBase implements Loggable {
   public Command balance() {
     PIDController controller = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
     controller.setTolerance(PITCH_TOLERANCE);
-    return run(() -> drive(controller.calculate(getPitch()), 0, 0, true))
+    return run(() ->
+            setSpeeds(new ChassisSpeeds(MAX_SPEED * controller.calculate(getPitch()), 0, 0)))
         .until(controller::atSetpoint)
+        .andThen(lock());
+  }
+
+  public Command bangBangBalance() {
+    DoubleUnaryOperator velocity =
+        pitch -> Math.signum(MathUtil.applyDeadband(pitch, 5.5)) * BALANCE_SPEED;
+    return run(() -> setSpeeds(new ChassisSpeeds(velocity.applyAsDouble(getPitch()), 0, 0)))
+        .until(() -> MathUtil.applyDeadband(getPitch(), 5.5) == 0)
         .andThen(lock());
   }
 

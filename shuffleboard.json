@@ -123,24 +123,11 @@
               "_showGlyph": false,
               "Game/Game": "A2023_Charged_Up",
               "Visuals/Robot Icon Size": 60.0,
-              "Visuals/Show Outside Circles": false
-            }
-          },
-          "4,0": {
-            "size": [
-              2,
-              2
-            ],
-            "content": {
-              "_type": "Gyro",
-              "_source0": "network_table:///Shuffleboard/Drive/imu",
-              "_title": "heading",
-              "_glyph": 148,
-              "_showGlyph": false,
-              "Visuals/Major tick spacing": 45.0,
-              "Visuals/Starting angle": 180.0,
-              "Visuals/Show tick mark ring": true,
-              "Visuals/Counter clockwise": false
+              "Visuals/Show Outside Circles": false,
+              "Colors/module-0": "#FFFFFFFF",
+              "Colors/module-3": "#FFFFFFFF",
+              "Colors/module-2": "#FFFFFFFF",
+              "Colors/module-1": "#FFFFFFFF"
             }
           },
           "2,2": {
@@ -173,6 +160,23 @@
                 }
               }
             }
+          },
+          "4,0": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Gyro",
+              "_source0": "network_table:///Shuffleboard/Drive/heading",
+              "_title": "heading",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Visuals/Major tick spacing": 45.0,
+              "Visuals/Starting angle": 180.0,
+              "Visuals/Show tick mark ring": true,
+              "Visuals/Counter clockwise": false
+            }
           }
         }
       }
@@ -192,9 +196,9 @@
     }
   ],
   "windowGeometry": {
-    "x": 0.0,
-    "y": 32.0,
-    "width": 1920.0,
-    "height": 1048.0
+    "x": -5.843478679656982,
+    "y": 0.8347826600074768,
+    "width": 1614.4696044921875,
+    "height": 866.50439453125
   }
 }

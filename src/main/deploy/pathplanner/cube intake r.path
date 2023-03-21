@@ -17,7 +17,7 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "backHighCone",
+          "backHighCube",
           "score"
         ],
         "executionBehavior": "sequential",
@@ -27,12 +27,12 @@
     },
     {
       "anchorPoint": {
-        "x": 7.265369744414703,
-        "y": 0.9249526191360088
+        "x": 8.025682688811303,
+        "y": 1.0558432361997558
       },
       "prevControl": {
-        "x": 6.762926346365515,
-        "y": 0.9363717872734894
+        "x": 7.393369803923777,
+        "y": 1.0319823726190958
       },
       "nextControl": null,
       "holonomicAngle": 9.234010376161333,
