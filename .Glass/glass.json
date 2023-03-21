@@ -57,7 +57,14 @@
       "/Shuffleboard/Drive/imu": "Gyro",
       "/Shuffleboard/Drivetrain/field2d": "Field2d",
       "/Shuffleboard/Drivetrain/gyro": "Gyro",
+      "/Shuffleboard/RobotContainer/arm": "Subsystem",
+      "/Shuffleboard/RobotContainer/auto path chooser": "String Chooser",
       "/Shuffleboard/RobotContainer/autos": "String Chooser",
+      "/Shuffleboard/RobotContainer/drive": "Subsystem",
+      "/Shuffleboard/RobotContainer/elevator": "Subsystem",
+      "/Shuffleboard/RobotContainer/intake": "Subsystem",
+      "/Shuffleboard/RobotContainer/led": "Subsystem",
+      "/Shuffleboard/RobotContainer/starting position chooser": "String Chooser",
       "/Shuffleboard/RobotContainer/visualizer": "Mechanism2d",
       "/SmartDashboard/backPhotonVision Sim Field": "Field2d",
       "/SmartDashboard/frontPhotonVision Sim Field": "Field2d"
@@ -243,7 +250,7 @@
               "autoFit": true
             }
           ],
-          "height": 405,
+          "height": 0,
           "series": [
             {
               "color": [
@@ -275,7 +282,7 @@
               "autoFit": true
             }
           ],
-          "height": 338,
+          "height": 0,
           "series": [
             {
               "color": [

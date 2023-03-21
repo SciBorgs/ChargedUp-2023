@@ -114,7 +114,7 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.1542, 0.6, 0.91, 0.038046); // v =  0.87884
 
-      public static final Constraints CONSTRAINTS = new Constraints(1.4, 1.3);
+      public static final Constraints CONSTRAINTS = new Constraints(1.5, 1.3);
     }
 
     public static final class Elbow {
@@ -132,7 +132,7 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
-      public static final Constraints CONSTRAINTS = new Constraints(1.5, 1.2);
+      public static final Constraints CONSTRAINTS = new Constraints(1.8, 1.2);
       public static final double ELBOW_OFFSET = -1.248660;
     }
   }
@@ -155,9 +155,9 @@ public final class Constants {
     public static final int SAMPLE_SIZE_TAPS = 5;
     public static final int CURRENT_SPIKE_THRESHOLD = 20;
 
-    public static final Constraints CONSTRAINTS = new Constraints(1.6, 1);
+    public static final Constraints CONSTRAINTS = new Constraints(1.8, 1.4);
 
-    public static final double OFFSET = 0.618420;
+    public static final double ZERO_OFFSET = 0.603467;
   }
 
   public static final class Intake {
@@ -238,8 +238,11 @@ public final class Constants {
 
     public static final PlacementState STOW =
         PlacementState.fromRelative(0, 1.21834, Math.PI / 2.0);
-    public static final PlacementState PASS_OVER =
+    public static final PlacementState PASS_OLD =
         PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0);
+    public static final PlacementState PASS_TO_BACK =
+        PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI);
+    public static final PlacementState PASS_TO_FRONT = PASS_TO_BACK;
 
     public static final PlacementState FRONT_INTAKE =
         PlacementState.fromAbsolute(0.44, -0.983, -0.09);
@@ -256,8 +259,9 @@ public final class Constants {
         PlacementState.fromAbsolute(0.061612, 0.493303, 0.001378);
 
     public static final PlacementState BACK_MID_CONE = STOW; // TODO
-    public static final PlacementState BACK_HIGH_CONE = PlacementState.fromAbsolute(0.25, 2.7, 3.1);
-
+    public static final PlacementState BACK_HIGH_CONE =
+        PlacementState.fromAbsolute(0.253, 3.072, 2.868);
+    // ele 0.2475
     public static final PlacementState FRONT_MID_CUBE =
         PlacementState.fromAbsolute(0.11362, 0.458149, 0.353288);
     public static final PlacementState FRONT_HIGH_CUBE =

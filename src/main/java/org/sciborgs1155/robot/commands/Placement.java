@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.util.PlacementState;
+import org.sciborgs1155.robot.util.PlacementState.Side;
 
 /** Placement command factories */
 public final class Placement {
@@ -44,6 +45,10 @@ public final class Placement {
 
   public Command safeToState(PlacementState state) {
     return new ConditionalCommand(
-        toState(PASS_OVER, state), toState(state), () -> state.side() != state().side());
+        passOver(state.side()), toState(state), () -> state.side() != state().side());
+  }
+
+  public Command passOver(Side side) {
+    return Commands.either(toState(PASS_TO_FRONT), toState(PASS_TO_BACK), () -> side == Side.FRONT);
   }
 }

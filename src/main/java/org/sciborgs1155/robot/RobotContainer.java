@@ -81,7 +81,7 @@ public class RobotContainer implements Loggable {
     autoChooser.addOption("cube score intake", autos::cubeIntake);
     autoChooser.addOption("cone, cube, engage", autos::coneCubeEngage);
     autoChooser.addOption("cone, cube, intake", autos::coneCubeIntake);
-    autoChooser.setDefaultCommand("cube, balance", autos::cubeBalance);
+    autoChooser.setDefaultOption("cube, balance", autos::cubeBalance);
     autoChooser.addOption("cone leave", autos::coneLeave);
     autoChooser.addOption("cube leave", autos::cubeLeave);
     autoChooser.addOption("cone/cube leave (no ppl)", autos::scoreLeaveNoPPL);
@@ -131,10 +131,11 @@ public class RobotContainer implements Loggable {
   }
 
   /** A command to run when the robot is enabled */
-  public Command getEnableCommand() {
-    return Commands.parallel(
-        elevator.setGoal(elevator.getPosition()),
-        arm.setGoals(arm.getElbowPosition(), arm.getRelativeWristPosition()));
+  public Supplier<Command> getEnableCommand() {
+    return () ->
+        Commands.parallel(
+            elevator.setGoal(elevator.getPosition()),
+            arm.setGoals(arm.getElbowPosition(), arm.getRelativeWristPosition()));
   }
 
   /**
