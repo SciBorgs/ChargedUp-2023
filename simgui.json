@@ -64,6 +64,12 @@
             "open": true
           }
         },
+        "Elevator": {
+          "open": true,
+          "pid": {
+            "open": true
+          }
+        },
         "open": true
       }
     }

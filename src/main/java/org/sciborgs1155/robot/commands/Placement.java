@@ -45,10 +45,12 @@ public final class Placement {
 
   public Command safeToState(PlacementState state) {
     return new ConditionalCommand(
-        passOver(state.side()), toState(state), () -> state.side() != state().side());
+        toState(passOver(state.side()), state),
+        toState(state),
+        () -> state.side() != state().side());
   }
 
-  public Command passOver(Side side) {
-    return Commands.either(toState(PASS_TO_FRONT), toState(PASS_TO_BACK), () -> side == Side.FRONT);
+  public PlacementState passOver(Side side) {
+    return side == Side.FRONT ? PASS_TO_FRONT : PASS_TO_BACK;
   }
 }

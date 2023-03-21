@@ -10,14 +10,14 @@
         "x": 1.884134116346467,
         "y": 2.7474696963282814
       },
-      "holonomicAngle": 180.0,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "frontHighCube",
+          "backHighCone",
           "score",
           "stow"
         ],
@@ -36,7 +36,7 @@
         "y": 2.7444810859173003
       },
       "nextControl": null,
-      "holonomicAngle": 180.0,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,

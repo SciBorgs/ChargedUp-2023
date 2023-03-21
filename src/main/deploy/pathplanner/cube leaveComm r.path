@@ -10,14 +10,14 @@
         "x": 2.0255994610117147,
         "y": 0.5582693907197497
       },
-      "holonomicAngle": 180.0,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "frontHighCube",
+          "backHighCone",
           "score"
         ],
         "executionBehavior": "sequential",
@@ -27,15 +27,15 @@
     },
     {
       "anchorPoint": {
-        "x": 5.358247581744775,
-        "y": 0.8851315269908241
+        "x": 5.854344102971124,
+        "y": 0.853025895764136
       },
       "prevControl": {
-        "x": 5.211596837000227,
-        "y": 0.8956833460663811
+        "x": 5.707693358226576,
+        "y": 0.863577714839693
       },
       "nextControl": null,
-      "holonomicAngle": 180.0,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -48,5 +48,13 @@
       }
     }
   ],
-  "markers": []
+  "markers": [
+    {
+      "position": 0.30260865864719233,
+      "names": [
+        "event",
+        "stow"
+      ]
+    }
+  ]
 }

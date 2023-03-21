@@ -16,6 +16,7 @@ import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.constants.SystemConstants;
+import org.sciborgs1155.robot.Constants.Arm.Elbow;
 import org.sciborgs1155.robot.util.PlacementState;
 
 /**
@@ -141,12 +142,14 @@ public final class Constants {
     public static final MotorConfig MOTOR =
         MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(40);
 
-    public static final Conversion CONVERSION =
+    public static final Conversion RELATIVE_CONVERSION =
         Conversion.base()
             .multiplyRadius(0.0181864)
             .withUnits(Conversion.Units.RADIANS)
             .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
     // units field for sysid is 0.1143
+    public static final Conversion ABSOLUTE_CONVERSION =
+        RELATIVE_CONVERSION.withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
 
     public static final PIDConstants PID = new PIDConstants(50, 0, 1);
     public static final SystemConstants FF = new SystemConstants(0.4, 0.069335, 33.25, 1.5514);
@@ -193,8 +196,8 @@ public final class Constants {
 
     public static final PIDConstants CARTESIAN = new PIDConstants(1.2, 0, 0);
     public static final PIDConstants ANGULAR = new PIDConstants(1.2, 0, 1);
-    public static final PIDConstants BALANCE = new PIDConstants(0.02, 0, 0);
-    public static final double PITCH_TOLERANCE = 4; // deg
+    public static final PIDConstants BALANCE = new PIDConstants(0.016, 0, 0);
+    public static final double PITCH_TOLERANCE = 10; // deg
 
     public static final PathConstraints CONSTRAINTS = new PathConstraints(MAX_SPEED, MAX_ACCEL);
   }
@@ -213,8 +216,8 @@ public final class Constants {
               .multiplyGearing(15.0)
               .multiplyGearing(14.0); // pinion teeth
 
-      public static final PIDConstants PID = new PIDConstants(0.1, 0, 0.06);
-      public static final SystemConstants FF = new SystemConstants(0.3, 0.65, 0.25);
+      public static final PIDConstants PID = new PIDConstants(0.5, 0, 0.05);
+      public static final SystemConstants FF = new SystemConstants(0.3, 2.5, 0.25);
     }
 
     public static final class Turning {
@@ -228,7 +231,7 @@ public final class Constants {
 
       public static final boolean ENCODER_INVERTED = true;
 
-      public static final PIDConstants PID = new PIDConstants(1.7, 0, 0.1);
+      public static final PIDConstants PID = new PIDConstants(2, 0, 0.1);
       // system constants only used in simulation
       public static final SystemConstants FF = new SystemConstants(0, 0.25, 0.015);
     }
@@ -236,13 +239,17 @@ public final class Constants {
 
   public static final class Positions {
 
+    public static final PlacementState INITIAL =
+        PlacementState.fromRelative(Elevator.ZERO_OFFSET, Elbow.ELBOW_OFFSET, Math.PI);
     public static final PlacementState STOW =
         PlacementState.fromRelative(0, 1.21834, Math.PI / 2.0);
+
     public static final PlacementState PASS_OLD =
         PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0);
     public static final PlacementState PASS_TO_BACK =
         PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI);
-    public static final PlacementState PASS_TO_FRONT = PASS_TO_BACK;
+    public static final PlacementState PASS_TO_FRONT =
+        PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 4.0);
 
     public static final PlacementState FRONT_INTAKE =
         PlacementState.fromAbsolute(0.44, -0.983, -0.09);

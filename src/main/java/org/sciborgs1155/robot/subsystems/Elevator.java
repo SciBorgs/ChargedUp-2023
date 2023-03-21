@@ -25,7 +25,6 @@ import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
-import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.util.Visualizer;
 
 public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
@@ -47,7 +46,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log private boolean hasSpiked = false;
 
-  private double offset = 0;
+  @Log private double offset = 0.61842;
 
   @Log
   @Log(name = "at goal", methodName = "atGoal")
@@ -60,9 +59,9 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   private final ElevatorSim sim =
       new ElevatorSim(
           DCMotor.getNEO(3),
-          CONVERSION.gearing(),
+          RELATIVE_CONVERSION.gearing(),
           Dimensions.ELEVATOR_MASS + Dimensions.FOREARM_MASS + Dimensions.CLAW_MASS,
-          CONVERSION.units(),
+          RELATIVE_CONVERSION.units(),
           Dimensions.ELEVATOR_MIN_HEIGHT,
           Dimensions.ELEVATOR_MAX_HEIGHT,
           true);
@@ -73,12 +72,13 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     left.follow(lead);
     right.follow(lead);
 
-    encoder.setDistancePerPulse(CONVERSION.factor());
-    offsetEncoder.setPositionConversionFactor(CONVERSION.factor());
+    encoder.setDistancePerPulse(RELATIVE_CONVERSION.factor());
+    offsetEncoder.setPositionConversionFactor(ABSOLUTE_CONVERSION.factor());
 
-    if (Robot.isReal()) {
-      offset = offsetEncoder.getPosition() + ZERO_OFFSET;
-    }
+    // for (int i = 0; i < 100; i++) System.out.println(offsetEncoder.getPosition());
+    // if (Robot.isReal()) {
+    //   offset = offsetEncoder.getPosition() + ZERO_OFFSET;
+    // }
 
     SmartDashboard.putNumber("start", offsetEncoder.getPosition());
     // STARTING POSITION ****MUST**** BE ABOVE THE ZERO LOCATION

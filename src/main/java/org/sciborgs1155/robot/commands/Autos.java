@@ -91,24 +91,26 @@ public final class Autos implements Sendable {
 
   public Command coneCubeEngage() {
     StartingPos startingPos = startingPosChooser.getSelected();
-    if (startingPos == StartingPos.CENTER) {
-      DriverStation.reportError(
-          "Error encountered when attempting to generate auto command: Cannot do cone cube engage auto path from center",
-          true);
-      return Commands.none();
-    }
+    // if (startingPos == StartingPos.CENTER) {
+    //   DriverStation.reportError(
+    //       "Error encountered when attempting to generate auto command: Cannot do cone cube engage
+    // auto path from center",
+    //       true);
+    //   return Commands.none();
+    // }
     return Commands.sequence(
         followAutoPath("cone cube balance" + startingPos.suffix), drive.balance());
   }
 
   public Command coneCubeIntake() {
     StartingPos startingPos = startingPosChooser.getSelected();
-    if (startingPos == StartingPos.CENTER) {
-      DriverStation.reportError(
-          "Error encountered when attempting to generate auto command: Cannot do cone cube intake auto path from center",
-          true);
-      return Commands.none();
-    }
+    // if (startingPos == StartingPos.CENTER) {
+    //   DriverStation.reportError(
+    //       "Error encountered when attempting to generate auto command: Cannot do cone cube intake
+    // auto path from center",
+    //       true);
+    //   return Commands.none();
+    // }
     return followAutoPath("cone cube intake" + startingPos.suffix);
   }
 
@@ -130,59 +132,64 @@ public final class Autos implements Sendable {
   }
 
   public Command cubeBalance() {
-    if (startingPosChooser.getSelected() != StartingPos.CENTER) {
-      DriverStation.reportError(
-          "Error encountered when attempting to generate auto command: Cube balance path can only be done from center",
-          true);
-      return Commands.none();
-    }
-    return Commands.sequence(followAutoPath("cube balance"), drive.balance());
+    // if (startingPosChooser.getSelected() != StartingPos.CENTER) {
+    //   DriverStation.reportError(
+    //       "Error encountered when attempting to generate auto command: Cube balance path can only
+    // be done from center",
+    //       true);
+    //   return Commands.none();
+    // }
+    return Commands.sequence(followAutoPath("cube balance"), drive.balance().withTimeout(3));
   }
 
   public Command coneBalance() {
-    if (startingPosChooser.getSelected() != StartingPos.CENTER) {
-      DriverStation.reportError(
-          "Error encountered when attempting to generate auto command: Cone balance path can only be done from center",
-          true);
-      return Commands.none();
-    }
+    // if (startingPosChooser.getSelected() != StartingPos.CENTER) {
+    //   DriverStation.reportError(
+    //       "Error encountered when attempting to generate auto command: Cone balance path can only
+    // be done from center",
+    //       true);
+    //   return Commands.none();
+    // }
     return Commands.sequence(followAutoPath("cone balance"), drive.balance());
   }
 
   public Command coneLeave() {
     StartingPos startingPos = startingPosChooser.getSelected();
-    if (startingPos == StartingPos.CENTER) {
-      DriverStation.reportError(
-          "Error encountered when attempting to generate auto command: Cone leave path cannot be done from the center",
-          true);
-      return Commands.none();
-    }
+    // if (startingPos == StartingPos.CENTER) {
+    //   DriverStation.reportError(
+    //       "Error encountered when attempting to generate auto command: Cone leave path cannot be
+    // done from the center",
+    //       true);
+    //   return Commands.none();
+    // }
     return followAutoPath("cone leaveComm" + startingPos.suffix);
   }
 
   public Command cubeLeave() {
     StartingPos startingPos = startingPosChooser.getSelected();
-    if (startingPos == StartingPos.CENTER) {
-      DriverStation.reportError(
-          "Error encountered when attempting to generate auto command: Cube leave path cannot be done from the center",
-          true);
-      return Commands.none();
-    }
+    // if (startingPos == StartingPos.CENTER) {
+    //   DriverStation.reportError(
+    //       "Error encountered when attempting to generate auto command: Cube leave path cannot be
+    // done from the center",
+    //       true);
+    //   return Commands.none();
+    // }
     return followAutoPath("cube leaveComm" + startingPos.suffix);
   }
 
   public Command justBalance() {
-    if (startingPosChooser.getSelected() != StartingPos.CENTER) {
-      DriverStation.reportError(
-          "Error encountered when attempting to generate auto command: Just balance path can only be done from center",
-          true);
-      return Commands.none();
-    }
+    // if (startingPosChooser.getSelected() != StartingPos.CENTER) {
+    //   DriverStation.reportError(
+    //       "Error encountered when attempting to generate auto command: Just balance path can only
+    // be done from center",
+    //       true);
+    //   return Commands.none();
+    // }
     return Commands.sequence(followAutoPath("balance"), drive.balance());
   }
 
   public Command cubeIntake() {
-    return followAutoPath("cube intake");
+    return followAutoPath("cube intake" + startingPosChooser.getSelected().suffix);
   }
 
   // public Command highConeScore() {

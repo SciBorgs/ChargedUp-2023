@@ -75,16 +75,16 @@ public class RobotContainer implements Loggable {
 
   private void configureAutoChoosers() {
     autoChooser.addOption("balance", autos::justBalance);
-    autoChooser.addOption("cone score", autos::highConeScore);
-    autoChooser.addOption("back cube score", autos::backHighCubeScore);
-    autoChooser.addOption("front cube score", autos::frontHighCubeScore);
-    autoChooser.addOption("cube score intake", autos::cubeIntake);
-    autoChooser.addOption("cone, cube, engage", autos::coneCubeEngage);
-    autoChooser.addOption("cone, cube, intake", autos::coneCubeIntake);
-    autoChooser.setDefaultOption("cube, balance", autos::cubeBalance);
-    autoChooser.addOption("cone leave", autos::coneLeave);
-    autoChooser.addOption("cube leave", autos::cubeLeave);
-    autoChooser.addOption("cone/cube leave (no ppl)", autos::scoreLeaveNoPPL);
+    autoChooser.addOption("high cone", autos::highConeScore);
+    autoChooser.addOption("back high cube", autos::backHighCubeScore);
+    autoChooser.addOption("front high cube", autos::frontHighCubeScore);
+    autoChooser.addOption("back high cube -> intake", autos::cubeIntake);
+    autoChooser.addOption("score cone, score cube, engage", autos::coneCubeEngage);
+    autoChooser.addOption("score cone, score cube, intake", autos::coneCubeIntake);
+    autoChooser.setDefaultOption("back high cube -> engage", autos::cubeBalance);
+    autoChooser.addOption("high cone -> leave comm", autos::coneLeave);
+    autoChooser.addOption("back high cube -> leave comm", autos::cubeLeave);
+    autoChooser.addOption("no ppl: back high cone/cube -> leave comm", autos::scoreLeaveNoPPL);
     autoChooser.addOption("none", Commands::none);
   }
 
