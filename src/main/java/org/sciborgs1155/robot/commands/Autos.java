@@ -102,6 +102,10 @@ public final class Autos implements Sendable {
   //         Constants.Drive.CONSTRAINTS.maxAcceleration));
   // }
 
+  public Command pplOneMeterTest() {
+    return followAutoPath("one meter");
+  }
+
   public Command coneCubeEngage() {
     StartingPos startingPos = startingPosChooser.getSelected();
     // if (startingPos == StartingPos.CENTER) {
