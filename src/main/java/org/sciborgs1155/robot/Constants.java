@@ -82,7 +82,7 @@ public final class Constants {
 
     // Robot to camera translations
     public static final Translation3d FRONT_CAM_TRANSLATION = new Translation3d();
-    public static final Rotation3d FRONT_CAM_ROTATION = new Rotation3d();
+    public static final Rotation3d FRONT_CAM_ROTATION = new Rotation3d(1.64933614, 1.78, 0);
     public static final Transform3d ROBOT_TO_FRONT_CAM =
         new Transform3d(FRONT_CAM_TRANSLATION, FRONT_CAM_ROTATION);
 
