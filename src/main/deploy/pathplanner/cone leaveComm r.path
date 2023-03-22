@@ -19,7 +19,7 @@
         "names": [
           "initialIntake",
           "backHighCone",
-          "score"
+          "outtakeCone"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -28,12 +28,12 @@
     },
     {
       "anchorPoint": {
-        "x": 7.381439372133447,
-        "y": 0.8649563275544659
+        "x": 6.605961305761954,
+        "y": 0.8053041686028126
       },
       "prevControl": {
-        "x": 7.788340909894856,
-        "y": 0.8530108071356469
+        "x": 7.012862843523363,
+        "y": 0.7933586481839936
       },
       "nextControl": null,
       "holonomicAngle": 0,

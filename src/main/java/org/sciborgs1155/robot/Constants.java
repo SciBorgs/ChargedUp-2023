@@ -176,8 +176,8 @@ public final class Constants {
   public static final class Drive {
     public enum SpeedMultiplier {
       MAX(1),
-      NORMAL(0.5),
-      SLOW(0.33);
+      NORMAL(0.55),
+      SLOW(0.25);
 
       public final double multiplier;
 
@@ -187,7 +187,7 @@ public final class Constants {
     }
 
     public static final double MAX_SPEED = 3; // m / s
-    public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
+    public static final double MAX_ANGULAR_SPEED = 1.5 * Math.PI; // rad / s
     public static final double MAX_ACCEL = 8; // m / s^2
 
     public static final Translation2d[] MODULE_OFFSET = {
@@ -206,14 +206,14 @@ public final class Constants {
       Math.PI / 2 // rear right
     };
 
-    public static final PIDConstants CARTESIAN = new PIDConstants(1.2, 0, 0);
-    public static final PIDConstants ANGULAR = new PIDConstants(1.2, 0, 1);
+    public static final PIDConstants CARTESIAN = new PIDConstants(0.6, 0, 0);
+    public static final PIDConstants ANGULAR = new PIDConstants(0.8, 0, 0.5);
     public static final PIDConstants BALANCE = new PIDConstants(0.017, 0, 0);
-    public static final double PITCH_TOLERANCE = 11.5; // 11.5; // deg
-    public static final double MIN_PITCH = 12.5; // 5.5; // deg
-    public static final double BALANCE_SPEED = 0.3; // m / s
+    // public static final double PITCH_TOLERANCE = 11.5; // deg
+    public static final double MIN_PITCH = 11; // 12.5; // deg
+    public static final double BALANCE_SPEED = 0.35; // m / s
 
-    public static final PathConstraints CONSTRAINTS = new PathConstraints(MAX_SPEED, MAX_ACCEL);
+    public static final PathConstraints CONSTRAINTS = new PathConstraints(MAX_SPEED / 2, MAX_ACCEL);
   }
 
   public static final class SwerveModule {
@@ -296,6 +296,11 @@ public final class Constants {
     public static final PlacementState BACK_MID_CUBE = FRONT_MID_CUBE; // TODO
     public static final PlacementState BACK_HIGH_CUBE =
         PlacementState.fromAbsolute(0.253, 3.072, 2.868);
+  }
+
+  public static final class Auto {
+    public static final double CUBE_OUTTAKE_TIME = 0.5; // seconds
+    public static final double CONE_OUTTAKE_TIME = 3; // seconds
   }
 
   public static final class Field {

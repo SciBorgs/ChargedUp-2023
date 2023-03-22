@@ -19,7 +19,7 @@
         "names": [
           "initialIntake",
           "backHighCone",
-          "score"
+          "outtakeCone"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -71,7 +71,7 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "score"
+          "outtakeCube"
         ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",

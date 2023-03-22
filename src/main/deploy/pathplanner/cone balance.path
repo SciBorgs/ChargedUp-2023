@@ -19,7 +19,7 @@
         "names": [
           "initialIntake",
           "backHighCone",
-          "score",
+          "outtakeCone",
           "stow"
         ],
         "executionBehavior": "sequential",

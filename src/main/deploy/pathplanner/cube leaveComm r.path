@@ -18,7 +18,7 @@
       "stopEvent": {
         "names": [
           "backHighCube",
-          "score"
+          "outtakeCube"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -27,12 +27,12 @@
     },
     {
       "anchorPoint": {
-        "x": 7.274065486020471,
-        "y": 0.8888171911351281
+        "x": 5.711178921487156,
+        "y": 0.7217911460704983
       },
       "prevControl": {
-        "x": 7.127414741275923,
-        "y": 0.8993690102106852
+        "x": 5.564528176742608,
+        "y": 0.7323429651460553
       },
       "nextControl": null,
       "holonomicAngle": 0.0,

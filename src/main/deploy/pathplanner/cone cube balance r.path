@@ -19,7 +19,7 @@
         "names": [
           "initialIntake",
           "backHighCone",
-          "score"
+          "outtakeCone"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -64,14 +64,14 @@
         "x": 2.3006276811164734,
         "y": 1.3196900664634654
       },
-      "holonomicAngle": 180.0,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "score"
+          "outtakeCube"
         ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
@@ -114,7 +114,7 @@
     {
       "position": 1.2787286931818191,
       "names": [
-        "frontHighCube"
+        "backHighCube"
       ]
     },
     {

@@ -8,13 +8,20 @@
         "Arm": {
           "elbow feedback": {
             "open": true
+          },
+          "open": true,
+          "wrist feedback": {
+            "open": true
           }
         },
         "Drive": {
-          "frontLeft": {
+          "open": true,
+          "rearLeft": {
             "open": true
           },
-          "open": true
+          "rearRight": {
+            "open": true
+          }
         },
         "Drivetrain": {
           "frontLeft": {

@@ -18,7 +18,7 @@
       "stopEvent": {
         "names": [
           "backHighCube",
-          "score"
+          "outtakeCube"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -27,12 +27,12 @@
     },
     {
       "anchorPoint": {
-        "x": 7.954100098069318,
-        "y": 4.467946728234323
+        "x": 7.035456850213858,
+        "y": 4.61111190971829
       },
       "prevControl": {
-        "x": 6.6775438965039395,
-        "y": 4.718485795831267
+        "x": 5.7589006486484795,
+        "y": 4.861650977315234
       },
       "nextControl": null,
       "holonomicAngle": -3.0127875041833168,
@@ -41,7 +41,9 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
+        "names": [
+          "initialIntake"
+        ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
@@ -50,13 +52,7 @@
   ],
   "markers": [
     {
-      "position": 0.18118572971823554,
-      "names": [
-        "stow"
-      ]
-    },
-    {
-      "position": 0.5302766503889498,
+      "position": 0.264663993356887,
       "names": [
         "intake"
       ]
