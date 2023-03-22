@@ -159,6 +159,18 @@ public final class Autos implements Sendable {
     return Commands.sequence(followAutoPath("cube balance"), drive.balance().withTimeout(3));
   }
 
+  public Command driveToBalance() {
+    return Commands.run(() -> drive.drive(0.5, 0, 0, false), drive)
+           .until(() -> drive.getPitch() >= 14.5);
+  }
+
+  public Command balanceNoPPL() {
+    return Commands.sequence(
+      driveToBalance(),
+      drive.balance()
+    );
+  }
+
   public Command coneBalance() {
     // if (startingPosChooser.getSelected() != StartingPos.CENTER) {
     //   DriverStation.reportError(

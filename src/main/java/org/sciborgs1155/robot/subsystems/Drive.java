@@ -274,16 +274,16 @@ public class Drive extends SubsystemBase implements Loggable {
                 fieldRelative));
   }
 
-  public Command balance() {
-    PIDController controller = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
-    controller.setTolerance(PITCH_TOLERANCE);
-    return run(() ->
-            setSpeeds(new ChassisSpeeds(MAX_SPEED * controller.calculate(getPitch()), 0, 0)))
-        .until(controller::atSetpoint)
-        .andThen(lock());
-  }
+  // public Command balance() {
+  //   PIDController controller = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
+  //   controller.setTolerance(PITCH_TOLERANCE);
+  //   return run(() ->
+  //           setSpeeds(new ChassisSpeeds(MAX_SPEED * controller.calculate(getPitch()), 0, 0)))
+  //       .until(controller::atSetpoint)
+  //       .andThen(lock());
+  // }
 
-  public Command bangBangBalance() {
+  public Command balance() {
     DoubleUnaryOperator velocity =
         pitch -> Math.signum(MathUtil.applyDeadband(pitch, 5.5)) * BALANCE_SPEED;
     return run(() -> setSpeeds(new ChassisSpeeds(velocity.applyAsDouble(getPitch()), 0, 0)))

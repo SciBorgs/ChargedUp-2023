@@ -75,7 +75,8 @@ public class RobotContainer implements Loggable {
   }
 
   private void configureAutoChoosers() {
-    autoChooser.addOption("balance", autos::justBalance);
+    // autoChooser.addOption("balance", autos::justBalance);
+    autoChooser.addOption("balance (no ppl)", autos::balanceNoPPL);
     autoChooser.addOption("high cone", autos::highConeScore);
     autoChooser.addOption("back high cube", autos::backHighCubeScore);
     autoChooser.addOption("front high cube", autos::frontHighCubeScore);
@@ -157,6 +158,5 @@ public class RobotContainer implements Loggable {
    */
   public Command getAutonomousCommand() {
     return autoChooser.getSelected().get();
-    // return drive.bangBangBalance();
   }
 }
