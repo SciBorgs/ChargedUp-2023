@@ -285,9 +285,10 @@ public class Drive extends SubsystemBase implements Loggable {
 
   public Command bangBangBalance() {
     DoubleUnaryOperator velocity =
-        pitch -> Math.signum(MathUtil.applyDeadband(pitch, 5.5)) * BALANCE_SPEED;
+        pitch -> Math.signum(MathUtil.applyDeadband(pitch, MIN_PITCH)) * BALANCE_SPEED;
+
     return run(() -> setSpeeds(new ChassisSpeeds(velocity.applyAsDouble(getPitch()), 0, 0)))
-        .until(() -> MathUtil.applyDeadband(getPitch(), 5.5) == 0)
+        .until(() -> Math.abs(getPitch()) < MIN_PITCH)
         .andThen(lock());
   }
 

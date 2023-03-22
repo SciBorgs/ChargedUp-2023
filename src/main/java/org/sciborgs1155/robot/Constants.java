@@ -210,8 +210,8 @@ public final class Constants {
     public static final PIDConstants ANGULAR = new PIDConstants(1.2, 0, 1);
     public static final PIDConstants BALANCE = new PIDConstants(0.017, 0, 0);
     public static final double PITCH_TOLERANCE = 11.5; // 11.5; // deg
-    public static final double THRESHOLD = 5; // deg
-    public static final double BALANCE_SPEED = 0.55; // m / s
+    public static final double MIN_PITCH = 12.5; // 5.5; // deg
+    public static final double BALANCE_SPEED = 0.3; // m / s
 
     public static final PathConstraints CONSTRAINTS = new PathConstraints(MAX_SPEED, MAX_ACCEL);
   }
