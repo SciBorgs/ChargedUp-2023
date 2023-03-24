@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot;
 
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -14,9 +15,10 @@ import org.sciborgs1155.lib.CustomPeriodRunnables;
  * project.
  */
 public class Robot extends TimedRobot {
-  private Command m_autonomousCommand;
 
-  private RobotContainer m_robotContainer;
+  private Command autonomousCommand;
+
+  private RobotContainer robotContainer;
 
   public Robot() {
     super(Constants.RATE);
@@ -30,11 +32,15 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    m_robotContainer = new RobotContainer();
+    robotContainer = new RobotContainer();
     // Start networktables logger
     DataLogManager.start();
     // binds FunctionRegistry to be ran at 0.01 hertz
     CustomPeriodRunnables.forEachRunnable(this::addPeriodic);
+
+    if (isSimulation()) {
+      DriverStation.silenceJoystickConnectionWarning(true);
+    }
   }
 
   /**
@@ -65,13 +71,13 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     // Resets goal positions to ensure safety of nearby humans...
-    m_robotContainer.getEnableCommand().schedule();
+    robotContainer.getEnableCommand().get().schedule();
 
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+    if (autonomousCommand != null) {
+      autonomousCommand.schedule();
     }
   }
 
@@ -85,12 +91,12 @@ public class Robot extends TimedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+    if (autonomousCommand != null) {
+      autonomousCommand.cancel();
     }
 
     // Resets goal positions to ensure safety of nearby humans...
-    m_robotContainer.getEnableCommand().schedule();
+    robotContainer.getEnableCommand().get().schedule();
   }
 
   /** This function is called periodically during operator control. */

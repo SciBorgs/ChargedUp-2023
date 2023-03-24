@@ -1,25 +1,9 @@
 {
-  "FMS": {
-    "window": {
-      "visible": false
-    }
-  },
-  "System Joysticks": {
-    "window": {
-      "visible": false
-    }
-  },
   "keyboardJoysticks": [
     {
       "axisConfig": [
-        {
-          "decKey": 68,
-          "incKey": 65
-        },
-        {
-          "decKey": 87,
-          "incKey": 83
-        },
+        {},
+        {},
         {
           "decKey": 69,
           "decayRate": 0.0,
@@ -27,13 +11,15 @@
           "keyRate": 0.009999999776482582
         }
       ],
-      "axisCount": 2,
-      "buttonCount": 4,
+      "axisCount": 3,
+      "buttonCount": 5,
       "buttonKeys": [
         90,
         88,
         67,
-        86
+        86,
+        78,
+        49
       ],
       "povConfig": [
         {
@@ -47,16 +33,26 @@
           "key90": 326
         }
       ],
-      "povCount": 0
+      "povCount": 1
     },
     {
       "axisConfig": [
         {
-          "decKey": 76,
-          "incKey": 74
+          "decKey": 87,
+          "incKey": 83
+        },
+        {
+          "decKey": 68,
+          "incKey": 65
+        },
+        {},
+        {},
+        {
+          "decKey": 74,
+          "incKey": 76
         }
       ],
-      "axisCount": 1,
+      "axisCount": 5,
       "buttonCount": 4,
       "buttonKeys": [
         77,
@@ -96,14 +92,11 @@
     }
   ],
   "robotJoysticks": [
-    {},
     {
-      "guid": "Keyboard0",
-      "name": "Movement"
+      "guid": "Keyboard0"
     },
     {
-      "guid": "Keyboard1",
-      "name": "Rotation"
+      "guid": "Keyboard1"
     }
   ]
 }

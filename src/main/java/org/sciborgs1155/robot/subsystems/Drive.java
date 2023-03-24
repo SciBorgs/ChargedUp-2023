@@ -30,11 +30,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
+import org.sciborgs1155.robot.util.Vision;
 
 public class Drive extends SubsystemBase implements Loggable {
 
@@ -58,7 +59,7 @@ public class Drive extends SubsystemBase implements Loggable {
 
   @Log private final WPI_PigeonIMU imu = new WPI_PigeonIMU(PIGEON);
 
-  private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
+  public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
   // Odometry and pose estimation
   private final Vision vision;
@@ -71,6 +72,8 @@ public class Drive extends SubsystemBase implements Loggable {
   // Rate limiting
   private final SlewRateLimiter xLimiter = new SlewRateLimiter(MAX_ACCEL);
   private final SlewRateLimiter yLimiter = new SlewRateLimiter(MAX_ACCEL);
+
+  @Log private double speedMultiplier = SpeedMultiplier.NORMAL.multiplier;
 
   public Drive(Vision vision) {
     this.vision = vision;
@@ -116,18 +119,22 @@ public class Drive extends SubsystemBase implements Loggable {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    xSpeed = xLimiter.calculate(Math.pow(xSpeed, 2) * Math.signum(xSpeed) * MAX_SPEED);
-    ySpeed = yLimiter.calculate(Math.pow(ySpeed, 2) * Math.signum(ySpeed) * MAX_SPEED);
-    rot = Math.pow(rot, 2) * Math.signum(rot) * MAX_ANGULAR_SPEED;
+    xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed) * MAX_SPEED * speedMultiplier;
+    ySpeed = Math.copySign(ySpeed * ySpeed, ySpeed) * MAX_SPEED * speedMultiplier;
+    rot = Math.copySign(rot * rot, rot) * MAX_ANGULAR_SPEED * speedMultiplier;
+
+    if (fieldRelative) {
+      xSpeed = xLimiter.calculate(xSpeed);
+      ySpeed = yLimiter.calculate(ySpeed);
+    }
 
     var speeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
 
-    if (fieldRelative) {
-      speeds =
-          ChassisSpeeds.fromFieldRelativeSpeeds(
-              speeds, odometry.getEstimatedPosition().getRotation());
-    }
+    setSpeeds(fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getHeading()) : speeds);
+  }
 
+  /** Sets the swerve ModuleStates via a {@link ChassisSpeeds} */
+  public void setSpeeds(ChassisSpeeds speeds) {
     setModuleStates(kinematics.toSwerveModuleStates(speeds));
   }
 
@@ -154,8 +161,8 @@ public class Drive extends SubsystemBase implements Loggable {
   }
 
   /** Zeroes the heading of the robot. */
-  public void zeroHeading() {
-    imu.reset();
+  public Command zeroHeading() {
+    return runOnce(imu::reset);
   }
 
   private SwerveModuleState[] getModuleStates() {
@@ -164,16 +171,6 @@ public class Drive extends SubsystemBase implements Loggable {
 
   private SwerveModulePosition[] getModulePositions() {
     return modules.stream().map(SwerveModule::getPosition).toArray(SwerveModulePosition[]::new);
-  }
-
-  /**
-   * Returns the turn rate of the robot.
-   *
-   * @return The turn rate of the robot, in degrees per second
-   */
-  @Log
-  public double getTurnRate() {
-    return imu.getRate();
   }
 
   /**
@@ -226,6 +223,11 @@ public class Drive extends SubsystemBase implements Loggable {
     vision.updateSeenTags();
   }
 
+  /** Sets a new speed multiplier for the robot, this affects max cartesian and angular speeds */
+  public Command setSpeedMultiplier(SpeedMultiplier multiplier) {
+    return runOnce(() -> speedMultiplier = multiplier.multiplier);
+  }
+
   /**
    * Follows a path on the field.
    *
@@ -270,25 +272,38 @@ public class Drive extends SubsystemBase implements Loggable {
                 fieldRelative));
   }
 
+  // public Command balance() {
+  //   PIDController controller = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
+  //   controller.setTolerance(PITCH_TOLERANCE);
+  //   return run(() ->
+  //           setSpeeds(new ChassisSpeeds(MAX_SPEED * controller.calculate(getPitch()), 0, 0)))
+  //       .until(controller::atSetpoint)
+  //       .andThen(lock());
+  // }
+
   public Command balance() {
-    PIDController controller = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
-    return run(() -> drive(controller.calculate(getPitch()), 0, 0, true))
-        .until(controller::atSetpoint)
+    DoubleUnaryOperator velocity =
+        pitch -> Math.signum(MathUtil.applyDeadband(pitch, MIN_PITCH)) * BALANCE_SPEED;
+
+    return run(() -> setSpeeds(new ChassisSpeeds(velocity.applyAsDouble(getPitch()), 0, 0)))
+        .until(() -> Math.abs(getPitch()) < MIN_PITCH)
         .andThen(lock());
   }
 
-  public Command balanceOrthogonal() {
-    PIDController x = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
-    PIDController y = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
-    return run(() -> drive(x.calculate(getPitch()), y.calculate(getRoll()), 0, false))
-        .until(() -> x.atSetpoint() && y.atSetpoint())
-        .andThen(lock());
-    // TODO see if pitch and yaw have to be switched
-  }
+  // public Command balanceOrthogonal() {
+  //   PIDController x = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
+  //   PIDController y = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
+  //   x.setTolerance(PITCH_TOLERANCE);
+  //   y.setTolerance(PITCH_TOLERANCE);
+  //   return run(() -> drive(x.calculate(getPitch()), y.calculate(getRoll()), 0, false))
+  //       .until(() -> x.atSetpoint() && y.atSetpoint())
+  //       .andThen(lock());
+  //   // TODO see if pitch and yaw have to be switched
+  // }
 
   /** Stops drivetrain */
   public Command stop() {
-    return run(() -> setModuleStates(getModuleStates()));
+    return drive(() -> 0, () -> 0, () -> 0, false);
   }
 
   /** Sets the drivetrain to an "X" configuration, preventing movement */
@@ -304,7 +319,7 @@ public class Drive extends SubsystemBase implements Loggable {
             desiredPose.getY() - currentPose.getY(), desiredPose.getX() - currentPose.getX()));
   }
 
-  private Command driveToPosesHelper(List<Pose2d> desiredPoses) {
+  private Command driveToPosesHelper(List<Pose2d> desiredPoses, boolean useAllianceColor) {
     List<PathPoint> points = new ArrayList<PathPoint>();
     Function<Integer, Rotation2d> heading =
         (i) ->
@@ -318,11 +333,12 @@ public class Drive extends SubsystemBase implements Loggable {
       points.add(new PathPoint(rawPose.getTranslation(), heading.apply(i), rawPose.getRotation()));
     }
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(CONSTRAINTS, points);
-    return follow(trajectory, false, false);
+    return follow(trajectory, false, useAllianceColor);
   }
 
   /** Creates and follows trajectory for swerve, starting at startPose, through all desired poses */
-  public Command driveToPoses(Pose2d startPose, List<Pose2d> desiredPoses) {
+  public Command driveToPoses(
+      Pose2d startPose, List<Pose2d> desiredPoses, boolean useAllianceColor) {
     BooleanSupplier closeEnough =
         () -> {
           Transform2d transform = getPose().minus(desiredPoses.get(desiredPoses.size() - 1));
@@ -332,24 +348,24 @@ public class Drive extends SubsystemBase implements Loggable {
         };
     List<Pose2d> posesWithStart =
         Stream.concat(Stream.of(startPose), desiredPoses.stream()).toList();
-    return driveToPosesHelper(posesWithStart).until(closeEnough);
+    return driveToPosesHelper(posesWithStart, useAllianceColor).until(closeEnough);
   }
 
   /**
    * Creates and follows trajectory for swerve, starting at curent pose, through all desired //
    * poses
    */
-  public Command driveToPoses(List<Pose2d> desiredPoses) {
-    return driveToPoses(getPose(), desiredPoses);
+  public Command driveToPoses(List<Pose2d> desiredPoses, boolean useAllianceColor) {
+    return driveToPoses(getPose(), desiredPoses, useAllianceColor);
   }
 
   /** Creates and follows trajectroy for swerve from startPose to desiredPose */
-  public Command driveToPose(Pose2d startPose, Pose2d desiredPose) {
-    return driveToPoses(startPose, List.of(desiredPose));
+  public Command driveToPose(Pose2d startPose, Pose2d desiredPose, boolean useAllianceColor) {
+    return driveToPoses(startPose, List.of(desiredPose), useAllianceColor);
   }
 
   /** Creates and follows trajectory for swerve from current pose to desiredPose */
-  public Command driveToPose(Pose2d desiredPose) {
-    return driveToPose(getPose(), desiredPose);
+  public Command driveToPose(Pose2d desiredPose, boolean useAllianceColor) {
+    return driveToPose(getPose(), desiredPose, useAllianceColor);
   }
 }

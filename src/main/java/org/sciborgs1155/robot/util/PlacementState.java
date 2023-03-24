@@ -1,4 +1,4 @@
-package org.sciborgs1155.lib;
+package org.sciborgs1155.robot.util;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -76,24 +76,29 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
                 Dimensions.CLAW_LENGTH * Math.sin(wristAngle),
                 Dimensions.FOREARM_LENGTH + Dimensions.CLAW_LENGTH * Math.cos(wristAngle));
 
-    // add elevator height if necessary
-    double currentHeight =
-        Math.sin(elbowAngle) * Dimensions.FOREARM_LENGTH
-            + Math.sin(wristAngle) * Dimensions.CLAW_LENGTH;
-
-    double elevatorHeight = 0;
-    // if (currentHeight < target.getY()) {
-    //   elevatorHeight = target.getY() - currentHeight;
-    // }
-
-    // check to see if state is valid
-    if (elevatorHeight != elevatorHeight || elbowAngle != elbowAngle || wristAngle != wristAngle) {
+    // check for nan
+    if (elbowAngle != elbowAngle || wristAngle != wristAngle) {
       return Optional.empty();
     }
 
-    var state = fromAbsolute(elevatorHeight, elbowAngle, wristAngle);
+    // add elevator height if necessary
+    double totalHeight =
+        Math.sin(elbowAngle) * Dimensions.FOREARM_LENGTH
+            + Math.sin(wristAngle) * Dimensions.CLAW_LENGTH;
+
+    double elevatorHeight = totalHeight < target.getY() ? target.getY() - totalHeight : 0;
+
+    var state = fromRelative(elevatorHeight, elbowAngle, wristAngle);
     System.out.println(state);
-    return Optional.of(fromAbsolute(elevatorHeight, elbowAngle, wristAngle));
+    System.out.println("claw pos" + state.endEffectorPosition());
+    return Optional.of(fromRelative(elevatorHeight, elbowAngle, wristAngle));
+  }
+
+  /** Performs forward kinematics to return the claw's position as a {@link Translation2d} */
+  public Translation2d endEffectorPosition() {
+    return new Translation2d(0, elevatorHeight)
+        .plus(new Translation2d(Dimensions.FOREARM_LENGTH, elbowAngle))
+        .plus(new Translation2d(Dimensions.CLAW_LENGTH, wristAngle));
   }
 
   public boolean roughlyEquals(PlacementState other, double margin) {

@@ -3,8 +3,10 @@ package org.sciborgs1155.robot.subsystems;
 import static org.sciborgs1155.robot.Constants.Elevator.*;
 import static org.sciborgs1155.robot.Ports.Elevator.*;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -23,7 +25,7 @@ import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
-import org.sciborgs1155.robot.subsystems.placement.Visualizer;
+import org.sciborgs1155.robot.util.Visualizer;
 
 public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
@@ -36,13 +38,18 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   @Log private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1]);
   private final EncoderSim simEncoder = new EncoderSim(encoder);
 
+  private final AbsoluteEncoder offsetEncoder = lead.getAbsoluteEncoder(Type.kDutyCycle);
+
   private final ElevatorFeedforward ff = new ElevatorFeedforward(FF.s(), FF.g(), FF.v(), FF.a());
 
   private final LinearFilter filter = LinearFilter.movingAverage(SAMPLE_SIZE_TAPS);
 
   @Log private boolean hasSpiked = false;
 
+  @Log private double offset = 0.61842;
+
   @Log
+  @Log(name = "at goal", methodName = "atGoal")
   private final ProfiledPIDController pid =
       new ProfiledPIDController(PID.p(), PID.i(), PID.d(), CONSTRAINTS);
 
@@ -52,9 +59,9 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   private final ElevatorSim sim =
       new ElevatorSim(
           DCMotor.getNEO(3),
-          CONVERSION.gearing(),
+          RELATIVE_CONVERSION.gearing(),
           Dimensions.ELEVATOR_MASS + Dimensions.FOREARM_MASS + Dimensions.CLAW_MASS,
-          CONVERSION.units(),
+          RELATIVE_CONVERSION.units(),
           Dimensions.ELEVATOR_MIN_HEIGHT,
           Dimensions.ELEVATOR_MAX_HEIGHT,
           true);
@@ -66,7 +73,17 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     left.follow(lead);
     right.follow(lead);
 
-    encoder.setDistancePerPulse(CONVERSION.factor());
+    encoder.setDistancePerPulse(RELATIVE_CONVERSION.factor());
+    offsetEncoder.setPositionConversionFactor(ABSOLUTE_CONVERSION.factor());
+
+    // for (int i = 0; i < 100; i++) System.out.println(offsetEncoder.getPosition());
+    // if (Robot.isReal()) {
+    //   offset = offsetEncoder.getPosition() + ZERO_OFFSET;
+    // }
+
+    SmartDashboard.putNumber("start", offsetEncoder.getPosition());
+    // STARTING POSITION ****MUST**** BE ABOVE THE ZERO LOCATION
+    // VALUES NEAR THE RED TAPE MARKING ARE GOOD
 
     lead.burnFlash();
     left.burnFlash();
@@ -79,8 +96,9 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Returns the height of the elevator, in meters */
+  @Log(name = "position")
   public double getPosition() {
-    return encoder.getDistance() + OFFSET;
+    return encoder.getDistance() + offset;
   }
 
   /** Returns the goal of the elevator, in meters */
@@ -119,24 +137,17 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
     lead.setVoltage(fbOutput + ffOutput);
 
-    filter.calculate(lead.getOutputCurrent());
-
-    if (lead.getOutputCurrent() >= CURRENT_SPIKE_THRESHOLD) {
-      hasSpiked = true;
-    }
+    hasSpiked = filter.calculate(lead.getOutputCurrent()) >= CURRENT_SPIKE_THRESHOLD;
 
     positionVisualizer.setElevatorHeight(getPosition());
     setpointVisualizer.setElevatorHeight(pid.getSetpoint().position);
-
-    SmartDashboard.putNumber("setpoint", pid.getSetpoint().position);
-    SmartDashboard.putNumber("position", this.getPosition());
   }
 
   @Override
   public void simulationPeriodic() {
     sim.setInputVoltage(lead.getAppliedOutput());
     sim.update(Constants.RATE);
-    simEncoder.setDistance(sim.getPositionMeters() - OFFSET);
+    simEncoder.setDistance(sim.getPositionMeters());
     simEncoder.setRate(sim.getVelocityMetersPerSecond());
   }
 
