@@ -14,10 +14,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Map;
 import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.Constants.*;
 import org.sciborgs1155.robot.commands.Scoring.*;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
-import org.sciborgs1155.robot.Constants.*;
 
 public final class Autos implements Sendable {
 
@@ -58,8 +58,12 @@ public final class Autos implements Sendable {
         Map.entry("backHighCone", placement.safeToState(BACK_HIGH_CONE)),
         Map.entry("backHighCube", placement.safeToState(BACK_HIGH_CUBE)),
         Map.entry("frontHighCube", placement.safeToState(FRONT_HIGH_CUBE)),
-        Map.entry("outtakeCone", intake.outtake().withTimeout(Auto.CONE_OUTTAKE_TIME).andThen(intake.stop())),
-        Map.entry("outtakeCube", intake.outtake().withTimeout(Auto.CUBE_OUTTAKE_TIME).andThen(intake.stop())),
+        Map.entry(
+            "outtakeCone",
+            intake.outtake().withTimeout(Auto.CONE_OUTTAKE_TIME).andThen(intake.stop())),
+        Map.entry(
+            "outtakeCube",
+            intake.outtake().withTimeout(Auto.CUBE_OUTTAKE_TIME).andThen(intake.stop())),
         Map.entry("score", intake.outtake().withTimeout(3).andThen(intake.stop())),
         Map.entry(
             "frontIntake",
@@ -163,20 +167,16 @@ public final class Autos implements Sendable {
 
   public Command driveToBalance() {
     return Commands.run(() -> drive.drive(0.75, 0, 0, false), drive)
-           .until(() -> Math.abs(drive.getPitch()) >= 14.5);
+        .until(() -> Math.abs(drive.getPitch()) >= 14.5);
   }
 
   public Command balanceNoPPL() {
-    return Commands.sequence(
-      driveToBalance(),
-      drive.balance()
-    );
+    return Commands.sequence(driveToBalance(), drive.balance());
   }
 
   public Command scoreBalanceNoPPL() {
     return Commands.sequence(
-      backHighCubeScore(),
-      balanceNoPPL().alongWith(placement.toState(STOW)));
+        backHighCubeScore(), balanceNoPPL().alongWith(placement.toState(STOW)));
   }
 
   public Command coneBalance() {

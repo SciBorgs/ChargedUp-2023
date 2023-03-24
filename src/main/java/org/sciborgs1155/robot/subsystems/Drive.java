@@ -110,10 +110,6 @@ public class Drive extends SubsystemBase implements Loggable {
     odometry.resetPosition(getHeading(), getModulePositions(), pose);
   }
 
-  private double scale(double input) {
-    return Math.copySign(input * input, input);
-  }
-
   /**
    * Method to drive the robot using joystick info.
    *
@@ -123,19 +119,21 @@ public class Drive extends SubsystemBase implements Loggable {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    xSpeed = xLimiter.calculate(scale(xSpeed) * MAX_SPEED * speedMultiplier);
-    ySpeed = yLimiter.calculate(scale(ySpeed) * MAX_SPEED * speedMultiplier);
-    rot = scale(rot) * MAX_ANGULAR_SPEED * speedMultiplier;
+    xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed) * MAX_SPEED * speedMultiplier;
+    ySpeed = Math.copySign(ySpeed * ySpeed, ySpeed) * MAX_SPEED * speedMultiplier;
+    rot = Math.copySign(rot * rot, rot) * MAX_ANGULAR_SPEED * speedMultiplier;
+
+    if (fieldRelative) {
+      xSpeed = xLimiter.calculate(xSpeed);
+      ySpeed = yLimiter.calculate(ySpeed);
+    }
 
     var speeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
 
-    if (fieldRelative) {
-      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getHeading());
-    }
-
-    setSpeeds(speeds);
+    setSpeeds(fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getHeading()) : speeds);
   }
 
+  /** Sets the swerve ModuleStates via a {@link ChassisSpeeds} */
   public void setSpeeds(ChassisSpeeds speeds) {
     setModuleStates(kinematics.toSwerveModuleStates(speeds));
   }
