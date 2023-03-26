@@ -1,13 +1,16 @@
 package org.sciborgs1155.robot.util.placement;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import org.sciborgs1155.robot.Constants.Positions;
 
 public class PlacementCache {
   public static void main(String... args) throws IOException, InterruptedException {
-
+    System.out.println("Generating...");
     // Generate trajectories between stored presets
     List<CachedTrajectory> generatedTrajectories = new ArrayList<CachedTrajectory>();
     var presets =
@@ -48,6 +51,14 @@ public class PlacementCache {
         }
       }
     }
+
+    ObjectMapper mapper = new ObjectMapper();
+    int id = (int) (Math.random() * 1000);
+    // TODO: add actual checks
+
+    File cacheFile =
+        Path.of(System.getProperty("java.io.tmpdir"), "arm_trajectory_cache_request.json").toFile();
+    mapper.writeValue(cacheFile, new StoredTrajectory(id, generatedTrajectories));
   }
 
   public static record CachedTrajectory(
@@ -56,4 +67,6 @@ public class PlacementCache {
       String[] constraintOverides,
       double totalTime,
       double[] points) {}
+
+  public static record StoredTrajectory(int id, List<CachedTrajectory> trajectories) {}
 }
