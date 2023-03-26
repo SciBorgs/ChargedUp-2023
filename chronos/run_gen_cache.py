@@ -23,11 +23,12 @@ def calculate_func(trajectory):
             config = yaml.safe_load(f)
         solver = Solver(config, silence=True)
 
+
     # Generate trajectory
     return solver.solve(
         {
-            "initial": trajectory["initialJointPositions"],
-            "final": trajectory["finalJointPositions"],
+            "initial": trajectory["initialPos"],
+            "final": trajectory["finalPos"],
             "constraintOverrides": trajectory["constraintOverrides"],
         }
     )
@@ -35,21 +36,24 @@ def calculate_func(trajectory):
 
 if __name__ == "__main__":
     start_time = time.time()
+    
     cache_data = None
     with open(
         os.path.join(tempfile.gettempdir(), "arm_trajectory_cache_request.json"), "r"
     ) as cache_file:
         cache_data = json.loads(cache_file.read())
-
+    
     # Generate all trajectories
     fail_count = 0
     results = multiprocessing.Pool().map(
         calculate_func,
         cache_data["trajectories"],
     )
+    
     for i in range(len(results)):
         result = results[i]
         trajectory = cache_data["trajectories"][i]
+        
         if result == None:
             print("Failed to generate trajectory:", trajectory)
             fail_count += 1

@@ -172,3 +172,6 @@ bin/
 
 # Simulation GUI and other tools window save file
 *-window.json
+
+# Trajectory Cache
+arm_trajectory_cache.json

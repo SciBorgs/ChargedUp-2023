@@ -64,7 +64,7 @@ public class PlacementCache {
   public static record CachedTrajectory(
       double[] initialPos,
       double[] finalPos,
-      String[] constraintOverides,
+      String[] constraintOverrides,
       double totalTime,
       double[] points) {}
 
