@@ -127,13 +127,6 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
   }
 
   public boolean roughlyEquals(PlacementState other, double margin) {
-    var v1 = this.toVec();
-    var v2 = other.toVec();
-    for (int i = 0; i < v1.getNumCols(); i++) {
-      if (Math.abs(v1.get(i, 0) - v2.get(i, 0)) > margin) {
-        return false;
-      }
-    }
-    return true;
+    return this.equals(other);
   }
 }
