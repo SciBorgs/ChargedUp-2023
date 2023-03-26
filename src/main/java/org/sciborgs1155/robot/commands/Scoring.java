@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.LED;
-import org.sciborgs1155.robot.util.PlacementState;
+import org.sciborgs1155.robot.util.placement.PlacementState;
 
 public final class Scoring implements Sendable {
 

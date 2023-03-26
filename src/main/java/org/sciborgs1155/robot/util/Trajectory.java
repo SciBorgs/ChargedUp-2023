@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.sciborgs1155.robot.util.placement.PlacementState;
 
 public class Trajectory {
   private double totalTime = 0;

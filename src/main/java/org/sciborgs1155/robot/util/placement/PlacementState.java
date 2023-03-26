@@ -1,7 +1,8 @@
-package org.sciborgs1155.robot.util;
+package org.sciborgs1155.robot.util.placement;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N3;
@@ -91,6 +92,30 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
     var state = fromRelative(elevatorHeight, elbowAngle, wristAngle);
     System.out.println(state);
     System.out.println("claw pos" + state.endEffectorPosition());
+    return Optional.of(fromRelative(elevatorHeight, elbowAngle, wristAngle));
+  }
+
+  public static Optional<PlacementState> fromIK(Pose2d target) {
+    double wristAngle = target.getRotation().getRadians();
+
+    double elbowAngle =
+        Math.atan2(target.getY(), target.getX())
+            + Math.atan2(
+                Dimensions.CLAW_LENGTH * Math.sin(target.getRotation().getRadians()),
+                Dimensions.FOREARM_LENGTH + Dimensions.CLAW_LENGTH * Math.cos(wristAngle));
+
+    // check for nan
+    if (elbowAngle != elbowAngle || wristAngle != wristAngle) {
+      return Optional.empty();
+    }
+
+    // add elevator height if necessary
+    double totalHeight =
+        Math.sin(elbowAngle) * Dimensions.FOREARM_LENGTH
+            + Math.sin(wristAngle) * Dimensions.CLAW_LENGTH;
+
+    double elevatorHeight = totalHeight < target.getY() ? target.getY() - totalHeight : 0;
+
     return Optional.of(fromRelative(elevatorHeight, elbowAngle, wristAngle));
   }
 

@@ -8,8 +8,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Elevator;
-import org.sciborgs1155.robot.util.PlacementState;
-import org.sciborgs1155.robot.util.PlacementState.Side;
+import org.sciborgs1155.robot.util.placement.PlacementState;
+import org.sciborgs1155.robot.util.placement.PlacementState.Side;
 
 /** Placement command factories */
 public final class Placement {
