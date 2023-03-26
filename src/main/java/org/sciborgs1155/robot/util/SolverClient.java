@@ -59,5 +59,5 @@ public class SolverClient {
     requestPub.set(stream.toString());
   }
 
-  public void results(Trajectory trajectory) {}
+  // public void results(Trajectory trajectory) {}
 }
