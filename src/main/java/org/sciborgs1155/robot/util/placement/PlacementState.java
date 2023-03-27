@@ -127,10 +127,10 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
   }
 
   public boolean roughlyEquals(PlacementState other, double margin) {
-    return margin > Math.abs(other.elevatorHeight - this.elevatorHeight) ?
-      margin > Math.abs(other.elbowAngle.getRadians() - this.elbowAngle.getRadians()) ? 
-      margin > Math.abs(other.wristAngle.getRadians() - this.wristAngle.getRadians()) : 
-      false :
-      false;
+    return margin > Math.abs(other.elevatorHeight - this.elevatorHeight)
+        ? margin > Math.abs(other.elbowAngle.getRadians() - this.elbowAngle.getRadians())
+            ? margin > Math.abs(other.wristAngle.getRadians() - this.wristAngle.getRadians())
+            : false
+        : false;
   }
 }
