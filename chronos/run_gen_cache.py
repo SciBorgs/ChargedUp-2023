@@ -25,13 +25,16 @@ def calculate_func(trajectory):
 
 
     # Generate trajectory
-    return solver.solve(
-        {
-            "initial": trajectory["initialPos"],
-            "final": trajectory["finalPos"],
-            "constraintOverrides": trajectory["constraintOverrides"],
-        }
-    )
+    try: 
+        return solver.solve(
+            {
+                "initial": trajectory["initialPos"],
+                "final": trajectory["finalPos"],
+                "constraintOverrides": trajectory["constraintOverrides"],
+            }
+        )
+    except:
+        return None
 
 
 if __name__ == "__main__":
