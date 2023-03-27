@@ -9,7 +9,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-import org.sciborgs1155.lib.Derivative;
+import org.sciborgs1155.lib.trajectory.PositionTrajectory;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.util.Visualizer;
@@ -40,21 +40,21 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   private final AbsoluteEncoder offsetEncoder = lead.getAbsoluteEncoder(Type.kDutyCycle);
 
+  private PositionTrajectory trajectory;
+  TrapezoidProfile p;
+  @Log private double setpoint;
+
   private final ElevatorFeedforward ff = new ElevatorFeedforward(FF.s(), FF.g(), FF.v(), FF.a());
+
+  @Log
+  @Log(name = "at setpoint", methodName = "atSetpoint")
+  private final PIDController pid = new PIDController(PID.p(), PID.i(), PID.d());
 
   private final LinearFilter filter = LinearFilter.movingAverage(SAMPLE_SIZE_TAPS);
 
   @Log private boolean hasSpiked = false;
 
   @Log private double offset = 0.61842;
-
-  @Log
-  @Log(name = "at goal", methodName = "atGoal")
-  private final ProfiledPIDController pid =
-      new ProfiledPIDController(PID.p(), PID.i(), PID.d(), CONSTRAINTS);
-
-  @Log(name = "acceleration", methodName = "getLastOutput")
-  private final Derivative accel = new Derivative();
 
   private final ElevatorSim sim =
       new ElevatorSim(
@@ -92,7 +92,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     this.positionVisualizer = positionVisualizer;
     this.setpointVisualizer = setpointVisualizer;
 
-    pid.setGoal(getPosition());
+    pid.setSetpoint(getPosition());
   }
 
   /** Returns the height of the elevator, in meters */
@@ -103,30 +103,24 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   /** Returns the goal of the elevator, in meters */
   public boolean atGoal() {
-    return pid.atGoal();
+    return pid.atSetpoint();
   }
 
-  /** Sets the elevator's goal to a height */
-  public Command setGoal(double goal) {
-    return setGoal(new TrapezoidProfile.State(goal, 0));
-  }
-
-  /** Sets the elevator's goal to a {@link TrapezoidProfile.State} */
-  public Command setGoal(TrapezoidProfile.State goal) {
+  /** Sets the elevator's setpoint height */
+  public Command setSetpoint(double height) {
     return runOnce(
         () ->
-            pid.setGoal(
-                new TrapezoidProfile.State(
-                    MathUtil.clamp(
-                        goal.position,
-                        Dimensions.ELEVATOR_MIN_HEIGHT,
-                        Dimensions.ELEVATOR_MAX_HEIGHT),
-                    goal.velocity)));
+            pid.setSetpoint(
+                MathUtil.clamp(
+                    height, Dimensions.ELEVATOR_MIN_HEIGHT, Dimensions.ELEVATOR_MAX_HEIGHT)));
   }
 
-  /** Runs the elevator to a goal {@link TrapezoidProfile.State} */
-  public Command runToGoal(TrapezoidProfile.State goal) {
-    return setGoal(goal).andThen(Commands.waitUntil(this::atGoal));
+  public Command setTrajectory(PositionTrajectory trajectory) {
+    return runOnce(() -> this.trajectory = trajectory);
+  }
+
+  public Command followTrajectory(PositionTrajectory trajectory) {
+    return setTrajectory(trajectory).andThen(Commands.waitUntil(this::atGoal));
   }
 
   @Override

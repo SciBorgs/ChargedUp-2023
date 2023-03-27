@@ -165,9 +165,12 @@ public final class Constants {
 
   public static final class Intake {
     public static final MotorConfig MOTOR =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withInvert(true);
+        MotorConfig.base()
+            .withNeutralBehavior(NeutralBehavior.BRAKE)
+            .withCurrentLimit(20)
+            .withInvert(true);
 
-    public static final double INTAKE_SPEED = 0.6;
+    public static final double INTAKE_SPEED = 1;
     public static final double OUTTAKE_SPEED = -0.25;
 
     public static final double THRESHOLD = 0.5;

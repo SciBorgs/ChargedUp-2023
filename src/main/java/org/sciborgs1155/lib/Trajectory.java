@@ -1,17 +1,14 @@
 package org.sciborgs1155.lib;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.Num;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
 import java.util.List;
 
 /** A generalized trajectory based off [position velocity] states. */
 public class Trajectory {
-  private final List<Vector<N2>> states;
+  private final List<Double> states;
   private final double totalTime;
 
   /**
@@ -19,35 +16,17 @@ public class Trajectory {
    *
    * @param states A vector of states.
    */
-  public Trajectory(final List<Vector<N2>> states) {
+  public Trajectory(final List<Double> states) {
     this.states = states;
     totalTime = 0.0;
   }
 
-  /** Performs linear interpolation between two N dimensional vectors */
-  private static final <N extends Num> Vector<N> lerp(Vector<N> start, Vector<N> end, double t) {
-    var res = new Vector<>(start);
-    for (int row = 0; row < res.getNumRows(); row++) {
-      res.set(row, 0, MathUtil.interpolate(start.get(row, 0), end.get(row, 0), t));
-    }
-    return res;
-  }
-
-  /** Finds the slope between two N dimensional vectors */
-  private static final <N extends Num> Vector<N> slope(Vector<N> start, Vector<N> end, double dt) {
-    var res = new Vector<>(start);
-    for (int row = 0; row < res.getNumRows(); row++) {
-      res.set(row, 0, (end.get(row, 0) - start.get(row, 0)) / dt);
-    }
-    return res;
-  }
-
-  public Vector<N2> getState(int index) {
+  public Double getState(int index) {
     return states.get(index);
   }
 
   /** Samples from the trajectory, returning a */
-  public Matrix<N2, N3> sample(double time) {
+  public Vector<N3> sample(double time) {
     double dt = totalTime / (states.size() - 1);
 
     // surrounding indices
@@ -64,24 +43,20 @@ public class Trajectory {
     secondNext = MathUtil.clamp(secondNext, 0, states.size() - 1);
 
     // calculate values
-    var position = lerp(states.get(prev), states.get(next), (time % dt) / dt);
-    var velocity = slope(states.get(prev), states.get(next), dt);
+    double position = MathUtil.interpolate(states.get(prev), states.get(next), (time % dt) / dt);
+    double velocity = (states.get(next) - states.get(prev)) / dt;
 
-    Vector<N2> acceleration;
+    double acceleration;
     if ((time % dt) / dt < 0.5) {
-      var prevVelocity = slope(states.get(secondPrev), states.get(prev), dt);
-      acceleration = slope(prevVelocity, velocity, dt);
+      var prevVelocity = (states.get(prev) - states.get(secondPrev)) / dt;
+      acceleration = (velocity - prevVelocity) / dt;
     } else {
-      var nextVelocity = slope(states.get(next), states.get(secondNext), dt);
-      acceleration = slope(velocity, nextVelocity, dt);
+      var nextVelocity = (states.get(secondNext) - states.get(next)) / dt;
+      acceleration = (nextVelocity - velocity) / dt;
     }
 
-    // return sample matrix
-    var res = new Matrix<>(Nat.N2(), Nat.N3());
-    res.assignBlock(0, 0, position);
-    res.assignBlock(1, 0, velocity);
-    res.assignBlock(2, 0, acceleration);
-    return res;
+    // return state vector
+    return VecBuilder.fill(position, velocity, acceleration);
   }
 
   /** Checks if the trajectory is within the tolerance of another one */

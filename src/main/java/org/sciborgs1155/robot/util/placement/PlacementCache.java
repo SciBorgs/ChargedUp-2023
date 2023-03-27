@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import org.sciborgs1155.lib.trajectory.PositionTrajectory;
 import org.sciborgs1155.robot.Constants.Positions;
 
 public class PlacementCache {
@@ -87,4 +88,8 @@ public class PlacementCache {
       double[] points) {}
 
   public static record StoredTrajectory(int id, List<CachedTrajectory> trajectories) {}
+
+  public PositionTrajectory getTrajectory(PlacementState start, PlacementState end) {
+    return null;
+  }
 }

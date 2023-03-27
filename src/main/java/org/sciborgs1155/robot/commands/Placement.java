@@ -6,6 +6,9 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import java.util.HashMap;
+import java.util.Map;
+import org.sciborgs1155.lib.trajectory.PositionTrajectory;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.util.placement.PlacementState;
@@ -16,6 +19,8 @@ public final class Placement {
 
   private final Arm arm;
   private final Elevator elevator;
+
+  private final Map<Integer, PositionTrajectory> trajectories = new HashMap<>();
 
   public Placement(Arm arm, Elevator elevator) {
     this.arm = arm;
