@@ -243,6 +243,8 @@ class Solver:
         opti = self._opti
         positions = self._positions
 
+        
+
         # Update position parameters
         opti.set_value(
             positions[0][0],
