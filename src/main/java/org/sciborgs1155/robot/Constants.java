@@ -81,7 +81,7 @@ public final class Constants {
     public static final String BACK_CAM = "backPhotonVision";
 
     // Robot to camera translations
-    public static final Translation3d FRONT_CAM_TRANSLATION = new Translation3d();
+    public static final Translation3d FRONT_CAM_TRANSLATION = new Translation3d(0.165, -0.305, 0.356);
     public static final Rotation3d FRONT_CAM_ROTATION = new Rotation3d(1.64933614, 1.78, 0);
     public static final Transform3d ROBOT_TO_FRONT_CAM =
         new Transform3d(FRONT_CAM_TRANSLATION, FRONT_CAM_ROTATION);
