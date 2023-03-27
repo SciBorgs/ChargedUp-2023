@@ -81,7 +81,8 @@ public final class Constants {
     public static final String BACK_CAM = "backPhotonVision";
 
     // Robot to camera translations
-    public static final Translation3d FRONT_CAM_TRANSLATION = new Translation3d(0.165, -0.305, 0.356);
+    public static final Translation3d FRONT_CAM_TRANSLATION =
+        new Translation3d(0.165, -0.305, 0.356);
     public static final Rotation3d FRONT_CAM_ROTATION = new Rotation3d(1.64933614, 1.78, 0);
     public static final Transform3d ROBOT_TO_FRONT_CAM =
         new Transform3d(FRONT_CAM_TRANSLATION, FRONT_CAM_ROTATION);
@@ -115,7 +116,7 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.1542, 0.6, 0.91, 0.038046); // v =  0.87884
 
-      public static final Constraints CONSTRAINTS = new Constraints(1.7, 1.5);
+      public static final Constraints CONSTRAINTS = new Constraints(2.1, 1.9);
     }
 
     public static final class Elbow {
@@ -133,7 +134,7 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
-      public static final Constraints CONSTRAINTS = new Constraints(1.9, 1.5);
+      public static final Constraints CONSTRAINTS = new Constraints(2.4, 2.2);
       public static final double ELBOW_OFFSET = -1.248660;
     }
   }
@@ -158,16 +159,19 @@ public final class Constants {
     public static final int SAMPLE_SIZE_TAPS = 5;
     public static final int CURRENT_SPIKE_THRESHOLD = 20;
 
-    public static final Constraints CONSTRAINTS = new Constraints(1.8, 1.7);
+    public static final Constraints CONSTRAINTS = new Constraints(2.4, 2.2);
 
     public static final double ZERO_OFFSET = 0.603467;
   }
 
   public static final class Intake {
     public static final MotorConfig MOTOR =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withInvert(true);
+        MotorConfig.base()
+            .withNeutralBehavior(NeutralBehavior.BRAKE)
+            .withCurrentLimit(20)
+            .withInvert(true);
 
-    public static final double INTAKE_SPEED = 0.6;
+    public static final double INTAKE_SPEED = 1;
     public static final double OUTTAKE_SPEED = -0.25;
 
     public static final double THRESHOLD = 0.5;
@@ -186,9 +190,9 @@ public final class Constants {
       }
     }
 
-    public static final double MAX_SPEED = 3; // m / s
+    public static final double MAX_SPEED = 3.35; // m / s
     public static final double MAX_ANGULAR_SPEED = 1.5 * Math.PI; // rad / s
-    public static final double MAX_ACCEL = 8; // m / s^2
+    public static final double MAX_ACCEL = 9; // m / s^2
 
     public static final Translation2d[] MODULE_OFFSET = {
       new Translation2d(Dimensions.WHEEL_BASE / 2, Dimensions.TRACK_WIDTH / 2), // front left
