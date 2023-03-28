@@ -156,13 +156,12 @@ public final class Autos implements Sendable {
 
   public Command coneLeaveNoOdometry() {
     return this.highConeScore()
-    .andThen(drive.drive(() -> 0.75, () -> 0, () -> 0, false))
-    .withTimeout(3);
+        .andThen(drive.drive(() -> 0.75, () -> 0, () -> 0, false))
+        .withTimeout(3);
   }
 
   public Command leaveNoOdometry() {
-    return drive.drive(() -> 0.75, () -> 0, () -> 0, false)
-    .withTimeout(2.4);
+    return drive.drive(() -> 0.75, () -> 0, () -> 0, false).withTimeout(2.4);
   }
 
   public Command cubeBalance() {
