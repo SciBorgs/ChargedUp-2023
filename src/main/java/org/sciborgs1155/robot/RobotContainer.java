@@ -15,6 +15,8 @@ import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
+import org.sciborgs1155.robot.subsystems.LED;
+import org.sciborgs1155.robot.subsystems.LED.LEDColors;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -32,6 +34,7 @@ public class RobotContainer {
   private final Elevator elevator = new Elevator(visualizer);
   private final Arm arm = new Arm(visualizer);
   private final Intake intake = new Intake();
+  private final LED led = new LED();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController xbox = new CommandXboxController(OI.XBOX);
@@ -57,6 +60,8 @@ public class RobotContainer {
         drive.drive(
             () -> -xbox.getLeftX(), () -> -leftJoystick.getX(), () -> -rightJoystick.getY(), true));
     // arm.setDefaultCommand(arm.setVoltage(() -> xbox.getRightY() * 3, () -> xbox.getLeftY() * 3));
+    led.setDefaultCommand(led.setPatterns(LEDColors.RAINBOW));
+
   }
 
   /**

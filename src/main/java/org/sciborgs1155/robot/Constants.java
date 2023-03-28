@@ -277,4 +277,10 @@ public final class Constants {
             Map.entry("R8", new Translation2d(10, 3)),
             Map.entry("R9", new Translation2d()));
   }
+  
+  public static final class ledConst {
+    public static final int buffer1Length = 60;
+
+    // public static final int buffer2Length = 60;
+  }
 }

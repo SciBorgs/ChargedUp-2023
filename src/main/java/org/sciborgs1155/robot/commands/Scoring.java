@@ -13,12 +13,16 @@ import org.sciborgs1155.lib.Vision;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
+import org.sciborgs1155.robot.subsystems.LED;
 
 public class Scoring {
   private final Intake intake;
   private final Drive drive;
   private final Placement placement;
   private final Vision vision;
+
+  private final LED led = new LED();
+
 
   public Scoring(Drive drive, Placement placement, Intake intake, Vision vision) {
     this.intake = intake;
@@ -142,4 +146,5 @@ public class Scoring {
             + "; side: "
             + side);
   }
+
 }

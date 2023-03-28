@@ -43,4 +43,10 @@ public final class Ports {
   public static final class Intake {
     public static final int WHEEL_MOTOR = 6;
   }
+  
+  public static final class ledPorts {
+    public static final int led1 = 9;
+    // on the robot before putting it on chassis the port # was 7
+    public static final int led2 = 8;
+  }
 }
