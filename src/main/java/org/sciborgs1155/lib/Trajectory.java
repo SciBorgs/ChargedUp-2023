@@ -21,8 +21,16 @@ public class Trajectory {
     totalTime = 0.0;
   }
 
-  public Double getState(int index) {
+  public double getState(int index) {
     return states.get(index);
+  }
+
+  public double getLast() {
+    return states.get(states.size() - 1);
+  }
+
+  public double getTotalTime() {
+    return totalTime;
   }
 
   /** Samples from the trajectory, returning a */
@@ -60,7 +68,7 @@ public class Trajectory {
   }
 
   /** Checks if the trajectory is within the tolerance of another one */
-  public boolean compare(Trajectory other, double tolerance) {
-    return getState(0).isIdentical(other.getState(0), tolerance);
-  }
+  // public boolean compare(Trajectory other, double tolerance) {
+  //   return getState(0).isIdentical(other.getState(0), tolerance);
+  // }
 }

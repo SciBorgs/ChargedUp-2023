@@ -40,12 +40,9 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
         elevatorHeight, Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle));
   }
 
-  /** Creates a PlacementState from a 6d vector */
+  /** Creates a PlacementState from an absolute 3d vector */
   public static PlacementState fromVec(Vector<N3> state) {
-    return new PlacementState(
-        state.get(0, 0),
-        Rotation2d.fromRadians(state.get(1, 0)),
-        Rotation2d.fromRadians(state.get(2, 0)));
+    return fromAbsolute(state.get(0, 0), state.get(1, 0), state.get(2, 0));
   }
 
   /** Returns a 6d vector representation of the state */
