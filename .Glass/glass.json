@@ -9,11 +9,17 @@
           "elbow feedback": {
             "open": true
           },
-          "elbowEncoder": {
-            "open": true
-          },
           "open": true,
           "wrist feedback": {
+            "open": true
+          }
+        },
+        "Drive": {
+          "open": true,
+          "rearLeft": {
+            "open": true
+          },
+          "rearRight": {
             "open": true
           }
         },
@@ -35,9 +41,28 @@
         "Elevator": {
           "encoder": {
             "open": true
+          },
+          "open": true,
+          "pid": {
+            "open": true
           }
         },
         "RobotContainer": {
+          "drive": {
+            "open": true
+          },
+          "open": true,
+          "scoring": {
+            "open": true
+          }
+        },
+        "open": true
+      },
+      "SmartDashboard": {
+        "open": true
+      },
+      "photonvision": {
+        "Microsoft_LifeCam_HD-3000 (1)": {
           "open": true
         },
         "open": true
@@ -45,12 +70,23 @@
     },
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Autos/Drive/field2d": "Field2d",
+      "/Shuffleboard/Autos/Drive/imu": "Gyro",
+      "/Shuffleboard/Autos/autoChooser": "String Chooser",
+      "/Shuffleboard/Autos/startingPosChooser": "String Chooser",
       "/Shuffleboard/Drive/field2d": "Field2d",
       "/Shuffleboard/Drive/gyro": "Gyro",
       "/Shuffleboard/Drive/imu": "Gyro",
       "/Shuffleboard/Drivetrain/field2d": "Field2d",
       "/Shuffleboard/Drivetrain/gyro": "Gyro",
+      "/Shuffleboard/RobotContainer/arm": "Subsystem",
+      "/Shuffleboard/RobotContainer/auto path chooser": "String Chooser",
       "/Shuffleboard/RobotContainer/autos": "String Chooser",
+      "/Shuffleboard/RobotContainer/drive": "Subsystem",
+      "/Shuffleboard/RobotContainer/elevator": "Subsystem",
+      "/Shuffleboard/RobotContainer/intake": "Subsystem",
+      "/Shuffleboard/RobotContainer/led": "Subsystem",
+      "/Shuffleboard/RobotContainer/starting position chooser": "String Chooser",
       "/Shuffleboard/RobotContainer/visualizer": "Mechanism2d",
       "/SmartDashboard/backPhotonVision Sim Field": "Field2d",
       "/SmartDashboard/frontPhotonVision Sim Field": "Field2d"
@@ -69,7 +105,7 @@
               "autoFit": true
             }
           ],
-          "height": 332,
+          "height": 321,
           "series": [
             {
               "color": [
@@ -93,6 +129,7 @@
         }
       ],
       "window": {
+        "name": "elevator tuning",
         "visible": false
       }
     },
@@ -104,7 +141,7 @@
               "autoFit": true
             }
           ],
-          "height": 330,
+          "height": 248,
           "series": [
             {
               "color": [
@@ -139,7 +176,7 @@
               "autoFit": true
             }
           ],
-          "height": 169,
+          "height": 229,
           "series": [
             {
               "color": [
@@ -169,7 +206,12 @@
     "Plot <3>": {
       "plots": [
         {
-          "height": 260,
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 275,
           "series": [
             {
               "color": [
@@ -188,12 +230,21 @@
                 1.0
               ],
               "id": "NT:/Shuffleboard/Arm/wrist position"
+            },
+            {
+              "color": [
+                0.3333333432674408,
+                0.658823549747467,
+                0.4078431725502014,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Arm/relative wrist position"
             }
           ]
         }
       ],
       "window": {
-        "visible": false
+        "name": "wrist tuning"
       }
     },
     "Plot <4>": {
@@ -204,7 +255,7 @@
               "autoFit": true
             }
           ],
-          "height": 338,
+          "height": 0,
           "series": [
             {
               "color": [
@@ -236,7 +287,7 @@
               "autoFit": true
             }
           ],
-          "height": 338,
+          "height": 405,
           "series": [
             {
               "color": [
@@ -258,7 +309,147 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
+    },
+    "Plot <6>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 338,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Drive/frontLeft/current position"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Drive/frontLeft/target velocity"
+            },
+            {
+              "color": [
+                0.3333333432674408,
+                0.658823549747467,
+                0.4078431725502014,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Drive/frontLeft/current velocity"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "visible": false
+      }
+    },
+    "Plot <7>": {
+      "plots": [
+        {
+          "height": 338,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Arm/relative wrist position"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Arm/elbowEncoder/Distance"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "visible": false
+      }
+    },
+    "Plot <8>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 292,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Drive/frontLeft/target angle"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Drive/frontLeft/current angle"
+            }
+          ]
+        },
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 292,
+          "series": [
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Drive/frontLeft/target velocity"
+            },
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Drive/frontLeft/current velocity"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "name": "swerve tuning"
+      }
     }
   }
 }

@@ -1,0 +1,246 @@
+{
+  "tabPane": [
+    {
+      "title": "Dashboard",
+      "autoPopulate": false,
+      "autoPopulatePrefix": "",
+      "widgetPane": {
+        "gridSize": 128.0,
+        "showGrid": false,
+        "hgap": 16.0,
+        "vgap": 16.0,
+        "titleType": 0,
+        "tiles": {
+          "2,0": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "List Layout",
+              "_title": "Auto",
+              "_glyph": 0,
+              "_showGlyph": false,
+              "Layout/Label position": "LEFT",
+              "_children": [
+                {
+                  "_type": "ComboBox Chooser",
+                  "_source0": "network_table:///Shuffleboard/RobotContainer/auto path chooser",
+                  "_title": "path",
+                  "_glyph": 148,
+                  "_showGlyph": false
+                },
+                {
+                  "_type": "ComboBox Chooser",
+                  "_source0": "network_table:///Shuffleboard/RobotContainer/starting position chooser",
+                  "_title": "starting position",
+                  "_glyph": 148,
+                  "_showGlyph": false
+                }
+              ]
+            }
+          },
+          "0,1": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Gyro",
+              "_source0": "network_table:///Shuffleboard/Arm/elbow position",
+              "_title": "elbow angle",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Visuals/Major tick spacing": 45.0,
+              "Visuals/Starting angle": 90.0,
+              "Visuals/Show tick mark ring": true,
+              "Visuals/Counter clockwise": true
+            }
+          },
+          "0,3": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Gyro",
+              "_source0": "network_table:///Shuffleboard/Arm/relative wrist position",
+              "_title": "relative wrist position",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Visuals/Major tick spacing": 45.0,
+              "Visuals/Starting angle": 90.0,
+              "Visuals/Show tick mark ring": true,
+              "Visuals/Counter clockwise": false
+            }
+          },
+          "2,3": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Gyro",
+              "_source0": "network_table:///Shuffleboard/Arm/absolute wrist position",
+              "_title": "absolute wrist position",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Visuals/Major tick spacing": 45.0,
+              "Visuals/Starting angle": 90.0,
+              "Visuals/Show tick mark ring": true,
+              "Visuals/Counter clockwise": false
+            }
+          },
+          "0,0": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Number Bar",
+              "_source0": "network_table:///Shuffleboard/Elevator/position",
+              "_title": "elevator height",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Range/Min": -1.0,
+              "Range/Max": 1.0,
+              "Range/Center": 0.0,
+              "Visuals/Num tick marks": 5,
+              "Visuals/Show text": true,
+              "Visuals/Orientation": "HORIZONTAL"
+            }
+          },
+          "4,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Field",
+              "_source0": "network_table:///Shuffleboard/Drive/field2d",
+              "_title": "Field",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Game/Game": "A2023_Charged_Up",
+              "Visuals/Robot Icon Size": 60.0,
+              "Visuals/Show Outside Circles": false,
+              "Colors/module-0": "#FFFFFFFF",
+              "Colors/module-3": "#FFFFFFFF",
+              "Colors/module-2": "#FFFFFFFF",
+              "Colors/module-1": "#FFFFFFFF"
+            }
+          },
+          "2,2": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Grid Layout",
+              "_title": "Placement",
+              "_glyph": 149,
+              "_showGlyph": false,
+              "Layout/Number of columns": 6,
+              "Layout/Number of rows": 3,
+              "Layout/Label position": "TOP",
+              "_children": {
+                "1,1": {
+                  "_type": "Text View",
+                  "_source0": "network_table:///Shuffleboard/RobotContainer/scoring/Game Piece",
+                  "_title": "Game Piece",
+                  "_glyph": 148,
+                  "_showGlyph": false
+                },
+                "2,1": {
+                  "_type": "Text View",
+                  "_source0": "network_table:///Shuffleboard/RobotContainer/scoring/Side",
+                  "_title": "Side",
+                  "_glyph": 148,
+                  "_showGlyph": false
+                }
+              }
+            }
+          },
+          "4,0": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Gyro",
+              "_source0": "network_table:///Shuffleboard/Drive/heading",
+              "_title": "heading",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Visuals/Major tick spacing": 45.0,
+              "Visuals/Starting angle": 180.0,
+              "Visuals/Show tick mark ring": true,
+              "Visuals/Counter clockwise": false
+            }
+          },
+          "6,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Camera Stream",
+              "_source0": "camera_server://photonvision_Port_1181_MJPEG_Server",
+              "_title": "photonvision_Port_1181_MJPEG_Server",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Crosshair/Show crosshair": true,
+              "Crosshair/Crosshair color": "#FFFFFFFF",
+              "Controls/Show controls": true,
+              "Controls/Rotation": "NONE",
+              "compression": -1.0,
+              "fps": -1,
+              "imageWidth": -1,
+              "imageHeight": -1
+            }
+          },
+          "7,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Camera Stream",
+              "_source0": "camera_server://photonvision_Port_1182_MJPEG_Server",
+              "_title": "photonvision_Port_1182_MJPEG_Server",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Crosshair/Show crosshair": true,
+              "Crosshair/Crosshair color": "#FFFFFFFF",
+              "Controls/Show controls": true,
+              "Controls/Rotation": "NONE",
+              "compression": -1.0,
+              "fps": -1,
+              "imageWidth": -1,
+              "imageHeight": -1
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "LiveWindow",
+      "autoPopulate": true,
+      "autoPopulatePrefix": "LiveWindow/",
+      "widgetPane": {
+        "gridSize": 128.0,
+        "showGrid": true,
+        "hgap": 16.0,
+        "vgap": 16.0,
+        "titleType": 0,
+        "tiles": {}
+      }
+    }
+  ],
+  "windowGeometry": {
+    "x": -5.843478679656982,
+    "y": 0.8347826600074768,
+    "width": 1614.4696044921875,
+    "height": 866.50439453125
+  }
+}

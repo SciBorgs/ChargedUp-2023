@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.sciborgs1155.robot.Constants.ledConst;
-import org.sciborgs1155.robot.Ports.ledPorts;
+import org.sciborgs1155.robot.Ports.Led;
 import org.sciborgs1155.robot.commands.Scoring.GamePiece;
 
 public class LED extends SubsystemBase {
@@ -26,7 +26,7 @@ public class LED extends SubsystemBase {
   }
 
   public LED() {
-    led1 = new AddressableLED(ledPorts.led1);
+    led1 = new AddressableLED(Led.led1);
     led1Buffer = new AddressableLEDBuffer(ledConst.buffer1Length);
     led1.setLength(led1Buffer.getLength());
     led1.setData(led1Buffer);
@@ -50,10 +50,9 @@ public class LED extends SubsystemBase {
   }
 
   public Command setPatterns(LEDColors desiredColor) {
-    if ( desiredColor == LEDColors.RAINBOW) {
+    if (desiredColor == LEDColors.RAINBOW) {
       return Commands.run(() -> LedPatterns(LEDColors.RAINBOW), this);
-    }
-    else {
+    } else {
       return Commands.run(() -> errorLED(), this);
     }
   }
@@ -75,7 +74,7 @@ public class LED extends SubsystemBase {
         // led2Buffer.setLED(i, Color.kBlue);
       }
       led1.setData(led1Buffer);
-    } 
+    }
   }
 
   public void LedPatterns(LEDColors ledColor) {

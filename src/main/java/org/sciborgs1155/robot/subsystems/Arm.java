@@ -22,12 +22,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-import java.util.function.DoubleSupplier;
 import org.sciborgs1155.lib.Derivative;
-import org.sciborgs1155.lib.Visualizer;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Robot;
+import org.sciborgs1155.robot.util.Visualizer;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
@@ -43,7 +42,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log private final Encoder elbowEncoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
   private final EncoderSim elbowEncoderSim = new EncoderSim(elbowEncoder);
 
-  @Log(name = "wrist position", methodName = "getPosition")
   @Log(name = "wrist velocity", methodName = "getVelocity")
   private final AbsoluteEncoder wristEncoder = wrist.getAbsoluteEncoder(Type.kDutyCycle);
 
@@ -53,10 +51,12 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
       new ArmFeedforward(Wrist.FF.s(), Wrist.FF.g(), Wrist.FF.v(), Wrist.FF.a());
 
   @Log(name = "elbow feedback")
+  @Log(name = "elbow at goal", methodName = "atGoal")
   private final ProfiledPIDController elbowFeedback =
       new ProfiledPIDController(Elbow.PID.p(), Elbow.PID.i(), Elbow.PID.d(), Elbow.CONSTRAINTS);
 
   @Log(name = "wrist feedback")
+  @Log(name = "wrist at goal", methodName = "atGoal")
   private final ProfiledPIDController wristFeedback =
       new ProfiledPIDController(Wrist.PID.p(), Wrist.PID.i(), Wrist.PID.d(), Wrist.CONSTRAINTS);
 
@@ -87,8 +87,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   private final Visualizer visualizer;
 
-  private double elbowV, wristV;
-
   public Arm(Visualizer visualizer) {
     elbowLeft.follow(elbow);
     elbowRight.follow(elbow);
@@ -111,15 +109,19 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
     this.visualizer = visualizer;
 
-    // wristFeedback.setGoal(Math.PI);
+    elbowFeedback.setGoal(getElbowPosition().getRadians());
+    wristFeedback.setGoal(Math.PI);
+    wristFeedback.setTolerance(0.3);
   }
 
   /** Elbow position relative to the chassis */
+  @Log(name = "elbow position", methodName = "getDegrees")
   public Rotation2d getElbowPosition() {
-    return Rotation2d.fromRadians(elbowEncoder.getDistance());
+    return Rotation2d.fromRadians(elbowEncoder.getDistance() + Elbow.ELBOW_OFFSET);
   }
 
   /** Wrist position relative to the forearm */
+  @Log(name = "relative wrist position", methodName = "getDegrees")
   public Rotation2d getRelativeWristPosition() {
     // encoder is zeroed fully folded in, which is actually PI, so we offset by -PI
     return Rotation2d.fromRadians(
@@ -127,6 +129,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Wrist position relative to chassis */
+  @Log(name = "absolute wrist position", methodName = "getDegrees")
   public Rotation2d getAbsoluteWristPosition() {
     return getRelativeWristPosition().plus(getElbowPosition());
   }
@@ -183,18 +186,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     return setGoals(elbowGoal, wristGoal).andThen(Commands.waitUntil(this::atGoal));
   }
 
-  public Command setVoltage(DoubleSupplier v, DoubleSupplier wristV) {
-    return run(
-        () -> {
-          this.elbowV = v.getAsDouble();
-          this.wristV = wristV.getAsDouble();
-        });
-  }
-
-  public Command setWristVoltage(DoubleSupplier v) {
-    return run(() -> this.wristV = v.getAsDouble());
-  }
-
   @Override
   public void periodic() {
     double elbowFB = elbowFeedback.calculate(getElbowPosition().getRadians());
@@ -219,9 +210,9 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     wrist.setVoltage(wristFB + wristFF);
 
     visualizer.setElbow(
-        getElbowPosition(), Rotation2d.fromRadians(elbowFeedback.getGoal().position));
+        getElbowPosition(), Rotation2d.fromRadians(elbowFeedback.getSetpoint().position));
     visualizer.setWrist(
-        getRelativeWristPosition(), Rotation2d.fromRadians(wristFeedback.getGoal().position));
+        getRelativeWristPosition(), Rotation2d.fromRadians(wristFeedback.getSetpoint().position));
   }
 
   @Override

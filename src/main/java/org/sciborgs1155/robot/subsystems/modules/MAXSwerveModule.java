@@ -105,9 +105,6 @@ public class MAXSwerveModule implements SwerveModule {
         SwerveModuleState.optimize(
             correctedDesiredState, Rotation2d.fromRadians(turningEncoder.getPosition()));
 
-    System.out.println(turningEncoder.getPositionConversionFactor());
-
-    // setpoint = desiredState;
     double driveFF = driveFeedforward.calculate(setpoint.speedMetersPerSecond);
     driveFeedback.setReference(setpoint.speedMetersPerSecond, ControlType.kVelocity, 0, driveFF);
     turnFeedback.setReference(setpoint.angle.getRadians(), ControlType.kPosition);

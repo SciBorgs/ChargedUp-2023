@@ -1,22 +1,30 @@
 package org.sciborgs1155.robot;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
-import org.sciborgs1155.lib.Vision;
-import org.sciborgs1155.lib.Visualizer;
+import java.util.function.Supplier;
+import org.sciborgs1155.robot.Constants.Drive.SpeedMultiplier;
+import org.sciborgs1155.robot.Constants.Positions;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Placement;
+import org.sciborgs1155.robot.commands.Scoring;
+import org.sciborgs1155.robot.commands.Scoring.GamePiece;
+import org.sciborgs1155.robot.commands.Scoring.Level;
+import org.sciborgs1155.robot.commands.Scoring.Side;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.subsystems.LED;
-import org.sciborgs1155.robot.subsystems.LED.LEDColors;
+import org.sciborgs1155.robot.util.Vision;
+import org.sciborgs1155.robot.util.Visualizer;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -24,44 +32,71 @@ import org.sciborgs1155.robot.subsystems.LED.LEDColors;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-public class RobotContainer {
+public class RobotContainer implements Loggable {
 
+  // Vision instance
   private final Vision vision = new Vision();
+
+  // Placement visualizer
   @Log private final Visualizer visualizer = new Visualizer();
 
-  // The robot's subsystems and commands are defined here...
-  private final Drive drive = new Drive(vision);
-  private final Elevator elevator = new Elevator(visualizer);
-  private final Arm arm = new Arm(visualizer);
-  private final Intake intake = new Intake();
-  private final LED led = new LED();
+  // Subsystems
+  @Log private final Drive drive = new Drive(vision);
+  @Log private final Elevator elevator = new Elevator(visualizer);
+  @Log private final Arm arm = new Arm(visualizer);
+  @Log private final Intake intake = new Intake();
+  @Log private final LED led = new LED();
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController xbox = new CommandXboxController(OI.XBOX);
-  private final CommandJoystick leftJoystick = new CommandJoystick(OI.LEFT_STICK);
-  private final CommandJoystick rightJoystick = new CommandJoystick(OI.RIGHT_STICK);
+  // Input devices
+  private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
+  private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
 
-  // command factories
+  // Command factories
   private final Placement placement = new Placement(arm, elevator);
-  private final Autos autos = new Autos(drive, placement, vision, intake);
+  @Log private final Scoring scoring = new Scoring(drive, placement, led);
+
+  @Log(name = "starting position chooser")
+  private final Autos autos = new Autos(drive, placement, intake);
+
+  // Auto choosers
+  @Log(name = "auto path chooser")
+  private final SendableChooser<Supplier<Command>> autoChooser = new SendableChooser<>();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the oblog logger
     Logger.configureLoggingAndConfig(this, false);
+    // Configure auto chooser options
+    configureAutoChoosers();
     // Configure the trigger bindings
     configureBindings();
     // Configure subsystem default commands
     configureSubsystemDefaults();
   }
 
+  private void configureAutoChoosers() {
+    // autoChooser.addOption("balance", autos::justBalance);
+    autoChooser.addOption("balance (no ppl)", autos::balanceNoPPL);
+    autoChooser.addOption("high cone", autos::highConeScore);
+    autoChooser.addOption("back high cube", autos::backHighCubeScore);
+    autoChooser.addOption("front high cube", autos::frontHighCubeScore);
+    autoChooser.addOption("back high cube -> intake", autos::cubeIntake);
+    autoChooser.addOption("score cone, score cube, engage", autos::coneCubeEngage);
+    autoChooser.addOption("score cone, score cube, intake", autos::coneCubeIntake);
+    autoChooser.addOption("back high cube -> engage", autos::cubeBalance);
+    autoChooser.setDefaultOption("high cone -> leave comm", autos::coneLeave);
+    autoChooser.addOption("back high cube -> leave comm", autos::cubeLeave);
+    // autoChooser.addOption("no ppl: back high cone/cube -> leave comm", autos::scoreLeaveNoPPL);
+    autoChooser.addOption("none", Commands::none);
+    autoChooser.addOption("cube balance NO PPL", autos::scoreBalanceNoPPL);
+  }
+
   private void configureSubsystemDefaults() {
     drive.setDefaultCommand(
-        drive.drive(
-            () -> -xbox.getLeftX(), () -> -leftJoystick.getX(), () -> -rightJoystick.getY(), true));
-    // arm.setDefaultCommand(arm.setVoltage(() -> xbox.getRightY() * 3, () -> xbox.getLeftY() * 3));
-    led.setDefaultCommand(led.setPatterns(LEDColors.RAINBOW));
-
+        drive
+            .drive(
+                () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX(), true)
+            .withName("teleop driving"));
   }
 
   /**
@@ -74,33 +109,46 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    // new Trigger(m_exampleSubsystem::exampleCondition)
-    // .onTrue(new ExampleCommand(m_exampleSubsystem));
+    driver.b().onTrue(drive.zeroHeading());
 
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is
-    // pressed,
-    // cancelling on release.
-    // xbox.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
-    rightJoystick.trigger().onTrue(intake.start(false)).onFalse(intake.stop());
-    // rightJoystick.top().onTrue(intake.start(true)).onFalse(intake.stop());
+    // SPEED SWITCHING
+    driver
+        .leftBumper()
+        .onTrue(drive.setSpeedMultiplier(SpeedMultiplier.SLOW))
+        .onFalse(drive.setSpeedMultiplier(SpeedMultiplier.NORMAL));
+    driver
+        .rightBumper()
+        .onTrue(drive.setSpeedMultiplier(SpeedMultiplier.MAX))
+        .onFalse(drive.setSpeedMultiplier(SpeedMultiplier.NORMAL));
 
-    xbox.a().onTrue(elevator.setGoal(0.3));
-    xbox.b().onTrue(elevator.setGoal(0));
-    xbox.x().onTrue(intake.start(false)).onFalse(intake.stop());
-    xbox.y().onTrue(intake.start(true)).onFalse(intake.stop());
+    // STATE SWITCHING
+    operator.b().onTrue(scoring.setSide(Side.FRONT));
+    operator.x().onTrue(scoring.setSide(Side.BACK));
+    operator.a().onTrue(scoring.setGamePiece(GamePiece.CUBE));
+    operator.y().onTrue(scoring.setGamePiece(GamePiece.CONE));
 
-    // xbox.povLeft().onTrue(arm.setElbowGoal(new State(0, 0)));
-    // xbox.povUp().onTrue(arm.setElbowGoal(new State(1.57, 0)));
-    // xbox.povRight().onTrue(arm.setElbowGoal(new State(3.14, 0)));
+    // SCORING
+    operator.povUp().onTrue(scoring.goTo(Level.HIGH));
+    operator.povRight().onTrue(scoring.goTo(Level.MID));
+    operator.povDown().onTrue(scoring.goTo(Level.LOW));
+    operator.povLeft().onTrue(placement.safeToState(Positions.STOW));
 
-    // xbox.povUp().onTrue(arm.set)
+    operator.leftTrigger().onTrue(scoring.goTo(Level.SINGLE_SUBSTATION));
+    operator.rightTrigger().onTrue(scoring.goTo(Level.DOUBLE_SUBSTATION));
+    // operator.povDownRight().onTrue(elevator.setGoal(0));
+    // operator.povUpRight().onTrue(elevator.setGoal(.5));
 
-    // xbox.povUp().onTrue(arm.setGoals(Rotation2d.fromDegrees(5), Rotation2d.fromDegrees(0)));
-    // xbox.povDown().onTrue(arm.setGoals(Rotation2d.fromDegrees(-5), Rotation2d.fromDegrees(0)));
-    // xbox.p.onTrue(arm.setVoltage(3)).onFalse(arm.setVoltage(0));
-    // xbox.povDownovUp()().onTrue(arm.setVoltage(-3)).onFalse(arm.setVoltage(0));
+    // INTAKING
+    operator.leftBumper().onTrue(intake.intake()).onFalse(intake.stop());
+    operator.rightBumper().onTrue(intake.outtake()).onFalse(intake.stop());
+  }
 
+  /** A command to run when the robot is enabled */
+  public Supplier<Command> getEnableCommand() {
+    return () ->
+        Commands.parallel(
+            elevator.setGoal(elevator.getPosition()),
+            arm.setGoals(arm.getElbowPosition(), arm.getRelativeWristPosition()));
   }
 
   /**
@@ -109,9 +157,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // return drive.follow("PRAY", true, true);
-    return autos.get();
-    // return arm.setElbowGoal(new TrapezoidProfile.State(0.75 * Math.PI, 0));
-    // return autos.get();
+    return autoChooser.getSelected().get();
   }
 }
