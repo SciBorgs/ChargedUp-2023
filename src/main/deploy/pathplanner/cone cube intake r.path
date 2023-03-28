@@ -28,24 +28,26 @@
     },
     {
       "anchorPoint": {
-        "x": 6.963787729658794,
-        "y": 0.9562215131374706
+        "x": 7.162338515649254,
+        "y": 0.9167317101995316
       },
       "prevControl": {
-        "x": 6.027977979567071,
-        "y": 0.6189055312138404
+        "x": 7.172776349024921,
+        "y": 0.9054240573758918
       },
       "nextControl": {
-        "x": 6.027977979567071,
-        "y": 0.6189055312138404
+        "x": 7.172776349024921,
+        "y": 0.9054240573758918
       },
-      "holonomicAngle": 16.611032265993952,
+      "holonomicAngle": 0.0,
       "isReversal": true,
       "velOverride": null,
       "isLocked": false,
-      "isStopPoint": false,
+      "isStopPoint": true,
       "stopEvent": {
-        "names": [],
+        "names": [
+          "initialIntake"
+        ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
@@ -57,14 +59,14 @@
         "y": 1.058396304292608
       },
       "prevControl": {
-        "x": 2.0638628273784327,
-        "y": 0.8378100922868512
+        "x": 1.9483508046877205,
+        "y": 0.6760816629272143
       },
       "nextControl": {
-        "x": 2.0638628273784327,
-        "y": 0.8378100922868512
+        "x": 1.9483508046877205,
+        "y": 0.6760816629272143
       },
-      "holonomicAngle": 180.0,
+      "holonomicAngle": 0.0,
       "isReversal": true,
       "velOverride": null,
       "isLocked": false,
@@ -84,17 +86,19 @@
         "y": 2.1368564438517765
       },
       "prevControl": {
-        "x": 5.566103852693816,
-        "y": -0.1972170628369042
+        "x": 5.731369547808541,
+        "y": 0.0779358225383119
       },
       "nextControl": null,
-      "holonomicAngle": -140.1182915436212,
+      "holonomicAngle": 39.88,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
+        "names": [
+          "initialIntake"
+        ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
@@ -114,14 +118,13 @@
     {
       "position": 1.2832031250000004,
       "names": [
-        "event",
-        "frontHighCube"
+        "backHighCube"
       ]
     },
     {
-      "position": 2.6888139204545465,
+      "position": 2.4568892045454556,
       "names": [
-        "backIntake"
+        "frontIntake"
       ]
     }
   ]
