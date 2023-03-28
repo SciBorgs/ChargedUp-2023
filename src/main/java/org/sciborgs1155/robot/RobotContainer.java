@@ -89,6 +89,10 @@ public class RobotContainer implements Loggable {
     // autoChooser.addOption("no ppl: back high cone/cube -> leave comm", autos::scoreLeaveNoPPL);
     autoChooser.addOption("none", Commands::none);
     autoChooser.addOption("cube balance NO PPL", autos::scoreBalanceNoPPL);
+
+    autoChooser.addOption("backup (no drive): cube score", autos::backHighCubeScore);
+    autoChooser.addOption("backup (no drive): cone score", autos::highConeScore);
+    autoChooser.addOption("backup (no odometry): cone leave", autos::coneLeaveNoOdometry);
   }
 
   private void configureSubsystemDefaults() {
