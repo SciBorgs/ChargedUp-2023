@@ -20,15 +20,18 @@ public class Scoring {
   private final Drive drive;
   private final Placement placement;
   private final Vision vision;
+  
+  private GamePiece gamePiece;
 
-  private final LED led = new LED();
+  private final LED led;
 
 
-  public Scoring(Drive drive, Placement placement, Intake intake, Vision vision) {
+  public Scoring(Drive drive, Placement placement, Intake intake, Vision vision, LED led) {
     this.intake = intake;
     this.drive = drive;
     this.placement = placement;
     this.vision = vision;
+    this.led = led;
   }
 
   public Command score(GamePiece gamePiece, ScoringHeight height, Side side) {
@@ -94,6 +97,12 @@ public class Scoring {
     HIGH,
     MID,
     LOW
+  }
+
+  
+  public Command setGamePiece(GamePiece gamePiece) {
+    return Commands.runOnce(() -> this.gamePiece = gamePiece)
+        .alongWith(led.setGamePieceColor(gamePiece));
   }
 
   public static PlacementState scoringState(GamePiece gamePiece, ScoringHeight height, Side side) {
