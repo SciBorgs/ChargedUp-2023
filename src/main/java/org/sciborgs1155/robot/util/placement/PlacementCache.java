@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.util.placement;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +10,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.sciborgs1155.lib.Trajectory;
 import org.sciborgs1155.robot.Constants.Positions;
@@ -33,11 +33,19 @@ public class PlacementCache {
 
     List<Trajectory> trajectories = new ArrayList<Trajectory>();
 
-    for(var cachedTrajectory : cache.trajectories) {
-      
+    for (var cachedTrajectory : cache.trajectories) {
       trajectories.add(
-        new Trajectory(Arrays.asList(ArrayUtils.toObject(cachedTrajectory.points)), cachedTrajectory.totalTime)
-      );
+          new Trajectory(
+              new PlacementState(
+                  cachedTrajectory.initialPos[0],
+                  new Rotation2d(cachedTrajectory.initialPos[1]),
+                  new Rotation2d(cachedTrajectory.initialPos[2])),
+              new PlacementState(
+                  cachedTrajectory.finalPos[0],
+                  new Rotation2d(cachedTrajectory.finalPos[1]),
+                  new Rotation2d(cachedTrajectory.finalPos[2])),
+              Arrays.asList(ArrayUtils.toObject(cachedTrajectory.points)),
+              cachedTrajectory.totalTime));
     }
 
     return trajectories;
@@ -47,7 +55,7 @@ public class PlacementCache {
   public static void main(String... args) throws IOException, InterruptedException {
     System.out.println("Generating...");
     // for(var x : loadTrajectories()) {
-    //     System.out.println(x.totalTime);
+    // System.out.println(x.totalTime);
     // }
     // Generate trajectories between stored presets
 
@@ -109,7 +117,8 @@ public class PlacementCache {
 
   public static record StoredTrajectory(int id, List<CachedTrajectory> trajectories) {}
 
-  // public PositionTrajectory getTrajectory(PlacementState start, PlacementState end) {
-  //   return null;
+  // public PositionTrajectory getTrajectory(PlacementState start, PlacementState
+  // end) {
+  // return null;
   // }
 }
