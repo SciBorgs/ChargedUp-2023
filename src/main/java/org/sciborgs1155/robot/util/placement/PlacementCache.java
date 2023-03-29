@@ -19,7 +19,7 @@ public class PlacementCache {
   private static final String cacheRequestFilename = "arm_trajectory_cache_request.json";
 
   /** Reads cached trajectories and returns a list of them */
-  public static List<Trajectory> loadTrajectories() {
+  public static List<PlacementTrajectory> loadTrajectories() {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     StoredTrajectory cache;
@@ -31,19 +31,21 @@ public class PlacementCache {
       throw new RuntimeException("Failed to parse");
     }
 
-    List<Trajectory> trajectories = new ArrayList<Trajectory>();
+    List<PlacementTrajectory> trajectories = new ArrayList<PlacementTrajectory>();
 
     for (var cachedTrajectory : cache.trajectories) {
       trajectories.add(
+          new PlacementTrajectory(null, null, null, null)
+
           new Trajectory(
-              new PlacementState(
-                  cachedTrajectory.initialPos[0],
-                  new Rotation2d(cachedTrajectory.initialPos[1]),
-                  new Rotation2d(cachedTrajectory.initialPos[2])),
-              new PlacementState(
-                  cachedTrajectory.finalPos[0],
-                  new Rotation2d(cachedTrajectory.finalPos[1]),
-                  new Rotation2d(cachedTrajectory.finalPos[2])),
+              // new PlacementState(
+              //     cachedTrajectory.initialPos[0],
+              //     new Rotation2d(cachedTrajectory.initialPos[1]),
+              //     new Rotation2d(cachedTrajectory.initialPos[2])),
+              // new PlacementState(
+              //     cachedTrajectory.finalPos[0],
+              //     new Rotation2d(cachedTrajectory.finalPos[1]),
+              //     new Rotation2d(cachedTrajectory.finalPos[2])),
               Arrays.asList(ArrayUtils.toObject(cachedTrajectory.points)),
               cachedTrajectory.totalTime));
     }

@@ -9,7 +9,7 @@ import org.sciborgs1155.robot.util.placement.PlacementState;
 
 /** A generalized trajectory based off [position velocity] states. */
 public class Trajectory {
-  private final PlacementState initialPos, finalPos;
+  
   private final List<Double> states;
   private final double totalTime;
 
@@ -19,12 +19,8 @@ public class Trajectory {
    * @param states A vector of states.
    */
   public Trajectory(
-      final PlacementState initialPos,
-      final PlacementState finalPos,
       final List<Double> states,
       final double totalTime) {
-    this.initialPos = initialPos;
-    this.finalPos = finalPos;
     this.states = states;
     this.totalTime = totalTime;
   }
