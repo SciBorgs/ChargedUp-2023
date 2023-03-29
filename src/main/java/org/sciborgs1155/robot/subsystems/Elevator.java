@@ -7,6 +7,7 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
@@ -49,6 +50,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   @Log(name = "at setpoint", methodName = "atSetpoint")
   private final PIDController pid = new PIDController(PID.p(), PID.i(), PID.d());
 
+  @Log(methodName = "getData")
   private Vector<N3> setpoint;
 
   private final LinearFilter filter = LinearFilter.movingAverage(SAMPLE_SIZE_TAPS);
@@ -93,7 +95,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     this.positionVisualizer = positionVisualizer;
     this.setpointVisualizer = setpointVisualizer;
 
-    pid.setSetpoint(getPosition());
+    setpoint = VecBuilder.fill(getPosition(), 0, 0);
   }
 
   /** Returns the height of the elevator, in meters */
@@ -109,7 +111,6 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   /** Sets the elevator's setpoint height */
   public void setSetpoint(Vector<N3> state) {
-    prevSetpoint = setpoint;
     setpoint = state;
   }
 
@@ -132,6 +133,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
         .until(() -> atSetpoint() && goal.equals(getTrapezoidSetpoint()));
   }
 
+  /** Follows a {@link Trajectory}, representing an arbitrary trajectory of position setpoints */
   public Command followTrajectory(Trajectory trajectory) {
     Timer timer = new Timer();
     return runOnce(timer::start)
@@ -142,7 +144,11 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Override
   public void periodic() {
-    double fbOutput = pid.calculate(getPosition(), setpoint.get(0, 0));
+    double position =
+        MathUtil.clamp(
+            setpoint.get(0, 0), Dimensions.ELEVATOR_MIN_HEIGHT, Dimensions.ELEVATOR_MAX_HEIGHT);
+
+    double fbOutput = pid.calculate(getPosition(), position);
     double ffOutput = ff.calculate(setpoint.get(1, 0), setpoint.get(2, 0));
 
     lead.setVoltage(fbOutput + ffOutput);

@@ -37,7 +37,7 @@ public final class Placement {
   /** Runs elevator and arm to a state, which can include velocity */
   public Command toState(PlacementState state) {
     return Commands.parallel(
-            elevator.runToGoal(new State(state.elevatorHeight(), 0)),
+            elevator.followProfile(state.elevatorHeight()),
             arm.runToGoals(
                 new State(state.elbowAngle().getRadians(), 0),
                 new State(state.wristAngle().getRadians(), 0)))

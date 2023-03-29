@@ -147,7 +147,7 @@ public class RobotContainer implements Loggable {
   public Supplier<Command> getEnableCommand() {
     return () ->
         Commands.parallel(
-            elevator.setGoal(elevator.getPosition()),
+            // elevator.setGoal(elevator.getPosition()),
             arm.setGoals(arm.getElbowPosition(), arm.getRelativeWristPosition()));
   }
 
