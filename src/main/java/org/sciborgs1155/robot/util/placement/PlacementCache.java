@@ -34,16 +34,17 @@ public class PlacementCache {
     List<Trajectory> trajectories = new ArrayList<Trajectory>();
 
     for (var cachedTrajectory : cache.trajectories) {
+    //   new PlacementState(
+    //     cachedTrajectory.initialPos[0],
+    //     new Rotation2d(cachedTrajectory.initialPos[1]),
+    //     new Rotation2d(cachedTrajectory.initialPos[2])),
+    // new PlacementState(
+    //     cachedTrajectory.finalPos[0],
+    //     new Rotation2d(cachedTrajectory.finalPos[1]),
+    //     new Rotation2d(cachedTrajectory.finalPos[2])),
       trajectories.add(
           new Trajectory(
-              new PlacementState(
-                  cachedTrajectory.initialPos[0],
-                  new Rotation2d(cachedTrajectory.initialPos[1]),
-                  new Rotation2d(cachedTrajectory.initialPos[2])),
-              new PlacementState(
-                  cachedTrajectory.finalPos[0],
-                  new Rotation2d(cachedTrajectory.finalPos[1]),
-                  new Rotation2d(cachedTrajectory.finalPos[2])),
+             
               Arrays.asList(ArrayUtils.toObject(cachedTrajectory.points)),
               cachedTrajectory.totalTime));
     }
