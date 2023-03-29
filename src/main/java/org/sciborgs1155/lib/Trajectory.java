@@ -16,9 +16,7 @@ public class Trajectory {
    *
    * @param states A vector of states.
    */
-  public Trajectory(
-      final List<Double> states,
-      final double totalTime) {
+  public Trajectory(final List<Double> states, final double totalTime) {
     this.states = states;
     this.totalTime = totalTime;
   }
