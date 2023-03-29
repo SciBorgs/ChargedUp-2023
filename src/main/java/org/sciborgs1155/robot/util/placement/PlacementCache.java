@@ -64,11 +64,8 @@ public class PlacementCache {
   /** Generates trajectories between every stored preset */
   public static void main(String... args) throws IOException, InterruptedException {
     System.out.println("Generating...");
-    // for(var x : loadTrajectories()) {
-    // System.out.println(x.totalTime);
-    // }
-    // Generate trajectories between stored presets
 
+    // Generate trajectories between stored presets
     List<CachedTrajectory> generatedTrajectories = new ArrayList<CachedTrajectory>();
     var presets =
         List.of(
