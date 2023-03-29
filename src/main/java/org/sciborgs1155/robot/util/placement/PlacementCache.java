@@ -7,8 +7,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import org.sciborgs1155.lib.trajectory.PositionTrajectory;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.sciborgs1155.lib.Trajectory;
 import org.sciborgs1155.robot.Constants.Positions;
 
 public class PlacementCache {
@@ -16,7 +19,7 @@ public class PlacementCache {
   private static final String cacheRequestFilename = "arm_trajectory_cache_request.json";
 
   /** Reads cached trajectories and returns a list of them */
-  public static List<CachedTrajectory> loadTrajectories() {
+  public static List<Trajectory> loadTrajectories() {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     StoredTrajectory cache;
@@ -27,7 +30,17 @@ public class PlacementCache {
     } catch (IOException e) {
       throw new RuntimeException("Failed to parse");
     }
-    return cache.trajectories;
+
+    List<Trajectory> trajectories = new ArrayList<Trajectory>();
+
+    for(var cachedTrajectory : cache.trajectories) {
+      
+      trajectories.add(
+        new Trajectory(Arrays.asList(ArrayUtils.toObject(cachedTrajectory.points)), cachedTrajectory.totalTime)
+      );
+    }
+
+    return trajectories;
   }
 
   /** Generates trajectories between every stored preset */
@@ -96,7 +109,7 @@ public class PlacementCache {
 
   public static record StoredTrajectory(int id, List<CachedTrajectory> trajectories) {}
 
-  public PositionTrajectory getTrajectory(PlacementState start, PlacementState end) {
-    return null;
-  }
+  // public PositionTrajectory getTrajectory(PlacementState start, PlacementState end) {
+  //   return null;
+  // }
 }
