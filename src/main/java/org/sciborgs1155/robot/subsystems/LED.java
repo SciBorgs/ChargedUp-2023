@@ -37,26 +37,6 @@ public class LED extends SubsystemBase {
     // led2.setLength(Constants.led.led2Length);
     // led2.start();
   }
-
-  public Command setGamePieceColor(GamePiece gamePiece) {
-    if (gamePiece == GamePiece.CUBE) {
-      return Commands.run(() -> GamePieceColors(GamePiece.CUBE), this);
-    } else if (gamePiece == GamePiece.CONE) {
-      return Commands.run(() -> GamePieceColors(GamePiece.CONE), this);
-    } else {
-      // LEDColor matches no standard LEDColor enum
-      return Commands.run(() -> errorLED(), this);
-    }
-  }
-
-  public Command setPatterns(LEDColors desiredColor) {
-    if (desiredColor == LEDColors.RAINBOW) {
-      return Commands.run(() -> LedPatterns(LEDColors.RAINBOW), this);
-    } else {
-      return Commands.run(() -> errorLED(), this);
-    }
-  }
-
   // note: is there a reason that you're using setRGB now instead of setLED?
   // from looking at the source code, it seems like if setRGB works, setLED should work too
 
@@ -99,6 +79,14 @@ public class LED extends SubsystemBase {
         led1.setData(led1Buffer);
       } // for loop
     } // while loop
+    else if (ledColor == LEDColors.AUTO) {
+
+      for (int i = 0; i < led1Buffer.getLength(); i++) {
+        if (i < led1Buffer.getLength() / 2) led1Buffer.setLED(i, Color.kRed);
+        else led1Buffer.setLED(i, Color.kYellow);
+      }
+      led1.setData(led1Buffer);
+    }
   }
 
   public void errorLED() {
@@ -106,5 +94,26 @@ public class LED extends SubsystemBase {
       led1Buffer.setLED(i, Color.kRed);
     }
     led1.setData(led1Buffer);
+  }
+
+  public Command setGamePieceColor(GamePiece gamePiece) {
+    if (gamePiece == GamePiece.CUBE) {
+      return Commands.run(() -> GamePieceColors(GamePiece.CUBE), this);
+    } else if (gamePiece == GamePiece.CONE) {
+      return Commands.run(() -> GamePieceColors(GamePiece.CONE), this);
+    } else {
+      // LEDColor matches no standard LEDColor enum
+      return Commands.run(() -> errorLED(), this);
+    }
+  }
+
+  public Command setPatterns(LEDColors desiredColor) {
+    if (desiredColor == LEDColors.RAINBOW) {
+      return Commands.run(() -> LedPatterns(LEDColors.RAINBOW), this);
+    } else if (desiredColor == LEDColors.AUTO) {
+      return Commands.run(() -> LedPatterns(LEDColors.AUTO));
+    } else {
+      return Commands.run(() -> errorLED(), this);
+    }
   }
 }
