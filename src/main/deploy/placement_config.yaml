@@ -1,7 +1,7 @@
 origin: [ 0.0, 0.5207 ]
 
 solver:
-  interiorPoints: 20
+  interiorPoints: 25
   maxVoltageElbow: 6
   maxVoltageWrist: 5
   maxVoltageLift: 6
