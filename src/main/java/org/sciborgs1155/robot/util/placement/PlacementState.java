@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N3;
+import java.util.List;
 import java.util.Optional;
 import org.sciborgs1155.robot.Constants.Dimensions;
 
@@ -123,6 +124,13 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
         .plus(new Translation2d(Dimensions.CLAW_LENGTH, wristAngle));
   }
 
+  /** Returns the distance between two end effector placement states */
+  public double distance(PlacementState other) {
+    return Math.sqrt(
+        Math.pow(this.endEffectorPosition().getX() - other.endEffectorPosition().getX(), 2)
+            + Math.pow(this.endEffectorPosition().getY() - other.endEffectorPosition().getY(), 2));
+  }
+
   /** Compares the elevator height, elbow angle, and wrist angle given a margin */
   public boolean roughlyEquals(PlacementState other, double margin) {
     return margin < Math.abs(other.elevatorHeight - this.elevatorHeight)
@@ -134,10 +142,21 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
 
   /** Compares the end effector positions of Placement States, given a margin */
   public boolean endRoughlyEquals(PlacementState other, double margin) {
-    return Math.sqrt(
-            Math.pow(this.endEffectorPosition().getX() - other.endEffectorPosition().getX(), 2)
-                + Math.pow(
-                    this.endEffectorPosition().getY() - other.endEffectorPosition().getY(), 2))
-        < margin;
+    return this.distance(other) < margin;
+  }
+
+  /** Finds the closest Placement State to the current State given a list of Placement States */
+  public PlacementState findClosest(List<PlacementState> states) {
+    PlacementState closest = states.size() != 0 ? states.get(0) : null;
+    double difference = Double.POSITIVE_INFINITY;
+    for (int i = 1; i < states.size(); i++) {
+      double currDiff = this.distance(states.get(i));
+      if (currDiff < difference) {
+        difference = currDiff;
+        closest = states.get(i);
+      }
+    }
+
+    return closest;
   }
 }
