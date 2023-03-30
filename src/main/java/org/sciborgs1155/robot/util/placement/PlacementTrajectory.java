@@ -1,6 +1,6 @@
 package org.sciborgs1155.robot.util.placement;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.sciborgs1155.lib.Trajectory;
 
@@ -8,13 +8,12 @@ public record PlacementTrajectory(
     Trajectory elevator, Trajectory elbow, Trajectory wrist, Parameters params) {
 
   public Optional<PlacementTrajectory> findTrajectory(
-      List<PlacementTrajectory> trajectories, PlacementState initialPos, PlacementState endPos) {
-    for (var trajectory : trajectories) {
-      if (trajectory.params.start.roughlyEquals(initialPos, 0.001)
-          && trajectory.params.end.roughlyEquals(endPos, 0.001)) {
-        return Optional.of(trajectory);
-      }
-    }
+      Map<Integer, PlacementTrajectory> trajectories,
+      PlacementState initialPos,
+      PlacementState endPos) {
+
+    int hash = new Parameters(initialPos, endPos).hashCode();
+    if (trajectories.get(hash) != null) return Optional.of(trajectories.get(hash));
     return Optional.empty();
   }
 

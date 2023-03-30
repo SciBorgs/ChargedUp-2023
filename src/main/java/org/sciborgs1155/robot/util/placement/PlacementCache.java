@@ -8,7 +8,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.sciborgs1155.lib.Trajectory;
 import org.sciborgs1155.robot.Constants.Positions;
 
@@ -17,7 +19,7 @@ public class PlacementCache {
   private static final String cacheRequestFilename = "arm_trajectory_cache_request.json";
 
   /** Reads cached trajectories and returns a list of them */
-  public static List<PlacementTrajectory> loadTrajectories() {
+  public static Map<Integer, PlacementTrajectory> loadTrajectories() {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     StoredTrajectory cache;
@@ -29,7 +31,7 @@ public class PlacementCache {
       throw new RuntimeException("Failed to parse");
     }
 
-    List<PlacementTrajectory> trajectories = new ArrayList<PlacementTrajectory>();
+    Map<Integer, PlacementTrajectory> trajectories = new HashMap<Integer, PlacementTrajectory>();
 
     for (var cachedTrajectory : cache.trajectories) {
       List<Double> elevatorStates = new ArrayList<Double>();
@@ -42,20 +44,24 @@ public class PlacementCache {
         wristStates.add(cachedTrajectory.points()[i + 2]);
       }
 
-      trajectories.add(
+      PlacementTrajectory.Parameters params =
+          new PlacementTrajectory.Parameters(
+              new PlacementState(
+                  cachedTrajectory.initialPos[0],
+                  new Rotation2d(cachedTrajectory.initialPos[1]),
+                  new Rotation2d(cachedTrajectory.initialPos[2])),
+              new PlacementState(
+                  cachedTrajectory.finalPos[0],
+                  new Rotation2d(cachedTrajectory.finalPos[1]),
+                  new Rotation2d(cachedTrajectory.finalPos[2])));
+
+      trajectories.put(
+          params.hashCode(),
           new PlacementTrajectory(
               new Trajectory(elevatorStates, cachedTrajectory.totalTime),
               new Trajectory(elbowStates, cachedTrajectory.totalTime),
               new Trajectory(wristStates, cachedTrajectory.totalTime),
-              new PlacementTrajectory.Parameters(
-                  new PlacementState(
-                      cachedTrajectory.initialPos[0],
-                      new Rotation2d(cachedTrajectory.initialPos[1]),
-                      new Rotation2d(cachedTrajectory.initialPos[2])),
-                  new PlacementState(
-                      cachedTrajectory.finalPos[0],
-                      new Rotation2d(cachedTrajectory.finalPos[1]),
-                      new Rotation2d(cachedTrajectory.finalPos[2])))));
+              params));
     }
 
     return trajectories;
@@ -109,13 +115,13 @@ public class PlacementCache {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     int id = (int) (Math.random() * 10000);
-    // TODO: add actual checks
 
     File cacheFile = Path.of(System.getProperty("java.io.tmpdir"), cacheRequestFilename).toFile();
     mapper.writeValue(cacheFile, new StoredTrajectory(id, generatedTrajectories));
   }
 
   public static record CachedTrajectory(
+      // String hashId,
       double[] initialPos,
       double[] finalPos,
       String[] constraintOverrides,
