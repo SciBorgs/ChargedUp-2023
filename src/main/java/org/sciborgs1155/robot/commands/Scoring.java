@@ -77,15 +77,12 @@ public final class Scoring implements Sendable {
       int tagID = vision.getBestTarget().getFiducialId();
 
       Translation2d scorePoint = new Translation2d();
-      if(gamePiece.CONE.equals(GamePiece.CONE)){
+      if (gamePiece.CONE.equals(GamePiece.CONE)) {
         scorePoint = SCORING_POINTS_CONE.get(tagID);
-      }
-      else if(gamePiece.CUBE.equals(GamePiece.CUBE)){
+      } else if (gamePiece.CUBE.equals(GamePiece.CUBE)) {
         scorePoint = SCORING_POINTS_CUBE.get(tagID);
-      }
-      else{
-        if(tagID < 4)
-        scorePoint = INTAKE_POINTS.get(tagID);
+      } else {
+        if (tagID < 4) scorePoint = INTAKE_POINTS.get(tagID);
       }
       return new Pose2d(scorePoint, Rotation2d.fromRadians(side.rads() % (2 * Math.PI)));
     }
