@@ -8,12 +8,9 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
@@ -27,6 +24,7 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Trajectory;
+import org.sciborgs1155.lib.Trajectory.State;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.util.Visualizer;
@@ -50,8 +48,10 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   @Log(name = "at setpoint", methodName = "atSetpoint")
   private final PIDController pid = new PIDController(PID.p(), PID.i(), PID.d());
 
-  @Log(methodName = "getData")
-  private Vector<N3> setpoint;
+  @Log(name = "position setpoint", methodName = "position")
+  @Log(name = "velocity setpoint", methodName = "velocity")
+  @Log(name = "acceleration setpoint", methodName = "acceleration")
+  private State setpoint;
 
   private final LinearFilter filter = LinearFilter.movingAverage(SAMPLE_SIZE_TAPS);
 
@@ -95,7 +95,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     this.positionVisualizer = positionVisualizer;
     this.setpointVisualizer = setpointVisualizer;
 
-    setpoint = VecBuilder.fill(getPosition(), 0, 0);
+    setpoint = new State(getPosition(), 0, 0);
   }
 
   /** Returns the height of the elevator, in meters */
@@ -104,66 +104,61 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     return encoder.getDistance() + offset;
   }
 
-  /** Returns the goal of the elevator, in meters */
-  public boolean atSetpoint() {
-    return pid.atSetpoint();
-  }
-
   /** Sets the elevator's setpoint height */
-  public void setSetpoint(Vector<N3> state) {
+  public void setSetpoint(State state) {
     setpoint = state;
-  }
-
-  /** Returns a trapezoid profile state from our current setpoint */
-  public TrapezoidProfile.State getTrapezoidSetpoint() {
-    return new TrapezoidProfile.State(setpoint.get(0, 0), setpoint.get(1, 0));
   }
 
   /** Follows a {@link TrapezoidProfile} to the desired height */
   public Command followProfile(double height) {
     var goal = new TrapezoidProfile.State(height, 0);
     var accel = new Derivative();
-    return run(() -> {
-          var profile = new TrapezoidProfile(CONSTRAINTS, goal, getTrapezoidSetpoint());
-          var setpoint = profile.calculate(pid.getPeriod());
-          this.setpoint =
-              VecBuilder.fill(
-                  setpoint.position, setpoint.velocity, accel.calculate(setpoint.velocity));
-        })
-        .until(() -> atSetpoint() && goal.equals(getTrapezoidSetpoint()));
+
+    return runOnce(accel::reset)
+        .andThen(
+            run(
+                () -> {
+                  var profile = new TrapezoidProfile(CONSTRAINTS, goal, setpoint.trapezoidState());
+                  var setpoint = profile.calculate(pid.getPeriod());
+                  setSetpoint(
+                      new State(
+                          setpoint.position,
+                          setpoint.velocity,
+                          accel.calculate(setpoint.velocity)));
+                }))
+        .until(() -> pid.atSetpoint() && goal.equals(setpoint.trapezoidState()));
   }
 
   /** Follows a {@link Trajectory}, representing an arbitrary trajectory of position setpoints */
   public Command followTrajectory(Trajectory trajectory) {
     Timer timer = new Timer();
     return runOnce(timer::start)
-        .andThen(
-            run(() -> setpoint = trajectory.sample(timer.get()))
-                .until(() -> timer.hasElapsed(trajectory.getTotalTime())));
+        .andThen(run(() -> setSetpoint(trajectory.sample(timer.get()))))
+        .until(() -> timer.hasElapsed(trajectory.getTotalTime()));
   }
 
   @Override
   public void periodic() {
     double position =
         MathUtil.clamp(
-            setpoint.get(0, 0), Dimensions.ELEVATOR_MIN_HEIGHT, Dimensions.ELEVATOR_MAX_HEIGHT);
+            setpoint.position(), Dimensions.ELEVATOR_MIN_HEIGHT, Dimensions.ELEVATOR_MAX_HEIGHT);
 
     double fbOutput = pid.calculate(getPosition(), position);
-    double ffOutput = ff.calculate(setpoint.get(1, 0), setpoint.get(2, 0));
+    double ffOutput = ff.calculate(setpoint.velocity(), setpoint.acceleration());
 
     lead.setVoltage(fbOutput + ffOutput);
 
     hasSpiked = filter.calculate(lead.getOutputCurrent()) >= CURRENT_SPIKE_THRESHOLD;
 
     positionVisualizer.setElevatorHeight(getPosition());
-    setpointVisualizer.setElevatorHeight(setpoint.get(0, 0));
+    setpointVisualizer.setElevatorHeight(setpoint.position());
   }
 
   @Override
   public void simulationPeriodic() {
     sim.setInputVoltage(lead.getAppliedOutput());
     sim.update(Constants.RATE);
-    simEncoder.setDistance(sim.getPositionMeters());
+    simEncoder.setDistance(sim.getPositionMeters() - offset);
     simEncoder.setRate(sim.getVelocityMetersPerSecond());
   }
 

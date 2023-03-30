@@ -1,15 +1,20 @@
 package org.sciborgs1155.lib;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import java.util.List;
 
 /** A generalized trajectory based off [position velocity] states. */
 public class Trajectory {
   private final List<Double> states;
   private final double totalTime;
+
+  public record State(double position, double velocity, double acceleration) {
+
+    public TrapezoidProfile.State trapezoidState() {
+      return new TrapezoidProfile.State(position, velocity);
+    }
+  }
 
   /**
    * Constructs a trajectory from a vector of states.
@@ -34,7 +39,7 @@ public class Trajectory {
   }
 
   /** Samples from the trajectory, returning a */
-  public Vector<N3> sample(double time) {
+  public State sample(double time) {
     double dt = totalTime / (states.size() - 1);
 
     // surrounding indices
@@ -64,7 +69,7 @@ public class Trajectory {
     }
 
     // return state vector
-    return VecBuilder.fill(position, velocity, acceleration);
+    return new State(position, velocity, acceleration);
   }
 
   /** Checks if the trajectory is within the tolerance of another one */

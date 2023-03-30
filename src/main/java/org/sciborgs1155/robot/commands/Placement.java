@@ -2,7 +2,6 @@ package org.sciborgs1155.robot.commands;
 
 import static org.sciborgs1155.robot.Constants.Positions.*;
 
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -38,9 +37,7 @@ public final class Placement {
   public Command toState(PlacementState state) {
     return Commands.parallel(
             elevator.followProfile(state.elevatorHeight()),
-            arm.runToGoals(
-                new State(state.elbowAngle().getRadians(), 0),
-                new State(state.wristAngle().getRadians(), 0)))
+            arm.followProfile(state.elbowAngle(), state.wristAngle()))
         .withName("placement to state");
   }
 
