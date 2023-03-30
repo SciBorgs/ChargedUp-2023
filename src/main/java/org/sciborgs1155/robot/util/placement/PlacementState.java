@@ -145,6 +145,7 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
     return this.distance(other) < margin;
   }
 
+  /** Finds the closest Placement State to the current State given a list of Placement States */
   public PlacementState findClosest(List<PlacementState> states) {
     PlacementState closest = states.size() != 0 ? states.get(0) : null;
     double difference = Double.POSITIVE_INFINITY;

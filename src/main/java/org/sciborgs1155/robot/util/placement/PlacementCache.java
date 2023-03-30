@@ -123,9 +123,4 @@ public class PlacementCache {
       double[] points) {}
 
   public static record StoredTrajectory(int id, List<CachedTrajectory> trajectories) {}
-
-  // public PositionTrajectory getTrajectory(PlacementState start, PlacementState
-  // end) {
-  // return null;
-  // }
 }
