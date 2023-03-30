@@ -32,7 +32,8 @@ public final class Scoring implements Sendable {
 
   public enum GamePiece {
     CONE,
-    CUBE;
+    CUBE,
+    NONE;
   }
 
   public enum Level {
@@ -74,7 +75,18 @@ public final class Scoring implements Sendable {
   private Pose2d closestScoringPoint(Side side, Vision vision, GamePiece gamePiece) {
     if (vision.hasTargets()) {
       int tagID = vision.getBestTarget().getFiducialId();
-      Translation2d scorePoint = SCORING_POINTS.get(tagID);
+
+      Translation2d scorePoint = new Translation2d();
+      if(gamePiece.CONE.equals(GamePiece.CONE)){
+        scorePoint = SCORING_POINTS_CONE.get(tagID);
+      }
+      else if(gamePiece.CUBE.equals(GamePiece.CUBE)){
+        scorePoint = SCORING_POINTS_CUBE.get(tagID);
+      }
+      else{
+        if(tagID < 4)
+        scorePoint = INTAKE_POINTS.get(tagID);
+      }
       return new Pose2d(scorePoint, Rotation2d.fromRadians(side.rads() % (2 * Math.PI)));
     }
     return new Pose2d();
@@ -106,6 +118,8 @@ public final class Scoring implements Sendable {
       case HIGH -> switch (gamePiece) {
         case CONE -> BACK_HIGH_CONE;
         case CUBE -> side == Side.FRONT ? FRONT_HIGH_CUBE : BACK_HIGH_CUBE;
+        case NONE -> throw new UnsupportedOperationException("Unimplemented case: " + gamePiece);
+        default -> throw new IllegalArgumentException("Unexpected value: " + gamePiece);
       };
       case SINGLE_SUBSTATION -> switch (gamePiece) {
         case CONE -> FRONT_SINGLE_SUBSTATION_CONE;

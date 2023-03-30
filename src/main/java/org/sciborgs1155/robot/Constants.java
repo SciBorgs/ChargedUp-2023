@@ -315,18 +315,29 @@ public final class Constants {
             Map.entry(3, new Translation2d(5, 4)),
             Map.entry(4, new Translation2d(5, 5)));
 
-    public static final Map<Integer, Translation2d> SCORING_POINTS =
+    public static final Map<Integer, Translation2d> SCORING_POINTS_CUBE =
         Map.ofEntries(
             Map.entry(1, new Translation2d(1, 2)),
             Map.entry(2, new Translation2d(1, 3)),
             Map.entry(3, new Translation2d(1, 4)),
-            Map.entry(4, new Translation2d(1, 5)),
-            Map.entry(5, new Translation2d(1, 6)),
-            Map.entry(6, new Translation2d(1, 7)),
-            Map.entry(7, new Translation2d(1, 8)),
-            Map.entry(8, new Translation2d(1, 9)),
-            Map.entry(9, new Translation2d(1, 10)));
-
+            Map.entry(1, new Translation2d(1, 2)),
+            Map.entry(2, new Translation2d(1, 3)),
+            Map.entry(3, new Translation2d(1, 4)),
+            Map.entry(1, new Translation2d(1, 2)),
+            Map.entry(2, new Translation2d(1, 3)),
+            Map.entry(3, new Translation2d(1, 4))
+        );
+    public static final Map<Integer, Translation2d> SCORING_POINTS_CONE =
+        Map.ofEntries(
+          Map.entry(1, new Translation2d(2, 2)),
+          Map.entry(2, new Translation2d(2, 3)),
+          Map.entry(3, new Translation2d(2, 4)),
+          Map.entry(4, new Translation2d(1, 2)),
+          Map.entry(5, new Translation2d(1, 3)),
+          Map.entry(6, new Translation2d(1, 4)),
+          Map.entry(8, new Translation2d(1, 4)),
+          Map.entry(9, new Translation2d(2, 4))
+        );
     public static final Map<Integer, Translation2d> BALANCE_POINTS =
         Map.ofEntries(Map.entry(1, new Translation2d(3, 5)), Map.entry(2, new Translation2d(1, 5)));
   }
