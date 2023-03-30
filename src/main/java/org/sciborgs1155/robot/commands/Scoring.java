@@ -11,12 +11,10 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.LED;
 import org.sciborgs1155.robot.util.PlacementState;
+import org.sciborgs1155.robot.util.Vision;
 
 public final class Scoring implements Sendable {
 
@@ -68,14 +66,20 @@ public final class Scoring implements Sendable {
   }
 
   // TODO make it take gamePiece into account
-  public Command odometryAlign(Side side) {
-    return drive.driveToPose(drive.getPose(), closestScoringPoint(side), true);
+  public Command odometryAlign(Side side, Vision vision, GamePiece gamePiece) {
+    return drive.driveToPose(drive.getPose(), closestScoringPoint(side, vision, gamePiece), true);
   }
 
   // TODO make commands to go to the next scoring poses to the left and right
-
-  // TODO vision alignment
-
+  private Pose2d closestScoringPoint(Side side, Vision vision, GamePiece gamePiece) {
+    if (vision.hasTargets()) {
+      int tagID = vision.getBestTarget().getFiducialId();
+      Translation2d scorePoint = SCORING_POINTS.get(tagID);
+      return new Pose2d(scorePoint, Rotation2d.fromRadians(side.rads() % (2 * Math.PI)));
+    }
+    return new Pose2d();
+  }
+  /*
   private Pose2d closestScoringPoint(Side side) {
     Collection<Translation2d> scoringPoints = SCORING_POINTS.values();
     Translation2d point =
@@ -83,9 +87,10 @@ public final class Scoring implements Sendable {
             .getPose()
             .getTranslation()
             .nearest(new ArrayList<Translation2d>(List.copyOf(scoringPoints)));
-    double rotationRad = (side.rads() /* TODO use path planner flip color.rads()*/) % (2 * Math.PI);
+    double rotationRad = (side.rads()  TODO use path planner flip color.rads()) % (2 * Math.PI);
     return new Pose2d(point, Rotation2d.fromRadians(rotationRad));
   }
+  */
 
   public Command goTo(Level height) {
     return new ProxyCommand(() -> placement.safeToState(scoringState(height)));

@@ -23,6 +23,7 @@ import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.subsystems.LED;
+import org.sciborgs1155.robot.subsystems.LED.LEDColors;
 import org.sciborgs1155.robot.util.Vision;
 import org.sciborgs1155.robot.util.Visualizer;
 
@@ -98,6 +99,8 @@ public class RobotContainer implements Loggable {
   }
 
   private void configureSubsystemDefaults() {
+    led.setDefaultCommand(led.setPatterns(LEDColors.RAINBOW));
+
     drive.setDefaultCommand(
         drive
             .drive(

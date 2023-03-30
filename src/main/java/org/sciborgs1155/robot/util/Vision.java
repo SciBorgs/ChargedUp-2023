@@ -11,6 +11,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -110,11 +111,14 @@ public class Vision {
 
   /** Use hasTargets() before calling */
   // note that getBestTarget() isn't updated to support apriltags
-  public PhotonTrackedTarget[] getBestTarget() {
+  public PhotonTrackedTarget getBestTarget() {
     return Stream.of(frontCam, backCam)
         .map(PhotonCamera::getLatestResult)
         .map(PhotonPipelineResult::getBestTarget)
-        .toArray(PhotonTrackedTarget[]::new);
+        .toList()
+        .stream()
+        .sorted(Comparator.comparingDouble(PhotonTrackedTarget::getPoseAmbiguity))
+        .toArray(PhotonTrackedTarget[]::new)[0];
   }
 
   /* Gets estimated pose from vision measurements */
