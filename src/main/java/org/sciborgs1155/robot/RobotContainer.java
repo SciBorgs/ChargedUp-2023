@@ -67,32 +67,34 @@ public class RobotContainer implements Loggable {
     // Configure the oblog logger
     Logger.configureLoggingAndConfig(this, false);
     // Configure auto chooser options
-    configureAutoChoosers();
+    configureAutoChooser();
     // Configure the trigger bindings
     configureBindings();
     // Configure subsystem default commands
     configureSubsystemDefaults();
   }
 
-  private void configureAutoChoosers() {
-    // autoChooser.addOption("balance", autos::justBalance);
-    autoChooser.addOption("balance (no ppl)", autos::balanceNoPPL);
-    autoChooser.addOption("high cone", autos::highConeScore);
-    autoChooser.addOption("back high cube", autos::backHighCubeScore);
-    autoChooser.addOption("front high cube", autos::frontHighCubeScore);
-    autoChooser.addOption("back high cube -> intake", autos::cubeIntake);
-    autoChooser.addOption("score cone, score cube, engage", autos::coneCubeEngage);
-    autoChooser.addOption("score cone, score cube, intake", autos::coneCubeIntake);
-    autoChooser.addOption("back high cube -> engage", autos::cubeBalance);
-    autoChooser.setDefaultOption("high cone -> leave comm", autos::coneLeave);
-    autoChooser.addOption("back high cube -> leave comm", autos::cubeLeave);
-    // autoChooser.addOption("no ppl: back high cone/cube -> leave comm", autos::scoreLeaveNoPPL);
-    autoChooser.addOption("none", Commands::none);
-    autoChooser.addOption("cube balance NO PPL", autos::scoreBalanceNoPPL);
+  private void configureAutoChooser() {
+    // ambitious path
+    autoChooser.addOption("2 gamepiece", autos::twoGamepiece);
 
+    // simple balances (no PPL)
+    autoChooser.addOption("balance", autos::balance);
+    autoChooser.addOption("cube balance", autos::cubeBalance);
+    autoChooser.addOption("cone balance", autos::coneBalance);
+
+    // simple scoring
+    autoChooser.addOption("cone -> leave", autos::coneLeave);
+    autoChooser.addOption("cube -> leave", autos::cubeLeave);
+
+    // backups
     autoChooser.addOption("backup (no drive): cube score", autos::backHighCubeScore);
     autoChooser.addOption("backup (no drive): cone score", autos::highConeScore);
-    autoChooser.addOption("backup (no odometry): cone leave", autos::coneLeaveNoOdometry);
+    autoChooser.addOption("backup (no odometry): cone -> leave", autos::coneLeaveNoOdometry);
+    autoChooser.addOption("backup (no arm): leave", autos::leave);
+
+    // ultimate backup
+    autoChooser.addOption("none", Commands::none);
   }
 
   private void configureSubsystemDefaults() {
