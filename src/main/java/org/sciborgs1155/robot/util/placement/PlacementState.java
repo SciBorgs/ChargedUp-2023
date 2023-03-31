@@ -1,11 +1,8 @@
 package org.sciborgs1155.robot.util.placement;
 
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.numbers.N3;
 import java.util.Optional;
 import org.sciborgs1155.robot.Constants.Dimensions;
 
@@ -40,14 +37,16 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
         elevatorHeight, Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle));
   }
 
-  /** Creates a PlacementState from an absolute 3d vector */
-  public static PlacementState fromVec(Vector<N3> state) {
-    return fromAbsolute(state.get(0, 0), state.get(1, 0), state.get(2, 0));
+  /** Creates a PlacementState from an absolute 3d array */
+  public static PlacementState fromArray(double[] state) {
+    return fromAbsolute(state[0], state[1], state[2]);
   }
 
-  /** Returns a 6d vector representation of the state */
-  public Vector<N3> toVec() {
-    return VecBuilder.fill(elevatorHeight, elbowAngle.getRadians(), wristAngle.getRadians());
+  /** Returns an array representation of the absolute state */
+  public double[] toArray() {
+    return new double[] {
+      elevatorHeight, elbowAngle.getRadians(), wristAngle.getRadians() + elbowAngle.getRadians()
+    };
   }
 
   /** The side of the robot the arm is on */

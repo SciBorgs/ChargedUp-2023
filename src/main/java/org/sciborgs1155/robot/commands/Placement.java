@@ -5,7 +5,6 @@ import static org.sciborgs1155.robot.Constants.Positions.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.sciborgs1155.robot.subsystems.Arm;
@@ -22,25 +21,15 @@ public final class Placement {
   private final Arm arm;
   private final Elevator elevator;
 
-  private final Map<Integer, PlacementTrajectory> trajectories =
-      new HashMap<Integer, PlacementTrajectory>();
+  private final Map<Integer, PlacementTrajectory> trajectories = PlacementCache.loadTrajectories();
 
   public Placement(Arm arm, Elevator elevator) {
     this.arm = arm;
     this.elevator = elevator;
-    for (var trajectory : PlacementCache.loadTrajectories().entrySet()) {
-      trajectories.put(trajectory.getKey(), trajectory.getValue());
-    }
   }
 
   public Optional<PlacementTrajectory> findTrajectory(Parameters params) {
-    int hash = params.hashCode();
-    // System.out.println(hash);
-    // for(var traj : trajectories.entrySet()) {
-    //   System.out.println(traj.getKey());
-    // }
-    if (trajectories.get(hash) != null) return Optional.of(trajectories.get(hash));
-    return Optional.empty();
+    return Optional.ofNullable(trajectories.get(params.hashCode()));
   }
 
   public PlacementState state() {

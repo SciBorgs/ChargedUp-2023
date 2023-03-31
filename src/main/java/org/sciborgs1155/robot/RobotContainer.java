@@ -27,6 +27,7 @@ import org.sciborgs1155.robot.subsystems.LED;
 import org.sciborgs1155.robot.subsystems.LED.LEDColors;
 import org.sciborgs1155.robot.util.Vision;
 import org.sciborgs1155.robot.util.Visualizer;
+import org.sciborgs1155.robot.util.placement.PlacementTrajectory;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -163,10 +164,10 @@ public class RobotContainer implements Loggable {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // var p =
-    //     new Parameters(Constants.Positions.STOW,
-    // Constants.Positions.FRONT_SINGLE_SUBSTATION_CONE);
-    // return placement.followTrajectory(p);
-    return autoChooser.getSelected().get();
+    var p =
+        new PlacementTrajectory.Parameters(
+            Constants.Positions.INITIAL, Constants.Positions.BACK_HIGH_CONE);
+    return placement.followTrajectory(p);
+    // return autoChooser.getSelected().get();
   }
 }

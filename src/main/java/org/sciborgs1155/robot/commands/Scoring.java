@@ -13,8 +13,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.LED;
-import org.sciborgs1155.robot.util.placement.PlacementState;
 import org.sciborgs1155.robot.util.Vision;
+import org.sciborgs1155.robot.util.placement.PlacementState;
 
 public final class Scoring implements Sendable {
 
