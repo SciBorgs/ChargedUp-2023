@@ -1,4 +1,4 @@
-package org.sciborgs1155.lib;
+package org.sciborgs1155.robot.util;
 
 import static org.sciborgs1155.robot.Constants.Vision.*;
 
@@ -11,12 +11,15 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.SimVisionSystem;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.sciborgs1155.robot.Robot;
 
@@ -102,35 +105,20 @@ public class Vision {
     }
   }
 
-  private double[] createObjects(Pose3d[] scopeTags) {
-    double[] data = new double[scopeTags.length * 7];
-    for (int i = 0; i < scopeTags.length; i++) {
-      data[i * 7] = scopeTags[i].getX();
-      data[i * 7 + 1] = scopeTags[i].getY();
-      data[i * 7 + 2] = scopeTags[i].getZ();
-      data[i * 7 + 3] = scopeTags[i].getRotation().getQuaternion().getW();
-      data[i * 7 + 4] = scopeTags[i].getRotation().getQuaternion().getX();
-      data[i * 7 + 5] = scopeTags[i].getRotation().getQuaternion().getY();
-      data[i * 7 + 6] = scopeTags[i].getRotation().getQuaternion().getZ();
-    }
-    return data;
+  public boolean hasTargets() {
+    return frontCam.getLatestResult().hasTargets() || backCam.getLatestResult().hasTargets();
   }
 
-  /** Determines which tags are in view, if any (for advantagescope) */
-  private Pose3d[] determineSeenTags(PhotonCamera cam, AprilTagFieldLayout layout) {
-    return cam.getLatestResult().getTargets().stream()
-        .filter(target -> target.getFiducialId() != -1)
-        .map(PhotonTrackedTarget::getFiducialId)
-        .map(layout::getTagPose)
-        .map(Optional::get)
-        .toArray(Pose3d[]::new);
-  }
-
-  public void updateSeenTags() {
-    SmartDashboard.putNumberArray(
-        "visible front tags", createObjects(determineSeenTags(frontCam, layout)));
-    SmartDashboard.putNumberArray(
-        "visible back tags", createObjects(determineSeenTags(backCam, layout)));
+  /** Use hasTargets() before calling */
+  // note that getBestTarget() isn't updated to support apriltags
+  public PhotonTrackedTarget getBestTarget() {
+    return Stream.of(frontCam, backCam)
+        .map(PhotonCamera::getLatestResult)
+        .map(PhotonPipelineResult::getBestTarget)
+        .toList()
+        .stream()
+        .sorted(Comparator.comparingDouble(PhotonTrackedTarget::getPoseAmbiguity))
+        .toArray(PhotonTrackedTarget[]::new)[0];
   }
 
   /* Gets estimated pose from vision measurements */
@@ -147,5 +135,62 @@ public class Vision {
         .map(PhotonPoseEstimator::update)
         .flatMap(Optional::stream)
         .toArray(EstimatedRobotPose[]::new);
+    // var frontCamEstimate =
+    //     frontEstimator.update(
+    //         new PhotonPipelineResult(
+    //             frontCam.getLatestResult().getLatencyMillis(),
+    //             filterTargets(frontCam)));
+    // var backCamEstimate =
+    //     backEstimator.update(
+    //         new PhotonPipelineResult(
+    //             backCam.getLatestResult().getLatencyMillis(),
+    //             filterTargets(backCam)));
+    // return new EstimatedRobotPose[] {frontCamEstimate.get(), backCamEstimate.get()};
+  }
+
+  private List<PhotonTrackedTarget> filterTargets(PhotonCamera cam) {
+    return filterTargets(cam.getLatestResult().getTargets());
+  }
+
+  /** Filter out tags that are too ambiguous */
+  private List<PhotonTrackedTarget> filterTargets(List<PhotonTrackedTarget> targets) {
+    double inaccThreshold = 0.12;
+    for (PhotonTrackedTarget target : targets) {
+      if (target.getPoseAmbiguity() > inaccThreshold) {
+        targets.remove(target);
+      }
+    }
+    return targets;
+  }
+
+  public void updateSeenTags() {
+    SmartDashboard.putNumberArray(
+        "visible front tags", createObjects(determineSeenTags(frontCam, layout)));
+    SmartDashboard.putNumberArray(
+        "visible back tags", createObjects(determineSeenTags(backCam, layout)));
+  }
+
+  /** Determines which tags are in view, if any (for advantagescope) */
+  private Pose3d[] determineSeenTags(PhotonCamera cam, AprilTagFieldLayout layout) {
+    return cam.getLatestResult().getTargets().stream()
+        .filter(target -> target.getFiducialId() != -1)
+        .map(PhotonTrackedTarget::getFiducialId)
+        .map(layout::getTagPose)
+        .map(Optional::get)
+        .toArray(Pose3d[]::new);
+  }
+
+  private double[] createObjects(Pose3d[] poses) {
+    double[] data = new double[poses.length * 7];
+    for (int i = 0; i < poses.length; i++) {
+      data[i * 7] = poses[i].getX();
+      data[i * 7 + 1] = poses[i].getY();
+      data[i * 7 + 2] = poses[i].getZ();
+      data[i * 7 + 3] = poses[i].getRotation().getQuaternion().getW();
+      data[i * 7 + 4] = poses[i].getRotation().getQuaternion().getX();
+      data[i * 7 + 5] = poses[i].getRotation().getQuaternion().getY();
+      data[i * 7 + 6] = poses[i].getRotation().getQuaternion().getZ();
+    }
+    return data;
   }
 }

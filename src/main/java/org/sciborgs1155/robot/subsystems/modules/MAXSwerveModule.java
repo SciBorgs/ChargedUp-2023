@@ -28,12 +28,11 @@ public class MAXSwerveModule implements SwerveModule {
   private final SparkMaxPIDController turnFeedback;
 
   private final SimpleMotorFeedforward driveFeedforward =
-      new SimpleMotorFeedforward(Driving.kS, Driving.kV, Driving.kA);
+      new SimpleMotorFeedforward(Driving.FF.s(), Driving.FF.v(), Driving.FF.a());
 
   private final Rotation2d angularOffset;
 
   private SwerveModuleState setpoint = new SwerveModuleState();
-  ;
 
   /**
    * Constructs a SwerveModule for rev's MAX Swerve.
@@ -55,18 +54,20 @@ public class MAXSwerveModule implements SwerveModule {
     driveFeedback.setFeedbackDevice(driveEncoder);
     turnFeedback.setFeedbackDevice(turningEncoder);
 
-    // turningEncoder.setInverted(Turning.ENCODER_INVERTED);
+    turningEncoder.setInverted(Turning.ENCODER_INVERTED);
 
-    Driving.PID.set(driveFeedback);
-    Turning.PID.set(turnFeedback);
+    setDrivePID(Driving.PID);
+    setTurnPID(Turning.PID);
 
-    Driving.CONVERSION.configureSparkFactors(driveEncoder);
-    Turning.CONVERSION.configureSparkFactors(turningEncoder);
+    driveEncoder.setPositionConversionFactor(Driving.CONVERSION.factor());
+    driveEncoder.setVelocityConversionFactor(Driving.CONVERSION.factor() / 60.0);
+    turningEncoder.setPositionConversionFactor(Turning.CONVERSION.factor());
+    turningEncoder.setVelocityConversionFactor(Turning.CONVERSION.factor() / 60.0);
 
     // set up continuous input for turning
     turnFeedback.setPositionPIDWrappingEnabled(true);
-    turnFeedback.setPositionPIDWrappingMinInput(Turning.MIN_INPUT);
-    turnFeedback.setPositionPIDWrappingMaxInput(Turning.MAX_INPUT);
+    turnFeedback.setPositionPIDWrappingMinInput(0);
+    turnFeedback.setPositionPIDWrappingMaxInput(Turning.CONVERSION.factor());
 
     driveMotor.burnFlash();
     turnMotor.burnFlash();
@@ -104,7 +105,6 @@ public class MAXSwerveModule implements SwerveModule {
         SwerveModuleState.optimize(
             correctedDesiredState, Rotation2d.fromRadians(turningEncoder.getPosition()));
 
-    // setpoint = desiredState;
     double driveFF = driveFeedforward.calculate(setpoint.speedMetersPerSecond);
     driveFeedback.setReference(setpoint.speedMetersPerSecond, ControlType.kVelocity, 0, driveFF);
     turnFeedback.setReference(setpoint.angle.getRadians(), ControlType.kPosition);
@@ -122,11 +122,15 @@ public class MAXSwerveModule implements SwerveModule {
 
   @Override
   public void setTurnPID(PIDConstants constants) {
-    constants.set(turnFeedback);
+    turnFeedback.setP(constants.p());
+    turnFeedback.setI(constants.i());
+    turnFeedback.setD(constants.d());
   }
 
   @Override
   public void setDrivePID(PIDConstants constants) {
-    constants.set(driveFeedback);
+    driveFeedback.setP(constants.p());
+    driveFeedback.setI(constants.i());
+    driveFeedback.setD(constants.d());
   }
 }

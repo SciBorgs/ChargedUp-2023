@@ -1,0 +1,98 @@
+{
+  "waypoints": [
+    {
+      "anchorPoint": {
+        "x": 1.83,
+        "y": 0.4946653701809754
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.1561267303784613,
+        "y": 0.6485654245088621
+      },
+      "holonomicAngle": 0.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "initialIntake",
+          "backHighCone",
+          "outtakeCone"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 7.162338515649254,
+        "y": 0.9167317101995316
+      },
+      "prevControl": {
+        "x": 7.172776349024921,
+        "y": 0.9054240573758918
+      },
+      "nextControl": {
+        "x": 7.172776349024921,
+        "y": 0.9054240573758918
+      },
+      "holonomicAngle": 0.0,
+      "isReversal": true,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": true,
+      "stopEvent": {
+        "names": [
+          "initialIntake"
+        ],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 1.83,
+        "y": 1.06
+      },
+      "prevControl": {
+        "x": 2.743484384260435,
+        "y": 0.7090568467248044
+      },
+      "nextControl": null,
+      "holonomicAngle": 0.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "outtakeCube"
+        ],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    }
+  ],
+  "maxVelocity": null,
+  "maxAcceleration": 8.0,
+  "isReversed": null,
+  "markers": [
+    {
+      "position": 0.3199218749999999,
+      "names": [
+        "frontIntake"
+      ]
+    },
+    {
+      "position": 1.2832031250000004,
+      "names": [
+        "backHighCube"
+      ]
+    }
+  ]
+}

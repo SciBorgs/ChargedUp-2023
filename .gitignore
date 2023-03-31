@@ -2,12 +2,13 @@
 # If you remove items from this file, intellisense might break.
 
 # python venv
+__pycache__/
 include/
-optimization/lib*
-
+venv
 
 # log files
 *.wpilog
+
 
 ### C++ ###
 # Prerequisites
@@ -153,6 +154,7 @@ gradle-app.setting
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
 !photonvision-settings960x544.zip
+!photonvision-settings960x544atomic.zip
 
 # Cache of project
 .gradletasknamecache

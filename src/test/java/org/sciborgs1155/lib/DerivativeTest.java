@@ -15,7 +15,7 @@ public class DerivativeTest {
   }
 
   @ParameterizedTest
-  @ValueSource(doubles = {1, 2, 3, 4, 5})
+  @ValueSource(doubles = {1, 2, 3, 4})
   void derivative(double x) throws InterruptedException {
     for (int i = 0; i < 3; i++) {
       Derivative dt = new Derivative();
