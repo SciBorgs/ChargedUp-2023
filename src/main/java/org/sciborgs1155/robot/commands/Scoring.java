@@ -32,8 +32,7 @@ public final class Scoring implements Sendable {
 
   public enum GamePiece {
     CONE,
-    CUBE,
-    NONE;
+    CUBE;
   }
 
   public enum Level {
@@ -115,7 +114,6 @@ public final class Scoring implements Sendable {
       case HIGH -> switch (gamePiece) {
         case CONE -> BACK_HIGH_CONE;
         case CUBE -> side == Side.FRONT ? FRONT_HIGH_CUBE : BACK_HIGH_CUBE;
-        case NONE -> throw new UnsupportedOperationException("Unimplemented case: " + gamePiece);
         default -> throw new IllegalArgumentException("Unexpected value: " + gamePiece);
       };
       case SINGLE_SUBSTATION -> switch (gamePiece) {
