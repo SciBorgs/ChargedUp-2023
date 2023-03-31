@@ -140,4 +140,14 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
                     this.endEffectorPosition().getY() - other.endEffectorPosition().getY(), 2))
         < margin;
   }
+
+  public String toString() {
+    return "("
+        + elevatorHeight
+        + ", "
+        + elbowAngle.getRadians()
+        + ", "
+        + wristAngle.getRadians()
+        + ")";
+  }
 }

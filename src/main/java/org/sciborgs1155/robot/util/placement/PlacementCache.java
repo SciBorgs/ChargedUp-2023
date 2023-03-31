@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.util.placement;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import java.io.File;
 import java.io.IOException;
@@ -45,14 +46,14 @@ public class PlacementCache {
 
       PlacementTrajectory.Parameters params =
           new PlacementTrajectory.Parameters(
-              PlacementState.fromAbsolute(
+              new PlacementState(
                   cachedTrajectory.initialPos[0],
-                  cachedTrajectory.initialPos[1],
-                  cachedTrajectory.initialPos[2]),
-              PlacementState.fromAbsolute(
+                  new Rotation2d(cachedTrajectory.initialPos[1]),
+                  new Rotation2d(cachedTrajectory.initialPos[2])),
+              new PlacementState(
                   cachedTrajectory.finalPos[0],
-                  cachedTrajectory.finalPos[1],
-                  cachedTrajectory.finalPos[2]));
+                  new Rotation2d(cachedTrajectory.finalPos[1]),
+                  new Rotation2d(cachedTrajectory.finalPos[2])));
 
       trajectories.put(
           params.hashCode(),
@@ -69,9 +70,6 @@ public class PlacementCache {
   /** Generates trajectories between every stored preset */
   public static void main(String... args) throws IOException, InterruptedException {
     System.out.println("Generating...");
-    // for(var x : loadTrajectories()) {
-    // System.out.println(x.totalTime);
-    // }
     // Generate trajectories between stored presets
 
     List<CachedTrajectory> generatedTrajectories = new ArrayList<CachedTrajectory>();

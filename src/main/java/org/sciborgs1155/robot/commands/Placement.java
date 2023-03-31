@@ -22,7 +22,8 @@ public final class Placement {
   private final Arm arm;
   private final Elevator elevator;
 
-  private final Map<Integer, PlacementTrajectory> trajectories = new HashMap<>();
+  private final Map<Integer, PlacementTrajectory> trajectories =
+      new HashMap<Integer, PlacementTrajectory>();
 
   public Placement(Arm arm, Elevator elevator) {
     this.arm = arm;
@@ -33,8 +34,11 @@ public final class Placement {
   }
 
   public Optional<PlacementTrajectory> findTrajectory(Parameters params) {
-
     int hash = params.hashCode();
+    // System.out.println(hash);
+    // for(var traj : trajectories.entrySet()) {
+    //   System.out.println(traj.getKey());
+    // }
     if (trajectories.get(hash) != null) return Optional.of(trajectories.get(hash));
     return Optional.empty();
   }
@@ -63,7 +67,11 @@ public final class Placement {
 
   public Command followTrajectory(Parameters params) {
     var foundTrajectory = findTrajectory(params);
-    if (foundTrajectory.isEmpty()) return Commands.none();
+    if (foundTrajectory.isEmpty()) {
+      System.out.println("did not find trajectory");
+      return Commands.none();
+    }
+
     return Commands.parallel(
         elevator.followTrajectory(foundTrajectory.get().elevator()),
         arm.followTrajectory(foundTrajectory.get().elbow(), foundTrajectory.get().wrist()));

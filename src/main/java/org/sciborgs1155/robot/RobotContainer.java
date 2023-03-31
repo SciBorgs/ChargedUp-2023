@@ -154,7 +154,10 @@ public class RobotContainer implements Loggable {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // return placement.followTrajectory(new Parameters(new PlacementState(0, null, null)));
+    // var p =
+    //     new Parameters(Constants.Positions.STOW,
+    // Constants.Positions.FRONT_SINGLE_SUBSTATION_CONE);
+    // return placement.followTrajectory(p);
     return autoChooser.getSelected().get();
   }
 }
