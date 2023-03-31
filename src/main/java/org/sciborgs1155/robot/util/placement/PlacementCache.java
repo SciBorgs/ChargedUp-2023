@@ -2,7 +2,6 @@ package org.sciborgs1155.robot.util.placement;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import java.io.File;
 import java.io.IOException;
@@ -46,14 +45,14 @@ public class PlacementCache {
 
       PlacementTrajectory.Parameters params =
           new PlacementTrajectory.Parameters(
-              new PlacementState(
+              PlacementState.fromAbsolute(
                   cachedTrajectory.initialPos[0],
-                  new Rotation2d(cachedTrajectory.initialPos[1]),
-                  new Rotation2d(cachedTrajectory.initialPos[2])),
-              new PlacementState(
+                  cachedTrajectory.initialPos[1],
+                  cachedTrajectory.initialPos[2]),
+              PlacementState.fromAbsolute(
                   cachedTrajectory.finalPos[0],
-                  new Rotation2d(cachedTrajectory.finalPos[1]),
-                  new Rotation2d(cachedTrajectory.finalPos[2])));
+                  cachedTrajectory.finalPos[1],
+                  cachedTrajectory.finalPos[2]));
 
       trajectories.put(
           params.hashCode(),

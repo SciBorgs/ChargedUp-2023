@@ -26,8 +26,6 @@ import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.subsystems.LED;
 import org.sciborgs1155.robot.util.Vision;
 import org.sciborgs1155.robot.util.Visualizer;
-import org.sciborgs1155.robot.util.placement.PlacementState;
-import org.sciborgs1155.robot.util.placement.PlacementTrajectory.Parameters;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
