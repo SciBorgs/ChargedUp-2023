@@ -124,7 +124,6 @@ public class PlacementCache {
   }
 
   public static record CachedTrajectory(
-      // String hashId,
       double[] initialPos,
       double[] finalPos,
       String[] constraintOverrides,

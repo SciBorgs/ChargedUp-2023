@@ -7,11 +7,14 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Elevator;
+import org.sciborgs1155.robot.util.placement.PlacementCache;
 import org.sciborgs1155.robot.util.placement.PlacementState;
 import org.sciborgs1155.robot.util.placement.PlacementState.Side;
 import org.sciborgs1155.robot.util.placement.PlacementTrajectory;
+import org.sciborgs1155.robot.util.placement.PlacementTrajectory.Parameters;
 
 /** Placement command factories */
 public final class Placement {
@@ -24,6 +27,16 @@ public final class Placement {
   public Placement(Arm arm, Elevator elevator) {
     this.arm = arm;
     this.elevator = elevator;
+    for (var trajectory : PlacementCache.loadTrajectories().entrySet()) {
+      trajectories.put(trajectory.getKey(), trajectory.getValue());
+    }
+  }
+
+  public Optional<PlacementTrajectory> findTrajectory(Parameters params) {
+
+    int hash = params.hashCode();
+    if (trajectories.get(hash) != null) return Optional.of(trajectories.get(hash));
+    return Optional.empty();
   }
 
   public PlacementState state() {
@@ -46,6 +59,14 @@ public final class Placement {
     Command cmd = Commands.none();
     for (var state : states) cmd = cmd.andThen(toState(state));
     return cmd;
+  }
+
+  public Command followTrajectory(Parameters params) {
+    var foundTrajectory = findTrajectory(params);
+    if (foundTrajectory.isEmpty()) return Commands.none();
+    return Commands.parallel(
+        elevator.followTrajectory(foundTrajectory.get().elevator()),
+        arm.followTrajectory(foundTrajectory.get().elbow(), foundTrajectory.get().wrist()));
   }
 
   public Command safeToState(PlacementState state) {
