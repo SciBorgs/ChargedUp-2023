@@ -145,10 +145,7 @@ public class RobotContainer implements Loggable {
 
   /** A command to run when the robot is enabled */
   public Supplier<Command> getEnableCommand() {
-    return () ->
-        Commands.parallel(
-            elevator.setGoal(elevator.getPosition()),
-            arm.setGoals(arm.getElbowPosition(), arm.getRelativeWristPosition()));
+    return () -> Commands.none();
   }
 
   /**
