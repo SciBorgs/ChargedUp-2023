@@ -2,119 +2,118 @@ package org.sciborgs1155.robot.subsystems;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.simulation.AddressableLEDSim;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Constants.led;
-import org.sciborgs1155.robot.Ports;
+import org.sciborgs1155.robot.Constants.ledConst;
+import org.sciborgs1155.robot.Ports.Led;
 import org.sciborgs1155.robot.commands.Scoring.GamePiece;
 
 public class LED extends SubsystemBase {
 
-  private AddressableLED led1;
-  // private AddressableLED led2;
-  private AddressableLEDBuffer led1Buffer;
-  // private AddressableLEDBuffer led2Buffer;
+  private static AddressableLED led1;
+  // private static AddressableLED led2;
+  private static AddressableLEDBuffer led1Buffer;
+  // private static AddressableLEDBuffer led2Buffer;
+  static double time = 0.0;
 
-  private int rainbowFirstPixelHue;
-
-  // note: why is the maidens one called pg (purple green) and the sciborgs one called sb (sciborgs
-  // i assume)?
-  public enum LEDColor {
+  public enum LEDColors {
     RAINBOW,
-    PG,
-    BLUE,
-    YELLOW
+    CUBE,
+    CONE,
+    AUTO
   }
 
   public LED() {
-    led1 = new AddressableLED(Ports.Led.led1);
-    led1Buffer = new AddressableLEDBuffer(Constants.led.buffer1Length);
+    led1 = new AddressableLED(Led.led1);
+    led1Buffer = new AddressableLEDBuffer(ledConst.buffer1Length);
     led1.setLength(led1Buffer.getLength());
     led1.setData(led1Buffer);
     led1.start();
-    // note: what are you trying to do with this led sim?
-    new AddressableLEDSim(led1);
 
     // led2 = new AddressableLED(Ports.LED.led2);
     // led2Buffer = new AddressableLEDBuffer(Constants.led.led2Buffer);
     // led2.setLength(Constants.led.led2Length);
     // led2.start();
   }
-
-  public void setColor(LEDColor desiredColor) {
-    switch (desiredColor) {
-      case RAINBOW -> rainbow();
-      case PG -> pgLED();
-      case YELLOW -> coneLED();
-      case BLUE -> cubeLED();
-    }
-  }
-
   // note: is there a reason that you're using setRGB now instead of setLED?
   // from looking at the source code, it seems like if setRGB works, setLED should work too
-  private void coneLED() {
+
+  public void GamePieceColors(GamePiece gamePiece) {
+    if (gamePiece == GamePiece.CONE) {
+      for (int i = 0; i < led1Buffer.getLength(); i++) {
+        led1Buffer.setLED(i, Color.kDarkOrange);
+        // led2Buffer.setLED(i, Color.kYellow);
+      }
+      led1.setData(led1Buffer);
+
+    } else if (gamePiece == GamePiece.CUBE) {
+      for (int i = 0; i < led1Buffer.getLength(); i++) {
+        led1Buffer.setLED(i, Color.kPurple);
+        // led2Buffer.setLED(i, Color.kBlue);
+      }
+      led1.setData(led1Buffer);
+    }
+  }
+
+  public void LedPatterns(LEDColors ledColor) {
+    if (ledColor == LEDColors.RAINBOW) {
+      time += .005;
+      for (int i = 0; i < led1Buffer.getLength(); i++) {
+
+        final double constant = i / (led1Buffer.getLength() * (Math.PI / 2));
+        double green = Math.sin(time + (constant));
+        double blue = Math.cos(time + (constant));
+        double red = -Math.sin(time + (constant));
+
+        green *= 255 / 2;
+        blue *= 255 / 2;
+        red *= 255 / 2;
+
+        green += 255 / 2;
+        blue += 255 / 2;
+        red += 255 / 2;
+
+        led1Buffer.setRGB(i, (int) red, (int) green, (int) blue);
+        led1.setData(led1Buffer);
+      } // for loop
+    } // while loop
+    else if (ledColor == LEDColors.AUTO) {
+
+      for (int i = 0; i < led1Buffer.getLength(); i++) {
+        if (i < led1Buffer.getLength() / 2) led1Buffer.setLED(i, Color.kRed);
+        else led1Buffer.setLED(i, Color.kYellow);
+      }
+      led1.setData(led1Buffer);
+    }
+  }
+
+  public void errorLED() {
     for (int i = 0; i < led1Buffer.getLength(); i++) {
-      led1Buffer.setRGB(i, led.yellow.getRed(), led.yellow.getGreen(), led.yellow.getBlue());
-      // led2Buffer.setLED(i, Color.kYellow);
+      led1Buffer.setLED(i, Color.kRed);
     }
     led1.setData(led1Buffer);
-    // led2.setData(led2Buffer);
   }
 
-  // note: there's block of code for setting the leds to a color (the for loop) that you're
-  // rewriting a few times
-  // it might be a good idea to write a separate function that takes in a Color and sets all the
-  // leds in the strip to that color
-  private void cubeLED() {
-    for (int i = 0; i < led1Buffer.getLength(); i++) {
-      led1Buffer.setRGB(i, led.blue.getRed(), led.blue.getGreen(), led.blue.getBlue());
-      // led2Buffer.setLED(i, Color.kBlue);
+  public Command setGamePieceColor(GamePiece gamePiece) {
+    if (gamePiece == GamePiece.CUBE) {
+      return Commands.run(() -> GamePieceColors(GamePiece.CUBE), this);
+    } else if (gamePiece == GamePiece.CONE) {
+      return Commands.run(() -> GamePieceColors(GamePiece.CONE), this);
+    } else {
+      // LEDColor matches no standard LEDColor enum
+      return Commands.run(() -> errorLED(), this);
     }
-    led1.setData(led1Buffer);
-    // led2.setData(led2Buffer);
   }
 
-  public Command gamePieceLED(GamePiece gamePiece) {
-    return Commands.runOnce(gamePiece == GamePiece.CONE ? this::coneLED : this::cubeLED, this);
-  }
-
-  public void rainbow() {
-    for (var i = 0; i < led1Buffer.getLength(); i++) {
-      final var hue = (rainbowFirstPixelHue + (i * 180 / led1Buffer.getLength())) % 180;
-
-      led1Buffer.setHSV(i, hue, 255, 128);
+  public Command setPatterns(LEDColors desiredColor) {
+    if (desiredColor == LEDColors.RAINBOW) {
+      return Commands.run(() -> LedPatterns(LEDColors.RAINBOW), this);
+    } else if (desiredColor == LEDColors.AUTO) {
+      return Commands.run(() -> LedPatterns(LEDColors.AUTO));
+    } else {
+      return Commands.run(() -> errorLED(), this);
     }
-    rainbowFirstPixelHue += 3;
-    rainbowFirstPixelHue %= 180;
-  }
-
-  /** Black and Yellow */
-  public void sbLED() {
-    for (int i = 0; i < led1Buffer.getLength(); i++) {
-      led1Buffer.setRGB(i, led.yellow.getRed(), led.yellow.getGreen(), led.yellow.getBlue());
-    }
-    led1.setData(led1Buffer);
-
-    // for (int i = 0; i < led2Buffer.getLength(); i++) {
-    //   led2Buffer.setLED(i, Color.kYellow);
-    // }
-    // led2.setData(led2Buffer);
-  }
-
-  /** Purple and green */
-  public void pgLED() {
-    for (int i = 0; i < led1Buffer.getLength(); i++) {
-      led1Buffer.setRGB(
-          i, led.lightPurple.getRed(), led.lightPurple.getGreen(), led.lightPurple.getBlue());
-    }
-    led1.setData(led1Buffer);
-
-    // for (int i = 0; i < led2Buffer.getLength(); i++) {
-    //   led2Buffer.setLED(i, Color.kLimeGreen);
-    // }
-    // led2.setData(led2Buffer);
   }
 }

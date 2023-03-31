@@ -26,13 +26,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.DoubleUnaryOperator;
-import java.util.function.Function;
-import java.util.stream.Stream;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 import org.sciborgs1155.robot.util.Vision;
@@ -119,6 +115,8 @@ public class Drive extends SubsystemBase implements Loggable {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+    // tmp
+    speedMultiplier = 1;
     xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed) * MAX_SPEED * speedMultiplier;
     ySpeed = Math.copySign(ySpeed * ySpeed, ySpeed) * MAX_SPEED * speedMultiplier;
     rot = Math.copySign(rot * rot, rot) * MAX_ANGULAR_SPEED * speedMultiplier;
@@ -319,49 +317,14 @@ public class Drive extends SubsystemBase implements Loggable {
             desiredPose.getY() - currentPose.getY(), desiredPose.getX() - currentPose.getX()));
   }
 
-  private Command driveToPosesHelper(List<Pose2d> desiredPoses, boolean useAllianceColor) {
-    List<PathPoint> points = new ArrayList<PathPoint>();
-    Function<Integer, Rotation2d> heading =
-        (i) ->
-            i < desiredPoses.size() - 1
-                ? headingToPose(desiredPoses.get(i), desiredPoses.get(i + 1))
-                : headingToPose(
-                    desiredPoses.get(i - 1),
-                    desiredPoses.get(i)); // i hate that i can't do a recursive lambda
-    for (int i = 0; i < desiredPoses.size(); i++) {
-      Pose2d rawPose = desiredPoses.get(i);
-      points.add(new PathPoint(rawPose.getTranslation(), heading.apply(i), rawPose.getRotation()));
-    }
-    PathPlannerTrajectory trajectory = PathPlanner.generatePath(CONSTRAINTS, points);
-    return follow(trajectory, false, useAllianceColor);
-  }
-
-  /** Creates and follows trajectory for swerve, starting at startPose, through all desired poses */
-  public Command driveToPoses(
-      Pose2d startPose, List<Pose2d> desiredPoses, boolean useAllianceColor) {
-    BooleanSupplier closeEnough =
-        () -> {
-          Transform2d transform = getPose().minus(desiredPoses.get(desiredPoses.size() - 1));
-          return Math.abs(transform.getX()) < 0.3
-              && Math.abs(transform.getY()) < 0.3
-              && Math.abs(transform.getRotation().getDegrees()) < 5;
-        };
-    List<Pose2d> posesWithStart =
-        Stream.concat(Stream.of(startPose), desiredPoses.stream()).toList();
-    return driveToPosesHelper(posesWithStart, useAllianceColor).until(closeEnough);
-  }
-
-  /**
-   * Creates and follows trajectory for swerve, starting at curent pose, through all desired //
-   * poses
-   */
-  public Command driveToPoses(List<Pose2d> desiredPoses, boolean useAllianceColor) {
-    return driveToPoses(getPose(), desiredPoses, useAllianceColor);
-  }
-
   /** Creates and follows trajectroy for swerve from startPose to desiredPose */
   public Command driveToPose(Pose2d startPose, Pose2d desiredPose, boolean useAllianceColor) {
-    return driveToPoses(startPose, List.of(desiredPose), useAllianceColor);
+    Rotation2d heading = headingToPose(startPose, desiredPose);
+    PathPoint start = new PathPoint(startPose.getTranslation(), heading, startPose.getRotation());
+    PathPoint goal =
+        new PathPoint(desiredPose.getTranslation(), heading, desiredPose.getRotation());
+    PathPlannerTrajectory trajectory = PathPlanner.generatePath(CONSTRAINTS, start, goal);
+    return follow(trajectory, false, useAllianceColor);
   }
 
   /** Creates and follows trajectory for swerve from current pose to desiredPose */

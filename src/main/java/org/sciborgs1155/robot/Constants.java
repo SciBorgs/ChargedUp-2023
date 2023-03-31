@@ -81,7 +81,8 @@ public final class Constants {
     public static final String BACK_CAM = "backPhotonVision";
 
     // Robot to camera translations
-    public static final Translation3d FRONT_CAM_TRANSLATION = new Translation3d();
+    public static final Translation3d FRONT_CAM_TRANSLATION =
+        new Translation3d(0.165, -0.305, 0.356);
     public static final Rotation3d FRONT_CAM_ROTATION = new Rotation3d(1.64933614, 1.78, 0);
     public static final Transform3d ROBOT_TO_FRONT_CAM =
         new Transform3d(FRONT_CAM_TRANSLATION, FRONT_CAM_ROTATION);
@@ -115,7 +116,7 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.1542, 0.6, 0.91, 0.038046); // v =  0.87884
 
-      public static final Constraints CONSTRAINTS = new Constraints(1.7, 1.5);
+      public static final Constraints CONSTRAINTS = new Constraints(2.1, 1.9);
     }
 
     public static final class Elbow {
@@ -133,7 +134,7 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
-      public static final Constraints CONSTRAINTS = new Constraints(1.9, 1.5);
+      public static final Constraints CONSTRAINTS = new Constraints(2.4, 2.2);
       public static final double ELBOW_OFFSET = -1.248660;
     }
   }
@@ -158,7 +159,7 @@ public final class Constants {
     public static final int SAMPLE_SIZE_TAPS = 5;
     public static final int CURRENT_SPIKE_THRESHOLD = 20;
 
-    public static final Constraints CONSTRAINTS = new Constraints(1.8, 1.7);
+    public static final Constraints CONSTRAINTS = new Constraints(2.4, 2.2);
 
     public static final double ZERO_OFFSET = 0.603467;
   }
@@ -189,9 +190,9 @@ public final class Constants {
       }
     }
 
-    public static final double MAX_SPEED = 3; // m / s
+    public static final double MAX_SPEED = 3.35; // m / s
     public static final double MAX_ANGULAR_SPEED = 1.5 * Math.PI; // rad / s
-    public static final double MAX_ACCEL = 8; // m / s^2
+    public static final double MAX_ACCEL = 9; // m / s^2
 
     public static final Translation2d[] MODULE_OFFSET = {
       new Translation2d(Dimensions.WHEEL_BASE / 2, Dimensions.TRACK_WIDTH / 2), // front left
@@ -313,18 +314,27 @@ public final class Constants {
             Map.entry(3, new Translation2d(5, 4)),
             Map.entry(4, new Translation2d(5, 5)));
 
-    public static final Map<Integer, Translation2d> SCORING_POINTS =
+    public static final Map<Integer, Translation2d> SCORING_POINTS_CUBE =
         Map.ofEntries(
             Map.entry(1, new Translation2d(1, 2)),
             Map.entry(2, new Translation2d(1, 3)),
             Map.entry(3, new Translation2d(1, 4)),
-            Map.entry(4, new Translation2d(1, 5)),
-            Map.entry(5, new Translation2d(1, 6)),
-            Map.entry(6, new Translation2d(1, 7)),
-            Map.entry(7, new Translation2d(1, 8)),
-            Map.entry(8, new Translation2d(1, 9)),
-            Map.entry(9, new Translation2d(1, 10)));
-
+            Map.entry(1, new Translation2d(1, 2)),
+            Map.entry(2, new Translation2d(1, 3)),
+            Map.entry(3, new Translation2d(1, 4)),
+            Map.entry(1, new Translation2d(1, 2)),
+            Map.entry(2, new Translation2d(1, 3)),
+            Map.entry(3, new Translation2d(1, 4)));
+    public static final Map<Integer, Translation2d> SCORING_POINTS_CONE =
+        Map.ofEntries(
+            Map.entry(1, new Translation2d(2, 2)),
+            Map.entry(2, new Translation2d(2, 3)),
+            Map.entry(3, new Translation2d(2, 4)),
+            Map.entry(4, new Translation2d(1, 2)),
+            Map.entry(5, new Translation2d(1, 3)),
+            Map.entry(6, new Translation2d(1, 4)),
+            Map.entry(8, new Translation2d(1, 4)),
+            Map.entry(9, new Translation2d(2, 4)));
     public static final Map<Integer, Translation2d> BALANCE_POINTS =
         Map.ofEntries(Map.entry(1, new Translation2d(3, 5)), Map.entry(2, new Translation2d(1, 5)));
   }
@@ -339,5 +349,11 @@ public final class Constants {
     public static Color yellow = new Color(237, 237, 12);
     public static Color blue = new Color(0, 0, 228);
     public static Color rainbow1stPixel = new Color(255, 0, 0);
+  }
+
+  public static final class ledConst {
+    public static final int buffer1Length = 60;
+
+    // public static final int buffer2Length = 60;
   }
 }
