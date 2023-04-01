@@ -109,6 +109,11 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     setpoint = state;
   }
 
+  /** Returns the elevator setpoint as a {@link State} */
+  public State getSetpoint() {
+    return setpoint;
+  }
+
   /** Follows a {@link TrapezoidProfile} to the desired height */
   public Command followProfile(double height) {
     var goal = new TrapezoidProfile.State(height, 0);

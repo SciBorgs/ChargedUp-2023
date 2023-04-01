@@ -101,7 +101,7 @@ public final class Scoring implements Sendable {
   */
 
   public Command goTo(Level height) {
-    return new ProxyCommand(() -> placement.safeToState(scoringState(height)));
+    return new ProxyCommand(() -> placement.goTo(scoringState(height)));
   }
 
   public PlacementState scoringState(Level height) {

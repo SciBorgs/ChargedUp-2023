@@ -146,9 +146,19 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowSetpoint = state;
   }
 
+  /** Returns the elbow setpoint as a {@link State} */
+  public State getElbowSetpoint() {
+    return elbowSetpoint;
+  }
+
   /** Sets the wrist's setpoint, in radians */
   public void setWristSetpoint(State state) {
     wristSetpoint = state;
+  }
+
+  /** Returns the wrist setpoint as a {@link State} */
+  public State getWristSetpoint() {
+    return wristSetpoint;
   }
 
   /** Follows a {@link TrapezoidProfile} for each joint's relative position */

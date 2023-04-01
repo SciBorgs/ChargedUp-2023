@@ -141,7 +141,7 @@ public class RobotContainer implements Loggable {
     operator.povUp().onTrue(scoring.goTo(Level.HIGH));
     operator.povRight().onTrue(scoring.goTo(Level.MID));
     operator.povDown().onTrue(scoring.goTo(Level.LOW));
-    operator.povLeft().onTrue(placement.safeToState(Positions.STOW));
+    operator.povLeft().onTrue(placement.goTo(Positions.STOW));
 
     operator.leftTrigger().onTrue(scoring.goTo(Level.SINGLE_SUBSTATION));
     operator.rightTrigger().onTrue(scoring.goTo(Level.DOUBLE_SUBSTATION));
@@ -164,10 +164,6 @@ public class RobotContainer implements Loggable {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    var p =
-        new PlacementTrajectory.Parameters(
-            Constants.Positions.FRONT_INTAKE, Constants.Positions.BACK_HIGH_CONE);
-    return placement.followTrajectory(p);
-    // return autoChooser.getSelected().get();
+    return autoChooser.getSelected().get();
   }
 }
