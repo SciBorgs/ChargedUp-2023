@@ -43,6 +43,7 @@ public final class Constants {
 
   public static final double RATE = 0.02; // roborio tickrate (s)
   public static final double DEADBAND = 0.1;
+  public static final int THROUGHBORE_CPR = 8192;
 
   public static final class Dimensions {
     public static final double BASE_OFFSET = -0.127;
@@ -129,7 +130,7 @@ public final class Constants {
               .multiplyGearing(12)
               .divideGearing(72)
               .withUnits(Conversion.Units.RADIANS)
-              .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
+              .withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
 
       public static final PIDConstants PID = new PIDConstants(9, 0, 1); // d = 2.18954
       public static final SystemConstants FF =
@@ -155,7 +156,7 @@ public final class Constants {
         Conversion.base()
             .multiplyRadius(0.0181864)
             .withUnits(Conversion.Units.RADIANS)
-            .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
+            .withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
     // units field for sysid is 0.1143
     public static final Conversion ABSOLUTE_CONVERSION =
         RELATIVE_CONVERSION.withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
@@ -319,6 +320,8 @@ public final class Constants {
   public static final class Auto {
     public static final double CUBE_OUTTAKE_TIME = 0.5; // seconds
     public static final double CONE_OUTTAKE_TIME = 3; // seconds
+    public static final double INITIAL_INTAKE_TIME = 0.6; // seconds
+    public static final double MOVING_INTAKE_TIME = 4; // seconds
   }
 
   public static final class Field {
