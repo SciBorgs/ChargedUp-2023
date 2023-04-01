@@ -38,7 +38,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log(name = "wrist applied output", methodName = "getAppliedOutput")
   private final CANSparkMax wrist = Wrist.MOTOR.build(MotorType.kBrushless, WRIST_MOTOR);
 
-  private final RelativeEncoder elbowEncoder = elbowRight.getAlternateEncoder(8192);
+  private final RelativeEncoder elbowEncoder = elbow.getAlternateEncoder(8192);
 
   @Log(name = "wrist velocity", methodName = "getVelocity")
   private final AbsoluteEncoder wristEncoder = wrist.getAbsoluteEncoder(Type.kDutyCycle);

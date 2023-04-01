@@ -27,8 +27,8 @@ public final class Ports {
 
   public static final class Arm {
     public static final int LEFT_ELBOW_MOTOR = 14;
-    public static final int MIDDLE_ELBOW_MOTOR = 15;
-    public static final int RIGHT_ELBOW_MOTOR = 16;
+    public static final int MIDDLE_ELBOW_MOTOR = 16;
+    public static final int RIGHT_ELBOW_MOTOR = 15;
 
     public static final int[] ELBOW_ENCODER = {9, 8};
 
