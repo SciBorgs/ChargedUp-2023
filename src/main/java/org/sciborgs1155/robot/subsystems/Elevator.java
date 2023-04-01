@@ -27,6 +27,7 @@ import org.sciborgs1155.lib.Trajectory;
 import org.sciborgs1155.lib.Trajectory.State;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
+import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.util.Visualizer;
 
 public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
@@ -57,7 +58,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log private boolean hasSpiked = false;
 
-  @Log private double offset = 0.61842;
+  @Log private double offset = Robot.isReal() ? 0.61842 : 0;
 
   private final ElevatorSim sim =
       new ElevatorSim(
@@ -95,7 +96,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     this.positionVisualizer = positionVisualizer;
     this.setpointVisualizer = setpointVisualizer;
 
-    // setpoint = new State(getPosition(), 0, 0);
+    setpoint = new State(getPosition(), 0, 0);
   }
 
   /** Returns the height of the elevator, in meters */
@@ -105,8 +106,8 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Sets the elevator's setpoint height */
-  public void setSetpoint(double height) {
-    setpoint = new State(height, 0, 0);
+  public Command setSetpoint(double height) {
+    return runOnce(() -> setpoint = new State(height, 0, 0));
   }
 
   /** Returns the elevator setpoint as a {@link State} */

@@ -114,8 +114,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowRight.burnFlash();
     wrist.burnFlash();
 
-    // elbowSetpoint = new State(getElbowPosition().getRadians(), 0, 0);
-    // wristSetpoint = new State(getRelativeWristPosition().getRadians(), 0, 0);
+    elbowSetpoint = new State(getElbowPosition().getRadians(), 0, 0);
+    wristSetpoint = new State(getRelativeWristPosition().getRadians(), 0, 0);
 
     this.positionVisualizer = positionVisualizer;
     this.setpointVisualizer = setpointVisualizer;
@@ -141,19 +141,18 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     return getRelativeWristPosition().plus(getElbowPosition());
   }
 
-  /** Sets the elbows's setpoint, in radians */
-  public void setElbowSetpoint(Rotation2d angle) {
-    elbowSetpoint = new State(angle.getRadians(), 0, 0);
+  /** Sets the position setpoints for the elbow and wrist, in radians */
+  public Command setSetpoints(Rotation2d elbowAngle, Rotation2d wristAngle) {
+    return runOnce(
+        () -> {
+          elbowSetpoint = new State(elbowAngle.getRadians(), 0, 0);
+          wristSetpoint = new State(wristAngle.getRadians(), 0, 0);
+        });
   }
 
   /** Returns the elbow setpoint as a {@link State} */
   public State getElbowSetpoint() {
     return elbowSetpoint;
-  }
-
-  /** Sets the wrist's relative setpoint, in radians */
-  public void setWristSetpoint(Rotation2d angle) {
-    wristSetpoint = new State(angle.getRadians(), 0, 0);
   }
 
   /** Returns the wrist setpoint as a {@link State} */

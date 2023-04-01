@@ -145,4 +145,11 @@ public final class Placement {
         elevator.followTrajectory(trajectory.elevator()),
         arm.followTrajectory(trajectory.elbow(), trajectory.wrist()));
   }
+
+  /** Sets the setpoints, this is generally not a good idea */
+  public Command setSetpoint(PlacementState setpoint) {
+    return Commands.parallel(
+        elevator.setSetpoint(setpoint.elevatorHeight()),
+        arm.setSetpoints(setpoint.elbowAngle(), setpoint.wristAngle()));
+  }
 }

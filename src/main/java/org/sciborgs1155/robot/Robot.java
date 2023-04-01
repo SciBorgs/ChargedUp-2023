@@ -70,9 +70,6 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    // Resets goal positions to ensure safety of nearby humans...
-    robotContainer.getEnableCommand().get().schedule();
-
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -96,7 +93,7 @@ public class Robot extends TimedRobot {
     }
 
     // Resets goal positions to ensure safety of nearby humans...
-    robotContainer.getEnableCommand().get().schedule();
+    robotContainer.getEnableCommand().schedule();
   }
 
   /** This function is called periodically during operator control. */

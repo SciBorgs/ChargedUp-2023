@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Loggable;
@@ -73,10 +74,6 @@ public class RobotContainer implements Loggable {
     configureBindings();
     // Configure subsystem default commands
     configureSubsystemDefaults();
-
-    elevator.setSetpoint(Positions.INITIAL.elevatorHeight());
-    arm.setElbowSetpoint(Positions.INITIAL.elbowAngle());
-    arm.setWristSetpoint(Positions.INITIAL.wristAngle());
   }
 
   private void configureAutoChooser() {
@@ -157,8 +154,8 @@ public class RobotContainer implements Loggable {
   }
 
   /** A command to run when the robot is enabled */
-  public Supplier<Command> getEnableCommand() {
-    return () -> Commands.none();
+  public Command getEnableCommand() {
+    return new ProxyCommand(() -> placement.setSetpoint(placement.state()));
   }
 
   /**
@@ -167,6 +164,6 @@ public class RobotContainer implements Loggable {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected().get();
+    return placement.setSetpoint(Positions.INITIAL).andThen(autoChooser.getSelected().get());
   }
 }
