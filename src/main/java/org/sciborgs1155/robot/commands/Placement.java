@@ -4,6 +4,7 @@ import static org.sciborgs1155.robot.Constants.Positions.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import java.util.Map;
 import java.util.Optional;
 import org.sciborgs1155.robot.subsystems.Arm;
@@ -89,10 +90,11 @@ public final class Placement {
    *     trapezoid profiling.
    */
   public Command goTo(PlacementState goal) {
-    return Commands.either(
-        followTrajectory(findTrajectory(goal).get()),
-        safeFollowProfile(goal),
-        () -> findTrajectory(goal).isPresent());
+    return new ProxyCommand(
+        () ->
+            findTrajectory(goal).isPresent()
+                ? followTrajectory(findTrajectory(goal).get())
+                : safeFollowProfile(goal));
   }
 
   /**
@@ -107,7 +109,7 @@ public final class Placement {
     return Commands.parallel(
             elevator.followProfile(goal.elevatorHeight()),
             arm.followProfile(goal.elbowAngle(), goal.wristAngle()))
-        .withName("placement to goal");
+        .withName("placement follow profile");
   }
 
   /**
