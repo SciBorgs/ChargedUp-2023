@@ -74,25 +74,27 @@ public final class Autos implements Sendable {
         Map.entry("frontHighCube", placement.safeToState(FRONT_HIGH_CUBE)),
         Map.entry(
             "outtakeCone",
-            intake.outtake().withTimeout(Auto.CONE_OUTTAKE_TIME).andThen(intake.stop())),
+            Commands.sequence(intake.outtake().withTimeout(Auto.CONE_OUTTAKE_TIME), intake.stop())),
         Map.entry(
             "outtakeCube",
-            intake.outtake().withTimeout(Auto.CUBE_OUTTAKE_TIME).andThen(intake.stop())),
-        Map.entry("score", intake.outtake().withTimeout(3).andThen(intake.stop())),
+            Commands.sequence(intake.outtake().withTimeout(Auto.CUBE_OUTTAKE_TIME), intake.stop())),
         Map.entry(
             "frontIntake",
             Commands.sequence(
                 placement.safeToState(Constants.Positions.FRONT_INTAKE),
-                intake.intake().withTimeout(4),
+                intake.intake().withTimeout(Auto.MOVING_INTAKE_TIME),
                 intake.stop())),
         Map.entry(
             "backIntake",
             Commands.sequence(
                 placement.safeToState(Constants.Positions.BACK_INTAKE),
-                intake.intake().withTimeout(4),
+                intake.intake().withTimeout(Auto.MOVING_INTAKE_TIME),
                 intake.stop())),
         Map.entry("stow", placement.safeToState(STOW)),
-        Map.entry("initialIntake", intake.intake().withTimeout(0.6).andThen(intake.stop())));
+        Map.entry(
+            "initialIntake",
+            Commands.sequence(
+                intake.intake().withTimeout(Auto.INITIAL_INTAKE_TIME), intake.stop())));
   }
 
   private Command followAutoPath(String pathName) {
@@ -138,12 +140,12 @@ public final class Autos implements Sendable {
 
   /** no PPL */
   public Command cubeBalance() {
-    return Commands.sequence(backHighCubeScore(), balance().alongWith(placement.toState(STOW)));
+    return Commands.sequence(backHighCubeScore(), balance().alongWith(eventMarkers.get("stow")));
   }
 
   /** no PPL */
   public Command coneBalance() {
-    return Commands.sequence(highConeScore(), balance().alongWith(placement.toState(STOW)));
+    return Commands.sequence(highConeScore(), balance().alongWith(eventMarkers.get("stow")));
   }
 
   public Command coneLeave() {
@@ -168,7 +170,14 @@ public final class Autos implements Sendable {
 
   /** backup: no odometry, no arm */
   public Command coneLeaveNoOdometry() {
-    return this.highConeScore().andThen(leaveNoOdometry());
+    return Commands.sequence(
+        highConeScore(), leaveNoOdometry().alongWith(eventMarkers.get("stow")));
+  }
+
+  /** backup: no odometry, no arm */
+  public Command cubeLeaveNoOdometry() {
+    return Commands.sequence(
+        backHighCubeScore(), leaveNoOdometry().alongWith(eventMarkers.get("stow")));
   }
 
   public Command defaultOdometryReset(GamePiece gamePiece, Rotation2d rotation) {

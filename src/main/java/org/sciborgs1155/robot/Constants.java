@@ -305,6 +305,8 @@ public final class Constants {
   public static final class Auto {
     public static final double CUBE_OUTTAKE_TIME = 0.5; // seconds
     public static final double CONE_OUTTAKE_TIME = 3; // seconds
+    public static final double INITIAL_INTAKE_TIME = 0.6; // seconds
+    public static final double MOVING_INTAKE_TIME = 4; // seconds
   }
 
   public static final class Field {
