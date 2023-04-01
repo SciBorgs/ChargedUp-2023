@@ -131,10 +131,10 @@ public record PlacementState(
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.addDoubleProperty("elevator height", this::elevatorHeight, null);
-    builder.addDoubleProperty("elbow angle", () -> elbowAngle().getDegrees(), null);
-    builder.addDoubleProperty("relative wrist angle", () -> wristAngle().getDegrees(), null);
+    builder.addDoubleProperty("elbow angle", () -> elbowAngle().getRadians(), null);
+    builder.addDoubleProperty("relative wrist angle", () -> wristAngle().getRadians(), null);
     builder.addDoubleProperty(
-        "absolute wrist angle", () -> elbowAngle().plus(wristAngle()).getDegrees(), null);
+        "absolute wrist angle", () -> elbowAngle().plus(wristAngle()).getRadians(), null);
     builder.addDoubleProperty("elevator velocity", this::elevatorVelocity, null);
     builder.addDoubleProperty("elbow angular velocity", this::elbowAngularVelocity, null);
     builder.addDoubleProperty("wrist angular velocity", this::wristAngularVelocity, null);

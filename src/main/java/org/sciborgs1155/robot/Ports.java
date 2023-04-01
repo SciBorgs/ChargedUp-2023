@@ -30,7 +30,7 @@ public final class Ports {
     public static final int MIDDLE_ELBOW_MOTOR = 15;
     public static final int RIGHT_ELBOW_MOTOR = 16;
 
-    public static final int[] ELBOW_ENCODER = {8, 9};
+    public static final int[] ELBOW_ENCODER = {9, 8};
 
     public static final int WRIST_MOTOR = 8;
   }

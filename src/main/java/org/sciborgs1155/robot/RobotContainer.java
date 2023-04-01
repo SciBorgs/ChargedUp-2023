@@ -94,16 +94,14 @@ public class RobotContainer implements Loggable {
      * starting location: in front of charge station
      */
     autoChooser.addOption("cube -> balance", autos::cubeBalance);
-    /*
-     * cube balance setup instructions:
+    /* cube balance setup instructions:
      * gamepiece: cube
      * orientation: away from grid
      * set starting pos: no
      * starting location: cube scoring, center
      */
     autoChooser.addOption("cone -> balance", autos::coneBalance);
-    /*
-     * cone balance setup instructions:
+    /* cone balance setup instructions:
      * gamepiece: cone
      * orientation: away from grid
      * set starting pos: no

@@ -128,7 +128,7 @@ public final class Constants {
               .multiplyGearing(12)
               .divideGearing(72)
               .withUnits(Conversion.Units.RADIANS)
-              .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
+              .withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
 
       public static final PIDConstants PID = new PIDConstants(9, 0, 1); // d = 2.18954
       public static final SystemConstants FF =
