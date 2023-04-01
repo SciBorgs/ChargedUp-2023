@@ -9,6 +9,7 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/Ungrouped/PIDController[11]": "PIDController",
       "/Shuffleboard/Autos/Drive/field2d": "Field2d",
       "/Shuffleboard/Autos/Drive/imu": "Gyro",
       "/Shuffleboard/Autos/autoChooser": "String Chooser",
@@ -41,11 +42,6 @@
         }
       },
       "/Shuffleboard/RobotContainer/starting position chooser": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/Shuffleboard/RobotContainer/visualizer": {
         "window": {
           "visible": true
         }

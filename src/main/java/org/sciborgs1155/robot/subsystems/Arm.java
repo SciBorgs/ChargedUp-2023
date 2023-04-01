@@ -38,7 +38,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log(name = "wrist applied output", methodName = "getAppliedOutput")
   private final CANSparkMax wrist = Wrist.MOTOR.build(MotorType.kBrushless, WRIST_MOTOR);
 
-  private final RelativeEncoder elbowEncoder = elbow.getAlternateEncoder(8192);
+  private final RelativeEncoder elbowEncoder =
+      elbow.getAlternateEncoder(Constants.Dimensions.ALTERNATE_COUNTS_PER_REV);
 
   @Log(name = "wrist velocity", methodName = "getVelocity")
   private final AbsoluteEncoder wristEncoder = wrist.getAbsoluteEncoder(Type.kDutyCycle);
@@ -89,7 +90,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowLeft.follow(elbow);
     elbowRight.follow(elbow);
 
-    elbowEncoder.setPosition(Elbow.ELBOW_OFFSET);
     elbowEncoder.setPositionConversionFactor(Elbow.CONVERSION.factor());
     elbowEncoder.setVelocityConversionFactor(Elbow.CONVERSION.factor() / 60.0);
     wristEncoder.setPositionConversionFactor(Wrist.CONVERSION.factor());
@@ -109,6 +109,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
     this.visualizer = visualizer;
 
+    elbowEncoder.setPosition(Elbow.ELBOW_OFFSET);
     elbowFeedback.setGoal(getElbowPosition().getRadians());
     wristFeedback.setGoal(Math.PI);
     wristFeedback.setTolerance(0.3);
@@ -213,7 +214,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
         getElbowPosition(), Rotation2d.fromRadians(elbowFeedback.getSetpoint().position));
     visualizer.setWrist(
         getRelativeWristPosition(), Rotation2d.fromRadians(wristFeedback.getSetpoint().position));
-    System.out.println("elbow pos: " + getElbowPosition().getRadians());
   }
 
   @Override

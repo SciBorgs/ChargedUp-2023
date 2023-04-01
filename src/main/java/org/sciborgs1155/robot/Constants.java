@@ -73,6 +73,7 @@ public final class Constants {
     // Distance between centers of right and left wheels on robot
     public static final double WHEEL_BASE = 0.5715;
     // Distance between front and back wheels on robot
+    public static final int ALTERNATE_COUNTS_PER_REV = 8192;
   }
 
   public static final class Vision {
@@ -147,7 +148,7 @@ public final class Constants {
         Conversion.base()
             .multiplyRadius(0.0181864)
             .withUnits(Conversion.Units.RADIANS)
-            .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
+            .withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
     // units field for sysid is 0.1143
     public static final Conversion ABSOLUTE_CONVERSION =
         RELATIVE_CONVERSION.withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);

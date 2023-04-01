@@ -37,8 +37,8 @@ public final class Ports {
 
   public static final class Elevator {
     public static final int LEFT_MOTOR = 26;
-    public static final int RIGHT_MOTOR = 25;
-    public static final int MIDDLE_MOTOR = 24;
+    public static final int RIGHT_MOTOR = 24;
+    public static final int MIDDLE_MOTOR = 25;
 
     public static final int[] ENCODER = {6, 7};
   }
