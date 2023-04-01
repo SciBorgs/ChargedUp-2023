@@ -1,68 +1,80 @@
-origin: [ 0.0, 0.5207 ]
+# supported constraints are:
+
+# minX = [value]
+# maxX = [value]
+# minY = [value]
+# maxY = [value]
+# circle = [center_x, center_y, radius]
+# rectangle = [x_0, y_0, x_1, y_1]
+
+origin: [ -0.127, 0.5203698 ]
 
 solver:
   interiorPoints: 25
-  maxVoltageElbow: 6
+  maxVoltageElbow: 8
   maxVoltageWrist: 5
-  maxVoltageLift: 6
-  maxAccelerationElbow: 1.5
-  maxAccelerationWrist: 1.4
-  maxAccelerationLift: 1.2
-  maxJerk: 1
+  maxVoltageLift: 8
+  maxAccelerationElbow: 2.5
+  maxAccelerationWrist: 2.5
+  maxAccelerationLift: 2.5
+  maxJerk: 6
 
 lift:
-  mass: 1.0 # estimated
+  mass: 6.80389
   minHeight: 0.01
   maxHeight: 0.66
   motor:
     type: neo
     count: 3
-    reduction: 63.75
+    reduction: 30.0
 
 elbow:
-  mass: 1.374
-  length: 0.9144
+  mass: 4.08233
+  length: 0.927
   cgRadius: 0.52
   moi: 0.1427
-  minAngle: -1.0472 # -60 degrees
-  maxAngle: 4.1015 # 235 degrees
+  minAngle: -1.57079632679
+  maxAngle: 4.71238898038
   motor:
     type: neo
     count: 3
-    reduction: 53.125
+    reduction: 63.75
 
 wrist:
-  mass: 2.372
-  length: 0.2921
+  mass: 3.85554
+  length: 0.488
   cgRadius: 0.16 # estimated
   moi: 0.0435
-  minRelAngle: -1.5707
+  minRelAngle: -3.1415
   maxRelAngle: 3.1415
   motor:
     type: neo
     count: 1
-    reduction: 42.222
+    reduction: 53.125
 
 constraints:
   floor:
     type: minY,
     point: end
-    args: [ 0 ]
+    args: [ 0.01 ]
   heightLimit:
     type: maxY
     point: end
-    args: [ 1.98 ]
+    args: [ 1.75 ]
   robotBody:
-    type: rectangle
-    point: wrist
-    args: [
-      -0.2, 0,
-      0.2, 1.5 # experimental constraint
-    ]
-  robotFrameEnd:
     type: rectangle
     point: end
     args: [
-      -0.2, 0,
-      0.2, 1.5 # experimental constraint
+      -0.3, 0,
+      0.3, 1.5
+    ]
+  elevator:
+    type: rectangle
+    point: wrist
+    args: [
+      # 0.127m wide
+      # starting height is 1.3208m
+      # offset by -0.127
+      -0.254, 0,
+      0, 1.34
     ]

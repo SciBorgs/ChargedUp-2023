@@ -75,20 +75,20 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   private final SingleJointedArmSim elbowSim =
       new SingleJointedArmSim(
           DCMotor.getNEO(3),
-          1 / Elbow.CONVERSION.gearing(),
+          Elbow.GEARING,
           SingleJointedArmSim.estimateMOI(Dimensions.FOREARM_LENGTH, Dimensions.FOREARM_MASS),
           Dimensions.FOREARM_LENGTH,
-          Dimensions.ELBOW_MIN_ANGLE,
-          Dimensions.ELBOW_MAX_ANGLE,
+          Elbow.MIN_ANGLE,
+          Elbow.MAX_ANGLE,
           true);
   private final SingleJointedArmSim wristSim =
       new SingleJointedArmSim(
           DCMotor.getNEO(1),
-          1,
+          Wrist.GEARING,
           SingleJointedArmSim.estimateMOI(Dimensions.CLAW_LENGTH, Dimensions.CLAW_MASS),
           Dimensions.CLAW_LENGTH,
-          Dimensions.WRIST_MIN_ANGLE,
-          Dimensions.WRIST_MAX_ANGLE,
+          Wrist.MIN_ANGLE,
+          Wrist.MAX_ANGLE,
           false);
 
   private final Visualizer positionVisualizer;

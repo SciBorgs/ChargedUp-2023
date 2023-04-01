@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import org.sciborgs1155.robot.Constants.Dimensions;
+import org.sciborgs1155.robot.Constants.Elevator;
 
 /** Visualization class specific for our charged up bot */
 public class Visualizer implements Sendable {
@@ -16,17 +17,16 @@ public class Visualizer implements Sendable {
   private static Rotation2d RIGHT_ANGLE = Rotation2d.fromRadians(Math.PI / 2.0);
 
   private final Mechanism2d mech =
-      new Mechanism2d(Dimensions.ARM_LENGTH * 3.0, Dimensions.ELEVATOR_MAX_HEIGHT * 3.0 / 2.0);
+      new Mechanism2d(Dimensions.FOREARM_LENGTH * 3.0, Elevator.MAX_HEIGHT * 3.0 / 2.0);
   private final MechanismRoot2d chassis =
-      mech.getRoot("Chassis", Dimensions.ARM_LENGTH * 3.0 / 2.0, 0);
+      mech.getRoot("Chassis", Dimensions.FOREARM_LENGTH * 3.0 / 2.0, 0);
 
   private final MechanismLigament2d elevator, forearm, claw;
 
   public Visualizer(Color8Bit color) {
     elevator =
         chassis.append(
-            new MechanismLigament2d(
-                "Elevator Position", Dimensions.ELEVATOR_MAX_HEIGHT, 90, WEIGHT, color));
+            new MechanismLigament2d("Elevator Position", Elevator.MAX_HEIGHT, 90, WEIGHT, color));
     forearm =
         elevator.append(
             new MechanismLigament2d(

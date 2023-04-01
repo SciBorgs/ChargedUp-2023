@@ -27,7 +27,6 @@ import org.sciborgs1155.lib.Trajectory;
 import org.sciborgs1155.lib.Trajectory.State;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
-import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.util.Visualizer;
 
 public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
@@ -58,16 +57,16 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log private boolean hasSpiked = false;
 
-  @Log private double offset = Robot.isReal() ? 0.61842 : 0;
+  @Log private double offset = 0.61842;
 
   private final ElevatorSim sim =
       new ElevatorSim(
           DCMotor.getNEO(3),
+          GEARING,
+          Dimensions.CARRIAGE_MASS + Dimensions.FOREARM_MASS + Dimensions.CLAW_MASS,
           RELATIVE_CONVERSION.gearing(),
-          Dimensions.ELEVATOR_MASS + Dimensions.FOREARM_MASS + Dimensions.CLAW_MASS,
-          RELATIVE_CONVERSION.units(),
-          Dimensions.ELEVATOR_MIN_HEIGHT,
-          Dimensions.ELEVATOR_MAX_HEIGHT,
+          MIN_HEIGHT,
+          MAX_HEIGHT,
           true);
 
   private final Visualizer positionVisualizer;
@@ -141,9 +140,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Override
   public void periodic() {
-    double position =
-        MathUtil.clamp(
-            setpoint.position(), Dimensions.ELEVATOR_MIN_HEIGHT, Dimensions.ELEVATOR_MAX_HEIGHT);
+    double position = MathUtil.clamp(setpoint.position(), MIN_HEIGHT, MAX_HEIGHT);
 
     double fbOutput = pid.calculate(getPosition(), position);
     double ffOutput = ff.calculate(setpoint.velocity(), setpoint.acceleration());

@@ -45,34 +45,26 @@ public final class Constants {
   public static final double DEADBAND = 0.1;
 
   public static final class Dimensions {
-    public static final double ELEVATOR_MIN_HEIGHT = 0;
-    public static final double ELEVATOR_MAX_HEIGHT = 0.65; // m
+    public static final double BASE_OFFSET = -0.127;
+    // Distance from the center of the robot to the center of the elevator
 
-    public static final double ELBOW_MIN_ANGLE = -Math.PI / 2.0;
-    public static final double ELBOW_MAX_ANGLE = 3.0 * Math.PI / 2.0;
-    public static final double WRIST_MIN_ANGLE = -Math.PI;
-    public static final double WRIST_MAX_ANGLE = Math.PI;
+    public static final double BASE_HEIGHT = 0.5203698;
+    // Distance from the ground to the lowest possible elbow position
 
-    public static final double CLAW_LENGTH = Units.inchesToMeters(11.5);
-    public static final double CLAW_MASS = 3.6; // var used to say 4.4, also could be 3.62874
-    public static final double CLAW_MOI =
-        1.0 / 12.0 * CLAW_MASS * CLAW_LENGTH * CLAW_LENGTH; // moi about center point
-    public static final double CLAW_RADIUS = CLAW_LENGTH / 2.0;
+    public static final double FOREARM_LENGTH = 0.927;
+    // Distance from elbow pivot to to wrist pivot
 
-    public static final double FOREARM_LENGTH = Units.inchesToMeters(36);
-    public static final double FOREARM_MASS = Units.lbsToKilograms(4.2);
-    public static final double FOREARM_MOI =
-        1. / 12 * FOREARM_MASS * FOREARM_LENGTH * FOREARM_LENGTH;
-    public static final double FOREARM_RADIUS = FOREARM_LENGTH / 2;
+    public static final double CLAW_LENGTH = 0.488;
+    // Distance (hypotenuse) from wrist joint to tip
 
-    public static final double ARM_LENGTH = CLAW_LENGTH + FOREARM_LENGTH;
+    public static final double CARRIAGE_MASS = 6.80389;
+    // Mass of the carriage alone
 
-    public static final double ELEVATOR_MASS = 4;
+    public static final double FOREARM_MASS = 4.08233;
+    // Mass of the forearm alone
 
-    public static final double TRACK_WIDTH = 0.5715;
-    // Distance between centers of right and left wheels on robot
-    public static final double WHEEL_BASE = 0.5715;
-    // Distance between front and back wheels on robot
+    public static final double CLAW_MASS = 3.85554;
+    // Mass of the claw alone
   }
 
   public static final class Vision {
@@ -109,6 +101,9 @@ public final class Constants {
       public static final MotorConfig MOTOR =
           MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withInvert(true);
 
+      public static final double GEARING = 53.125 / 1.0;
+      // Gearing for motor : angle (radians)
+
       public static final Conversion CONVERSION =
           Conversion.base().withUnits(Conversion.Units.RADIANS);
 
@@ -117,11 +112,17 @@ public final class Constants {
           new SystemConstants(0.1542, 0.6, 0.91, 0.038046); // v =  0.87884
 
       public static final Constraints CONSTRAINTS = new Constraints(2.1, 1.9);
+
+      public static final double MAX_ANGLE = Math.PI;
+      public static final double MIN_ANGLE = -Math.PI;
     }
 
     public static final class Elbow {
       public static final MotorConfig MOTOR =
           MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
+
+      public static final double GEARING = 63.75 / 1.0;
+      // Gearing for motor : angle (radians)
 
       public static final Conversion CONVERSION =
           Conversion.base()
@@ -135,6 +136,10 @@ public final class Constants {
           new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
       public static final Constraints CONSTRAINTS = new Constraints(2.4, 2.2);
+
+      public static final double MAX_ANGLE = 3.0 * Math.PI / 2.0;
+      public static final double MIN_ANGLE = -Math.PI / 2.0;
+
       public static final double ELBOW_OFFSET = -1.248660;
     }
   }
@@ -142,6 +147,9 @@ public final class Constants {
   public static final class Elevator {
     public static final MotorConfig MOTOR =
         MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(40);
+
+    public static final double GEARING = 30.0 / 1.0;
+    // Gearing for motor : height (meters)
 
     public static final Conversion RELATIVE_CONVERSION =
         Conversion.base()
@@ -154,7 +162,9 @@ public final class Constants {
 
     public static final PIDConstants PID = new PIDConstants(50, 0, 1);
     public static final SystemConstants FF = new SystemConstants(0.4, 0.069335, 33.25, 1.5514);
-    // s = 0.20619
+
+    public static final double MIN_HEIGHT = 0;
+    public static final double MAX_HEIGHT = 0.65;
 
     public static final int SAMPLE_SIZE_TAPS = 5;
     public static final int CURRENT_SPIKE_THRESHOLD = 20;
@@ -194,11 +204,16 @@ public final class Constants {
     public static final double MAX_ANGULAR_SPEED = 1.5 * Math.PI; // rad / s
     public static final double MAX_ACCEL = 9; // m / s^2
 
+    public static final double TRACK_WIDTH = 0.5715;
+    // Distance between centers of right and left wheels on robot
+    public static final double WHEEL_BASE = 0.5715;
+    // Distance between front and back wheels on robot
+
     public static final Translation2d[] MODULE_OFFSET = {
-      new Translation2d(Dimensions.WHEEL_BASE / 2, Dimensions.TRACK_WIDTH / 2), // front left
-      new Translation2d(Dimensions.WHEEL_BASE / 2, -Dimensions.TRACK_WIDTH / 2), // front right
-      new Translation2d(-Dimensions.WHEEL_BASE / 2, Dimensions.TRACK_WIDTH / 2), // rear left
-      new Translation2d(-Dimensions.WHEEL_BASE / 2, -Dimensions.TRACK_WIDTH / 2) // rear right
+      new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), // front left
+      new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), // front right
+      new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), // rear left
+      new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2) // rear right
     };
 
     // angular offsets of the modules, since we use absolute encoders
