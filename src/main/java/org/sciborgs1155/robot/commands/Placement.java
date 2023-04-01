@@ -48,7 +48,7 @@ public final class Placement {
    *     values.
    */
   public Optional<PlacementTrajectory> findTrajectory(PlacementState goal) {
-    return findTrajectory(new Parameters(state(), goal));
+    return findTrajectory(new Parameters(setpoint(), goal));
   }
 
   /** Returns the current position goal of the placement mechanisms */

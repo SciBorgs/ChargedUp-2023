@@ -95,7 +95,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     this.positionVisualizer = positionVisualizer;
     this.setpointVisualizer = setpointVisualizer;
 
-    setpoint = new State(getPosition(), 0, 0);
+    // setpoint = new State(getPosition(), 0, 0);
   }
 
   /** Returns the height of the elevator, in meters */
@@ -105,8 +105,8 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Sets the elevator's setpoint height */
-  public void setSetpoint(State state) {
-    setpoint = state;
+  public void setSetpoint(double height) {
+    setpoint = new State(height, 0, 0);
   }
 
   /** Returns the elevator setpoint as a {@link State} */
@@ -124,12 +124,9 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
             run(
                 () -> {
                   var profile = new TrapezoidProfile(CONSTRAINTS, goal, setpoint.trapezoidState());
-                  var setpoint = profile.calculate(pid.getPeriod());
-                  setSetpoint(
-                      new State(
-                          setpoint.position,
-                          setpoint.velocity,
-                          accel.calculate(setpoint.velocity)));
+                  var target = profile.calculate(pid.getPeriod());
+                  setpoint =
+                      new State(target.position, target.velocity, accel.calculate(target.velocity));
                 }))
         .until(() -> pid.atSetpoint() && goal.equals(setpoint.trapezoidState()));
   }
@@ -137,7 +134,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   public Command followTrajectory(Trajectory trajectory) {
     Timer timer = new Timer();
     return runOnce(timer::start)
-        .andThen(run(() -> setSetpoint(trajectory.sample(timer.get()))))
+        .andThen(run(() -> setpoint = trajectory.sample(timer.get())))
         .until(() -> timer.hasElapsed(trajectory.getTotalTime()));
   }
 

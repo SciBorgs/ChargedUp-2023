@@ -114,8 +114,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowRight.burnFlash();
     wrist.burnFlash();
 
-    elbowSetpoint = new State(getElbowPosition().getRadians(), 0, 0);
-    wristSetpoint = new State(getRelativeWristPosition().getRadians(), 0, 0);
+    // elbowSetpoint = new State(getElbowPosition().getRadians(), 0, 0);
+    // wristSetpoint = new State(getRelativeWristPosition().getRadians(), 0, 0);
 
     this.positionVisualizer = positionVisualizer;
     this.setpointVisualizer = setpointVisualizer;
@@ -142,8 +142,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Sets the elbows's setpoint, in radians */
-  public void setElbowSetpoint(State state) {
-    elbowSetpoint = state;
+  public void setElbowSetpoint(Rotation2d angle) {
+    elbowSetpoint = new State(angle.getRadians(), 0, 0);
   }
 
   /** Returns the elbow setpoint as a {@link State} */
@@ -151,9 +151,9 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     return elbowSetpoint;
   }
 
-  /** Sets the wrist's setpoint, in radians */
-  public void setWristSetpoint(State state) {
-    wristSetpoint = state;
+  /** Sets the wrist's relative setpoint, in radians */
+  public void setWristSetpoint(Rotation2d angle) {
+    wristSetpoint = new State(angle.getRadians(), 0, 0);
   }
 
   /** Returns the wrist setpoint as a {@link State} */
@@ -183,19 +183,19 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
                       new TrapezoidProfile(
                           Wrist.CONSTRAINTS, wristGoal, wristSetpoint.trapezoidState());
 
-                  var elbowSetpoint = elbowProfile.calculate(elbowFeedback.getPeriod());
-                  var wristSetpoint = wristProfile.calculate(wristFeedback.getPeriod());
+                  var elbowTarget = elbowProfile.calculate(elbowFeedback.getPeriod());
+                  var wristTarget = wristProfile.calculate(wristFeedback.getPeriod());
 
-                  setElbowSetpoint(
+                  elbowSetpoint =
                       new State(
-                          elbowSetpoint.position,
-                          elbowSetpoint.velocity,
-                          elbowAccel.calculate(elbowSetpoint.velocity)));
-                  setWristSetpoint(
+                          elbowTarget.position,
+                          elbowTarget.velocity,
+                          elbowAccel.calculate(elbowTarget.velocity));
+                  wristSetpoint =
                       new State(
-                          wristSetpoint.position,
-                          wristSetpoint.velocity,
-                          wristAccel.calculate(wristSetpoint.velocity)));
+                          wristTarget.position,
+                          wristTarget.velocity,
+                          wristAccel.calculate(wristTarget.velocity));
                 }))
         .until(
             () ->
@@ -216,8 +216,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
         .andThen(
             run(
                 () -> {
-                  setElbowSetpoint(elbowTrajectory.sample(timer.get()));
-                  setWristSetpoint(wristTrajectory.sample(timer.get()));
+                  elbowSetpoint = elbowTrajectory.sample(timer.get());
+                  wristSetpoint = wristTrajectory.sample(timer.get());
                 }))
         .until(() -> timer.hasElapsed(elbowTrajectory.getTotalTime()));
   }

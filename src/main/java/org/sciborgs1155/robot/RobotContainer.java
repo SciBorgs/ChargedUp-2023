@@ -73,6 +73,10 @@ public class RobotContainer implements Loggable {
     configureBindings();
     // Configure subsystem default commands
     configureSubsystemDefaults();
+
+    elevator.setSetpoint(Positions.INITIAL.elevatorHeight());
+    arm.setElbowSetpoint(Positions.INITIAL.elbowAngle());
+    arm.setWristSetpoint(Positions.INITIAL.wristAngle());
   }
 
   private void configureAutoChooser() {
