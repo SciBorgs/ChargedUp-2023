@@ -41,7 +41,7 @@ public class PlacementCache {
       for (int i = 0; i < cachedTrajectory.points().length - 3; i += 3) {
         elevatorStates.add(cachedTrajectory.points()[i]);
         elbowStates.add(cachedTrajectory.points()[i + 1]);
-        wristStates.add(cachedTrajectory.points()[i + 2]);
+        wristStates.add(cachedTrajectory.points()[i + 2] - cachedTrajectory.points()[i + 1]);
       }
 
       Parameters params =
