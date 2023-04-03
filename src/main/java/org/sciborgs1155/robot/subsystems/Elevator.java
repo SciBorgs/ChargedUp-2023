@@ -151,6 +151,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
     positionVisualizer.setElevatorHeight(getPosition());
     setpointVisualizer.setElevatorHeight(setpoint.position());
+    System.out.println("ELEVATOR SETPOINT : " + pid.getSetpoint());
     // SmartDashboard.putNumber("start", offsetEncoder.getPosition());
   }
 
