@@ -14,6 +14,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -86,6 +87,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
           false);
 
   private final Visualizer visualizer;
+
+  private DigitalInput limitSwitch = new DigitalInput(0);
 
   public Arm(Visualizer visualizer) {
     elbowLeft.follow(elbow);
@@ -194,7 +197,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             elbowFeedback.getSetpoint().position,
             elbowFeedback.getSetpoint().velocity,
             elbowAccel.calculate(elbowFeedback.getSetpoint().velocity));
-    elbow.setVoltage(elbowFB + elbowFF);
+    if(limitSwitch.get()){elbow.setVoltage(0);} else{elbow.setVoltage(elbowFB + elbowFF);}
 
     // wrist feedback is calculated using an absolute angle setpoint, rather than a relative one
     // this means the extra voltage calculated to cancel out gravity is kG * cos(θ + ϕ), where θ is
@@ -207,7 +210,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             wristFeedback.getSetpoint().position + elbowFeedback.getSetpoint().position,
             wristFeedback.getSetpoint().velocity,
             wristAccel.calculate(wristFeedback.getSetpoint().velocity));
-    wrist.setVoltage(wristFB + wristFF);
+    if(limitSwitch.get()) {wrist.setVoltage(0);} else {wrist.setVoltage(wristFB + wristFF);}
 
     visualizer.setElbow(
         getElbowPosition(), Rotation2d.fromRadians(elbowFeedback.getSetpoint().position));

@@ -13,6 +13,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
@@ -67,6 +68,8 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
           true);
 
   private final Visualizer visualizer;
+  
+  DigitalInput toplimitSwitch = new DigitalInput(0);
 
   public Elevator(Visualizer visualizer) {
     left.follow(lead);
@@ -132,11 +135,9 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     double fbOutput = pid.calculate(getPosition());
     double ffOutput =
         ff.calculate(pid.getSetpoint().velocity, accel.calculate(pid.getSetpoint().velocity));
-
-    lead.setVoltage(fbOutput + ffOutput);
+        lead.setVoltage(ffOutput+fbOutput);
 
     hasSpiked = filter.calculate(lead.getOutputCurrent()) >= CURRENT_SPIKE_THRESHOLD;
-
     visualizer.setElevator(getPosition(), pid.getSetpoint().position);
     SmartDashboard.putNumber("start", offsetEncoder.getPosition());
   }
