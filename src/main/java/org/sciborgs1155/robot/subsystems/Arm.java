@@ -109,7 +109,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
     this.visualizer = visualizer;
 
-    elbowEncoder.setPosition(Elbow.ELBOW_OFFSET);
     elbowFeedback.setGoal(getElbowPosition().getRadians());
     wristFeedback.setGoal(Math.PI);
     wristFeedback.setTolerance(0.3);
@@ -118,7 +117,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   /** Elbow position relative to the chassis */
   @Log(name = "elbow position", methodName = "getRadians")
   public Rotation2d getElbowPosition() {
-    return Rotation2d.fromRadians(elbowEncoder.getPosition());
+    return Rotation2d.fromRadians(elbowEncoder.getPosition() + Elbow.ELBOW_OFFSET);
   }
 
   /** Wrist position relative to the forearm */

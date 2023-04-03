@@ -44,7 +44,7 @@ public final class Ports {
   }
 
   public static final class Intake {
-    public static final int WHEEL_MOTOR = 6;
+    public static final int WHEEL_MOTOR = 7;
   }
 
   public static final class Led {

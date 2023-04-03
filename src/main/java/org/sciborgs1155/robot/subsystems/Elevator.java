@@ -26,10 +26,10 @@ import org.sciborgs1155.robot.util.Visualizer;
 public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log(name = "applied output", methodName = "getAppliedOutput")
-  private final CANSparkMax lead = MOTOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
+  private final CANSparkMax lead = MOTOR.build(MotorType.kBrushless, RIGHT_MOTOR);
 
   private final CANSparkMax left = MOTOR.build(MotorType.kBrushless, LEFT_MOTOR);
-  private final CANSparkMax right = MOTOR.build(MotorType.kBrushless, RIGHT_MOTOR);
+  private final CANSparkMax right = MOTOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
 
   // @Log private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1]);
   // private final EncoderSim simEncoder = new EncoderSim(encoder);
@@ -70,6 +70,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     left.follow(lead);
     right.follow(lead);
 
+    encoder.setInverted(true);
     encoder.setPositionConversionFactor(RELATIVE_CONVERSION.factor());
     encoder.setVelocityConversionFactor(RELATIVE_CONVERSION.factor() / 60.0);
     // offsetEncoder.setPositionConversionFactor(ABSOLUTE_CONVERSION.factor());
@@ -87,8 +88,6 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     left.burnFlash();
     right.burnFlash();
 
-    encoder.setPosition(offset);
-
     this.visualizer = visualizer;
 
     pid.setGoal(getPosition());
@@ -97,7 +96,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   /** Returns the height of the elevator, in meters */
   @Log(name = "position")
   public double getPosition() {
-    return encoder.getPosition();
+    return encoder.getPosition() + offset;
   }
 
   /** Returns the goal of the elevator, in meters */
@@ -135,6 +134,8 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
         ff.calculate(pid.getSetpoint().velocity, accel.calculate(pid.getSetpoint().velocity));
 
     lead.setVoltage(fbOutput + ffOutput);
+    // lead.stopMotor();
+    // System.out.println(ffOutput + fbOutput);
 
     hasSpiked = filter.calculate(lead.getOutputCurrent()) >= CURRENT_SPIKE_THRESHOLD;
 
