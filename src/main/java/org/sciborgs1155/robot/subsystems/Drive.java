@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.DoubleUnaryOperator;
 import org.sciborgs1155.robot.Constants;
@@ -324,7 +325,14 @@ public class Drive extends SubsystemBase implements Loggable {
     PathPoint goal =
         new PathPoint(desiredPose.getTranslation(), heading, desiredPose.getRotation());
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(CONSTRAINTS, start, goal);
-    return follow(trajectory, false, useAllianceColor);
+    BooleanSupplier closeEnough =
+        () -> {
+          Transform2d transform = getPose().minus(desiredPose);
+          return Math.abs(transform.getX()) < 0.3
+              && Math.abs(transform.getY()) < 0.3
+              && Math.abs(transform.getRotation().getDegrees()) < 5;
+        };
+    return follow(trajectory, false, useAllianceColor).until(closeEnough);
   }
 
   /** Creates and follows trajectory for swerve from current pose to desiredPose */

@@ -12,6 +12,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -21,6 +22,7 @@ import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
+import org.sciborgs1155.robot.Ports;
 import org.sciborgs1155.robot.util.Visualizer;
 
 public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
@@ -39,6 +41,8 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   // private final AbsoluteEncoder offsetEncoder = right.getAbsoluteEncoder(Type.kDutyCycle);
 
   private final ElevatorFeedforward ff = new ElevatorFeedforward(FF.s(), FF.g(), FF.v(), FF.a());
+  // set ports V
+  private DigitalInput limitSwitch = new DigitalInput(Ports.Elevator.LIMIT_SWITCH);
 
   private final LinearFilter filter = LinearFilter.movingAverage(SAMPLE_SIZE_TAPS);
 
@@ -65,6 +69,8 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
           true);
 
   private final Visualizer visualizer;
+
+  private boolean stopped;
 
   public Elevator(Visualizer visualizer) {
     left.follow(lead);
@@ -127,18 +133,23 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     return setGoal(goal).andThen(Commands.waitUntil(this::atGoal));
   }
 
+  public boolean atSwitch() {
+    return limitSwitch.get();
+  }
+
+  public Command setStopped(boolean stopped) {
+
+    return runOnce(() -> this.stopped = stopped);
+  }
+
   @Override
   public void periodic() {
     double fbOutput = pid.calculate(getPosition());
     double ffOutput =
         ff.calculate(pid.getSetpoint().velocity, accel.calculate(pid.getSetpoint().velocity));
-
-    lead.setVoltage(fbOutput + ffOutput);
-    // lead.stopMotor();
-    // System.out.println(ffOutput + fbOutput);
+    lead.setVoltage(stopped ? 0 : ffOutput + fbOutput);
 
     hasSpiked = filter.calculate(lead.getOutputCurrent()) >= CURRENT_SPIKE_THRESHOLD;
-
     visualizer.setElevator(getPosition(), pid.getSetpoint().position);
     // SmartDashboard.putNumber("start", offsetEncoder.getPosition());
   }
