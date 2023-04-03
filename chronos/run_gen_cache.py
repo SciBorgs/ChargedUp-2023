@@ -61,6 +61,7 @@ if __name__ == "__main__":
             print("Failed to generate trajectory:", trajectory)
             fail_count += 1
         else:
+            print("Generated trajectory: ", trajectory)
             trajectory["totalTime"] = result[0]
             trajectory["points"] = []
             for i in range(len(result[1])):

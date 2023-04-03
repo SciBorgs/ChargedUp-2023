@@ -63,7 +63,7 @@ public class PlacementCache {
 
   /** Generates trajectories between every stored preset */
   public static void main(String... args) throws IOException, InterruptedException {
-    System.out.println("Generating...");
+    System.out.println("Generating trajectories...");
     // Generate trajectories between stored presets
 
     List<CachedTrajectory> generatedTrajectories = new ArrayList<CachedTrajectory>();
@@ -87,6 +87,7 @@ public class PlacementCache {
     for (var initialPos : presets) {
       for (var finalPos : presets) {
         if (!initialPos.equals(finalPos)) {
+          System.out.println("Adding initial: " + initialPos + " final: " + finalPos);
           generatedTrajectories.add(
               new CachedTrajectory(
                   initialPos.toArray(), finalPos.toArray(), new String[] {}, 0, new double[] {}));

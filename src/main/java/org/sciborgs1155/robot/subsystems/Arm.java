@@ -255,10 +255,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     setpointVisualizer.setArmAngles(
         Rotation2d.fromRadians(elbowFeedback.getSetpoint()),
         Rotation2d.fromRadians(wristFeedback.getSetpoint()));
-
-    System.out.println("ELBOW SETPOINT : " + elbowFeedback.getSetpoint());
-    System.out.println(
-        "WRIST SETPOINT : " + (wristFeedback.getSetpoint() + elbowFeedback.getSetpoint()));
   }
 
   @Override

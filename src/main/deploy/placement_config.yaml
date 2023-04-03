@@ -10,10 +10,10 @@
 origin: [ -0.127, 0.5203698 ]
 
 solver:
-  interiorPoints: 25
-  maxVoltageElbow: 7
+  interiorPoints: 20
+  maxVoltageElbow: 8
   maxVoltageWrist: 5
-  maxVoltageLift: 7
+  maxVoltageLift: 8
   maxAccelerationElbow: 2.9
   maxAccelerationWrist: 2.8
   maxAccelerationLift: 2.8
