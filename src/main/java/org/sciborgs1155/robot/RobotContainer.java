@@ -67,32 +67,109 @@ public class RobotContainer implements Loggable {
     // Configure the oblog logger
     Logger.configureLoggingAndConfig(this, false);
     // Configure auto chooser options
-    configureAutoChoosers();
+    configureAutoChooser();
     // Configure the trigger bindings
     configureBindings();
     // Configure subsystem default commands
     configureSubsystemDefaults();
   }
 
-  private void configureAutoChoosers() {
-    // autoChooser.addOption("balance", autos::justBalance);
-    autoChooser.addOption("balance (no ppl)", autos::balanceNoPPL);
-    autoChooser.addOption("high cone", autos::highConeScore);
-    autoChooser.addOption("back high cube", autos::backHighCubeScore);
-    autoChooser.addOption("front high cube", autos::frontHighCubeScore);
-    autoChooser.addOption("back high cube -> intake", autos::cubeIntake);
-    autoChooser.addOption("score cone, score cube, engage", autos::coneCubeEngage);
-    autoChooser.addOption("score cone, score cube, intake", autos::coneCubeIntake);
-    autoChooser.addOption("back high cube -> engage", autos::cubeBalance);
-    autoChooser.setDefaultOption("high cone -> leave comm", autos::coneLeave);
-    autoChooser.addOption("back high cube -> leave comm", autos::cubeLeave);
-    // autoChooser.addOption("no ppl: back high cone/cube -> leave comm", autos::scoreLeaveNoPPL);
-    autoChooser.addOption("none", Commands::none);
-    autoChooser.addOption("cube balance NO PPL", autos::scoreBalanceNoPPL);
+  private void configureAutoChooser() {
+    // ambitious path
+    autoChooser.addOption("2 gamepiece", autos::twoGamepiece);
+    /* 2 gamepiece setup instructions:
+     * gamepiece: cone
+     * orientation: away from grid
+     * set starting pos: yes
+     * starting location: cone scoring, all the way to one side
+     */
 
+    // simple balances (no PPL)
+    autoChooser.addOption("balance", autos::balance);
+    /* balance setup instructions:
+     * gamepiece: none
+     * orientation: away from grid
+     * set starting pos: no
+     * starting location: in front of charge station
+     */
+    autoChooser.addOption("cube -> balance", autos::cubeBalance);
+    /* cube balance setup instructions:
+     * gamepiece: cube
+     * orientation: away from grid
+     * set starting pos: no
+     * starting location: cube scoring, center
+     */
+    autoChooser.addOption("cone -> balance", autos::coneBalance);
+    /* cone balance setup instructions:
+     * gamepiece: cone
+     * orientation: away from grid
+     * set starting pos: no
+     * starting location: cone scoring, off-center (right/left doesn't matter, as long as it's
+     * in front of charge)
+     */
+
+    // simple scoring
+    autoChooser.addOption("cone -> leave", autos::coneLeave);
+    /* cone leave setup instructions:
+     * gamepiece: cone
+     * orientation: away from grid
+     * set starting pos: yes
+     * starting location: cone scoring, all the way to one side
+     */
+    autoChooser.addOption("cube -> leave", autos::cubeLeave);
+    /* cube leave setup instructions:
+     * gamepiece: cube
+     * orientation: away from grid
+     * set starting pos: yes
+     * starting location: cube scoring, all the way to one side
+     */
+
+    // backups
     autoChooser.addOption("backup (no drive): cube score", autos::backHighCubeScore);
-    autoChooser.addOption("backup (no drive): cone score", autos::highConeScore);
-    autoChooser.addOption("backup (no odometry): cone leave", autos::coneLeaveNoOdometry);
+    /* cube score setup instructions:
+     * gamepiece: cube
+     * orientation: away from grid
+     * set starting pos: no
+     * starting location: cube scoring (anywhere)
+     */
+    autoChooser.setDefaultOption("backup (no drive): cone score", autos::highConeScore);
+    /* cone score setup instructions:
+     * gamepiece: cone
+     * orientation: away from grid
+     * set starting pos: no
+     * starting location: cone scoring (anywhere)
+     */
+    autoChooser.addOption("backup (no odometry): cone -> leave", autos::coneLeaveNoOdometry);
+    /* cone leave (no odometry) setup instructions:
+     * gamepiece: cone
+     * orientation: away from grid
+     * set starting pos: no
+     * starting location: cone scoring, all the way to one side
+     */
+    autoChooser.addOption("backup (no odometry): cube -> leave", autos::cubeLeaveNoOdometry);
+    /* cube leave (no odometry) setup instructions:
+     * gamepiece: cube
+     * orientation: away from grid
+     * set starting pos: no
+     * starting location: cube scoring, all the way to one side
+     */
+    autoChooser.addOption("backup (no arm, no odometry): leave", autos::leaveNoOdometry);
+    /* leave (no odometry) setup instructions:
+     * gamepiece: none
+     * orientation: away from grid
+     * set starting pos: no
+     * starting location: against grid, to one side (it should have a clear path straight forward)
+     */
+    autoChooser.addOption("backup (no arm): leave", autos::leave);
+    /* leave setup instructions:
+     * gamepiece: none
+     * orientation: away from grid
+     * set starting pos: yes
+     * starting location: against grid, to one side (it should have a clear path straight forward)
+     */
+
+    // ultimate backup
+    autoChooser.addOption("none", Commands::none);
   }
 
   private void configureSubsystemDefaults() {
@@ -147,6 +224,8 @@ public class RobotContainer implements Loggable {
     // INTAKING
     operator.leftBumper().onTrue(intake.intake()).onFalse(intake.stop());
     operator.rightBumper().onTrue(intake.outtake()).onFalse(intake.stop());
+
+    new Trigger(elevator::atSwitch).onTrue(elevator.setStopped(true));
   }
 
   /** A command to run when the robot is enabled */
@@ -164,5 +243,13 @@ public class RobotContainer implements Loggable {
    */
   public Command getAutonomousCommand() {
     return autoChooser.getSelected().get();
+  }
+
+  public Command getTestCommand() {
+    // return Commands.sequence(
+    //   Commands.runOnce(() -> drive.resetOdometry(new Pose2d(3, 3, Rotation2d.fromDegrees(0))),
+    // drive),
+    //   scoring.odometryAlign(Side.BACK));
+    return Commands.none();
   }
 }

@@ -2,11 +2,9 @@ package org.sciborgs1155.robot.subsystems;
 
 import static org.sciborgs1155.robot.Constants.Elevator.*;
 import static org.sciborgs1155.robot.Ports.Elevator.*;
-
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -14,10 +12,7 @@ import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,6 +20,7 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.Ports;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.util.Visualizer;
 
@@ -36,18 +32,22 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   private final CANSparkMax left = MOTOR.build(MotorType.kBrushless, LEFT_MOTOR);
   private final CANSparkMax right = MOTOR.build(MotorType.kBrushless, RIGHT_MOTOR);
 
-  @Log private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1]);
-  private final EncoderSim simEncoder = new EncoderSim(encoder);
+  // @Log private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1]);
+  // private final EncoderSim simEncoder = new EncoderSim(encoder);
+  private final RelativeEncoder encoder =
+      lead.getAlternateEncoder(Constants.Dimensions.ALTERNATE_COUNTS_PER_REV);
 
-  private final AbsoluteEncoder offsetEncoder = lead.getAbsoluteEncoder(Type.kDutyCycle);
+  // private final AbsoluteEncoder offsetEncoder = right.getAbsoluteEncoder(Type.kDutyCycle);
 
   private final ElevatorFeedforward ff = new ElevatorFeedforward(FF.s(), FF.g(), FF.v(), FF.a());
+  // set ports V
+  private DigitalInput limitSwitch = new DigitalInput(Ports.Elevator.LIMIT_SWITCH);
 
   private final LinearFilter filter = LinearFilter.movingAverage(SAMPLE_SIZE_TAPS);
 
   @Log private boolean hasSpiked = false;
 
-  @Log private double offset = 0.61842;
+  @Log private final double offset = 0.61842;
 
   @Log
   @Log(name = "at goal", methodName = "atGoal")
@@ -68,28 +68,31 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
           true);
 
   private final Visualizer visualizer;
-  
-  DigitalInput toplimitSwitch = new DigitalInput(0);
+
+  private boolean stopped;
 
   public Elevator(Visualizer visualizer) {
     left.follow(lead);
     right.follow(lead);
 
-    encoder.setDistancePerPulse(RELATIVE_CONVERSION.factor());
-    offsetEncoder.setPositionConversionFactor(ABSOLUTE_CONVERSION.factor());
+    encoder.setPositionConversionFactor(RELATIVE_CONVERSION.factor());
+    encoder.setVelocityConversionFactor(RELATIVE_CONVERSION.factor() / 60.0);
+    // offsetEncoder.setPositionConversionFactor(ABSOLUTE_CONVERSION.factor());
 
     // for (int i = 0; i < 100; i++) System.out.println(offsetEncoder.getPosition());
     // if (Robot.isReal()) {
     //   offset = offsetEncoder.getPosition() + ZERO_OFFSET;
     // }
 
-    SmartDashboard.putNumber("start", offsetEncoder.getPosition());
+    // SmartDashboard.putNumber("start", offsetEncoder.getPosition());
     // STARTING POSITION ****MUST**** BE ABOVE THE ZERO LOCATION
     // VALUES NEAR THE RED TAPE MARKING ARE GOOD
 
     lead.burnFlash();
     left.burnFlash();
     right.burnFlash();
+
+    encoder.setPosition(offset);
 
     this.visualizer = visualizer;
 
@@ -99,7 +102,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   /** Returns the height of the elevator, in meters */
   @Log(name = "position")
   public double getPosition() {
-    return encoder.getDistance() + offset;
+    return encoder.getPosition();
   }
 
   /** Returns the goal of the elevator, in meters */
@@ -130,24 +133,34 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     return setGoal(goal).andThen(Commands.waitUntil(this::atGoal));
   }
 
+  
+  public boolean atSwitch(){
+    return limitSwitch.get();
+  }
+
+  public Command setStopped(boolean stopped){
+
+    return runOnce(() -> this.stopped = stopped) ;
+  }
+  
+
   @Override
   public void periodic() {
     double fbOutput = pid.calculate(getPosition());
     double ffOutput =
         ff.calculate(pid.getSetpoint().velocity, accel.calculate(pid.getSetpoint().velocity));
-        lead.setVoltage(ffOutput+fbOutput);
+    lead.setVoltage(stopped ? 0 : ffOutput + fbOutput);
 
     hasSpiked = filter.calculate(lead.getOutputCurrent()) >= CURRENT_SPIKE_THRESHOLD;
     visualizer.setElevator(getPosition(), pid.getSetpoint().position);
-    SmartDashboard.putNumber("start", offsetEncoder.getPosition());
+    // SmartDashboard.putNumber("start", offsetEncoder.getPosition());
   }
 
   @Override
   public void simulationPeriodic() {
     sim.setInputVoltage(lead.getAppliedOutput());
     sim.update(Constants.RATE);
-    simEncoder.setDistance(sim.getPositionMeters());
-    simEncoder.setRate(sim.getVelocityMetersPerSecond());
+    encoder.setPosition(sim.getPositionMeters());
   }
 
   @Override

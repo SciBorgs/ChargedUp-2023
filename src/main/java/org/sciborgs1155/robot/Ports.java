@@ -27,20 +27,22 @@ public final class Ports {
 
   public static final class Arm {
     public static final int LEFT_ELBOW_MOTOR = 14;
-    public static final int MIDDLE_ELBOW_MOTOR = 15;
-    public static final int RIGHT_ELBOW_MOTOR = 16;
+    public static final int MIDDLE_ELBOW_MOTOR = 16;
+    public static final int RIGHT_ELBOW_MOTOR = 15;
 
-    public static final int[] ELBOW_ENCODER = {8, 9};
+    public static final int[] ELBOW_ENCODER = {9, 8};
 
     public static final int WRIST_MOTOR = 8;
   }
 
   public static final class Elevator {
     public static final int LEFT_MOTOR = 26;
-    public static final int RIGHT_MOTOR = 25;
-    public static final int MIDDLE_MOTOR = 24;
+    public static final int RIGHT_MOTOR = 24;
+    public static final int MIDDLE_MOTOR = 25;
 
     public static final int[] ENCODER = {6, 7};
+
+    public static final int LIMIT_SWITCH = 23;
   }
 
   public static final class Intake {

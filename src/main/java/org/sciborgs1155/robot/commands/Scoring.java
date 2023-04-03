@@ -11,10 +11,11 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
+import java.util.Collection;
+import java.util.List;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.LED;
 import org.sciborgs1155.robot.util.PlacementState;
-import org.sciborgs1155.robot.util.Vision;
 
 public final class Scoring implements Sendable {
 
@@ -65,32 +66,23 @@ public final class Scoring implements Sendable {
     return Commands.runOnce(() -> this.side = side);
   }
 
-  // TODO make it take gamePiece into account
-  public Command odometryAlign(Side side, Vision vision, GamePiece gamePiece) {
-    return drive.driveToPose(drive.getPose(), closestScoringPoint(side, vision, gamePiece), true);
+  public Command odometryAlign(Side side) {
+    return odometryAlign(drive.getPose(), side);
   }
 
-  // TODO make commands to go to the next scoring poses to the left and right
-  private Pose2d closestScoringPoint(Side side, Vision vision, GamePiece gamePiece) {
-    if (vision.hasTargets()) {
-      int tagID = vision.getBestTarget().getFiducialId();
-      Translation2d scorePoint = SCORING_POINTS.get(tagID);
-      return new Pose2d(scorePoint, Rotation2d.fromRadians(side.rads() % (2 * Math.PI)));
-    }
-    return new Pose2d();
+  public Command odometryAlign(Pose2d startPose, Side side) {
+    return drive.driveToPose(startPose, closestScoringPoint(startPose, side), true);
   }
-  /*
-  private Pose2d closestScoringPoint(Side side) {
-    Collection<Translation2d> scoringPoints = SCORING_POINTS.values();
-    Translation2d point =
-        drive
-            .getPose()
-            .getTranslation()
-            .nearest(new ArrayList<Translation2d>(List.copyOf(scoringPoints)));
-    double rotationRad = (side.rads()  TODO use path planner flip color.rads()) % (2 * Math.PI);
-    return new Pose2d(point, Rotation2d.fromRadians(rotationRad));
+
+  private Pose2d closestScoringPoint(Pose2d pose, Side side) {
+    Collection<Translation2d> scoringPoints =
+        switch (gamePiece) {
+          case CONE -> SCORING_POINTS_CONE.values();
+          case CUBE -> SCORING_POINTS_CUBE.values();
+        };
+    Translation2d point = pose.getTranslation().nearest(List.copyOf(scoringPoints));
+    return new Pose2d(point, Rotation2d.fromRadians(side.rads()));
   }
-  */
 
   public Command goTo(Level height) {
     return new ProxyCommand(() -> placement.safeToState(scoringState(height)));
@@ -106,6 +98,7 @@ public final class Scoring implements Sendable {
       case HIGH -> switch (gamePiece) {
         case CONE -> BACK_HIGH_CONE;
         case CUBE -> side == Side.FRONT ? FRONT_HIGH_CUBE : BACK_HIGH_CUBE;
+        default -> throw new IllegalArgumentException("Unexpected value: " + gamePiece);
       };
       case SINGLE_SUBSTATION -> switch (gamePiece) {
         case CONE -> FRONT_SINGLE_SUBSTATION_CONE;
