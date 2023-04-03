@@ -16,10 +16,9 @@ public class Visualizer implements Sendable {
   private static double WEIGHT = 4;
   private static Rotation2d RIGHT_ANGLE = Rotation2d.fromRadians(Math.PI / 2.0);
 
-  private final Mechanism2d mech =
-      new Mechanism2d(Dimensions.FOREARM_LENGTH * 3.0, Elevator.MAX_HEIGHT * 3.0 / 2.0);
+  private final Mechanism2d mech = new Mechanism2d(4, 2);
   private final MechanismRoot2d chassis =
-      mech.getRoot("Chassis", Dimensions.FOREARM_LENGTH * 3.0 / 2.0, 0);
+      mech.getRoot("Chassis", 2 + Dimensions.BASE_OFFSET, Dimensions.BASE_HEIGHT);
 
   private final MechanismLigament2d elevator, forearm, claw;
 

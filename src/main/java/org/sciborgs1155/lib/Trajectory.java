@@ -11,7 +11,6 @@ public class Trajectory {
   private final double totalTime;
 
   public record State(double position, double velocity, double acceleration) {
-
     public TrapezoidProfile.State trapezoidState() {
       return new TrapezoidProfile.State(position, velocity);
     }
@@ -29,6 +28,10 @@ public class Trajectory {
 
   public double getState(int index) {
     return states.get(index);
+  }
+
+  public double getFirst() {
+    return states.get(0);
   }
 
   public double getLast() {

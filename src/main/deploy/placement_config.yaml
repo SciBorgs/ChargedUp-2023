@@ -11,17 +11,17 @@ origin: [ -0.127, 0.5203698 ]
 
 solver:
   interiorPoints: 25
-  maxVoltageElbow: 8
+  maxVoltageElbow: 7
   maxVoltageWrist: 5
-  maxVoltageLift: 8
-  maxAccelerationElbow: 2.5
-  maxAccelerationWrist: 2.5
-  maxAccelerationLift: 2.5
-  maxJerk: 6
+  maxVoltageLift: 7
+  maxAccelerationElbow: 2.9
+  maxAccelerationWrist: 2.8
+  maxAccelerationLift: 2.8
+  maxJerk: 30
 
 lift:
   mass: 6.80389
-  minHeight: 0.01
+  minHeight: 0
   maxHeight: 0.66
   motor:
     type: neo
@@ -57,10 +57,14 @@ constraints:
     type: minY,
     point: end
     args: [ 0.01 ]
-  heightLimit:
+  heightLimitEnd:
     type: maxY
     point: end
-    args: [ 1.75 ]
+    args: [ 1.8 ]
+  heightLimitWrist:
+    type: maxY
+    point: wrist
+    args: [ 1.8 ]
   robotBody:
     type: rectangle
     point: end

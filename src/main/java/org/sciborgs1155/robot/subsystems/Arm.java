@@ -209,8 +209,10 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   /** Follows a {@link Trajectory} for each joint's relative position */
   // TODO check if relative or absolute trajectories are loaded
   public Command followTrajectory(Trajectory elbowTrajectory, Trajectory wristTrajectory) {
-    DriverStation.reportError(
-        "SUPPLIED ELBOW AND WRIST TRAJECTORIES DO NOT HAVE EQUAL TOTAL TIMES", false);
+    if (elbowTrajectory.getTotalTime() != wristTrajectory.getTotalTime()) {
+      DriverStation.reportError(
+          "SUPPLIED ELBOW AND WRIST TRAJECTORIES DO NOT HAVE EQUAL TOTAL TIMES", false);
+    }
 
     Timer timer = new Timer();
     return runOnce(timer::start)
@@ -220,7 +222,10 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
                   elbowSetpoint = elbowTrajectory.sample(timer.get());
                   wristSetpoint = wristTrajectory.sample(timer.get());
                 }))
-        .until(() -> timer.hasElapsed(elbowTrajectory.getTotalTime()));
+        .until(
+            () ->
+                elbowSetpoint.position() == elbowTrajectory.getLast()
+                    && wristSetpoint.position() == wristTrajectory.getLast());
   }
 
   @Override

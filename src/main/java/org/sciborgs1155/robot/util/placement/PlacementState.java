@@ -85,9 +85,6 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
 
     double elevatorHeight = totalHeight < target.getY() ? target.getY() - totalHeight : 0;
 
-    var state = fromRelative(elevatorHeight, elbowAngle, wristAngle);
-    System.out.println(state);
-    System.out.println("claw pos" + state.endEffectorPosition());
     return Optional.of(fromRelative(elevatorHeight, elbowAngle, wristAngle));
   }
 
