@@ -155,9 +155,9 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Override
   public void periodic() {
-    double position = MathUtil.clamp(setpoint.position(), MIN_HEIGHT, MAX_HEIGHT);
+    setpoint = new State(MathUtil.clamp(setpoint.position(), MIN_HEIGHT, MAX_HEIGHT), setpoint.velocity(), setpoint.acceleration());
 
-    double fbOutput = pid.calculate(getPosition(), position);
+    double fbOutput = pid.calculate(getPosition(), setpoint.position());
     double ffOutput = ff.calculate(setpoint.velocity(), setpoint.acceleration());
 
     hasSpiked = filter.calculate(lead.getOutputCurrent()) >= CURRENT_SPIKE_THRESHOLD;

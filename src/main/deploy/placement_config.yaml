@@ -14,9 +14,9 @@ solver:
   maxVoltageElbow: 8
   maxVoltageWrist: 5
   maxVoltageLift: 8
-  maxAccelerationElbow: 2.9
-  maxAccelerationWrist: 2.8
-  maxAccelerationLift: 2.8
+  maxAccelerationElbow: 2.3
+  maxAccelerationWrist: 2.3
+  maxAccelerationLift: 2.3
   maxJerk: 30
 
 lift:
@@ -60,11 +60,11 @@ constraints:
   heightLimitEnd:
     type: maxY
     point: end
-    args: [ 1.8 ]
+    args: [ 2.0 ]
   heightLimitWrist:
     type: maxY
     point: wrist
-    args: [ 1.8 ]
+    args: [ 2.0 ]
   robotBody:
     type: rectangle
     point: end
@@ -80,5 +80,5 @@ constraints:
       # starting height is 1.3208m
       # offset by -0.127
       -0.254, 0,
-      0, 1.34
+      0, 1.8
     ]

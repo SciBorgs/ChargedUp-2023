@@ -310,7 +310,7 @@ public final class Constants {
         PlacementState.fromAbsolute(0.061612, 0.493303, 0.001378);
 
     public static final PlacementState BACK_MID_CONE = STOW; // TODO
-    public static final PlacementState BACK_HIGH_CONE = PlacementState.fromAbsolute(0., 3.072, 2.5);
+    public static final PlacementState BACK_HIGH_CONE = PlacementState.fromAbsolute(0.2475, 3.072, 2.5);
     // ele 0.2475
     public static final PlacementState FRONT_MID_CUBE =
         PlacementState.fromAbsolute(0.11362, 0.458149, 0.353288);

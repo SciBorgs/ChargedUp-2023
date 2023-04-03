@@ -36,7 +36,11 @@ public final class Placement {
    *     values.
    */
   public Optional<PlacementTrajectory> findTrajectory(Parameters params) {
-    return Optional.ofNullable(trajectories.get(params.hashCode()));
+    System.out.println("params: " + params);
+    var traj = Optional.ofNullable(trajectories.get(params.hashCode()));
+    System.out.println(traj);
+    System.out.println("exists: " + traj.isPresent());
+    return traj;
   }
 
   /**
@@ -92,10 +96,9 @@ public final class Placement {
   public Command goTo(PlacementState goal) {
     return new ProxyCommand(
         () ->
-            // findTrajectory(goal).isPresent()
-            //     ? followTrajectory(findTrajectory(goal).get())
-            //     : safeFollowProfile(goal));
-            safeFollowProfile(goal));
+            findTrajectory(goal).isPresent()
+                ? followTrajectory(findTrajectory(goal).get())
+                : safeFollowProfile(goal));
   }
 
   /**

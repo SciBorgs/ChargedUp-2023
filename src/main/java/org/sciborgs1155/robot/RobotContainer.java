@@ -176,7 +176,7 @@ public class RobotContainer implements Loggable {
   }
 
   private void configureSubsystemDefaults() {
-    led.setDefaultCommand(led.setGamePieceColor(GamePiece.CONE));
+    // led.setDefaultCommand(led.setGamePieceColor(GamePiece.CONE));
 
     drive.setDefaultCommand(
         drive
