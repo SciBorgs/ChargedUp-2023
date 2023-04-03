@@ -145,7 +145,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     return elbowFeedback.atGoal() && wristFeedback.atGoal();
   }
 
-
   /** Sets elbow goal relative to the chassis */
   public Command setElbowGoal(State goal) {
     return runOnce(
@@ -192,8 +191,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   public Command runToGoals(State elbowGoal, State wristGoal) {
     return setGoals(elbowGoal, wristGoal).andThen(Commands.waitUntil(this::atGoal));
   }
-  
-  public Command setStopped(boolean stopped){
+
+  public Command setStopped(boolean stopped) {
     return runOnce(() -> this.stopped = stopped);
   }
 
@@ -219,7 +218,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             wristFeedback.getSetpoint().velocity,
             wristAccel.calculate(wristFeedback.getSetpoint().velocity));
     wrist.setVoltage(stopped ? 0 : wristFB + wristFF);
-
 
     visualizer.setElbow(
         getElbowPosition(), Rotation2d.fromRadians(elbowFeedback.getSetpoint().position));

@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.subsystems;
 
 import static org.sciborgs1155.robot.Constants.Elevator.*;
 import static org.sciborgs1155.robot.Ports.Elevator.*;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
@@ -20,8 +21,8 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Ports;
 import org.sciborgs1155.robot.Constants.Dimensions;
+import org.sciborgs1155.robot.Ports;
 import org.sciborgs1155.robot.util.Visualizer;
 
 public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
@@ -133,16 +134,14 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     return setGoal(goal).andThen(Commands.waitUntil(this::atGoal));
   }
 
-  
-  public boolean atSwitch(){
+  public boolean atSwitch() {
     return limitSwitch.get();
   }
 
-  public Command setStopped(boolean stopped){
+  public Command setStopped(boolean stopped) {
 
-    return runOnce(() -> this.stopped = stopped) ;
+    return runOnce(() -> this.stopped = stopped);
   }
-  
 
   @Override
   public void periodic() {
