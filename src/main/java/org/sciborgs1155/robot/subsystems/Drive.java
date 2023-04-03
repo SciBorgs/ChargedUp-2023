@@ -312,15 +312,9 @@ public class Drive extends SubsystemBase implements Loggable {
     return run(() -> setModuleStates(new SwerveModuleState[] {front, back, back, front}));
   }
 
-  public Rotation2d headingToPose(Pose2d currentPose, Pose2d desiredPose) {
-    return new Rotation2d(
-        Math.atan2(
-            desiredPose.getY() - currentPose.getY(), desiredPose.getX() - currentPose.getX()));
-  }
-
   /** Creates and follows trajectroy for swerve from startPose to desiredPose */
   public Command driveToPose(Pose2d startPose, Pose2d desiredPose, boolean useAllianceColor) {
-    Rotation2d heading = headingToPose(startPose, desiredPose);
+    Rotation2d heading = desiredPose.minus(startPose).getTranslation().getAngle();
     PathPoint start = new PathPoint(startPose.getTranslation(), heading, startPose.getRotation());
     PathPoint goal =
         new PathPoint(desiredPose.getTranslation(), heading, desiredPose.getRotation());
