@@ -27,7 +27,6 @@ import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.subsystems.LED;
-import org.sciborgs1155.robot.subsystems.LED.LEDColors;
 import org.sciborgs1155.robot.util.Vision;
 import org.sciborgs1155.robot.util.Visualizer;
 
@@ -136,7 +135,7 @@ public class RobotContainer implements Loggable {
      * set starting pos: no
      * starting location: cube scoring (anywhere)
      */
-    autoChooser.addOption("backup (no drive): cone score", autos::highConeScore);
+    autoChooser.setDefaultOption("backup (no drive): cone score", autos::highConeScore);
     /* cone score setup instructions:
      * gamepiece: cone
      * orientation: away from grid
@@ -157,11 +156,18 @@ public class RobotContainer implements Loggable {
      * set starting pos: no
      * starting location: cube scoring, all the way to one side
      */
+    autoChooser.addOption("backup (no arm, no odometry): leave", autos::leaveNoOdometry);
+    /* leave (no odometry) setup instructions:
+     * gamepiece: none
+     * orientation: away from grid
+     * set starting pos: no
+     * starting location: against grid, to one side (it should have a clear path straight forward)
+     */
     autoChooser.addOption("backup (no arm): leave", autos::leave);
     /* leave setup instructions:
      * gamepiece: none
      * orientation: away from grid
-     * set starting pos: no
+     * set starting pos: yes
      * starting location: against grid, to one side (it should have a clear path straight forward)
      */
 
@@ -170,7 +176,7 @@ public class RobotContainer implements Loggable {
   }
 
   private void configureSubsystemDefaults() {
-    led.setDefaultCommand(led.setPatterns(LEDColors.RAINBOW));
+    led.setDefaultCommand(led.setGamePieceColor(GamePiece.CONE));
 
     drive.setDefaultCommand(
         drive
@@ -221,6 +227,8 @@ public class RobotContainer implements Loggable {
     // INTAKING
     operator.leftBumper().onTrue(intake.intake()).onFalse(intake.stop());
     operator.rightBumper().onTrue(intake.outtake()).onFalse(intake.stop());
+
+    new Trigger(elevator::atSwitch).onTrue(elevator.setStopped(true));
   }
 
   /** A command to run when the robot is enabled */

@@ -92,6 +92,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   private final Visualizer positionVisualizer;
   private final Visualizer setpointVisualizer;
 
+  @Log private boolean stopped;
+
   public Arm(Visualizer positionVisualizer, Visualizer setpointVisualizer) {
     elbowLeft.follow(elbow);
     elbowRight.follow(elbow);
@@ -126,7 +128,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   /** Elbow position relative to the chassis */
   @Log(name = "elbow position", methodName = "getRadians")
   public Rotation2d getElbowPosition() {
-    return Rotation2d.fromRadians(elbowEncoder.getPosition());
+    return Rotation2d.fromRadians(elbowEncoder.getPosition() + Elbow.ELBOW_OFFSET);
   }
 
   /** Wrist position relative to the forearm */
@@ -207,7 +209,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Follows a {@link Trajectory} for each joint's relative position */
-  // TODO check if relative or absolute trajectories are loaded
   public Command followTrajectory(Trajectory elbowTrajectory, Trajectory wristTrajectory) {
     if (elbowTrajectory.getTotalTime() != wristTrajectory.getTotalTime()) {
       DriverStation.reportError(
@@ -228,6 +229,10 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
                     && wristSetpoint.position() == wristTrajectory.getLast());
   }
 
+  public Command setStopped(boolean stopped) {
+    return runOnce(() -> this.stopped = stopped);
+  }
+
   @Override
   public void periodic() {
     double elbowFB =
@@ -235,7 +240,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     double elbowFF =
         elbowFeedforward.calculate(
             elbowSetpoint.position(), elbowSetpoint.velocity(), elbowSetpoint.acceleration());
-    elbow.setVoltage(elbowFB + elbowFF);
+
+    elbow.setVoltage(stopped ? 0 : elbowFB + elbowFF);
 
     // wrist feedback is calculated using an absolute angle setpoint, rather than a relative one
     // this means the extra voltage calculated to cancel out gravity is kG * cos(θ + ϕ), where θ is
@@ -249,7 +255,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             wristSetpoint.position() + elbowSetpoint.position(),
             wristSetpoint.velocity(),
             wristSetpoint.acceleration());
-    wrist.setVoltage(wristFB + wristFF);
+
+    wrist.setVoltage(stopped ? 0 : wristFB + wristFF);
 
     positionVisualizer.setArmAngles(getElbowPosition(), getRelativeWristPosition());
     setpointVisualizer.setArmAngles(

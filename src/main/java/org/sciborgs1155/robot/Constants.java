@@ -66,6 +66,11 @@ public final class Constants {
 
     public static final double CLAW_MASS = 3.85554;
     // Mass of the claw alone
+
+    public static final double WHEEL_BASE = 0.5715;
+
+    // Distance between front and back wheels on robot
+    public static final int ALTERNATE_COUNTS_PER_REV = 8192;
   }
 
   public static final class Vision {
@@ -325,36 +330,25 @@ public final class Constants {
   }
 
   public static final class Field {
-    public static final Map<Integer, Translation2d> INTAKE_POINTS =
-        Map.ofEntries(
-            Map.entry(1, new Translation2d(5, 2)),
-            Map.entry(2, new Translation2d(5, 3)),
-            Map.entry(3, new Translation2d(5, 4)),
-            Map.entry(4, new Translation2d(5, 5)));
-
+    // public static final Map<Integer, Translation2d> INTAKE_POINTS =
+    //     Map.ofEntries(
+    //         Map.entry(1, new Translation2d(5, 2)),
+    //         Map.entry(2, new Translation2d(5, 3)),
+    //         Map.entry(3, new Translation2d(5, 4)),
+    //         Map.entry(4, new Translation2d(5, 5)));
     public static final Map<Integer, Translation2d> SCORING_POINTS_CUBE =
         Map.ofEntries(
-            Map.entry(1, new Translation2d(1, 2)),
-            Map.entry(2, new Translation2d(1, 3)),
-            Map.entry(3, new Translation2d(1, 4)),
-            Map.entry(1, new Translation2d(1, 2)),
-            Map.entry(2, new Translation2d(1, 3)),
-            Map.entry(3, new Translation2d(1, 4)),
-            Map.entry(1, new Translation2d(1, 2)),
-            Map.entry(2, new Translation2d(1, 3)),
-            Map.entry(3, new Translation2d(1, 4)));
+            Map.entry(1, new Translation2d(1.83, 4.42)),
+            Map.entry(2, new Translation2d(1.83, 2.75)),
+            Map.entry(3, new Translation2d(1.83, 1.06)));
     public static final Map<Integer, Translation2d> SCORING_POINTS_CONE =
         Map.ofEntries(
-            Map.entry(1, new Translation2d(2, 2)),
-            Map.entry(2, new Translation2d(2, 3)),
-            Map.entry(3, new Translation2d(2, 4)),
-            Map.entry(4, new Translation2d(1, 2)),
-            Map.entry(5, new Translation2d(1, 3)),
-            Map.entry(6, new Translation2d(1, 4)),
-            Map.entry(8, new Translation2d(1, 4)),
-            Map.entry(9, new Translation2d(2, 4)));
-    public static final Map<Integer, Translation2d> BALANCE_POINTS =
-        Map.ofEntries(Map.entry(1, new Translation2d(3, 5)), Map.entry(2, new Translation2d(1, 5)));
+            Map.entry(1, new Translation2d(1.83, 5.00)),
+            Map.entry(2, new Translation2d(1.83, 3.85)),
+            Map.entry(3, new Translation2d(1.83, 3.34)),
+            Map.entry(4, new Translation2d(1.83, 2.17)),
+            Map.entry(5, new Translation2d(1.83, 1.63)),
+            Map.entry(6, new Translation2d(1.83, 0.51)));
   }
 
   public static final class led {
@@ -372,6 +366,6 @@ public final class Constants {
   public static final class ledConst {
     public static final int buffer1Length = 60;
 
-    // public static final int buffer2Length = 60;
+    public static final int buffer2Length = 60;
   }
 }

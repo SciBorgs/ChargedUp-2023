@@ -28,10 +28,10 @@ import org.sciborgs1155.robot.util.Visualizer;
 public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log(name = "applied output", methodName = "getAppliedOutput")
-  private final CANSparkMax lead = MOTOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
+  private final CANSparkMax lead = MOTOR.build(MotorType.kBrushless, RIGHT_MOTOR);
 
   private final CANSparkMax left = MOTOR.build(MotorType.kBrushless, LEFT_MOTOR);
-  private final CANSparkMax right = MOTOR.build(MotorType.kBrushless, RIGHT_MOTOR);
+  private final CANSparkMax right = MOTOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
 
   // @Log private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1]);
   // private final EncoderSim simEncoder = new EncoderSim(encoder);
@@ -40,6 +40,8 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   // private final AbsoluteEncoder offsetEncoder = right.getAbsoluteEncoder(Type.kDutyCycle);
 
   private final ElevatorFeedforward ff = new ElevatorFeedforward(FF.s(), FF.g(), FF.v(), FF.a());
+  // set ports V
+  // private DigitalInput limitSwitch = new DigitalInput(Ports.Elevator.LIMIT_SWITCH);
 
   @Log
   @Log(name = "at setpoint", methodName = "atSetpoint")
@@ -66,6 +68,8 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
           MAX_HEIGHT,
           true);
 
+  private boolean stopped;
+
   private final Visualizer positionVisualizer;
   private final Visualizer setpointVisualizer;
 
@@ -73,6 +77,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     left.follow(lead);
     right.follow(lead);
 
+    encoder.setInverted(true);
     encoder.setPositionConversionFactor(RELATIVE_CONVERSION.factor());
     encoder.setVelocityConversionFactor(RELATIVE_CONVERSION.factor() / 60.0);
     // offsetEncoder.setPositionConversionFactor(ABSOLUTE_CONVERSION.factor());
@@ -101,7 +106,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   /** Returns the height of the elevator, in meters */
   @Log(name = "position")
   public double getPosition() {
-    return encoder.getPosition();
+    return encoder.getPosition() + offset;
   }
 
   /** Sets the elevator's setpoint height */
@@ -138,6 +143,16 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
         .until(() -> setpoint.position() == trajectory.getLast());
   }
 
+  public boolean atSwitch() {
+    // return limitSwitch.get();
+    return false;
+  }
+
+  public Command setStopped(boolean stopped) {
+
+    return runOnce(() -> this.stopped = stopped);
+  }
+
   @Override
   public void periodic() {
     double position = MathUtil.clamp(setpoint.position(), MIN_HEIGHT, MAX_HEIGHT);
@@ -145,9 +160,9 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     double fbOutput = pid.calculate(getPosition(), position);
     double ffOutput = ff.calculate(setpoint.velocity(), setpoint.acceleration());
 
-    lead.setVoltage(fbOutput + ffOutput);
-
     hasSpiked = filter.calculate(lead.getOutputCurrent()) >= CURRENT_SPIKE_THRESHOLD;
+
+    lead.setVoltage(stopped ? 0 : ffOutput + fbOutput);
 
     positionVisualizer.setElevatorHeight(getPosition());
     setpointVisualizer.setElevatorHeight(setpoint.position());

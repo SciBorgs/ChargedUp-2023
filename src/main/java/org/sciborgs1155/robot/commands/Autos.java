@@ -116,7 +116,7 @@ public final class Autos implements Sendable {
         defaultOdometryReset(GamePiece.CONE, Rotation2d.fromRadians(0)),
         eventMarkers.get("initialIntake"),
         eventMarkers.get("backHighCone"),
-        eventMarkers.get("score"));
+        eventMarkers.get("outtakeCone"));
   }
 
   public Command backHighCubeScore() {
@@ -130,7 +130,7 @@ public final class Autos implements Sendable {
     return Commands.sequence(
         defaultOdometryReset(GamePiece.CUBE, Rotation2d.fromRadians(Math.PI)),
         eventMarkers.get("frontHighCube"),
-        eventMarkers.get("score"));
+        eventMarkers.get("outtakeCube"));
   }
 
   /** no PPL */
@@ -149,13 +149,11 @@ public final class Autos implements Sendable {
   }
 
   public Command coneLeave() {
-    StartingPos startingPos = startingPosChooser.getSelected();
-    return followAutoPath("cone leaveComm" + startingPos.suffix);
+    return followAutoPath("cone leaveComm" + startingPosChooser.getSelected().suffix);
   }
 
   public Command cubeLeave() {
-    StartingPos startingPos = startingPosChooser.getSelected();
-    return followAutoPath("cube leaveComm" + startingPos.suffix);
+    return followAutoPath("cube leaveComm" + startingPosChooser.getSelected().suffix);
   }
 
   /** backup: no arm */
@@ -209,6 +207,43 @@ public final class Autos implements Sendable {
                       case Red -> Rotation2d.fromRadians(Math.PI - rotation.getRadians());
                       case Invalid -> rotation; // should never happen!
                     })),
+        drive);
+  }
+
+  public Command betterDefaultOdometryReset(GamePiece gamePiece, Rotation2d rotation) {
+    return Commands.runOnce(
+        () ->
+            drive.resetOdometry(
+                new Pose2d(
+                    switch (DriverStation.getAlliance()) {
+                      case Blue -> 1.83;
+                      case Red -> 14.67;
+                      case Invalid -> -1; // should never happen!
+                    },
+                    switch (gamePiece) {
+                      case CONE -> Constants.Field.SCORING_POINTS_CONE
+                          .get(
+                              switch (startingPosChooser.getSelected()) {
+                                case SUBSTATION -> 1;
+                                case CENTER -> 3;
+                                case CORNER -> 6;
+                              })
+                          .getY();
+                      case CUBE -> Constants.Field.SCORING_POINTS_CUBE
+                          .get(
+                              switch (startingPosChooser.getSelected()) {
+                                case SUBSTATION -> 1;
+                                case CENTER -> 2;
+                                case CORNER -> 3;
+                              })
+                          .getY();
+                    },
+                    switch (DriverStation.getAlliance()) {
+                      case Blue -> rotation;
+                      case Red -> Rotation2d.fromRadians(Math.PI - rotation.getRadians());
+                      case Invalid -> rotation;
+                    } // should never happen!
+                    )),
         drive);
   }
 
