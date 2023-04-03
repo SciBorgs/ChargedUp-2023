@@ -15,6 +15,8 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+// import edu.wpi.first.wpilibj.Encoder;
+// import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -85,6 +87,9 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
           false);
 
   private final Visualizer visualizer;
+  // set ports
+
+  @Log private boolean stopped;
 
   public Arm(Visualizer visualizer) {
     elbowLeft.follow(elbow);
@@ -109,7 +114,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
     this.visualizer = visualizer;
 
-    elbowEncoder.setPosition(Elbow.ELBOW_OFFSET);
     elbowFeedback.setGoal(getElbowPosition().getRadians());
     wristFeedback.setGoal(Math.PI);
     wristFeedback.setTolerance(0.3);
@@ -118,7 +122,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   /** Elbow position relative to the chassis */
   @Log(name = "elbow position", methodName = "getRadians")
   public Rotation2d getElbowPosition() {
-    return Rotation2d.fromRadians(elbowEncoder.getPosition());
+    return Rotation2d.fromRadians(elbowEncoder.getPosition() + Elbow.ELBOW_OFFSET);
   }
 
   /** Wrist position relative to the forearm */
@@ -187,6 +191,10 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     return setGoals(elbowGoal, wristGoal).andThen(Commands.waitUntil(this::atGoal));
   }
 
+  public Command setStopped(boolean stopped) {
+    return runOnce(() -> this.stopped = stopped);
+  }
+
   @Override
   public void periodic() {
     double elbowFB = elbowFeedback.calculate(getElbowPosition().getRadians());
@@ -195,7 +203,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             elbowFeedback.getSetpoint().position,
             elbowFeedback.getSetpoint().velocity,
             elbowAccel.calculate(elbowFeedback.getSetpoint().velocity));
-    elbow.setVoltage(elbowFB + elbowFF);
+    elbow.setVoltage(stopped ? 0 : elbowFB + elbowFF);
 
     // wrist feedback is calculated using an absolute angle setpoint, rather than a relative one
     // this means the extra voltage calculated to cancel out gravity is kG * cos(θ + ϕ), where θ is
@@ -208,7 +216,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             wristFeedback.getSetpoint().position + elbowFeedback.getSetpoint().position,
             wristFeedback.getSetpoint().velocity,
             wristAccel.calculate(wristFeedback.getSetpoint().velocity));
-    wrist.setVoltage(wristFB + wristFF);
+    wrist.setVoltage(stopped ? 0 : wristFB + wristFF);
 
     visualizer.setElbow(
         getElbowPosition(), Rotation2d.fromRadians(elbowFeedback.getSetpoint().position));

@@ -23,7 +23,6 @@ import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.subsystems.LED;
-import org.sciborgs1155.robot.subsystems.LED.LEDColors;
 import org.sciborgs1155.robot.util.Vision;
 import org.sciborgs1155.robot.util.Visualizer;
 
@@ -174,7 +173,7 @@ public class RobotContainer implements Loggable {
   }
 
   private void configureSubsystemDefaults() {
-    led.setDefaultCommand(led.setPatterns(LEDColors.RAINBOW));
+    led.setDefaultCommand(led.setGamePieceColor(GamePiece.CONE));
 
     drive.setDefaultCommand(
         drive
@@ -225,6 +224,8 @@ public class RobotContainer implements Loggable {
     // INTAKING
     operator.leftBumper().onTrue(intake.intake()).onFalse(intake.stop());
     operator.rightBumper().onTrue(intake.outtake()).onFalse(intake.stop());
+
+    new Trigger(elevator::atSwitch).onTrue(elevator.setStopped(true));
   }
 
   /** A command to run when the robot is enabled */

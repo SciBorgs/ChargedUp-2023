@@ -347,6 +347,6 @@ public final class Constants {
   public static final class ledConst {
     public static final int buffer1Length = 60;
 
-    // public static final int buffer2Length = 60;
+    public static final int buffer2Length = 60;
   }
 }
