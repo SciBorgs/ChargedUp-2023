@@ -10,7 +10,7 @@
 origin: [ -0.127, 0.5203698 ]
 
 solver:
-  interiorPoints: 20
+  interiorPoints: 30
   maxVoltageElbow: 8
   maxVoltageWrist: 5
   maxVoltageLift: 8
@@ -60,17 +60,17 @@ constraints:
   heightLimitEnd:
     type: maxY
     point: end
-    args: [ 2.0 ]
+    args: [ 1.8 ]
   heightLimitWrist:
     type: maxY
     point: wrist
-    args: [ 2.0 ]
+    args: [ 1.8 ]
   robotBody:
     type: rectangle
     point: end
     args: [
       -0.3, 0,
-      0.3, 1.5
+      0.3, 0.5
     ]
   elevator:
     type: rectangle
@@ -79,6 +79,7 @@ constraints:
       # 0.127m wide
       # starting height is 1.3208m
       # offset by -0.127
-      -0.254, 0,
-      0, 1.8
+      # -0.254, 0,
+      -0.427, 0.3,
+      0, 1.65
     ]

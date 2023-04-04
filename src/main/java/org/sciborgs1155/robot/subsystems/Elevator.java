@@ -155,7 +155,11 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Override
   public void periodic() {
-    setpoint = new State(MathUtil.clamp(setpoint.position(), MIN_HEIGHT, MAX_HEIGHT), setpoint.velocity(), setpoint.acceleration());
+    setpoint =
+        new State(
+            MathUtil.clamp(setpoint.position(), MIN_HEIGHT, MAX_HEIGHT),
+            setpoint.velocity(),
+            setpoint.acceleration());
 
     double fbOutput = pid.calculate(getPosition(), setpoint.position());
     double ffOutput = ff.calculate(setpoint.velocity(), setpoint.acceleration());
