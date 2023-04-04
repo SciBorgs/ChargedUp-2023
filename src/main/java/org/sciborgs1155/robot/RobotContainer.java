@@ -1,8 +1,12 @@
 package org.sciborgs1155.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Loggable;
@@ -36,14 +40,13 @@ public class RobotContainer implements Loggable {
 
   // Vision instance
   private final Vision vision = new Vision();
-
-  // Placement visualizer
-  @Log private final Visualizer visualizer = new Visualizer();
+  @Log private final Visualizer position = new Visualizer(new Color8Bit(255, 0, 0));
+  @Log private final Visualizer setpoint = new Visualizer(new Color8Bit(0, 0, 255));
 
   // Subsystems
   @Log private final Drive drive = new Drive(vision);
-  @Log private final Elevator elevator = new Elevator(visualizer);
-  @Log private final Arm arm = new Arm(visualizer);
+  @Log private final Elevator elevator = new Elevator(position, setpoint);
+  @Log private final Arm arm = new Arm(position, setpoint);
   @Log private final Intake intake = new Intake();
   @Log private final LED led = new LED();
 
@@ -173,7 +176,7 @@ public class RobotContainer implements Loggable {
   }
 
   private void configureSubsystemDefaults() {
-    led.setDefaultCommand(led.setGamePieceColor(GamePiece.CONE));
+    // led.setDefaultCommand(led.setGamePieceColor(GamePiece.CONE));
 
     drive.setDefaultCommand(
         drive
@@ -214,7 +217,7 @@ public class RobotContainer implements Loggable {
     operator.povUp().onTrue(scoring.goTo(Level.HIGH));
     operator.povRight().onTrue(scoring.goTo(Level.MID));
     operator.povDown().onTrue(scoring.goTo(Level.LOW));
-    operator.povLeft().onTrue(placement.safeToState(Positions.STOW));
+    operator.povLeft().onTrue(placement.goTo(Positions.STOW));
 
     operator.leftTrigger().onTrue(scoring.goTo(Level.SINGLE_SUBSTATION));
     operator.rightTrigger().onTrue(scoring.goTo(Level.DOUBLE_SUBSTATION));
@@ -229,11 +232,8 @@ public class RobotContainer implements Loggable {
   }
 
   /** A command to run when the robot is enabled */
-  public Supplier<Command> getEnableCommand() {
-    return () ->
-        Commands.parallel(
-            elevator.setGoal(elevator.getPosition()),
-            arm.setGoals(arm.getElbowPosition(), arm.getRelativeWristPosition()));
+  public Command getEnableCommand() {
+    return new ProxyCommand(() -> placement.setSetpoint(placement.state()));
   }
 
   /**
@@ -242,14 +242,13 @@ public class RobotContainer implements Loggable {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected().get();
+    return placement.setSetpoint(Positions.INITIAL).andThen(autoChooser.getSelected().get());
   }
 
   public Command getTestCommand() {
-    // return Commands.sequence(
-    //   Commands.runOnce(() -> drive.resetOdometry(new Pose2d(3, 3, Rotation2d.fromDegrees(0))),
-    // drive),
-    //   scoring.odometryAlign(Side.BACK));
-    return Commands.none();
+    return Commands.sequence(
+        Commands.runOnce(
+            () -> drive.resetOdometry(new Pose2d(3, 3, Rotation2d.fromDegrees(0))), drive),
+        scoring.odometryAlign(Side.BACK));
   }
 }

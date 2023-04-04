@@ -69,9 +69,9 @@ public final class Autos implements Sendable {
 
   private Map<String, Command> genEventMarkers() {
     return Map.ofEntries(
-        Map.entry("backHighCone", placement.safeToState(BACK_HIGH_CONE)),
-        Map.entry("backHighCube", placement.safeToState(BACK_HIGH_CUBE)),
-        Map.entry("frontHighCube", placement.safeToState(FRONT_HIGH_CUBE)),
+        Map.entry("backHighCone", placement.goTo(BACK_HIGH_CONE)),
+        Map.entry("backHighCube", placement.goTo(BACK_HIGH_CUBE)),
+        Map.entry("frontHighCube", placement.goTo(FRONT_HIGH_CUBE)),
         Map.entry(
             "outtakeCone",
             Commands.sequence(intake.outtake().withTimeout(Auto.CONE_OUTTAKE_TIME), intake.stop())),
@@ -81,16 +81,16 @@ public final class Autos implements Sendable {
         Map.entry(
             "frontIntake",
             Commands.sequence(
-                placement.safeToState(Constants.Positions.FRONT_INTAKE),
-                intake.intake().withTimeout(Auto.MOVING_INTAKE_TIME),
+                placement.goTo(Constants.Positions.FRONT_INTAKE),
+                intake.intake().withTimeout(4),
                 intake.stop())),
         Map.entry(
             "backIntake",
             Commands.sequence(
-                placement.safeToState(Constants.Positions.BACK_INTAKE),
+                placement.goTo(Constants.Positions.BACK_INTAKE),
                 intake.intake().withTimeout(Auto.MOVING_INTAKE_TIME),
                 intake.stop())),
-        Map.entry("stow", placement.safeToState(STOW)),
+        Map.entry("stow", placement.goTo(STOW)),
         Map.entry(
             "initialIntake",
             Commands.sequence(
@@ -140,12 +140,12 @@ public final class Autos implements Sendable {
 
   /** no PPL */
   public Command cubeBalance() {
-    return Commands.sequence(backHighCubeScore(), balance().alongWith(eventMarkers.get("stow")));
+    return Commands.sequence(backHighCubeScore(), balance().alongWith(placement.goTo(STOW)));
   }
 
   /** no PPL */
   public Command coneBalance() {
-    return Commands.sequence(highConeScore(), balance().alongWith(eventMarkers.get("stow")));
+    return Commands.sequence(highConeScore(), balance().alongWith(placement.goTo(STOW)));
   }
 
   public Command coneLeave() {

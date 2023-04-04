@@ -9,21 +9,21 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-// import edu.wpi.first.wpilibj.Encoder;
-// import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Derivative;
+import org.sciborgs1155.lib.Trajectory;
+import org.sciborgs1155.lib.Trajectory.State;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Robot;
@@ -40,8 +40,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log(name = "wrist applied output", methodName = "getAppliedOutput")
   private final CANSparkMax wrist = Wrist.MOTOR.build(MotorType.kBrushless, WRIST_MOTOR);
 
-  private final RelativeEncoder elbowEncoder =
-      elbow.getAlternateEncoder(Constants.Dimensions.ALTERNATE_COUNTS_PER_REV);
+  private final RelativeEncoder elbowEncoder = elbow.getAlternateEncoder(Constants.THROUGHBORE_CPR);
 
   @Log(name = "wrist velocity", methodName = "getVelocity")
   private final AbsoluteEncoder wristEncoder = wrist.getAbsoluteEncoder(Type.kDutyCycle);
@@ -52,46 +51,50 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
       new ArmFeedforward(Wrist.FF.s(), Wrist.FF.g(), Wrist.FF.v(), Wrist.FF.a());
 
   @Log(name = "elbow feedback")
-  @Log(name = "elbow at goal", methodName = "atGoal")
-  private final ProfiledPIDController elbowFeedback =
-      new ProfiledPIDController(Elbow.PID.p(), Elbow.PID.i(), Elbow.PID.d(), Elbow.CONSTRAINTS);
+  @Log(name = "elbow at setpoint", methodName = "atSetpoint")
+  private final PIDController elbowFeedback =
+      new PIDController(Elbow.PID.p(), Elbow.PID.i(), Elbow.PID.d());
 
   @Log(name = "wrist feedback")
-  @Log(name = "wrist at goal", methodName = "atGoal")
-  private final ProfiledPIDController wristFeedback =
-      new ProfiledPIDController(Wrist.PID.p(), Wrist.PID.i(), Wrist.PID.d(), Wrist.CONSTRAINTS);
+  @Log(name = "wrist at setpoint", methodName = "atSetpoint")
+  private final PIDController wristFeedback =
+      new PIDController(Wrist.PID.p(), Wrist.PID.i(), Wrist.PID.d());
 
-  @Log(name = "wrist acceleration", methodName = "getLastOutput")
-  private final Derivative wristAccel = new Derivative();
+  @Log(name = "elbow position setpoint", methodName = "position")
+  @Log(name = "elbow velocity setpoint", methodName = "velocity")
+  @Log(name = "elbow acceleration setpoint", methodName = "acceleration")
+  private State elbowSetpoint;
 
-  @Log(name = "elbow acceleration", methodName = "getLastOutput")
-  private final Derivative elbowAccel = new Derivative();
+  @Log(name = "wrist position setpoint", methodName = "position")
+  @Log(name = "wrist velocity setpoint", methodName = "velocity")
+  @Log(name = "wrist acceleration setpoint", methodName = "acceleration")
+  private State wristSetpoint;
 
   private final SingleJointedArmSim elbowSim =
       new SingleJointedArmSim(
           DCMotor.getNEO(3),
-          1 / Elbow.CONVERSION.gearing(),
+          Elbow.GEARING,
           SingleJointedArmSim.estimateMOI(Dimensions.FOREARM_LENGTH, Dimensions.FOREARM_MASS),
           Dimensions.FOREARM_LENGTH,
-          Dimensions.ELBOW_MIN_ANGLE,
-          Dimensions.ELBOW_MAX_ANGLE,
+          Elbow.MIN_ANGLE,
+          Elbow.MAX_ANGLE,
           true);
   private final SingleJointedArmSim wristSim =
       new SingleJointedArmSim(
           DCMotor.getNEO(1),
-          1,
+          Wrist.GEARING,
           SingleJointedArmSim.estimateMOI(Dimensions.CLAW_LENGTH, Dimensions.CLAW_MASS),
           Dimensions.CLAW_LENGTH,
-          Dimensions.WRIST_MIN_ANGLE,
-          Dimensions.WRIST_MAX_ANGLE,
+          Wrist.MIN_ANGLE,
+          Wrist.MAX_ANGLE,
           false);
 
-  private final Visualizer visualizer;
-  // set ports
+  private final Visualizer positionVisualizer;
+  private final Visualizer setpointVisualizer;
 
   @Log private boolean stopped;
 
-  public Arm(Visualizer visualizer) {
+  public Arm(Visualizer positionVisualizer, Visualizer setpointVisualizer) {
     elbowLeft.follow(elbow);
     elbowRight.follow(elbow);
 
@@ -112,10 +115,13 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowRight.burnFlash();
     wrist.burnFlash();
 
-    this.visualizer = visualizer;
+    elbowSetpoint = new State(getElbowPosition().getRadians(), 0, 0);
+    wristSetpoint = new State(getRelativeWristPosition().getRadians(), 0, 0);
 
-    elbowFeedback.setGoal(getElbowPosition().getRadians());
-    wristFeedback.setGoal(Math.PI);
+    this.positionVisualizer = positionVisualizer;
+    this.setpointVisualizer = setpointVisualizer;
+
+    elbowEncoder.setPosition(Elbow.ELBOW_OFFSET);
     wristFeedback.setTolerance(0.3);
   }
 
@@ -139,56 +145,88 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     return getRelativeWristPosition().plus(getElbowPosition());
   }
 
-  /** Elbow and wrist at goals */
-  public boolean atGoal() {
-    return elbowFeedback.atGoal() && wristFeedback.atGoal();
-  }
-
-  /** Sets elbow goal relative to the chassis */
-  public Command setElbowGoal(State goal) {
+  /** Sets the position setpoints for the elbow and wrist, in radians */
+  public Command setSetpoints(Rotation2d elbowAngle, Rotation2d wristAngle) {
     return runOnce(
-        () ->
-            elbowFeedback.setGoal(
-                new State(
-                    MathUtil.clamp(
-                        goal.position, Dimensions.ELBOW_MIN_ANGLE, Dimensions.ELBOW_MAX_ANGLE),
-                    goal.velocity)));
+        () -> {
+          elbowSetpoint = new State(elbowAngle.getRadians(), 0, 0);
+          wristSetpoint = new State(wristAngle.getRadians(), 0, 0);
+        });
   }
 
-  /** Sets wrist goal relative to being parallel to the forearm */
-  public Command setWristGoal(State goal) {
+  /** Returns the elbow setpoint as a {@link State} */
+  public State getElbowSetpoint() {
+    return elbowSetpoint;
+  }
+
+  /** Returns the wrist setpoint as a {@link State} */
+  public State getWristSetpoint() {
+    return wristSetpoint;
+  }
+
+  /** Follows a {@link TrapezoidProfile} for each joint's relative position */
+  public Command followProfile(Rotation2d elbowPosition, Rotation2d wristPosition) {
+    var elbowGoal = new TrapezoidProfile.State(elbowPosition.getRadians(), 0);
+    var wristGoal = new TrapezoidProfile.State(wristPosition.getRadians(), 0);
+    var elbowAccel = new Derivative();
+    var wristAccel = new Derivative();
+
     return runOnce(
-        () ->
-            wristFeedback.setGoal(
-                new State(
-                    MathUtil.clamp(
-                        goal.position, Dimensions.WRIST_MIN_ANGLE, Dimensions.WRIST_MAX_ANGLE),
-                    goal.velocity)));
+            () -> {
+              elbowAccel.reset();
+              wristAccel.reset();
+            })
+        .andThen(
+            run(
+                () -> {
+                  var elbowProfile =
+                      new TrapezoidProfile(
+                          Elbow.CONSTRAINTS, elbowGoal, elbowSetpoint.trapezoidState());
+                  var wristProfile =
+                      new TrapezoidProfile(
+                          Wrist.CONSTRAINTS, wristGoal, wristSetpoint.trapezoidState());
+
+                  var elbowTarget = elbowProfile.calculate(elbowFeedback.getPeriod());
+                  var wristTarget = wristProfile.calculate(wristFeedback.getPeriod());
+
+                  elbowSetpoint =
+                      new State(
+                          elbowTarget.position,
+                          elbowTarget.velocity,
+                          elbowAccel.calculate(elbowTarget.velocity));
+                  wristSetpoint =
+                      new State(
+                          wristTarget.position,
+                          wristTarget.velocity,
+                          wristAccel.calculate(wristTarget.velocity));
+                }))
+        .until(
+            () ->
+                elbowFeedback.atSetpoint()
+                    && elbowGoal.equals(elbowSetpoint.trapezoidState())
+                    && wristFeedback.atSetpoint()
+                    && wristGoal.equals(wristSetpoint.trapezoidState()));
   }
 
-  /** Sets both the wrist and elbow goals */
-  public Command setGoals(Rotation2d elbowGoal, Rotation2d wristGoal) {
-    return setGoals(new State(elbowGoal.getRadians(), 0), new State(wristGoal.getRadians(), 0));
-  }
+  /** Follows a {@link Trajectory} for each joint's relative position */
+  public Command followTrajectory(Trajectory elbowTrajectory, Trajectory wristTrajectory) {
+    if (elbowTrajectory.getTotalTime() != wristTrajectory.getTotalTime()) {
+      DriverStation.reportError(
+          "SUPPLIED ELBOW AND WRIST TRAJECTORIES DO NOT HAVE EQUAL TOTAL TIMES", false);
+    }
 
-  /** Sets both the wrist and elbow goals */
-  public Command setGoals(State elbowGoal, State wristGoal) {
-    return setElbowGoal(elbowGoal).andThen(setWristGoal(wristGoal));
-  }
-
-  /** Runs elbow to goal relative to the chassis */
-  public Command runElbowToGoal(State goal) {
-    return setElbowGoal(goal).andThen(Commands.waitUntil(elbowFeedback::atGoal));
-  }
-
-  /** Runs wrist to goal relative to the forearm */
-  public Command runWristToGoal(State goal) {
-    return setWristGoal(goal).andThen(Commands.waitUntil(wristFeedback::atGoal));
-  }
-
-  /** Runs elbow and wrist go provided goals, with the wrist goal relative to the forearm */
-  public Command runToGoals(State elbowGoal, State wristGoal) {
-    return setGoals(elbowGoal, wristGoal).andThen(Commands.waitUntil(this::atGoal));
+    Timer timer = new Timer();
+    return runOnce(timer::start)
+        .andThen(
+            run(
+                () -> {
+                  elbowSetpoint = elbowTrajectory.sample(timer.get());
+                  wristSetpoint = wristTrajectory.sample(timer.get());
+                }))
+        .until(
+            () ->
+                elbowSetpoint.position() == elbowTrajectory.getLast()
+                    && wristSetpoint.position() == wristTrajectory.getLast());
   }
 
   public Command setStopped(boolean stopped) {
@@ -197,12 +235,12 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Override
   public void periodic() {
-    double elbowFB = elbowFeedback.calculate(getElbowPosition().getRadians());
+    double elbowFB =
+        elbowFeedback.calculate(getElbowPosition().getRadians(), elbowSetpoint.position());
     double elbowFF =
         elbowFeedforward.calculate(
-            elbowFeedback.getSetpoint().position,
-            elbowFeedback.getSetpoint().velocity,
-            elbowAccel.calculate(elbowFeedback.getSetpoint().velocity));
+            elbowSetpoint.position(), elbowSetpoint.velocity(), elbowSetpoint.acceleration());
+
     elbow.setVoltage(stopped ? 0 : elbowFB + elbowFF);
 
     // wrist feedback is calculated using an absolute angle setpoint, rather than a relative one
@@ -210,18 +248,20 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     // the elbow setpoint and ϕ is the wrist setpoint
     // the elbow angle is used as a setpoint instead of current position because we're using a
     // profiled pid controller, which means setpoints are achievable states, rather than goals
-    double wristFB = wristFeedback.calculate(getRelativeWristPosition().getRadians());
+    double wristFB =
+        wristFeedback.calculate(getRelativeWristPosition().getRadians(), wristSetpoint.position());
     double wristFF =
         wristFeedforward.calculate(
-            wristFeedback.getSetpoint().position + elbowFeedback.getSetpoint().position,
-            wristFeedback.getSetpoint().velocity,
-            wristAccel.calculate(wristFeedback.getSetpoint().velocity));
+            wristSetpoint.position() + elbowSetpoint.position(),
+            wristSetpoint.velocity(),
+            wristSetpoint.acceleration());
+
     wrist.setVoltage(stopped ? 0 : wristFB + wristFF);
 
-    visualizer.setElbow(
-        getElbowPosition(), Rotation2d.fromRadians(elbowFeedback.getSetpoint().position));
-    visualizer.setWrist(
-        getRelativeWristPosition(), Rotation2d.fromRadians(wristFeedback.getSetpoint().position));
+    positionVisualizer.setArmAngles(getElbowPosition(), getRelativeWristPosition());
+    setpointVisualizer.setArmAngles(
+        Rotation2d.fromRadians(elbowFeedback.getSetpoint()),
+        Rotation2d.fromRadians(wristFeedback.getSetpoint()));
   }
 
   @Override
