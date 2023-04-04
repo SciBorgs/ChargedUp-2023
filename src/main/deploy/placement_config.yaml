@@ -11,13 +11,13 @@ origin: [ -0.127, 0.5203698 ]
 
 solver:
   interiorPoints: 20
-  maxVoltageElbow: 9
-  maxVoltageWrist: 8
-  maxVoltageLift: 9
-  maxAccelerationElbow: 2.3
-  maxAccelerationWrist: 2.3
-  maxAccelerationLift: 2.3
-  maxJerk: 30
+  maxVoltageElbow: 10
+  maxVoltageWrist: 9
+  maxVoltageLift: 10
+  maxAccelerationElbow: 2.7
+  maxAccelerationWrist: 2.5
+  maxAccelerationLift: 3.2
+  maxJerk: 40
 
 lift:
   mass: 6.80389
@@ -56,7 +56,7 @@ constraints:
   floor:
     type: minY,
     point: end
-    args: [ 0.01 ]
+    args: [ 0.08 ]
   heightLimitEnd:
     type: maxY
     point: end

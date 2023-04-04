@@ -117,7 +117,7 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.1542, 0.6, 0.91, 0.038046); // v =  0.87884
 
-      public static final Constraints CONSTRAINTS = new Constraints(2.1, 1.9);
+      public static final Constraints CONSTRAINTS = new Constraints(2.45, 2.5);
 
       public static final double MAX_ANGLE = Math.PI;
       public static final double MIN_ANGLE = -Math.PI;
@@ -141,7 +141,7 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
-      public static final Constraints CONSTRAINTS = new Constraints(2.4, 2.2);
+      public static final Constraints CONSTRAINTS = new Constraints(2.9, 2.7);
 
       public static final double MAX_ANGLE = 3.0 * Math.PI / 2.0;
       public static final double MIN_ANGLE = -Math.PI / 2.0;
@@ -175,7 +175,7 @@ public final class Constants {
     public static final int SAMPLE_SIZE_TAPS = 5;
     public static final int CURRENT_SPIKE_THRESHOLD = 20;
 
-    public static final Constraints CONSTRAINTS = new Constraints(2.4, 2.2);
+    public static final Constraints CONSTRAINTS = new Constraints(3, 3.2);
 
     public static final double ZERO_OFFSET = 0.603467;
   }
@@ -293,7 +293,7 @@ public final class Constants {
     public static final PlacementState PASS_TO_BACK =
         PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI);
     public static final PlacementState PASS_TO_FRONT =
-        PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 4.0);
+        PlacementState.fromAbsolute(0.05, Math.PI / 2.0, Math.PI / 4.0);
 
     public static final PlacementState FRONT_INTAKE =
         PlacementState.fromAbsolute(0.44, -0.983, -0.09);
