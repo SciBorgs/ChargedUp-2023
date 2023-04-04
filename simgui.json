@@ -9,6 +9,7 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/Intake": "Subsystem",
       "/LiveWindow/Ungrouped/PIDController[10]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[11]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
@@ -110,8 +111,5 @@
         "open": true
       }
     }
-  },
-  "NetworkTables View": {
-    "visible": false
   }
 }

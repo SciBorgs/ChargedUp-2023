@@ -95,10 +95,7 @@ public final class Placement {
    */
   public Command goTo(PlacementState goal) {
     return new ProxyCommand(
-        () ->
-            findTrajectory(goal).isPresent()
-                ? followTrajectory(findTrajectory(goal).get())
-                : safeFollowProfile(goal));
+        () -> findTrajectory(goal).map(this::followTrajectory).orElse(safeFollowProfile(goal)));
   }
 
   /**

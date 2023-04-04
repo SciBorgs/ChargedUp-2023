@@ -149,7 +149,6 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   public Command setStopped(boolean stopped) {
-
     return runOnce(() -> this.stopped = stopped);
   }
 
@@ -176,7 +175,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   public void simulationPeriodic() {
     sim.setInputVoltage(lead.getAppliedOutput());
     sim.update(Constants.RATE);
-    encoder.setPosition(sim.getPositionMeters());
+    encoder.setPosition(sim.getPositionMeters() - offset);
   }
 
   @Override
