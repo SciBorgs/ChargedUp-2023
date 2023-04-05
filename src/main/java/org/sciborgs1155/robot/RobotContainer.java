@@ -1,7 +1,8 @@
 package org.sciborgs1155.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -173,6 +174,31 @@ public class RobotContainer implements Loggable {
 
     // ultimate backup
     autoChooser.addOption("none", Commands::none);
+
+    // testing autos
+    autoChooser.addOption(
+        "one meter test",
+        () ->
+            drive.driveToPose(
+                drive
+                    .getPose()
+                    .plus(
+                        new Transform2d(
+                            new Translation2d(1, Rotation2d.fromRadians(0)),
+                            Rotation2d.fromRadians(0))),
+                false));
+
+    autoChooser.addOption(
+        "one meter and spin test",
+        () ->
+            drive.driveToPose(
+                drive
+                    .getPose()
+                    .plus(
+                        new Transform2d(
+                            new Translation2d(1, Rotation2d.fromRadians(0)),
+                            Rotation2d.fromRadians(Math.PI))),
+                false));
   }
 
   private void configureSubsystemDefaults() {
