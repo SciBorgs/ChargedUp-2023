@@ -245,9 +245,9 @@ public class Drive extends SubsystemBase implements Loggable {
             trajectory,
             this::getPose,
             kinematics,
-            new PIDController(CARTESIAN.p(), CARTESIAN.i(), CARTESIAN.d()),
-            new PIDController(CARTESIAN.p(), CARTESIAN.i(), CARTESIAN.d()),
-            new PIDController(ANGULAR.p(), ANGULAR.i(), ANGULAR.d()),
+            new PIDController(TRANSLATION.p(), TRANSLATION.i(), TRANSLATION.d()),
+            new PIDController(TRANSLATION.p(), TRANSLATION.i(), TRANSLATION.d()),
+            new PIDController(ROTATION.p(), ROTATION.i(), ROTATION.d()),
             this::setModuleStates,
             useAllianceColor)
         .andThen(stop());
@@ -271,15 +271,6 @@ public class Drive extends SubsystemBase implements Loggable {
                 fieldRelative));
   }
 
-  // public Command balance() {
-  //   PIDController controller = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
-  //   controller.setTolerance(PITCH_TOLERANCE);
-  //   return run(() ->
-  //           setSpeeds(new ChassisSpeeds(MAX_SPEED * controller.calculate(getPitch()), 0, 0)))
-  //       .until(controller::atSetpoint)
-  //       .andThen(lock());
-  // }
-
   public Command balance() {
     DoubleUnaryOperator velocity =
         pitch -> Math.signum(MathUtil.applyDeadband(pitch, MIN_PITCH)) * BALANCE_SPEED;
@@ -288,17 +279,6 @@ public class Drive extends SubsystemBase implements Loggable {
         .until(() -> Math.abs(getPitch()) < MIN_PITCH)
         .andThen(lock());
   }
-
-  // public Command balanceOrthogonal() {
-  //   PIDController x = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
-  //   PIDController y = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
-  //   x.setTolerance(PITCH_TOLERANCE);
-  //   y.setTolerance(PITCH_TOLERANCE);
-  //   return run(() -> drive(x.calculate(getPitch()), y.calculate(getRoll()), 0, false))
-  //       .until(() -> x.atSetpoint() && y.atSetpoint())
-  //       .andThen(lock());
-  //   // TODO see if pitch and yaw have to be switched
-  // }
 
   /** Stops drivetrain */
   public Command stop() {
@@ -319,14 +299,7 @@ public class Drive extends SubsystemBase implements Loggable {
     PathPoint goal =
         new PathPoint(desiredPose.getTranslation(), heading, desiredPose.getRotation());
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(CONSTRAINTS, start, goal);
-    BooleanSupplier closeEnough =
-        () -> {
-          Transform2d transform = getPose().minus(desiredPose);
-          return Math.abs(transform.getX()) < 0.3
-              && Math.abs(transform.getY()) < 0.3
-              && Math.abs(transform.getRotation().getDegrees()) < 5;
-        };
-    return follow(trajectory, false, useAllianceColor).until(closeEnough);
+    return follow(trajectory, false, useAllianceColor);
   }
 
   /** Creates and follows trajectory for swerve from current pose to desiredPose */
