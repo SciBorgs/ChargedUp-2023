@@ -82,7 +82,7 @@ public final class Autos implements Sendable {
             "frontIntake",
             Commands.sequence(
                 placement.goTo(Constants.Positions.FRONT_INTAKE),
-                intake.intake().withTimeout(4),
+                intake.intake().withTimeout(Auto.MOVING_INTAKE_TIME),
                 intake.stop())),
         Map.entry(
             "backIntake",
@@ -140,12 +140,12 @@ public final class Autos implements Sendable {
 
   /** no PPL */
   public Command cubeBalance() {
-    return Commands.sequence(backHighCubeScore(), balance().alongWith(placement.goTo(STOW)));
+    return Commands.sequence(backHighCubeScore(), balance().alongWith(eventMarkers.get("stow")));
   }
 
   /** no PPL */
   public Command coneBalance() {
-    return Commands.sequence(highConeScore(), balance().alongWith(placement.goTo(STOW)));
+    return Commands.sequence(highConeScore(), balance().alongWith(eventMarkers.get("stow")));
   }
 
   public Command coneLeave() {

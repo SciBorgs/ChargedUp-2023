@@ -246,9 +246,10 @@ public class RobotContainer implements Loggable {
   }
 
   public Command getTestCommand() {
-    return Commands.sequence(
-        Commands.runOnce(
-            () -> drive.resetOdometry(new Pose2d(3, 3, Rotation2d.fromDegrees(0))), drive),
-        scoring.odometryAlign(Side.BACK));
+    // return Commands.sequence(
+    //     Commands.runOnce(
+    //         () -> drive.resetOdometry(new Pose2d(3, 3, Rotation2d.fromDegrees(0))), drive),
+    //     scoring.odometryAlign(Side.BACK));
+    return Commands.none();
   }
 }
