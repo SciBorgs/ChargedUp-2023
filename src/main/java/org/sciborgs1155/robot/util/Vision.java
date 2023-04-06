@@ -31,6 +31,7 @@ public class Vision {
    * camera
    */
   public enum Mode {
+    NONE,
     REAL,
     SIM,
     SIM_WITH_CAM;
@@ -123,6 +124,10 @@ public class Vision {
 
   /* Gets estimated pose from vision measurements */
   public EstimatedRobotPose[] getPoseEstimates(Pose2d lastPose) {
+    if (mode == Mode.NONE) {
+      return new EstimatedRobotPose[0];
+    }
+
     frontEstimator.setReferencePose(lastPose);
     backEstimator.setReferencePose(lastPose);
 

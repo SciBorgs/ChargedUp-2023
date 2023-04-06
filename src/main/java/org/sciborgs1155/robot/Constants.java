@@ -132,7 +132,7 @@ public final class Constants {
               .withUnits(Conversion.Units.RADIANS)
               .withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
 
-      public static final PIDConstants PID = new PIDConstants(9, 0, 1); // d = 2.18954
+      public static final PIDConstants PID = new PIDConstants(12, 0, 1.1); // d = 2.18954
       public static final SystemConstants FF =
           new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
@@ -203,7 +203,7 @@ public final class Constants {
 
     public static final double MAX_SPEED = 3.35; // m / s
     public static final double MAX_ANGULAR_SPEED = 1.5 * Math.PI; // rad / s
-    public static final double MAX_ACCEL = 9; // m / s^2
+    public static final double MAX_ACCEL = 8; // m / s^2
 
     public static final double TRACK_WIDTH = 0.5715;
     // Distance between centers of right and left wheels on robot
@@ -227,7 +227,7 @@ public final class Constants {
     };
 
     public static final PIDConstants TRANSLATION = new PIDConstants(0.6, 0, 0);
-    public static final PIDConstants ROTATION = new PIDConstants(0.8, 0, 0.5);
+    public static final PIDConstants ROTATION = new PIDConstants(0.4, 0, 0);
 
     public static final double MIN_PITCH = 11; // 12.5; // deg
     public static final double BALANCE_SPEED = 0.35; // m / s
@@ -309,7 +309,7 @@ public final class Constants {
 
     public static final PlacementState BACK_MID_CUBE = FRONT_MID_CUBE; // TODO
     public static final PlacementState BACK_HIGH_CUBE =
-        PlacementState.fromAbsolute(0.253, 3.072, 2.868);
+        PlacementState.fromAbsolute(0.253, 2.75, 3.16);
   }
 
   public static final class Auto {

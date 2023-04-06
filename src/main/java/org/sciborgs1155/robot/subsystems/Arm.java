@@ -116,7 +116,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     wrist.burnFlash();
 
     elbowSetpoint = new State(getElbowPosition().getRadians(), 0, 0);
-    wristSetpoint = new State(getRelativeWristPosition().getRadians(), 0, 0);
+    wristSetpoint = new State(Math.PI, 0, 0);
 
     this.positionVisualizer = positionVisualizer;
     this.setpointVisualizer = setpointVisualizer;
@@ -222,6 +222,13 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
                 () -> {
                   elbowSetpoint = elbowTrajectory.sample(timer.get());
                   wristSetpoint = wristTrajectory.sample(timer.get());
+                  System.out.println("elbow setpoint: " + elbowSetpoint.position());
+                  System.out.println("final elbow setpoint: " + elbowTrajectory.getLast());
+                  System.out.println(elbowSetpoint.position() == elbowTrajectory.getLast());
+
+                  System.out.println("wrist setpoint: " + elbowSetpoint.position());
+                  System.out.println("final wrist setpoint: " + elbowTrajectory.getLast());
+                  System.out.println(elbowSetpoint.position() == elbowTrajectory.getLast());
                 }))
         .until(
             () ->

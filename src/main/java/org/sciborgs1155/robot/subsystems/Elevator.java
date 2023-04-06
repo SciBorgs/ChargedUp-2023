@@ -139,7 +139,8 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   public Command followTrajectory(Trajectory trajectory) {
     Timer timer = new Timer();
     return runOnce(timer::start)
-        .andThen(run(() -> setpoint = trajectory.sample(timer.get())))
+        .andThen(run(() -> {setpoint = trajectory.sample(timer.get());
+         System.out.println(setpoint.position() == trajectory.getLast());} ))
         .until(() -> setpoint.position() == trajectory.getLast());
   }
 

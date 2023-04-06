@@ -29,6 +29,7 @@ import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.subsystems.LED;
 import org.sciborgs1155.robot.util.Vision;
+import org.sciborgs1155.robot.util.Vision.Mode;
 import org.sciborgs1155.robot.util.Visualizer;
 
 /**
@@ -40,7 +41,7 @@ import org.sciborgs1155.robot.util.Visualizer;
 public class RobotContainer implements Loggable {
 
   // Vision instance
-  private final Vision vision = new Vision();
+  private final Vision vision = new Vision(Mode.NONE);
   @Log private final Visualizer position = new Visualizer(new Color8Bit(255, 0, 0));
   @Log private final Visualizer setpoint = new Visualizer(new Color8Bit(0, 0, 255));
 
@@ -182,7 +183,7 @@ public class RobotContainer implements Loggable {
      * set starting pos: yes
      * starting location: against grid, to one side (it should have a clear path straight forward)
      */
-    // autoChooser.addOption("backup (no arm): leave", autos::leave);
+    autoChooser.addOption("backup (no arm): leave", autos::leave);
 
     // ultimate backup
     autoChooser.addOption("none", Commands::none);
@@ -209,9 +210,9 @@ public class RobotContainer implements Loggable {
                     .plus(
                         new Transform2d(
                             new Translation2d(1, Rotation2d.fromRadians(0)),
-                            Rotation2d.fromRadians(Math.PI))),
+                            Rotation2d.fromRadians(Math.PI / 2))),
                 false));
-  }
+      }
 
   private void configureSubsystemDefaults() {
     drive.setDefaultCommand(
@@ -220,7 +221,7 @@ public class RobotContainer implements Loggable {
                 () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX(), true)
             .withName("teleop driving"));
 
-    intake.setDefaultCommand(intake.set(Constants.Intake.DEFAULT_SPEED));
+    // intake.setDefaultCommand(intake.set(Constants.Intake.DEFAULT_SPEED));
   }
 
   /**
@@ -276,7 +277,8 @@ public class RobotContainer implements Loggable {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return placement.setSetpoint(Positions.INITIAL).andThen(autoChooser.getSelected().get());
+    // return placement.setSetpoint(Positions.INITIAL).andThen(autoChooser.getSelected().get());
+    return autoChooser.getSelected().get();
   }
 
   public Command getTestCommand() {

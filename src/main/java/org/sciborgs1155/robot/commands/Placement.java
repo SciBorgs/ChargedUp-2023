@@ -144,7 +144,8 @@ public final class Placement {
   public Command followTrajectory(PlacementTrajectory trajectory) {
     return Commands.parallel(
         elevator.followTrajectory(trajectory.elevator()),
-        arm.followTrajectory(trajectory.elbow(), trajectory.wrist()));
+        arm.followTrajectory(trajectory.elbow(), trajectory.wrist())
+        ).andThen(Commands.print("NO LONGER FOLLOWING"));
   }
 
   /** Sets the setpoints, this is generally not a good idea */

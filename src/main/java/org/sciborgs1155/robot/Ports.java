@@ -32,7 +32,7 @@ public final class Ports {
 
     public static final int[] ELBOW_ENCODER = {9, 8};
 
-    public static final int WRIST_MOTOR = 9;
+    public static final int WRIST_MOTOR = 7;
   }
 
   public static final class Elevator {

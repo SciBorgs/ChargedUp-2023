@@ -98,7 +98,6 @@ public final class Scoring implements Sendable {
       case HIGH -> switch (gamePiece) {
         case CONE -> BACK_HIGH_CONE;
         case CUBE -> side == Side.FRONT ? FRONT_HIGH_CUBE : BACK_HIGH_CUBE;
-        default -> throw new IllegalArgumentException("Unexpected value: " + gamePiece);
       };
       case SINGLE_SUBSTATION -> switch (gamePiece) {
         case CONE -> FRONT_SINGLE_SUBSTATION_CONE;
