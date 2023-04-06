@@ -6,6 +6,7 @@ import static org.sciborgs1155.robot.Ports.Intake.*;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
@@ -23,12 +24,16 @@ public class Intake extends SubsystemBase implements Loggable, AutoCloseable {
   @Log private double intakeSpeed = INTAKE_SPEED;
   @Log private double outtakeSpeed = OUTTAKE_SPEED;
 
+  public Command set(double percent) {
+    return run(() -> wheels.set(MathUtil.clamp(percent, -1, 1)));
+  }
+
   public Command intake() {
-    return run(() -> wheels.set(intakeSpeed)).withName("intake");
+    return set(intakeSpeed).withName("intake");
   }
 
   public Command outtake() {
-    return run(() -> wheels.set(outtakeSpeed)).withName("outtake");
+    return set(outtakeSpeed).withName("outtake");
   }
 
   public Command stop() {

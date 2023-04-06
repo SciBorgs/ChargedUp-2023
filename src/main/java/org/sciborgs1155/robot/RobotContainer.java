@@ -219,6 +219,8 @@ public class RobotContainer implements Loggable {
             .drive(
                 () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX(), true)
             .withName("teleop driving"));
+
+    intake.setDefaultCommand(intake.set(Constants.Intake.DEFAULT_SPEED));
   }
 
   /**

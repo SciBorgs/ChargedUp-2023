@@ -50,6 +50,7 @@
           "drive": {
             "open": true
           },
+          "open": true,
           "scoring": {
             "open": true
           }
