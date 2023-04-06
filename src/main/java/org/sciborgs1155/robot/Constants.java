@@ -248,7 +248,7 @@ public final class Constants {
               .divideGearing(22.0)
               .multiplyGearing(15.0)
               .multiplyGearing(14.0); // pinion teeth
-              
+
       public static final PIDConstants PID = new PIDConstants(0.11, 0, 0.06);
       public static final SystemConstants FF = new SystemConstants(0.3, 2.7, 0.25);
     }
@@ -285,7 +285,7 @@ public final class Constants {
         PlacementState.fromAbsolute(0.05, Math.PI / 2.0, Math.PI / 4.0);
 
     public static final PlacementState FRONT_INTAKE =
-        PlacementState.fromAbsolute(0.44, -0.983, -0.09);
+        PlacementState.fromAbsolute(0.46, -0.983, -0.09);
     public static final PlacementState BACK_INTAKE = STOW; // TODO
 
     public static final PlacementState FRONT_SINGLE_SUBSTATION_CONE =

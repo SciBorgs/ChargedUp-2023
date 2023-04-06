@@ -17,7 +17,7 @@ solver:
   maxAccelerationElbow: 2.7
   maxAccelerationWrist: 2.5
   maxAccelerationLift: 3.2
-  maxJerk: 40
+  maxJerk: 30
 
 lift:
   mass: 6.80389

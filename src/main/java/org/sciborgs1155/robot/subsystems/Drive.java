@@ -27,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.DoubleUnaryOperator;
 import org.sciborgs1155.robot.Constants;
@@ -277,7 +276,7 @@ public class Drive extends SubsystemBase implements Loggable {
 
     return run(() -> setSpeeds(new ChassisSpeeds(velocity.applyAsDouble(getPitch()), 0, 0)))
         .until(() -> Math.abs(getPitch()) < MIN_PITCH)
-        .andThen(lock());
+        .andThen(stop());
   }
 
   /** Stops drivetrain */
