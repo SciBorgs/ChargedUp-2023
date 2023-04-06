@@ -235,12 +235,8 @@ public class RobotContainer implements Loggable {
 
     // SPEED SWITCHING
     driver
-        .leftBumper()
-        .onTrue(drive.setSpeedMultiplier(SpeedMultiplier.SLOW))
-        .onFalse(drive.setSpeedMultiplier(SpeedMultiplier.NORMAL));
-    driver
         .rightBumper()
-        .onTrue(drive.setSpeedMultiplier(SpeedMultiplier.MAX))
+        .onTrue(drive.setSpeedMultiplier(SpeedMultiplier.SLOW))
         .onFalse(drive.setSpeedMultiplier(SpeedMultiplier.NORMAL));
 
     // STATE SWITCHING

@@ -190,9 +190,8 @@ public final class Constants {
 
   public static final class Drive {
     public enum SpeedMultiplier {
-      MAX(1),
-      NORMAL(0.55),
-      SLOW(0.25);
+      NORMAL(1),
+      SLOW(1.0 / 3.0);
 
       public final double multiplier;
 
