@@ -116,7 +116,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     wrist.burnFlash();
 
     elbowSetpoint = new State(getElbowPosition().getRadians(), 0, 0);
-    wristSetpoint = new State(getRelativeWristPosition().getRadians(), 0, 0);
+    wristSetpoint = new State(Math.PI, 0, 0);
 
     this.positionVisualizer = positionVisualizer;
     this.setpointVisualizer = setpointVisualizer;

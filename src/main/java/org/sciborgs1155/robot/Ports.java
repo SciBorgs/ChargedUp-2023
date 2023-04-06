@@ -10,7 +10,7 @@ public final class Ports {
   }
   // angy
   // angery
-  // the faint taste of peach - we should get sponsored by arizona
+
   public static final class Drive {
     public static final int FRONT_LEFT_DRIVE = 1;
     public static final int REAR_LEFT_DRIVE = 38;
@@ -32,7 +32,7 @@ public final class Ports {
 
     public static final int[] ELBOW_ENCODER = {9, 8};
 
-    public static final int WRIST_MOTOR = 8;
+    public static final int WRIST_MOTOR = 9;
   }
 
   public static final class Elevator {
@@ -46,7 +46,7 @@ public final class Ports {
   }
 
   public static final class Intake {
-    public static final int WHEEL_MOTOR = 7;
+    public static final int WHEEL_MOTOR = 10;
   }
 
   public static final class Led {
