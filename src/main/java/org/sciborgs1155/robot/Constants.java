@@ -112,7 +112,7 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.1542, 0.6, 0.91, 0.038046); // v =  0.87884
 
-      public static final Constraints CONSTRAINTS = new Constraints(2.45, 2.5);
+      public static final Constraints CONSTRAINTS = new Constraints(2.45, 2.8);
 
       public static final double MAX_ANGLE = Math.PI;
       public static final double MIN_ANGLE = -Math.PI;
@@ -136,7 +136,7 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
-      public static final Constraints CONSTRAINTS = new Constraints(2.9, 2.7);
+      public static final Constraints CONSTRAINTS = new Constraints(2.9, 3.25);
 
       public static final double MAX_ANGLE = 3.0 * Math.PI / 2.0;
       public static final double MIN_ANGLE = -Math.PI / 2.0;
@@ -285,7 +285,7 @@ public final class Constants {
         PlacementState.fromAbsolute(0.05, Math.PI / 2.0, Math.PI / 4.0);
 
     public static final PlacementState FRONT_INTAKE =
-        PlacementState.fromAbsolute(0.46, -0.983, -0.09);
+        PlacementState.fromAbsolute(0.455, -0.983, -0.09);
     public static final PlacementState BACK_INTAKE = STOW; // TODO
 
     public static final PlacementState FRONT_SINGLE_SUBSTATION_CONE =

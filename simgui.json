@@ -95,19 +95,16 @@
           }
         },
         "Elevator": {
-          "open": true,
           "pid": {
             "open": true
           }
         },
         "RobotContainer": {
+          "open": true,
           "scoring": {
             "open": true
           }
         },
-        "open": true
-      },
-      "photonvision": {
         "open": true
       }
     }

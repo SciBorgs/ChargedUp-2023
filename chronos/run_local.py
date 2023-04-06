@@ -14,8 +14,10 @@ if __name__ == "__main__":
 
     request = {
         # "initial": [0.44, -1.110857, 0.1],
-        "initial": [0.425006, 0.128855, -0.305],
-        "final": [0.521769, 3.04, 2.74],
+        # "initial": [0.425006, 0.128855, -0.305],
+        # back high to front intake
+        "initial": [0.2475, 3.072, 2.5],
+        "final": [0.455, -0.983, -0.09],
         "constraintOverrides": [],
     }
     result = solver.solve(request)
