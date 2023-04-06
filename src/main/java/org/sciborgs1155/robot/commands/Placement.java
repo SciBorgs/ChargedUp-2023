@@ -38,8 +38,8 @@ public final class Placement {
   public Optional<PlacementTrajectory> findTrajectory(Parameters params) {
     System.out.println("params: " + params);
     var traj = Optional.ofNullable(trajectories.get(params.hashCode()));
-    System.out.println(traj);
-    System.out.println("exists: " + traj.isPresent());
+    System.out.println(
+        traj.map(PlacementTrajectory::toString).orElseGet(() -> "trajectory not found"));
     return traj;
   }
 
