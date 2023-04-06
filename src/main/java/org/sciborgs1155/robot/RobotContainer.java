@@ -157,14 +157,14 @@ public class RobotContainer implements Loggable {
      * set starting pos: no
      * starting location: cube scoring, all the way to one side
      */
-    autoChooser.addOption("backup (no arm, no odometry): leave", autos::leaveNoOdometry);
+    // autoChooser.addOption("backup (no arm, no odometry): leave", autos::leaveNoOdometry);
     /* leave (no odometry) setup instructions:
      * gamepiece: none
      * orientation: away from grid
      * set starting pos: no
      * starting location: against grid, to one side (it should have a clear path straight forward)
      */
-    autoChooser.addOption("backup (no arm): leave", autos::leave);
+    // autoChooser.addOption("backup (no arm): leave", autos::leave);
     /* leave setup instructions:
      * gamepiece: none
      * orientation: away from grid
