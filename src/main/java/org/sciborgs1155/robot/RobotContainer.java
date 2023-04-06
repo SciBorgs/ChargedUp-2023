@@ -80,30 +80,33 @@ public class RobotContainer implements Loggable {
 
   private void configureAutoChooser() {
     // ambitious path
-    autoChooser.addOption("2 gamepiece", autos::twoGamepiece);
+
     /* 2 gamepiece setup instructions:
      * gamepiece: cone
      * orientation: away from grid
      * set starting pos: yes
      * starting location: cone scoring, all the way to one side
      */
+    autoChooser.addOption("2 gamepiece", autos::twoGamepiece);
 
     // simple balances (no PPL)
-    autoChooser.addOption("balance", autos::balance);
+
     /* balance setup instructions:
      * gamepiece: none
      * orientation: away from grid
      * set starting pos: no
      * starting location: in front of charge station
      */
-    autoChooser.addOption("cube -> balance", autos::cubeBalance);
+    autoChooser.addOption("balance", autos::fullBalance);
+
     /* cube balance setup instructions:
      * gamepiece: cube
      * orientation: away from grid
      * set starting pos: no
      * starting location: cube scoring, center
      */
-    autoChooser.addOption("cone -> balance", autos::coneBalance);
+    autoChooser.addOption("cube -> balance", autos::cubeBalance);
+
     /* cone balance setup instructions:
      * gamepiece: cone
      * orientation: away from grid
@@ -111,66 +114,75 @@ public class RobotContainer implements Loggable {
      * starting location: cone scoring, off-center (right/left doesn't matter, as long as it's
      * in front of charge)
      */
+    autoChooser.addOption("cone -> balance", autos::coneBalance);
 
     // simple scoring
-    autoChooser.addOption("cone -> leave", autos::coneLeave);
+
     /* cone leave setup instructions:
      * gamepiece: cone
      * orientation: away from grid
      * set starting pos: yes
      * starting location: cone scoring, all the way to one side
      */
-    autoChooser.addOption("cube -> leave", autos::cubeLeave);
+    autoChooser.addOption("cone -> leave", autos::coneLeave);
+
     /* cube leave setup instructions:
      * gamepiece: cube
      * orientation: away from grid
      * set starting pos: yes
      * starting location: cube scoring, all the way to one side
      */
+    autoChooser.addOption("cube -> leave", autos::cubeLeave);
 
     // backups
-    autoChooser.addOption("backup (no drive): cube score", autos::backHighCubeScore);
+
     /* cube score setup instructions:
      * gamepiece: cube
      * orientation: away from grid
      * set starting pos: no
      * starting location: cube scoring (anywhere)
      */
-    autoChooser.setDefaultOption("backup (no drive): cone score", autos::highConeScore);
+    autoChooser.addOption("backup (no drive): cube score", autos::backHighCubeScore);
+
     /* cone score setup instructions:
      * gamepiece: cone
      * orientation: away from grid
      * set starting pos: no
      * starting location: cone scoring (anywhere)
      */
-    autoChooser.addOption("backup (no odometry): cone -> leave", autos::coneLeaveNoOdometry);
+    autoChooser.setDefaultOption("backup (no drive): cone score", autos::highConeScore);
+
     /* cone leave (no odometry) setup instructions:
      * gamepiece: cone
      * orientation: away from grid
      * set starting pos: no
      * starting location: cone scoring, all the way to one side
      */
-    autoChooser.addOption("backup (no odometry): cube -> leave", autos::cubeLeaveNoOdometry);
+    autoChooser.addOption("backup (no odometry): cone -> leave", autos::coneLeaveNoOdometry);
+
     /* cube leave (no odometry) setup instructions:
      * gamepiece: cube
      * orientation: away from grid
      * set starting pos: no
      * starting location: cube scoring, all the way to one side
      */
-    // autoChooser.addOption("backup (no arm, no odometry): leave", autos::leaveNoOdometry);
+    autoChooser.addOption("backup (no odometry): cube -> leave", autos::cubeLeaveNoOdometry);
+
     /* leave (no odometry) setup instructions:
      * gamepiece: none
      * orientation: away from grid
      * set starting pos: no
      * starting location: against grid, to one side (it should have a clear path straight forward)
      */
-    // autoChooser.addOption("backup (no arm): leave", autos::leave);
+    // autoChooser.addOption("backup (no arm, no odometry): leave", autos::leaveNoOdometry);
+
     /* leave setup instructions:
      * gamepiece: none
      * orientation: away from grid
      * set starting pos: yes
      * starting location: against grid, to one side (it should have a clear path straight forward)
      */
+    // autoChooser.addOption("backup (no arm): leave", autos::leave);
 
     // ultimate backup
     autoChooser.addOption("none", Commands::none);
@@ -202,8 +214,6 @@ public class RobotContainer implements Loggable {
   }
 
   private void configureSubsystemDefaults() {
-    // led.setDefaultCommand(led.setGamePieceColor(GamePiece.CONE));
-
     drive.setDefaultCommand(
         drive
             .drive(

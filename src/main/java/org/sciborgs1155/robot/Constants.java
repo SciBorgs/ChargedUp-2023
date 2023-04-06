@@ -66,11 +66,6 @@ public final class Constants {
 
     public static final double CLAW_MASS = 3.85554;
     // Mass of the claw alone
-
-    public static final double WHEEL_BASE = 0.5715;
-
-    // Distance between front and back wheels on robot
-    public static final int ALTERNATE_COUNTS_PER_REV = 8192;
   }
 
   public static final class Vision {
@@ -117,7 +112,7 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.1542, 0.6, 0.91, 0.038046); // v =  0.87884
 
-      public static final Constraints CONSTRAINTS = new Constraints(2.45, 2.5);
+      public static final Constraints CONSTRAINTS = new Constraints(2.45, 2.8);
 
       public static final double MAX_ANGLE = Math.PI;
       public static final double MIN_ANGLE = -Math.PI;
@@ -141,7 +136,7 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
-      public static final Constraints CONSTRAINTS = new Constraints(2.9, 2.7);
+      public static final Constraints CONSTRAINTS = new Constraints(2.9, 3.25);
 
       public static final double MAX_ANGLE = 3.0 * Math.PI / 2.0;
       public static final double MIN_ANGLE = -Math.PI / 2.0;
@@ -231,10 +226,9 @@ public final class Constants {
       Math.PI / 2 // rear right
     };
 
-    public static final PIDConstants CARTESIAN = new PIDConstants(0.6, 0, 0);
-    public static final PIDConstants ANGULAR = new PIDConstants(0.8, 0, 0.5);
-    public static final PIDConstants BALANCE = new PIDConstants(0.017, 0, 0);
-    // public static final double PITCH_TOLERANCE = 11.5; // deg
+    public static final PIDConstants TRANSLATION = new PIDConstants(0.6, 0, 0);
+    public static final PIDConstants ROTATION = new PIDConstants(0.8, 0, 0.5);
+
     public static final double MIN_PITCH = 11; // 12.5; // deg
     public static final double BALANCE_SPEED = 0.35; // m / s
 
@@ -255,11 +249,6 @@ public final class Constants {
               .multiplyGearing(15.0)
               .multiplyGearing(14.0); // pinion teeth
 
-      // OLD (WORKING)
-      //   public static final PIDConstants PID = new PIDConstants(0.1, 0, 0.06);
-      //   public static final SystemConstants FF = new SystemConstants(0.3, 0.65, 0.25);
-
-      // TESTING
       public static final PIDConstants PID = new PIDConstants(0.11, 0, 0.06);
       public static final SystemConstants FF = new SystemConstants(0.3, 2.7, 0.25);
     }
@@ -296,7 +285,7 @@ public final class Constants {
         PlacementState.fromAbsolute(0.05, Math.PI / 2.0, Math.PI / 4.0);
 
     public static final PlacementState FRONT_INTAKE =
-        PlacementState.fromAbsolute(0.44, -0.983, -0.09);
+        PlacementState.fromAbsolute(0.455, -0.983, -0.09);
     public static final PlacementState BACK_INTAKE = STOW; // TODO
 
     public static final PlacementState FRONT_SINGLE_SUBSTATION_CONE =
@@ -326,7 +315,7 @@ public final class Constants {
   public static final class Auto {
     public static final double CUBE_OUTTAKE_TIME = 0.5; // seconds
     public static final double CONE_OUTTAKE_TIME = 3; // seconds
-    public static final double INITIAL_INTAKE_TIME = 0.6; // seconds
+    public static final double INITIAL_INTAKE_TIME = 0.3; // seconds
     public static final double MOVING_INTAKE_TIME = 4; // seconds
   }
 
@@ -352,7 +341,7 @@ public final class Constants {
             Map.entry(6, new Translation2d(1.83, 0.51)));
   }
 
-  public static final class led {
+  public static final class LED {
     public static final int buffer1Length = 60;
 
     public static final int buffer2Length = 60;
@@ -362,11 +351,5 @@ public final class Constants {
     public static Color yellow = new Color(237, 237, 12);
     public static Color blue = new Color(0, 0, 228);
     public static Color rainbow1stPixel = new Color(255, 0, 0);
-  }
-
-  public static final class ledConst {
-    public static final int buffer1Length = 60;
-
-    public static final int buffer2Length = 60;
   }
 }

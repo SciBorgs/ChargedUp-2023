@@ -59,8 +59,8 @@ public final class Autos implements Sendable {
             drive::getPose,
             drive::resetOdometry,
             drive.kinematics,
-            Constants.Drive.CARTESIAN.toPPL(),
-            Constants.Drive.ANGULAR.toPPL(),
+            Constants.Drive.TRANSLATION.toPPL(),
+            Constants.Drive.ROTATION.toPPL(),
             drive::setModuleStates,
             eventMarkers,
             true,
@@ -106,9 +106,19 @@ public final class Autos implements Sendable {
     return followAutoPath("cone cube" + startingPosChooser.getSelected().suffix);
   }
 
-  public Command driveToBalance() {
+  public Command fullBalance() {
     return Commands.run(() -> drive.drive(0.75, 0, 0, false), drive)
-        .until(() -> Math.abs(drive.getPitch()) >= 14.5);
+        .until(() -> Math.abs(drive.getPitch()) >= 14.5)
+        .andThen(drive.balance())
+        .andThen(Commands.run(() -> drive.drive(-0.60, 0, 0, false), drive).withTimeout(0.1))
+        .andThen(drive.lock())
+        .withName("balance auto");
+  }
+
+  public Command oldBalance() {
+    return Commands.run(() -> drive.drive(0.75, 0, 0, false), drive)
+        .until(() -> Math.abs(drive.getPitch()) >= 14.5)
+        .andThen(drive.lock());
   }
 
   public Command highConeScore() {
@@ -134,18 +144,13 @@ public final class Autos implements Sendable {
   }
 
   /** no PPL */
-  public Command balance() {
-    return Commands.sequence(driveToBalance(), drive.balance());
-  }
-
-  /** no PPL */
   public Command cubeBalance() {
-    return Commands.sequence(backHighCubeScore(), balance().alongWith(eventMarkers.get("stow")));
+    return Commands.sequence(backHighCubeScore(), fullBalance().alongWith(placement.goTo(STOW)));
   }
 
   /** no PPL */
   public Command coneBalance() {
-    return Commands.sequence(highConeScore(), balance().alongWith(eventMarkers.get("stow")));
+    return Commands.sequence(highConeScore(), fullBalance().alongWith(placement.goTo(STOW)));
   }
 
   public Command coneLeave() {

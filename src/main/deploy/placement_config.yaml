@@ -11,13 +11,13 @@ origin: [ -0.127, 0.5203698 ]
 
 solver:
   interiorPoints: 20
-  maxVoltageElbow: 10
+  maxVoltageElbow: 11
   maxVoltageWrist: 9
   maxVoltageLift: 10
-  maxAccelerationElbow: 2.7
-  maxAccelerationWrist: 2.5
+  maxAccelerationElbow: 3.25
+  maxAccelerationWrist: 2.8
   maxAccelerationLift: 3.2
-  maxJerk: 40
+  maxJerk: 45
 
 lift:
   mass: 6.80389
@@ -56,21 +56,21 @@ constraints:
   floor:
     type: minY,
     point: end
-    args: [ 0.08 ]
+    args: [ 0.1 ]
   heightLimitEnd:
     type: maxY
     point: end
-    args: [ 1.8 ]
+    args: [ 1.75 ]
   heightLimitWrist:
     type: maxY
     point: wrist
-    args: [ 1.8 ]
+    args: [ 1.75 ]
   robotBody:
     type: rectangle
     point: end
     args: [
       -0.3, 0,
-      0.3, 0.5
+      0.3, 0.25
     ]
   elevator:
     type: rectangle
