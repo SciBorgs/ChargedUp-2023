@@ -277,8 +277,8 @@ public class RobotContainer implements Loggable {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // return placement.setSetpoint(Positions.INITIAL).andThen(autoChooser.getSelected().get());
-    return autoChooser.getSelected().get();
+    return placement.setSetpoint(Positions.INITIAL).andThen(autoChooser.getSelected().get());
+    // return autoChooser.getSelected().get();
   }
 
   public Command getTestCommand() {
