@@ -10,9 +10,9 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import java.util.Collection;
 import java.util.List;
+import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.LED;
 import org.sciborgs1155.robot.util.placement.PlacementState;
@@ -85,7 +85,7 @@ public final class Scoring implements Sendable {
   }
 
   public Command goTo(Level height) {
-    return new ProxyCommand(() -> placement.goTo(scoringState(height)));
+    return new DeferredCommand(() -> placement.goTo(scoringState(height)));
   }
 
   public PlacementState scoringState(Level height) {

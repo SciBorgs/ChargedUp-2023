@@ -4,9 +4,9 @@ import static org.sciborgs1155.robot.Constants.Positions.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import java.util.Map;
 import java.util.Optional;
+import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.util.placement.PlacementCache;
@@ -94,7 +94,7 @@ public final class Placement {
    *     trapezoid profiling.
    */
   public Command goTo(PlacementState goal) {
-    return new ProxyCommand(
+    return new DeferredCommand(
         () -> findTrajectory(goal).map(this::followTrajectory).orElse(safeFollowProfile(goal)));
   }
 
@@ -143,9 +143,9 @@ public final class Placement {
    */
   public Command followTrajectory(PlacementTrajectory trajectory) {
     return Commands.parallel(
-        elevator.followTrajectory(trajectory.elevator()),
-        arm.followTrajectory(trajectory.elbow(), trajectory.wrist())
-        ).andThen(Commands.print("NO LONGER FOLLOWING"));
+            elevator.followTrajectory(trajectory.elevator()),
+            arm.followTrajectory(trajectory.elbow(), trajectory.wrist()))
+        .andThen(Commands.print("NO LONGER FOLLOWING"));
   }
 
   /** Sets the setpoints, this is generally not a good idea */
