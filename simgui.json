@@ -59,6 +59,16 @@
           "visible": true
         }
       },
+      "/Shuffleboard/RobotContainer/position": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/RobotContainer/setpoint": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Shuffleboard/RobotContainer/starting position chooser": {
         "window": {
           "visible": true
@@ -98,8 +108,5 @@
         "open": true
       }
     }
-  },
-  "NetworkTables View": {
-    "visible": false
   }
 }

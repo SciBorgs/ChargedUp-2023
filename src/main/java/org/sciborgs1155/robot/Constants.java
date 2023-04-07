@@ -310,7 +310,7 @@ public final class Constants {
 
     public static final PlacementState BACK_MID_CUBE = FRONT_MID_CUBE; // TODO
     public static final PlacementState BACK_HIGH_CUBE =
-        PlacementState.fromAbsolute(0.253, 2.75, 3.16);
+        PlacementState.fromAbsolute(0.245, 2.75, 3.17);
   }
 
   public static final class Auto {
