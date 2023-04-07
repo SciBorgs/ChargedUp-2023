@@ -7,13 +7,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.function.Supplier;
+import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.robot.Constants.Drive.SpeedMultiplier;
 import org.sciborgs1155.robot.Constants.Positions;
 import org.sciborgs1155.robot.Ports.OI;
@@ -212,7 +212,7 @@ public class RobotContainer implements Loggable {
                             new Translation2d(1, Rotation2d.fromRadians(0)),
                             Rotation2d.fromRadians(Math.PI / 2))),
                 false));
-      }
+  }
 
   private void configureSubsystemDefaults() {
     drive.setDefaultCommand(
@@ -268,7 +268,7 @@ public class RobotContainer implements Loggable {
 
   /** A command to run when the robot is enabled */
   public Command getEnableCommand() {
-    return new ProxyCommand(() -> placement.setSetpoint(placement.state()));
+    return new DeferredCommand(() -> placement.setSetpoint(placement.state()));
   }
 
   /**
@@ -278,7 +278,6 @@ public class RobotContainer implements Loggable {
    */
   public Command getAutonomousCommand() {
     return placement.setSetpoint(Positions.INITIAL).andThen(autoChooser.getSelected().get());
-    // return autoChooser.getSelected().get();
   }
 
   public Command getTestCommand() {

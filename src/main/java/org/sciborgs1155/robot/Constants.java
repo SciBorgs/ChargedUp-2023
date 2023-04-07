@@ -112,7 +112,7 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.1542, 0.6, 0.91, 0.038046); // v =  0.87884
 
-      public static final Constraints CONSTRAINTS = new Constraints(2.2, 2.9);
+      public static final Constraints CONSTRAINTS = new Constraints(2.45, 2.9);
 
       public static final double MAX_ANGLE = Math.PI;
       public static final double MIN_ANGLE = -Math.PI;
@@ -201,9 +201,9 @@ public final class Constants {
       }
     }
 
-    public static final double MAX_SPEED = 3.35; // m / s
+    public static final double MAX_SPEED = 3.6; // m / s
     public static final double MAX_ANGULAR_SPEED = 1.5 * Math.PI; // rad / s
-    public static final double MAX_ACCEL = 8; // m / s^2
+    public static final double MAX_ACCEL = 7.8; // m / s^2
 
     public static final double TRACK_WIDTH = 0.5715;
     // Distance between centers of right and left wheels on robot
@@ -232,7 +232,8 @@ public final class Constants {
     public static final double MIN_PITCH = 11; // 12.5; // deg
     public static final double BALANCE_SPEED = 0.35; // m / s
 
-    public static final PathConstraints CONSTRAINTS = new PathConstraints(MAX_SPEED / 2, MAX_ACCEL);
+    public static final PathConstraints CONSTRAINTS =
+        new PathConstraints(MAX_SPEED / 2.5, MAX_ACCEL / 1.2);
   }
 
   public static final class SwerveModule {

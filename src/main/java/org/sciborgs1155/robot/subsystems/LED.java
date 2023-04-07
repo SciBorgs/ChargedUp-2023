@@ -1,7 +1,5 @@
 package org.sciborgs1155.robot.subsystems;
 
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -9,11 +7,11 @@ import org.sciborgs1155.robot.commands.Scoring.GamePiece;
 
 public class LED extends SubsystemBase {
 
-  private static AddressableLED led1;
-  private static AddressableLED led2;
-  private static AddressableLEDBuffer led1Buffer;
-  private static AddressableLEDBuffer led2Buffer;
-  static double time = 0.0;
+  // private static AddressableLED led1;
+  // private static AddressableLED led2;
+  // private static AddressableLEDBuffer led1Buffer;
+  // private static AddressableLEDBuffer led2Buffer;
+  // static double time = 0.0;
 
   public enum LEDColors {
     RAINBOW,
