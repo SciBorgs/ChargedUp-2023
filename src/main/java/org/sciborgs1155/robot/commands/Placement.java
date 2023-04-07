@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.commands;
 
 import static org.sciborgs1155.robot.Constants.Positions.*;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Map;
@@ -82,6 +83,10 @@ public final class Placement {
     return side == Side.FRONT ? PASS_TO_FRONT : PASS_TO_BACK;
   }
 
+  public Command goTo(PlacementState goal) {
+    return goTo(goal, true);
+  }
+
   /**
    * Goes to a {@link PlacementState} in the most optimal way, this is a safe command.
    *
@@ -90,12 +95,24 @@ public final class Placement {
    * Otherwise, falls back on {@link #safeFollowProfile(PlacementState)} for on the fly movements.
    *
    * @param goal The goal state.
+   * @param useTrajectories Whether to use trajectories.
    * @return A command that goes to the goal safely using either custom trajectory following or
    *     trapezoid profiling.
    */
-  public Command goTo(PlacementState goal) {
+  public Command goTo(PlacementState goal, boolean useTrajectories) {
     return new DeferredCommand(
-        () -> findTrajectory(goal).map(this::followTrajectory).orElse(safeFollowProfile(goal)));
+        () -> {
+          if (!arm.allowPassOver() && goal.side() != state().side()) {
+            DriverStation.reportError(
+                "THE WRIST IS CURRENTLY LIMP AND WILL NOT PASS OVER, COMMAND IGNORED", false);
+            return Commands.none();
+          }
+          var trajectory = findTrajectory(goal);
+          if (useTrajectories && trajectory.isPresent()) {
+            return followTrajectory(trajectory.get());
+          }
+          return safeFollowProfile(goal);
+        });
   }
 
   /**
@@ -106,7 +123,7 @@ public final class Placement {
    * @param goal The goal goal.
    * @return A following command that will run until all mechanisms are at their goal.
    */
-  public Command followProfile(PlacementState goal) {
+  private Command followProfile(PlacementState goal) {
     return Commands.parallel(
             elevator.followProfile(goal.elevatorHeight()),
             arm.followProfile(goal.elbowAngle(), goal.wristAngle()))
@@ -124,7 +141,7 @@ public final class Placement {
    * @return A safe following command that will run to a safe goal and then until all mechanisms are
    *     at their goal.
    */
-  public Command safeFollowProfile(PlacementState goal) {
+  private Command safeFollowProfile(PlacementState goal) {
     return Commands.either(
             followProfile(passOver(goal.side())),
             Commands.none(),
@@ -141,17 +158,22 @@ public final class Placement {
    * @param trajectory The trajectory to follow.
    * @return A command to follow a generated trajectory.
    */
-  public Command followTrajectory(PlacementTrajectory trajectory) {
+  private Command followTrajectory(PlacementTrajectory trajectory) {
     return Commands.parallel(
             elevator.followTrajectory(trajectory.elevator()),
             arm.followTrajectory(trajectory.elbow(), trajectory.wrist()))
         .andThen(Commands.print("NO LONGER FOLLOWING"));
   }
 
-  /** Sets the setpoints, this is generally not a good idea */
+  /** Sets the setpoints, this is generally a very bad idea */
   public Command setSetpoint(PlacementState setpoint) {
     return Commands.parallel(
         elevator.setSetpoint(setpoint.elevatorHeight()),
         arm.setSetpoints(setpoint.elbowAngle(), setpoint.wristAngle()));
+  }
+
+  /** Sets everything to stopped */
+  public Command setStopped(boolean stopped) {
+    return Commands.parallel(elevator.setStopped(stopped), arm.setStopped(stopped));
   }
 }

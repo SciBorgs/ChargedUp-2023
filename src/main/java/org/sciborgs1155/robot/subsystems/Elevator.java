@@ -12,6 +12,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -41,7 +42,8 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   private final ElevatorFeedforward ff = new ElevatorFeedforward(FF.s(), FF.g(), FF.v(), FF.a());
   // set ports V
-  // private DigitalInput limitSwitch = new DigitalInput(Ports.Elevator.LIMIT_SWITCH);
+
+  private DigitalInput bottomSwitch = new DigitalInput(LIMIT_SWITCH);
 
   @Log
   @Log(name = "at setpoint", methodName = "atSetpoint")
@@ -55,7 +57,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   private final LinearFilter current = LinearFilter.movingAverage(SAMPLE_SIZE_TAPS);
   @Log private boolean stalling = false;
 
-  @Log private final double offset = 0.61842;
+  @Log private double offset = ZERO_OFFSET;
 
   private final ElevatorSim sim =
       new ElevatorSim(
@@ -158,6 +160,10 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Override
   public void periodic() {
+    if (bottomSwitch.get()) {
+      offset = -encoder.getPosition();
+    }
+
     setpoint =
         new State(
             MathUtil.clamp(setpoint.position(), MIN_HEIGHT, MAX_HEIGHT),

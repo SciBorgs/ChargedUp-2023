@@ -3,6 +3,7 @@ package org.sciborgs1155.robot.commands;
 import static org.sciborgs1155.robot.Constants.Positions.*;
 
 import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -49,14 +50,14 @@ public final class Autos implements Sendable {
 
     eventMarkers =
         Map.ofEntries(
-            Map.entry("backHighCone", placement.safeFollowProfile(BACK_HIGH_CONE)),
-            Map.entry("backHighCube", placement.safeFollowProfile(BACK_HIGH_CUBE)),
-            Map.entry("frontHighCube", placement.safeFollowProfile(FRONT_HIGH_CUBE)),
+            Map.entry("backHighCone", placement.goTo(BACK_HIGH_CONE, false)),
+            Map.entry("backHighCube", placement.goTo(BACK_HIGH_CUBE, false)),
+            Map.entry("frontHighCube", placement.goTo(FRONT_HIGH_CUBE, false)),
             Map.entry("outtakeCone", outtake(GamePiece.CONE)),
             Map.entry("outtakeCube", outtake(GamePiece.CUBE)),
             Map.entry("frontIntake", frontMovingIntake()),
-            Map.entry("stow", placement.safeFollowProfile(STOW)),
-            Map.entry("balanceState", placement.safeFollowProfile(BALANCE)),
+            Map.entry("stow", placement.goTo(STOW, false)),
+            Map.entry("balanceState", placement.goTo(BALANCE, false)),
             Map.entry("initialIntake", initialIntake()));
 
     startingPosChooser = new SendableChooser<StartingPos>();
@@ -91,7 +92,7 @@ public final class Autos implements Sendable {
 
   private Command frontMovingIntake() {
     return Commands.sequence(
-        placement.safeFollowProfile(Constants.Positions.FRONT_INTAKE),
+        placement.goTo(Constants.Positions.FRONT_INTAKE, false),
         intake.intake().withTimeout(Auto.MOVING_INTAKE_TIME),
         intake.stop());
   }
@@ -110,11 +111,19 @@ public final class Autos implements Sendable {
   }
 
   public Command fullBalance() {
-    // 6 ft
-    return drive
-        .follow("balance", true, true)
+    var trajectory = PathPlanner.loadPath("balance", Constants.Drive.CONSTRAINTS);
+    // var initialState =
+    //               PathPlannerTrajectory.transformStateForAlliance(
+    //                   trajectory.getInitialState(), DriverStation.getAlliance());
+    // Pose2d initialPose = new Pose2d(
+    //   initialState.poseMeters.getTranslation(), initialState.holonomicRotation);
+    
+    // return Commands.runOnce(() -> drive.resetOdometry(initialPose), drive)
+    //     .andThen(drive.follow(trajectory, false, true))
+    return drive.follow("balance", false, true)
+        // followAutoPath("balance")
         .andThen(drive.balance())
-        .withTimeout(4)
+        .withTimeout(10)
         .andThen(Commands.print("balanced!"))
         .andThen(Commands.run(() -> drive.drive(-0.3, 0, 0, false), drive).withTimeout(0.1))
         .andThen(drive.lock())
@@ -126,26 +135,20 @@ public final class Autos implements Sendable {
     // .withName("balance auto").withTimeout(8);
   }
 
-  public Command oldBalance() {
-    return Commands.run(() -> drive.drive(0.75, 0, 0, false), drive)
-        .until(() -> Math.abs(drive.getPitch()) >= 14.5)
-        .andThen(drive.lock());
-  }
-
   public Command highConeScore() {
     return Commands.sequence(
         defaultOdometryReset(GamePiece.CONE, Rotation2d.fromRadians(0)),
         initialIntake(),
-        placement.safeFollowProfile(BACK_HIGH_CONE).withTimeout(5),
+        placement.goTo(BACK_HIGH_CONE, false).withTimeout(5),
         outtake(GamePiece.CONE));
   }
 
   public Command backHighCubeScore() {
     return Commands.sequence(
         defaultOdometryReset(GamePiece.CUBE, Rotation2d.fromRadians(0)),
-        placement.safeFollowProfile(BACK_HIGH_CUBE).withTimeout(5),
+        placement.goTo(BACK_HIGH_CUBE, false).withTimeout(5),
         // Commands.print("going to state..."),
-        // placement.safeFollowProfile(FRONT_HIGH_CUBE),
+        // placement.goTo(FRONT_HIGH_CUBE, false),
         // Commands.print("got to state!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"),
         outtake(GamePiece.CUBE));
   }
@@ -153,20 +156,22 @@ public final class Autos implements Sendable {
   public Command frontHighCubeScore() {
     return Commands.sequence(
         defaultOdometryReset(GamePiece.CUBE, Rotation2d.fromRadians(Math.PI)),
-        placement.safeFollowProfile(FRONT_HIGH_CUBE).withTimeout(5),
+        placement.goTo(FRONT_HIGH_CUBE, false).withTimeout(5),
         outtake(GamePiece.CUBE));
   }
 
   /** no PPL */
   public Command cubeBalance() {
     return Commands.sequence(
-        backHighCubeScore(), fullBalance().alongWith(placement.safeFollowProfile(BALANCE)));
+        backHighCubeScore(), 
+        placement.goTo(BALANCE, false).withTimeout(2.5),
+        fullBalance());
   }
 
   /** no PPL */
   public Command coneBalance() {
     return Commands.sequence(
-        highConeScore(), fullBalance().alongWith(placement.safeFollowProfile(BALANCE)));
+        highConeScore(), fullBalance().alongWith(placement.goTo(BALANCE, false)));
   }
 
   public Command coneLeave() {
@@ -175,6 +180,13 @@ public final class Autos implements Sendable {
 
   public Command cubeLeave() {
     return followAutoPath("cube leaveComm" + startingPosChooser.getSelected().suffix);
+  }
+
+  public Command lowCubeLeave() {
+    return Commands.sequence(
+        placement.goTo(FRONT_INTAKE, false),
+        outtake(GamePiece.CUBE),
+        followAutoPath("leaveComm l backwards"));
   }
 
   /** backup: no arm */
@@ -194,13 +206,13 @@ public final class Autos implements Sendable {
   /** backup: no odometry, no arm */
   public Command coneLeaveNoOdometry() {
     return Commands.sequence(
-        highConeScore(), leaveNoOdometry().alongWith(placement.safeFollowProfile(STOW)));
+        highConeScore(), leaveNoOdometry().alongWith(placement.goTo(STOW, false)));
   }
 
   /** backup: no odometry, no arm */
   public Command cubeLeaveNoOdometry() {
     return Commands.sequence(
-        backHighCubeScore(), leaveNoOdometry().alongWith(placement.safeFollowProfile(STOW)));
+        backHighCubeScore(), leaveNoOdometry().alongWith(placement.goTo(STOW, false)));
   }
 
   public Command scoreOneMeterTest() {

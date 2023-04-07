@@ -236,7 +236,7 @@ public class Drive extends SubsystemBase implements Loggable {
    */
   public Command follow(
       PathPlannerTrajectory trajectory, boolean resetPosition, boolean useAllianceColor) {
-    if (resetPosition) resetOdometry(trajectory.getInitialPose());
+    // if (resetPosition) resetOdometry(trajectory.getInitialPose());
 
     return new PPSwerveControllerCommand(
             trajectory,

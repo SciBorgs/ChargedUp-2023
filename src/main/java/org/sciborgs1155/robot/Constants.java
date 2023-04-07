@@ -136,12 +136,14 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
-      public static final Constraints CONSTRAINTS = new Constraints(2.9, 3.4);
+      public static final Constraints CONSTRAINTS = new Constraints(2.9, 3.05);
 
       public static final double MAX_ANGLE = 3.0 * Math.PI / 2.0;
       public static final double MIN_ANGLE = -Math.PI / 2.0;
 
       public static final double ELBOW_OFFSET = -1.248660;
+
+      public static final double ERROR_SHUTDOWN_THRESHOLD = 1;
     }
   }
 
@@ -172,7 +174,7 @@ public final class Constants {
 
     public static final Constraints CONSTRAINTS = new Constraints(3, 3.2);
 
-    public static final double ZERO_OFFSET = 0.603467;
+    public static final double ZERO_OFFSET = 0.61842;
   }
 
   public static final class Intake {
@@ -233,7 +235,7 @@ public final class Constants {
     public static final double BALANCE_SPEED = 0.35; // m / s
 
     public static final PathConstraints CONSTRAINTS =
-        new PathConstraints(MAX_SPEED / 2.1, MAX_ACCEL / 1.2);
+        new PathConstraints(MAX_SPEED / 2.5, MAX_ACCEL / 1.2);
   }
 
   public static final class SwerveModule {

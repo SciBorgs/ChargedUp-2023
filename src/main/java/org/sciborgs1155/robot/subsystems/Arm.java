@@ -92,7 +92,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   private final Visualizer positionVisualizer;
   private final Visualizer setpointVisualizer;
 
-  @Log private boolean stopped;
+  @Log private boolean stopped = false;
+  @Log private boolean wristLimp = false;
 
   public Arm(Visualizer positionVisualizer, Visualizer setpointVisualizer) {
     elbowLeft.follow(elbow);
@@ -145,6 +146,26 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   public Rotation2d getAbsoluteWristPosition() {
     return getRelativeWristPosition().plus(getElbowPosition());
   }
+
+  /**
+   * If elbow is far enough from setpoint (we always use trapezoid profiling or trajectories), it is
+   * dangerous
+   */
+  @Log(name = "elbow failing")
+  public boolean elbowFailing() {
+    return Math.abs(elbowFeedback.getPositionError()) > Elbow.ERROR_SHUTDOWN_THRESHOLD;
+  }
+
+  /**
+   * If wrist is not working, we cannot pass over. It's better to check if encoder is 0 because our
+   * wrist cannot be at 0 (hardware)
+   */
+  @Log
+  public boolean allowPassOver() {
+    return !wristLimp;
+  }
+
+  /** If wrist is far enough from setpoint (it is dangerous, although not as much as elbow) */
 
   /** Sets the position setpoints for the elbow and wrist, in radians */
   public Command setSetpoints(Rotation2d elbowAngle, Rotation2d wristAngle) {
@@ -243,6 +264,9 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Override
   public void periodic() {
+    // SAFETY CHECKS
+    wristLimp = wristEncoder.getPosition() == 0;
+
     double elbowFB =
         elbowFeedback.calculate(getElbowPosition().getRadians(), elbowSetpoint.position());
     double elbowFF =
@@ -264,7 +288,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             wristSetpoint.velocity(),
             wristSetpoint.acceleration());
 
-    wrist.setVoltage(stopped ? 0 : wristFB + wristFF);
+    wrist.setVoltage(stopped || wristLimp ? 0 : wristFB + wristFF);
 
     positionVisualizer.setArmAngles(getElbowPosition(), getRelativeWristPosition());
     setpointVisualizer.setArmAngles(

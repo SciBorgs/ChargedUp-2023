@@ -42,7 +42,7 @@ public final class Ports {
 
     public static final int[] ENCODER = {6, 7};
 
-    public static final int LIMIT_SWITCH = 23;
+    public static final int LIMIT_SWITCH = 9;
   }
 
   public static final class Intake {
