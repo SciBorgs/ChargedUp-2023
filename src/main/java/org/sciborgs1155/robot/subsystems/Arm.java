@@ -123,6 +123,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
     elbowEncoder.setPosition(Elbow.ELBOW_OFFSET);
     wristFeedback.setTolerance(0.3);
+    elbowFeedback.setTolerance(0.3);
   }
 
   /** Elbow position relative to the chassis */

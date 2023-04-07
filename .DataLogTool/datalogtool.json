@@ -1,1 +1,10 @@
-{}
+{
+  "download": {
+    "deleteAfter": false,
+    "localDir": "C:\\Users\\robotics\\Robotics\\ChargedUp-2023\\logs",
+    "serverTeam": "1155"
+  },
+  "output": {
+    "outputFolder": "C:\\Users\\robotics\\Robotics\\ChargedUp-2023"
+  }
+}

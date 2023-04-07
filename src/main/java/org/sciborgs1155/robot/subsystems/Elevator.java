@@ -52,9 +52,8 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   @Log(name = "acceleration setpoint", methodName = "acceleration")
   private State setpoint;
 
-  private final LinearFilter filter = LinearFilter.movingAverage(SAMPLE_SIZE_TAPS);
-
-  @Log private boolean hasSpiked = false;
+  private final LinearFilter current = LinearFilter.movingAverage(SAMPLE_SIZE_TAPS);
+  @Log private boolean stalling = false;
 
   @Log private final double offset = 0.61842;
 
@@ -148,8 +147,8 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
         .until(() -> setpoint.position() == trajectory.getLast());
   }
 
-  public boolean atSwitch() {
-    // return limitSwitch.get();
+  public boolean stalling() {
+    // return stalling;
     return false;
   }
 
@@ -168,7 +167,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     double fbOutput = pid.calculate(getPosition(), setpoint.position());
     double ffOutput = ff.calculate(setpoint.velocity(), setpoint.acceleration());
 
-    hasSpiked = filter.calculate(lead.getOutputCurrent()) >= CURRENT_SPIKE_THRESHOLD;
+    stalling = current.calculate(lead.getOutputCurrent()) >= CURRENT_THRESHOLD;
 
     lead.setVoltage(stopped ? 0 : ffOutput + fbOutput);
 

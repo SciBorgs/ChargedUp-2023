@@ -82,7 +82,8 @@ public class PlacementCache {
             Positions.FRONT_MID_CUBE,
             Positions.FRONT_HIGH_CUBE,
             Positions.BACK_MID_CUBE,
-            Positions.BACK_HIGH_CUBE);
+            Positions.BACK_HIGH_CUBE,
+            Positions.BALANCE);
 
     for (var initialPos : presets) {
       for (var finalPos : presets) {

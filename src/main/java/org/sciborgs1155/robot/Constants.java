@@ -147,7 +147,7 @@ public final class Constants {
 
   public static final class Elevator {
     public static final MotorConfig MOTOR =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(40);
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(35);
 
     public static final double GEARING = 30.0 / 1.0;
     // Gearing for motor : height (meters)
@@ -167,8 +167,8 @@ public final class Constants {
     public static final double MIN_HEIGHT = 0;
     public static final double MAX_HEIGHT = 0.65;
 
-    public static final int SAMPLE_SIZE_TAPS = 5;
-    public static final int CURRENT_SPIKE_THRESHOLD = 20;
+    public static final int SAMPLE_SIZE_TAPS = 3;
+    public static final int CURRENT_THRESHOLD = 40; // TODO this might be too high/unreasonable
 
     public static final Constraints CONSTRAINTS = new Constraints(3, 3.2);
 
@@ -201,7 +201,7 @@ public final class Constants {
       }
     }
 
-    public static final double MAX_SPEED = 3.6; // m / s
+    public static final double MAX_SPEED = 3.25; // m / s
     public static final double MAX_ANGULAR_SPEED = 1.5 * Math.PI; // rad / s
     public static final double MAX_ACCEL = 7.8; // m / s^2
 
@@ -229,11 +229,11 @@ public final class Constants {
     public static final PIDConstants TRANSLATION = new PIDConstants(0.6, 0, 0);
     public static final PIDConstants ROTATION = new PIDConstants(0.4, 0, 0);
 
-    public static final double MIN_PITCH = 11; // 12.5; // deg
+    public static final double MIN_PITCH = 12; // 12.5; // deg
     public static final double BALANCE_SPEED = 0.35; // m / s
 
     public static final PathConstraints CONSTRAINTS =
-        new PathConstraints(MAX_SPEED / 2.5, MAX_ACCEL / 1.2);
+        new PathConstraints(MAX_SPEED / 2.1, MAX_ACCEL / 1.2);
   }
 
   public static final class SwerveModule {
@@ -278,10 +278,14 @@ public final class Constants {
     public static final PlacementState STOW =
         PlacementState.fromRelative(0, 1.21834, Math.PI / 2.0);
 
+    // LOWEST COG
+    public static final PlacementState BALANCE =
+        PlacementState.fromRelative(Elevator.ZERO_OFFSET, Elbow.ELBOW_OFFSET + 0.1, 3);
+
     public static final PlacementState PASS_OLD =
         PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0);
     public static final PlacementState PASS_TO_BACK =
-        PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI);
+        PlacementState.fromAbsolute(0.03, Math.PI / 2.0, Math.PI);
     public static final PlacementState PASS_TO_FRONT =
         PlacementState.fromAbsolute(0.05, Math.PI / 2.0, Math.PI / 4.0);
 

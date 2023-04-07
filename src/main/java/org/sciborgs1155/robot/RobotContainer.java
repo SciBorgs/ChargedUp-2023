@@ -77,6 +77,8 @@ public class RobotContainer implements Loggable {
     configureBindings();
     // Configure subsystem default commands
     configureSubsystemDefaults();
+
+    // SmartDashboard.putNumber("CURRENT", () -> RobotController.getInputCurrent())
   }
 
   private void configureAutoChooser() {
@@ -201,6 +203,8 @@ public class RobotContainer implements Loggable {
                             Rotation2d.fromRadians(0))),
                 false));
 
+    autoChooser.addOption("full test (arm, drive)", autos::scoreOneMeterTest);
+
     autoChooser.addOption(
         "one meter and spin test",
         () ->
@@ -221,7 +225,7 @@ public class RobotContainer implements Loggable {
                 () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX(), true)
             .withName("teleop driving"));
 
-    // intake.setDefaultCommand(intake.set(Constants.Intake.DEFAULT_SPEED));
+    intake.setDefaultCommand(intake.set(Constants.Intake.DEFAULT_SPEED));
   }
 
   /**
@@ -237,6 +241,11 @@ public class RobotContainer implements Loggable {
     driver.b().onTrue(drive.zeroHeading());
 
     // SPEED SWITCHING
+    driver
+        .leftBumper()
+        .onTrue(drive.setSpeedMultiplier(SpeedMultiplier.SLOW))
+        .onFalse(drive.setSpeedMultiplier(SpeedMultiplier.NORMAL));
+
     driver
         .rightBumper()
         .onTrue(drive.setSpeedMultiplier(SpeedMultiplier.SLOW))
@@ -256,6 +265,9 @@ public class RobotContainer implements Loggable {
 
     operator.leftTrigger().onTrue(scoring.goTo(Level.SINGLE_SUBSTATION));
     operator.rightTrigger().onTrue(scoring.goTo(Level.DOUBLE_SUBSTATION));
+
+    operator.rightStick().onTrue(placement.goTo(Positions.BALANCE));
+    operator.leftStick().onTrue(placement.goTo(Positions.BALANCE));
     // operator.povDownRight().onTrue(elevator.setGoal(0));
     // operator.povUpRight().onTrue(elevator.setGoal(.5));
 
@@ -263,7 +275,7 @@ public class RobotContainer implements Loggable {
     operator.leftBumper().onTrue(intake.intake()).onFalse(intake.stop());
     operator.rightBumper().onTrue(intake.outtake()).onFalse(intake.stop());
 
-    new Trigger(elevator::atSwitch).onTrue(elevator.setStopped(true));
+    new Trigger(elevator::stalling).onTrue(elevator.setStopped(true));
   }
 
   /** A command to run when the robot is enabled */
@@ -277,7 +289,8 @@ public class RobotContainer implements Loggable {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return placement.setSetpoint(Positions.INITIAL).andThen(autoChooser.getSelected().get());
+    // return placement.setSetpoint(Positions.INITIAL).andThen(autoChooser.getSelected().get());
+    return autoChooser.getSelected().get();
   }
 
   public Command getTestCommand() {

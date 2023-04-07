@@ -124,16 +124,16 @@ public class Vision {
 
   /* Gets estimated pose from vision measurements */
   public EstimatedRobotPose[] getPoseEstimates(Pose2d lastPose) {
-    if (mode == Mode.NONE) {
-      return new EstimatedRobotPose[0];
-    }
-
     frontEstimator.setReferencePose(lastPose);
     backEstimator.setReferencePose(lastPose);
 
     if (mode == Mode.SIM) {
       simFront.processFrame(lastPose);
       simBack.processFrame(lastPose);
+    }
+
+    if (mode == Mode.NONE) {
+      return new EstimatedRobotPose[0];
     }
 
     return Stream.of(frontEstimator, backEstimator)
