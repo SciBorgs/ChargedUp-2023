@@ -3,7 +3,6 @@ package org.sciborgs1155.robot.commands;
 import static org.sciborgs1155.robot.Constants.Positions.*;
 
 import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -117,10 +116,11 @@ public final class Autos implements Sendable {
     //                   trajectory.getInitialState(), DriverStation.getAlliance());
     // Pose2d initialPose = new Pose2d(
     //   initialState.poseMeters.getTranslation(), initialState.holonomicRotation);
-    
+
     // return Commands.runOnce(() -> drive.resetOdometry(initialPose), drive)
     //     .andThen(drive.follow(trajectory, false, true))
-    return drive.follow("balance", false, true)
+    return drive
+        .follow("balance", false, true)
         // followAutoPath("balance")
         .andThen(drive.balance())
         .withTimeout(10)
@@ -163,9 +163,7 @@ public final class Autos implements Sendable {
   /** no PPL */
   public Command cubeBalance() {
     return Commands.sequence(
-        backHighCubeScore(), 
-        placement.goTo(BALANCE, false).withTimeout(2.5),
-        fullBalance());
+        backHighCubeScore(), placement.goTo(BALANCE, false).withTimeout(2.5), fullBalance());
   }
 
   /** no PPL */
