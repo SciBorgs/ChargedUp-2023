@@ -143,7 +143,7 @@ public final class Constants {
 
       public static final double ELBOW_OFFSET = -1.248660;
 
-      public static final double ERROR_SHUTDOWN_THRESHOLD = 1;
+      public static final double FAILING_DEBOUNCE_TIME = 0.2;
     }
   }
 

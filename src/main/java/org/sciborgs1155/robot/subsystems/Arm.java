@@ -11,6 +11,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Derivative;
@@ -93,6 +95,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   private final Visualizer setpointVisualizer;
 
   @Log private boolean stopped = false;
+  // 'tis but a scratch (see: match 42) (the elbow is unplugged)
+  @Log private boolean butAScratch = false;
   @Log private boolean wristLimp = false;
 
   public Arm(Visualizer positionVisualizer, Visualizer setpointVisualizer) {
@@ -149,23 +153,21 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   /**
    * If elbow is far enough from setpoint (we always use trapezoid profiling or trajectories), it is
-   * dangerous
+   * dangerous. This method returns a debounced trigger for when the elbow encoder is likely
+   * failing/not plugged in.
    */
-  @Log(name = "elbow failing")
-  public boolean elbowFailing() {
-    return Math.abs(elbowFeedback.getPositionError()) > Elbow.ERROR_SHUTDOWN_THRESHOLD;
+  public Trigger onElbowFailing() {
+    return new Trigger(() -> butAScratch).debounce(Elbow.FAILING_DEBOUNCE_TIME, DebounceType.kBoth);
   }
 
   /**
-   * If wrist is not working, we cannot pass over. It's better to check if encoder is 0 because our
-   * wrist cannot be at 0 (hardware)
+   * If wrist is not working, we cannot pass over. The wrist not working is determined in {@link
+   * #periodic()}
    */
   @Log
   public boolean allowPassOver() {
     return !wristLimp;
   }
-
-  /** If wrist is far enough from setpoint (it is dangerous, although not as much as elbow) */
 
   /** Sets the position setpoints for the elbow and wrist, in radians */
   public Command setSetpoints(Rotation2d elbowAngle, Rotation2d wristAngle) {
@@ -265,7 +267,14 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Override
   public void periodic() {
     // SAFETY CHECKS
-    wristLimp = wristEncoder.getPosition() == 0;
+    wristLimp =
+        wristEncoder.getPosition() == 0
+            && wristEncoder.getVelocity() == 0
+            && wristSetpoint.position() != 0;
+    butAScratch =
+        elbowEncoder.getPosition() == 0
+            && elbowEncoder.getVelocity() == 0
+            && elbowSetpoint.position() != Elbow.ELBOW_OFFSET;
 
     double elbowFB =
         elbowFeedback.calculate(getElbowPosition().getRadians(), elbowSetpoint.position());

@@ -277,8 +277,7 @@ public class RobotContainer implements Loggable {
     // MANUAL OVERRIDE FOR STOPPING
     // operator.leftTrigger().onTrue(placement.setStopped(true));
 
-    new Trigger(elevator::stalling).onTrue(placement.setStopped(true));
-    new Trigger(arm::elbowFailing).onTrue(placement.setStopped(true));
+    arm.onElbowFailing().onTrue(placement.setStopped(true));
   }
 
   /** A command to run when the robot is enabled */
