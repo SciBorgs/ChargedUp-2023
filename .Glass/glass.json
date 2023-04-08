@@ -9,12 +9,12 @@
           "elbow feedback": {
             "open": true
           },
-          "open": true,
           "wrist feedback": {
             "open": true
           }
         },
         "Drive": {
+          "open": true,
           "rearLeft": {
             "open": true
           },
@@ -50,21 +50,16 @@
           "drive": {
             "open": true
           },
-          "open": true,
           "scoring": {
             "open": true
           }
         },
         "open": true
       },
-      "SmartDashboard": {
-        "open": true
-      },
       "photonvision": {
         "Microsoft_LifeCam_HD-3000 (1)": {
           "open": true
-        },
-        "open": true
+        }
       }
     },
     "types": {
@@ -109,7 +104,7 @@
     }
   },
   "NetworkTables Settings": {
-    "mode": "Client (NT4)",
+    "mode": "Client (NT3)",
     "serverTeam": "1155"
   },
   "Plots": {

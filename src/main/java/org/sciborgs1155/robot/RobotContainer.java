@@ -134,6 +134,8 @@ public class RobotContainer implements Loggable {
      */
     autoChooser.addOption("cube -> leave", autos::cubeLeave);
 
+    autoChooser.addOption("cube -> intake", autos::cubeIntake);
+
     // backups
 
     /* cube score setup instructions:
@@ -278,6 +280,7 @@ public class RobotContainer implements Loggable {
     // operator.leftTrigger().onTrue(placement.setStopped(true));
 
     arm.onElbowFailing().onTrue(placement.setStopped(true));
+    elevator.onFailin().onTrue(placement.setStopped(true));
   }
 
   /** A command to run when the robot is enabled */

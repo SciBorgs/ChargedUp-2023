@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.Derivative;
@@ -69,6 +70,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
           MAX_HEIGHT,
           true);
 
+  @Log private boolean encoderUnplugged;
   private boolean stopped;
 
   private final Visualizer positionVisualizer;
@@ -149,9 +151,13 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
         .until(() -> setpoint.position() == trajectory.getLast());
   }
 
-  public boolean stalling() {
-    // return stalling;
-    return false;
+  /**
+   * If elevator is far enough from setpoint (we always use trapezoid profiling or trajectories), it
+   * is dangerous. This method returns a debounced trigger for when the elbow encoder is likely
+   * failing/not plugged in.
+   */
+  public Trigger onFailin() {
+    return new Trigger(() -> encoderUnplugged).debounce(FAILING_DEBOUNCE_TIME);
   }
 
   public Command setStopped(boolean stopped) {
@@ -160,9 +166,14 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Override
   public void periodic() {
-    if (bottomSwitch.get()) {
-      offset = -encoder.getPosition();
-    }
+    // if (bottomSwitch.get()) {
+    //   offset = -encoder.getPosition();
+    // }
+    encoderUnplugged =
+        encoder.getPosition() == 0
+            && encoder.getVelocity() == 0
+            && setpoint.position() != offset
+            && lead.getAppliedOutput() != 0;
 
     setpoint =
         new State(

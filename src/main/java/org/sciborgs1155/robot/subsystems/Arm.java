@@ -272,9 +272,10 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             && wristEncoder.getVelocity() == 0
             && wristSetpoint.position() != 0;
     butAScratch =
-        elbowEncoder.getPosition() == 0
-            && elbowEncoder.getVelocity() == 0
-            && elbowSetpoint.position() != Elbow.ELBOW_OFFSET;
+        elbowEncoder.getPosition() == 0 // no position reading
+            && elbowEncoder.getVelocity() == 0 // no velocity reading
+            && elbowSetpoint.position() != Elbow.ELBOW_OFFSET // elbow is not going to 0
+            && elbow.getAppliedOutput() != 0; // elbow is trying to move
 
     double elbowFB =
         elbowFeedback.calculate(getElbowPosition().getRadians(), elbowSetpoint.position());

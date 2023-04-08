@@ -175,6 +175,8 @@ public final class Constants {
     public static final Constraints CONSTRAINTS = new Constraints(3, 3.2);
 
     public static final double ZERO_OFFSET = 0.61842;
+
+    public static final double FAILING_DEBOUNCE_TIME = 0.2;
   }
 
   public static final class Intake {
@@ -186,7 +188,7 @@ public final class Constants {
 
     public static final double DEFAULT_SPEED = 0.1;
     public static final double INTAKE_SPEED = 1;
-    public static final double OUTTAKE_SPEED = -0.25;
+    public static final double OUTTAKE_SPEED = -0.3;
 
     public static final double THRESHOLD = 0.5;
   }
@@ -231,11 +233,11 @@ public final class Constants {
     public static final PIDConstants TRANSLATION = new PIDConstants(0.6, 0, 0);
     public static final PIDConstants ROTATION = new PIDConstants(0.4, 0, 0);
 
-    public static final double MIN_PITCH = 12; // 12.5; // deg
+    public static final double MIN_PITCH = 12.5; // 12.5; // deg
     public static final double BALANCE_SPEED = 0.35; // m / s
 
     public static final PathConstraints CONSTRAINTS =
-        new PathConstraints(MAX_SPEED / 2.5, MAX_ACCEL / 1.2);
+        new PathConstraints(MAX_SPEED / 1.8, MAX_ACCEL / 1.2);
   }
 
   public static final class SwerveModule {

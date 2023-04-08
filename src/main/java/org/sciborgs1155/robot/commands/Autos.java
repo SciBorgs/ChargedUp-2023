@@ -110,19 +110,15 @@ public final class Autos implements Sendable {
   }
 
   public Command fullBalance() {
-    return drive
-        .follow("balance", true, true)
+    // return drive
+    // .follow("balance", true, true).withTimeout(4)
+    return Commands.run(() -> drive.drive(0.6, 0, 0, false), drive)
+        .until(() -> Math.abs(drive.getPitch()) >= 13.5)
+        .withTimeout(4)
         .andThen(drive.balance())
-        .withTimeout(10)
-        .andThen(Commands.print("balanced!"))
         .andThen(Commands.run(() -> drive.drive(-0.3, 0, 0, false), drive).withTimeout(0.1))
         .andThen(drive.lock())
-        .andThen(Commands.print("locked!"))
         .withName("balance auto");
-    // .andThen(drive.balance())
-    // .andThen(Commands.run(() -> drive.drive(-0.60, 0, 0, false), drive).withTimeout(0.1))
-    // .andThen(drive.lock())
-    // .withName("balance auto").withTimeout(8);
   }
 
   public Command highConeScore() {
@@ -153,7 +149,7 @@ public final class Autos implements Sendable {
   /** no PPL */
   public Command cubeBalance() {
     return Commands.sequence(
-        backHighCubeScore(), placement.goTo(BALANCE, false).withTimeout(2.5), fullBalance());
+        backHighCubeScore(), placement.goTo(BALANCE, false).withTimeout(3.5), fullBalance());
   }
 
   /** no PPL */
@@ -168,6 +164,10 @@ public final class Autos implements Sendable {
 
   public Command cubeLeave() {
     return followAutoPath("cube leaveComm" + startingPosChooser.getSelected().suffix);
+  }
+
+  public Command cubeIntake() {
+    return followAutoPath("cube intake l");
   }
 
   public Command lowCubeLeave() {
