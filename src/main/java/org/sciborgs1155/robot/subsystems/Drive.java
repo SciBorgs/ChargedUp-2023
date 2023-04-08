@@ -20,9 +20,11 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
@@ -234,10 +236,7 @@ public class Drive extends SubsystemBase implements Loggable {
    *     following
    * @return The command that follows the trajectory
    */
-  public Command follow(
-      PathPlannerTrajectory trajectory, boolean resetPosition, boolean useAllianceColor) {
-    // if (resetPosition) resetOdometry(trajectory.getInitialPose());
-
+  public Command follow(PathPlannerTrajectory trajectory, boolean useAllianceColor) {
     return new PPSwerveControllerCommand(
             trajectory,
             this::getPose,
@@ -253,7 +252,20 @@ public class Drive extends SubsystemBase implements Loggable {
   /** Follows the specified path planner path given a path name */
   public Command follow(String pathName, boolean resetPosition, boolean useAllianceColor) {
     PathPlannerTrajectory loadedPath = PathPlanner.loadPath(pathName, CONSTRAINTS);
-    return follow(loadedPath, resetPosition, useAllianceColor);
+    return (resetPosition ? pathOdometryReset(loadedPath, useAllianceColor) : Commands.none())
+        .andThen(follow(loadedPath, useAllianceColor));
+  }
+
+  /** Resets odometry to first pose in path, using ppl to reflects if using alliance color */
+  public Command pathOdometryReset(PathPlannerTrajectory trajectory, boolean useAllianceColor) {
+    var initialState =
+        useAllianceColor
+            ? PathPlannerTrajectory.transformStateForAlliance(
+                trajectory.getInitialState(), DriverStation.getAlliance())
+            : trajectory.getInitialState();
+    Pose2d initialPose =
+        new Pose2d(initialState.poseMeters.getTranslation(), initialState.holonomicRotation);
+    return Commands.runOnce(() -> resetOdometry(initialPose), this);
   }
 
   /** Drives robot based on three double suppliers (x,y and rot) */
@@ -296,7 +308,7 @@ public class Drive extends SubsystemBase implements Loggable {
     PathPoint goal =
         new PathPoint(desiredPose.getTranslation(), heading, desiredPose.getRotation());
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(CONSTRAINTS, start, goal);
-    return follow(trajectory, false, useAllianceColor);
+    return follow(trajectory, useAllianceColor);
   }
 
   /** Creates and follows trajectory for swerve from current pose to desiredPose */

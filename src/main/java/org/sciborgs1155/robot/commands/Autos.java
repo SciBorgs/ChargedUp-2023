@@ -110,18 +110,8 @@ public final class Autos implements Sendable {
   }
 
   public Command fullBalance() {
-    var trajectory = PathPlanner.loadPath("balance", Constants.Drive.CONSTRAINTS);
-    // var initialState =
-    //               PathPlannerTrajectory.transformStateForAlliance(
-    //                   trajectory.getInitialState(), DriverStation.getAlliance());
-    // Pose2d initialPose = new Pose2d(
-    //   initialState.poseMeters.getTranslation(), initialState.holonomicRotation);
-
-    // return Commands.runOnce(() -> drive.resetOdometry(initialPose), drive)
-    //     .andThen(drive.follow(trajectory, false, true))
     return drive
-        .follow("balance", false, true)
-        // followAutoPath("balance")
+        .follow("balance", true, true)
         .andThen(drive.balance())
         .withTimeout(10)
         .andThen(Commands.print("balanced!"))
@@ -218,6 +208,11 @@ public final class Autos implements Sendable {
   }
 
   public Command defaultOdometryReset(GamePiece gamePiece, Rotation2d rotation) {
+    return defaultOdometryReset(gamePiece, rotation, startingPosChooser.getSelected());
+  }
+
+  public Command defaultOdometryReset(
+      GamePiece gamePiece, Rotation2d rotation, StartingPos startingPos) {
     return Commands.runOnce(
         () ->
             drive.resetOdometry(
@@ -227,7 +222,7 @@ public final class Autos implements Sendable {
                       case Red -> 14.67;
                       case Invalid -> -1; // should never happen!
                     },
-                    switch (startingPosChooser.getSelected()) {
+                    switch (startingPos) {
                       case SUBSTATION -> switch (gamePiece) {
                         case CONE -> 5.0;
                         case CUBE -> 4.42;
