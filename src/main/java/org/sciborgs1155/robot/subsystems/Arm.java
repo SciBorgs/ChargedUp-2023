@@ -16,10 +16,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
@@ -189,75 +189,45 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Follows a {@link TrapezoidProfile} for each joint's relative position */
-  public Command followProfile(Rotation2d elbowPosition, Rotation2d wristPosition) {
-    var elbowGoal = new TrapezoidProfile.State(elbowPosition.getRadians(), 0);
-    var wristGoal = new TrapezoidProfile.State(wristPosition.getRadians(), 0);
+  public Command followProfile(Rotation2d elbowGoal, Rotation2d wristGoal) {
     var elbowAccel = new Derivative();
     var wristAccel = new Derivative();
+    var elbowProfile =
+        new TrapezoidProfile(
+            Elbow.CONSTRAINTS,
+            new TrapezoidProfile.State(elbowGoal.getRadians(), 0),
+            elbowSetpoint.trapezoidState());
+    var wristProfile =
+        new TrapezoidProfile(
+            Wrist.CONSTRAINTS,
+            new TrapezoidProfile.State(wristGoal.getRadians(), 0),
+            wristSetpoint.trapezoidState());
 
-    return runOnce(
-            () -> {
-              elbowAccel.reset();
-              wristAccel.reset();
-            })
-        .andThen(
-            run(
-                () -> {
-                  var elbowProfile =
-                      new TrapezoidProfile(
-                          Elbow.CONSTRAINTS, elbowGoal, elbowSetpoint.trapezoidState());
-                  var wristProfile =
-                      new TrapezoidProfile(
-                          Wrist.CONSTRAINTS, wristGoal, wristSetpoint.trapezoidState());
-
-                  var elbowTarget = elbowProfile.calculate(elbowFeedback.getPeriod());
-                  var wristTarget = wristProfile.calculate(wristFeedback.getPeriod());
-
-                  elbowSetpoint =
-                      new State(
-                          elbowTarget.position,
-                          elbowTarget.velocity,
-                          elbowAccel.calculate(elbowTarget.velocity));
-                  wristSetpoint =
-                      new State(
-                          wristTarget.position,
-                          wristTarget.velocity,
-                          wristAccel.calculate(wristTarget.velocity));
-                }))
-        .until(
-            () ->
-                elbowFeedback.atSetpoint()
-                    && elbowGoal.equals(elbowSetpoint.trapezoidState())
-                    && wristFeedback.atSetpoint()
-                    && wristGoal.equals(wristSetpoint.trapezoidState()));
+    return new TrapezoidProfileCommand(
+            elbowProfile,
+            state ->
+                elbowSetpoint =
+                    new State(state.position, state.velocity, elbowAccel.calculate(state.velocity)))
+        .alongWith(
+            new TrapezoidProfileCommand(
+                wristProfile,
+                state ->
+                    wristSetpoint =
+                        new State(
+                            state.position, state.velocity, wristAccel.calculate(state.velocity)),
+                this));
   }
 
   /** Follows a {@link Trajectory} for each joint's relative position */
   public Command followTrajectory(Trajectory elbowTrajectory, Trajectory wristTrajectory) {
-    if (elbowTrajectory.getTotalTime() != wristTrajectory.getTotalTime()) {
+    if (elbowTrajectory.totalTime() != wristTrajectory.totalTime()) {
       DriverStation.reportError(
           "SUPPLIED ELBOW AND WRIST TRAJECTORIES DO NOT HAVE EQUAL TOTAL TIMES", false);
     }
 
-    Timer timer = new Timer();
-    return runOnce(timer::start)
-        .andThen(
-            run(
-                () -> {
-                  elbowSetpoint = elbowTrajectory.sample(timer.get());
-                  wristSetpoint = wristTrajectory.sample(timer.get());
-                  System.out.println("elbow setpoint: " + elbowSetpoint.position());
-                  System.out.println("final elbow setpoint: " + elbowTrajectory.getLast());
-                  System.out.println(elbowSetpoint.position() == elbowTrajectory.getLast());
-
-                  System.out.println("wrist setpoint: " + elbowSetpoint.position());
-                  System.out.println("final wrist setpoint: " + elbowTrajectory.getLast());
-                  System.out.println(elbowSetpoint.position() == elbowTrajectory.getLast());
-                }))
-        .until(
-            () ->
-                elbowSetpoint.position() == elbowTrajectory.getLast()
-                    && wristSetpoint.position() == wristTrajectory.getLast());
+    return elbowTrajectory
+        .follow(state -> elbowSetpoint = state)
+        .alongWith(wristTrajectory.follow(state -> wristSetpoint = state, this));
   }
 
   public Command setStopped(boolean stopped) {

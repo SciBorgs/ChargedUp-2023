@@ -2,7 +2,10 @@ package org.sciborgs1155.lib;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.List;
+import java.util.function.Consumer;
 
 /** A generalized trajectory based off [position velocity] states. */
 public class Trajectory {
@@ -38,7 +41,7 @@ public class Trajectory {
     return states.get(states.size() - 1);
   }
 
-  public double getTotalTime() {
+  public double totalTime() {
     return totalTime;
   }
 
@@ -76,8 +79,8 @@ public class Trajectory {
     return new State(position, velocity, acceleration);
   }
 
-  /** Checks if the trajectory is within the tolerance of another one */
-  // public boolean compare(Trajectory other, double tolerance) {
-  //   return getState(0).isIdentical(other.getState(0), tolerance);
-  // }
+  /** Returns a command to follow the trajectory using {@link TrajectoryCommand} */
+  public CommandBase follow(Consumer<State> output, Subsystem... requirements) {
+    return new TrajectoryCommand(this, output, requirements);
+  }
 }

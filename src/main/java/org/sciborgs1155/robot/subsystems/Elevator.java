@@ -13,10 +13,10 @@ import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
@@ -124,31 +124,21 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   /** Follows a {@link TrapezoidProfile} to the desired height */
   public Command followProfile(double height) {
-    var goal = new TrapezoidProfile.State(height, 0);
     var accel = new Derivative();
+    var profile =
+        new TrapezoidProfile(
+            CONSTRAINTS, new TrapezoidProfile.State(height, 0), setpoint.trapezoidState());
 
-    return runOnce(accel::reset)
-        .andThen(
-            run(
-                () -> {
-                  var profile = new TrapezoidProfile(CONSTRAINTS, goal, setpoint.trapezoidState());
-                  var target = profile.calculate(pid.getPeriod());
-                  setpoint =
-                      new State(target.position, target.velocity, accel.calculate(target.velocity));
-                }))
-        .until(() -> pid.atSetpoint() && goal.equals(setpoint.trapezoidState()));
+    return new TrapezoidProfileCommand(
+        profile,
+        state ->
+            setpoint = new State(state.position, state.velocity, accel.calculate(state.velocity)),
+        this);
   }
 
+  /** Follows a {@link Trajectory} to the desired height */
   public Command followTrajectory(Trajectory trajectory) {
-    Timer timer = new Timer();
-    return runOnce(timer::start)
-        .andThen(
-            run(
-                () -> {
-                  setpoint = trajectory.sample(timer.get());
-                  System.out.println(setpoint.position() == trajectory.getLast());
-                }))
-        .until(() -> setpoint.position() == trajectory.getLast());
+    return trajectory.follow(state -> setpoint = state, this);
   }
 
   /**

@@ -38,7 +38,7 @@ import org.sciborgs1155.robot.util.Visualizer;
 public class RobotContainer implements Loggable {
 
   // Vision instance
-  private final Vision vision = new Vision(Mode.NONE);
+  private final Vision vision = new Vision(Mode.SIM);
   @Log private final Visualizer position = new Visualizer(new Color8Bit(255, 0, 0));
   @Log private final Visualizer setpoint = new Visualizer(new Color8Bit(0, 0, 255));
 
