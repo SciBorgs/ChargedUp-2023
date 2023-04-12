@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
+import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Trajectory;
 import org.sciborgs1155.lib.Trajectory.State;
@@ -125,20 +126,28 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   /** Follows a {@link TrapezoidProfile} to the desired height */
   public Command followProfile(double height) {
     var accel = new Derivative();
-    var profile =
-        new TrapezoidProfile(
-            CONSTRAINTS, new TrapezoidProfile.State(height, 0), setpoint.trapezoidState());
 
-    return new TrapezoidProfileCommand(
-        profile,
-        state ->
-            setpoint = new State(state.position, state.velocity, accel.calculate(state.velocity)),
-        this);
+    return runOnce(accel::reset)
+        .andThen(
+            new DeferredCommand(
+                () ->
+                    new TrapezoidProfileCommand(
+                        new TrapezoidProfile(
+                            CONSTRAINTS,
+                            new TrapezoidProfile.State(height, 0),
+                            setpoint.trapezoidState()),
+                        state ->
+                            setpoint =
+                                new State(
+                                    state.position,
+                                    state.velocity,
+                                    accel.calculate(state.velocity)))))
+        .withName("following profile");
   }
 
   /** Follows a {@link Trajectory} to the desired height */
   public Command followTrajectory(Trajectory trajectory) {
-    return trajectory.follow(state -> setpoint = state, this);
+    return trajectory.follow(state -> setpoint = state, this).withName("following trajectory");
   }
 
   /**

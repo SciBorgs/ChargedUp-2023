@@ -16,33 +16,11 @@ import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.LED;
 import org.sciborgs1155.robot.util.placement.PlacementState;
+import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;
+import org.sciborgs1155.robot.util.placement.PlacementState.Level;
+import org.sciborgs1155.robot.util.placement.PlacementState.Side;
 
 public final class Scoring implements Sendable {
-
-  public enum Side {
-    BACK,
-    FRONT;
-
-    public double rads() {
-      if (this == BACK) {
-        return Math.PI;
-      }
-      return 0;
-    }
-  }
-
-  public enum GamePiece {
-    CONE,
-    CUBE;
-  }
-
-  public enum Level {
-    HIGH,
-    MID,
-    LOW,
-    SINGLE_SUBSTATION,
-    DOUBLE_SUBSTATION,
-  }
 
   private final Drive drive;
   private final Placement placement;
@@ -66,6 +44,21 @@ public final class Scoring implements Sendable {
     return Commands.runOnce(() -> this.side = side);
   }
 
+  /**
+   * Returns an appropriate {@link PlacementState} based on current parameters and inputted {@link
+   * PlacementState.Level}
+   */
+  public PlacementState state(Level level) {
+    return PlacementState.fromOperator(level, gamePiece, side);
+  }
+
+  /** Returns a command that goes to the approperiate level, using {@link this#state(Level)} */
+  public Command goTo(Level level) {
+    return new DeferredCommand(() -> placement.goTo(state(level)));
+  }
+
+  // TODO MOVE THESE THREE COMMANDS ELSEWHERE
+
   public Command odometryAlign(Side side) {
     return odometryAlign(drive.getPose(), side);
   }
@@ -82,29 +75,6 @@ public final class Scoring implements Sendable {
         };
     Translation2d point = pose.getTranslation().nearest(List.copyOf(scoringPoints));
     return new Pose2d(point, Rotation2d.fromRadians(side.rads()));
-  }
-
-  public Command goTo(Level height) {
-    return new DeferredCommand(() -> placement.goTo(scoringState(height)));
-  }
-
-  public PlacementState scoringState(Level height) {
-    return switch (height) {
-      case LOW -> side == Side.FRONT ? FRONT_INTAKE : BACK_INTAKE;
-      case MID -> switch (gamePiece) {
-        case CONE -> side == Side.FRONT ? FRONT_MID_CONE : BACK_MID_CONE;
-        case CUBE -> side == Side.FRONT ? FRONT_MID_CUBE : BACK_MID_CUBE;
-      };
-      case HIGH -> switch (gamePiece) {
-        case CONE -> BACK_HIGH_CONE;
-        case CUBE -> side == Side.FRONT ? FRONT_HIGH_CUBE : BACK_HIGH_CUBE;
-      };
-      case SINGLE_SUBSTATION -> switch (gamePiece) {
-        case CONE -> FRONT_SINGLE_SUBSTATION_CONE;
-        case CUBE -> FRONT_SINGLE_SUBSTATION_CUBE;
-      };
-      case DOUBLE_SUBSTATION -> BACK_DOUBLE_SUBSTATION;
-    };
   }
 
   @Override

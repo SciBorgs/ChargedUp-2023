@@ -2,11 +2,11 @@ package org.sciborgs1155.robot.commands;
 
 import static org.sciborgs1155.robot.Constants.Positions.*;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Elevator;
@@ -37,11 +37,7 @@ public final class Placement {
    *     values.
    */
   public Optional<PlacementTrajectory> findTrajectory(Parameters params) {
-    System.out.println("params: " + params);
-    var traj = Optional.ofNullable(trajectories.get(params.hashCode()));
-    System.out.println(
-        traj.map(PlacementTrajectory::toString).orElseGet(() -> "trajectory not found"));
-    return traj;
+    return Optional.ofNullable(trajectories.get(params.hashCode()));
   }
 
   /**
@@ -84,7 +80,7 @@ public final class Placement {
   }
 
   public Command goTo(PlacementState goal) {
-    return goTo(goal, true);
+    return goTo(() -> goal);
   }
 
   /**
@@ -99,20 +95,18 @@ public final class Placement {
    * @return A command that goes to the goal safely using either custom trajectory following or
    *     trapezoid profiling.
    */
-  public Command goTo(PlacementState goal, boolean useTrajectories) {
+  public Command goTo(Supplier<PlacementState> goal) {
     return new DeferredCommand(
-        () -> {
-          if (!arm.allowPassOver() && goal.side() != state().side()) {
-            DriverStation.reportError(
-                "THE WRIST IS CURRENTLY LIMP AND WILL NOT PASS OVER, COMMAND IGNORED", false);
-            return Commands.none();
-          }
-          var trajectory = findTrajectory(goal);
-          if (useTrajectories && trajectory.isPresent()) {
-            return followTrajectory(trajectory.get());
-          }
-          return safeFollowProfile(goal);
-        });
+            () ->
+                Commands.either(
+                    findTrajectory(goal.get())
+                        .map(this::followTrajectory)
+                        .orElse(safeFollowProfile(goal.get())),
+                    Commands.none(),
+                    () -> arm.allowPassOver() || goal.get().side() == state().side()),
+            arm,
+            elevator)
+        .withName("placement goto");
   }
 
   /**
@@ -146,7 +140,8 @@ public final class Placement {
             followProfile(passOver(goal.side())),
             Commands.none(),
             () -> goal.side() != state().side())
-        .andThen(followProfile(goal));
+        .andThen(followProfile(goal))
+        .withName("safe follow profile");
   }
 
   /**
@@ -162,7 +157,7 @@ public final class Placement {
     return Commands.parallel(
             elevator.followTrajectory(trajectory.elevator()),
             arm.followTrajectory(trajectory.elbow(), trajectory.wrist()))
-        .andThen(Commands.print("NO LONGER FOLLOWING"));
+        .withName("follow trajectory");
   }
 
   /** Sets the setpoints, this is generally a very bad idea */

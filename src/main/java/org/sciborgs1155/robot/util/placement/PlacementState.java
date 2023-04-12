@@ -1,5 +1,7 @@
 package org.sciborgs1155.robot.util.placement;
 
+import static org.sciborgs1155.robot.Constants.Positions.*;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -13,6 +15,28 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
   public enum Side {
     FRONT,
     BACK;
+
+    public double rads() {
+      if (this == BACK) {
+        return Math.PI;
+      }
+      return 0;
+    }
+  }
+
+  /** Represents the game piece the robot is holding */
+  public enum GamePiece {
+    CONE,
+    CUBE;
+  }
+
+  /** Represents the part of the game the robot is interacting with */
+  public enum Level {
+    HIGH,
+    MID,
+    LOW,
+    SINGLE_SUBSTATION,
+    DOUBLE_SUBSTATION,
   }
 
   /**
@@ -52,6 +76,26 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
   /** The side of the robot the arm is on */
   public Side side() {
     return elbowAngle.getCos() > 0 ? Side.FRONT : Side.BACK;
+  }
+
+  /** Returns a PlacementState from scoring parameters */
+  public static PlacementState fromOperator(Level height, GamePiece gamePiece, Side side) {
+    return switch (height) {
+      case LOW -> side == Side.FRONT ? FRONT_INTAKE : BACK_INTAKE;
+      case MID -> switch (gamePiece) {
+        case CONE -> side == Side.FRONT ? FRONT_MID_CONE : BACK_MID_CONE;
+        case CUBE -> side == Side.FRONT ? FRONT_MID_CUBE : BACK_MID_CUBE;
+      };
+      case HIGH -> switch (gamePiece) {
+        case CONE -> BACK_HIGH_CONE;
+        case CUBE -> side == Side.FRONT ? FRONT_HIGH_CUBE : BACK_HIGH_CUBE;
+      };
+      case SINGLE_SUBSTATION -> switch (gamePiece) {
+        case CONE -> FRONT_SINGLE_SUBSTATION_CONE;
+        case CUBE -> FRONT_SINGLE_SUBSTATION_CUBE;
+      };
+      case DOUBLE_SUBSTATION -> BACK_DOUBLE_SUBSTATION;
+    };
   }
 
   /**

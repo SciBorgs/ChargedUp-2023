@@ -94,7 +94,6 @@
           "elbow feedback": {
             "open": true
           },
-          "open": true,
           "wrist feedback": {
             "open": true
           }
@@ -105,6 +104,12 @@
           }
         },
         "RobotContainer": {
+          "arm": {
+            "open": true
+          },
+          "elevator": {
+            "open": true
+          },
           "open": true,
           "scoring": {
             "open": true

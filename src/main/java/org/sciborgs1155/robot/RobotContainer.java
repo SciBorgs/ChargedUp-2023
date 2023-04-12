@@ -17,9 +17,6 @@ import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Placement;
 import org.sciborgs1155.robot.commands.Scoring;
-import org.sciborgs1155.robot.commands.Scoring.GamePiece;
-import org.sciborgs1155.robot.commands.Scoring.Level;
-import org.sciborgs1155.robot.commands.Scoring.Side;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
@@ -28,6 +25,9 @@ import org.sciborgs1155.robot.subsystems.LED;
 import org.sciborgs1155.robot.util.Vision;
 import org.sciborgs1155.robot.util.Vision.Mode;
 import org.sciborgs1155.robot.util.Visualizer;
+import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;
+import org.sciborgs1155.robot.util.placement.PlacementState.Level;
+import org.sciborgs1155.robot.util.placement.PlacementState.Side;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -259,25 +259,20 @@ public class RobotContainer implements Loggable {
     operator.y().onTrue(scoring.setGamePiece(GamePiece.CONE));
 
     // SCORING
-    operator.povUp().onTrue(scoring.goTo(Level.HIGH));
-    operator.povRight().onTrue(scoring.goTo(Level.MID));
-    operator.povDown().onTrue(scoring.goTo(Level.LOW));
+    operator.povUp().onTrue(placement.goTo(() -> scoring.state(Level.HIGH)));
+    operator.povRight().onTrue(placement.goTo(() -> scoring.state(Level.MID)));
+    operator.povDown().onTrue(placement.goTo(() -> scoring.state(Level.LOW)));
     operator.povLeft().onTrue(placement.goTo(Positions.STOW));
 
-    operator.leftTrigger().onTrue(scoring.goTo(Level.SINGLE_SUBSTATION));
-    operator.rightTrigger().onTrue(scoring.goTo(Level.DOUBLE_SUBSTATION));
+    operator.leftTrigger().onTrue(placement.goTo(() -> scoring.state(Level.SINGLE_SUBSTATION)));
+    operator.rightTrigger().onTrue(placement.goTo(() -> scoring.state(Level.DOUBLE_SUBSTATION)));
 
     operator.rightStick().onTrue(placement.goTo(Positions.BALANCE));
     operator.leftStick().onTrue(placement.goTo(Positions.BALANCE));
-    // operator.povDownRight().onTrue(elevator.setGoal(0));
-    // operator.povUpRight().onTrue(elevator.setGoal(.5));
 
     // INTAKING
     operator.leftBumper().onTrue(intake.intake()).onFalse(intake.stop());
     operator.rightBumper().onTrue(intake.outtake()).onFalse(intake.stop());
-
-    // MANUAL OVERRIDE FOR STOPPING
-    // operator.leftTrigger().onTrue(placement.setStopped(true));
 
     arm.onElbowFailing().onTrue(placement.setStopped(true));
     elevator.onFailin().onTrue(placement.setStopped(true));
@@ -285,7 +280,7 @@ public class RobotContainer implements Loggable {
 
   /** A command to run when the robot is enabled */
   public Command getEnableCommand() {
-    return new DeferredCommand(() -> placement.setSetpoint(placement.state()));
+    return new DeferredCommand(() -> placement.setSetpoint(placement.state()), arm, elevator);
   }
 
   /**

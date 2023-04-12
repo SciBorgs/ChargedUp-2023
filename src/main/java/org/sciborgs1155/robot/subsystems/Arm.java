@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
+import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Trajectory;
 import org.sciborgs1155.lib.Trajectory.State;
@@ -192,30 +193,40 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   public Command followProfile(Rotation2d elbowGoal, Rotation2d wristGoal) {
     var elbowAccel = new Derivative();
     var wristAccel = new Derivative();
-    var elbowProfile =
-        new TrapezoidProfile(
-            Elbow.CONSTRAINTS,
-            new TrapezoidProfile.State(elbowGoal.getRadians(), 0),
-            elbowSetpoint.trapezoidState());
-    var wristProfile =
-        new TrapezoidProfile(
-            Wrist.CONSTRAINTS,
-            new TrapezoidProfile.State(wristGoal.getRadians(), 0),
-            wristSetpoint.trapezoidState());
 
-    return new TrapezoidProfileCommand(
-            elbowProfile,
-            state ->
-                elbowSetpoint =
-                    new State(state.position, state.velocity, elbowAccel.calculate(state.velocity)))
-        .alongWith(
-            new TrapezoidProfileCommand(
-                wristProfile,
-                state ->
-                    wristSetpoint =
-                        new State(
-                            state.position, state.velocity, wristAccel.calculate(state.velocity)),
-                this));
+    return runOnce(
+            () -> {
+              elbowAccel.reset();
+              wristAccel.reset();
+            })
+        .andThen(
+            new DeferredCommand(
+                () ->
+                    new TrapezoidProfileCommand(
+                            new TrapezoidProfile(
+                                Elbow.CONSTRAINTS,
+                                new TrapezoidProfile.State(elbowGoal.getRadians(), 0),
+                                elbowSetpoint.trapezoidState()),
+                            state ->
+                                elbowSetpoint =
+                                    new State(
+                                        state.position,
+                                        state.velocity,
+                                        elbowAccel.calculate(state.velocity)))
+                        .alongWith(
+                            new TrapezoidProfileCommand(
+                                new TrapezoidProfile(
+                                    Wrist.CONSTRAINTS,
+                                    new TrapezoidProfile.State(wristGoal.getRadians(), 0),
+                                    wristSetpoint.trapezoidState()),
+                                state ->
+                                    wristSetpoint =
+                                        new State(
+                                            state.position,
+                                            state.velocity,
+                                            wristAccel.calculate(state.velocity)))),
+                this))
+        .withName("following profile");
   }
 
   /** Follows a {@link Trajectory} for each joint's relative position */
@@ -227,7 +238,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
     return elbowTrajectory
         .follow(state -> elbowSetpoint = state)
-        .alongWith(wristTrajectory.follow(state -> wristSetpoint = state, this));
+        .alongWith(wristTrajectory.follow(state -> wristSetpoint = state, this))
+        .withName("following trajectory");
   }
 
   public Command setStopped(boolean stopped) {
