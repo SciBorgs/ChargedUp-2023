@@ -17,7 +17,7 @@ import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants.Arm.Elbow;
-import org.sciborgs1155.robot.util.PlacementState;
+import org.sciborgs1155.robot.util.placement.PlacementState;
 
 /**
  * Constants is a globally accessible class for storing immutable values. Every value should be
@@ -43,36 +43,29 @@ public final class Constants {
 
   public static final double RATE = 0.02; // roborio tickrate (s)
   public static final double DEADBAND = 0.1;
+  public static final int THROUGHBORE_CPR = 8192;
 
   public static final class Dimensions {
-    public static final double ELEVATOR_MIN_HEIGHT = 0;
-    public static final double ELEVATOR_MAX_HEIGHT = 0.6; // m
+    public static final double BASE_OFFSET = -0.127;
+    // Distance from the center of the robot to the center of the elevator
 
-    public static final double ELBOW_MIN_ANGLE = -Math.PI / 2.0;
-    public static final double ELBOW_MAX_ANGLE = 3.0 * Math.PI / 2.0;
-    public static final double WRIST_MIN_ANGLE = -Math.PI;
-    public static final double WRIST_MAX_ANGLE = Math.PI;
+    public static final double BASE_HEIGHT = 0.5203698;
+    // Distance from the ground to the lowest possible elbow position
 
-    public static final double CLAW_LENGTH = Units.inchesToMeters(20);
-    public static final double CLAW_MASS = 3.6; // var used to say 4.4, also could be 3.62874
-    public static final double CLAW_MOI =
-        1.0 / 12.0 * CLAW_MASS * CLAW_LENGTH * CLAW_LENGTH; // moi about center point
-    public static final double CLAW_RADIUS = CLAW_LENGTH / 2.0;
+    public static final double FOREARM_LENGTH = 0.927;
+    // Distance from elbow pivot to to wrist pivot
 
-    public static final double FOREARM_LENGTH = Units.inchesToMeters(41);
-    public static final double FOREARM_MASS = Units.lbsToKilograms(4.2);
-    public static final double FOREARM_MOI =
-        1. / 12 * FOREARM_MASS * FOREARM_LENGTH * FOREARM_LENGTH;
-    public static final double FOREARM_RADIUS = FOREARM_LENGTH / 2;
+    public static final double CLAW_LENGTH = 0.488;
+    // Distance (hypotenuse) from wrist joint to tip
 
-    public static final double ARM_LENGTH = CLAW_LENGTH + FOREARM_LENGTH;
+    public static final double CARRIAGE_MASS = 6.80389;
+    // Mass of the carriage alone
 
-    public static final double ELEVATOR_MASS = 4;
+    public static final double FOREARM_MASS = 4.08233;
+    // Mass of the forearm alone
 
-    public static final double TRACK_WIDTH = 0.5715;
-    // Distance between centers of right and left wheels on robot
-    public static final double WHEEL_BASE = 0.5715;
-    // Distance between front and back wheels on robot
+    public static final double CLAW_MASS = 3.85554;
+    // Mass of the claw alone
   }
 
   public static final class Vision {
@@ -109,6 +102,9 @@ public final class Constants {
       public static final MotorConfig MOTOR =
           MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withInvert(true);
 
+      public static final double GEARING = 53.125 / 1.0;
+      // Gearing for motor : angle (radians)
+
       public static final Conversion CONVERSION =
           Conversion.base().withUnits(Conversion.Units.RADIANS);
 
@@ -116,52 +112,71 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.1542, 0.6, 0.91, 0.038046); // v =  0.87884
 
-      public static final Constraints CONSTRAINTS = new Constraints(2.1, 1.9);
+      public static final Constraints CONSTRAINTS = new Constraints(2.45, 2.9);
+
+      public static final double MAX_ANGLE = Math.PI;
+      public static final double MIN_ANGLE = -Math.PI;
     }
 
     public static final class Elbow {
       public static final MotorConfig MOTOR =
           MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
 
+      public static final double GEARING = 63.75 / 1.0;
+      // Gearing for motor : angle (radians)
+
       public static final Conversion CONVERSION =
           Conversion.base()
               .multiplyGearing(12)
               .divideGearing(72)
               .withUnits(Conversion.Units.RADIANS)
-              .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
+              .withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
 
-      public static final PIDConstants PID = new PIDConstants(9, 0, 1); // d = 2.18954
+      public static final PIDConstants PID = new PIDConstants(12, 0, 1.1); // d = 2.18954
       public static final SystemConstants FF =
           new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
-      public static final Constraints CONSTRAINTS = new Constraints(2.4, 2.2);
+      public static final Constraints CONSTRAINTS = new Constraints(2.9, 3.05);
+
+      public static final double MAX_ANGLE = 3.0 * Math.PI / 2.0;
+      public static final double MIN_ANGLE = -Math.PI / 2.0;
+
       public static final double ELBOW_OFFSET = -1.248660;
+
+      public static final double FAILING_DEBOUNCE_TIME = 0.2;
     }
   }
 
   public static final class Elevator {
     public static final MotorConfig MOTOR =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(40);
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(35);
+
+    public static final double GEARING = 30.0 / 1.0;
+    // Gearing for motor : height (meters)
 
     public static final Conversion RELATIVE_CONVERSION =
         Conversion.base()
             .multiplyRadius(0.0181864)
             .withUnits(Conversion.Units.RADIANS)
-            .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
+            .withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
     // units field for sysid is 0.1143
     public static final Conversion ABSOLUTE_CONVERSION =
         RELATIVE_CONVERSION.withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
 
     public static final PIDConstants PID = new PIDConstants(50, 0, 1);
     public static final SystemConstants FF = new SystemConstants(0.4, 0.069335, 33.25, 1.5514);
-    // s = 0.20619
 
-    public static final int SAMPLE_SIZE_TAPS = 5;
-    public static final int CURRENT_SPIKE_THRESHOLD = 20;
+    public static final double MIN_HEIGHT = 0;
+    public static final double MAX_HEIGHT = 0.65;
 
-    public static final Constraints CONSTRAINTS = new Constraints(2.4, 2.2);
+    public static final int SAMPLE_SIZE_TAPS = 3;
+    public static final int CURRENT_THRESHOLD = 40; // TODO this might be too high/unreasonable
 
-    public static final double ZERO_OFFSET = 0.603467;
+    public static final Constraints CONSTRAINTS = new Constraints(3, 3.2);
+
+    public static final double ZERO_OFFSET = 0.61842;
+
+    public static final double FAILING_DEBOUNCE_TIME = 0.2;
   }
 
   public static final class Intake {
@@ -171,17 +186,17 @@ public final class Constants {
             .withCurrentLimit(20)
             .withInvert(true);
 
+    public static final double DEFAULT_SPEED = 0.1;
     public static final double INTAKE_SPEED = 1;
-    public static final double OUTTAKE_SPEED = -0.25;
+    public static final double OUTTAKE_SPEED = -0.3;
 
     public static final double THRESHOLD = 0.5;
   }
 
   public static final class Drive {
     public enum SpeedMultiplier {
-      MAX(1),
-      NORMAL(0.55),
-      SLOW(0.25);
+      NORMAL(1),
+      SLOW(1.0 / 3.0);
 
       public final double multiplier;
 
@@ -190,15 +205,20 @@ public final class Constants {
       }
     }
 
-    public static final double MAX_SPEED = 3.35; // m / s
+    public static final double MAX_SPEED = 3.25; // m / s
     public static final double MAX_ANGULAR_SPEED = 1.5 * Math.PI; // rad / s
-    public static final double MAX_ACCEL = 9; // m / s^2
+    public static final double MAX_ACCEL = 7.8; // m / s^2
+
+    public static final double TRACK_WIDTH = 0.5715;
+    // Distance between centers of right and left wheels on robot
+    public static final double WHEEL_BASE = 0.5715;
+    // Distance between front and back wheels on robot
 
     public static final Translation2d[] MODULE_OFFSET = {
-      new Translation2d(Dimensions.WHEEL_BASE / 2, Dimensions.TRACK_WIDTH / 2), // front left
-      new Translation2d(Dimensions.WHEEL_BASE / 2, -Dimensions.TRACK_WIDTH / 2), // front right
-      new Translation2d(-Dimensions.WHEEL_BASE / 2, Dimensions.TRACK_WIDTH / 2), // rear left
-      new Translation2d(-Dimensions.WHEEL_BASE / 2, -Dimensions.TRACK_WIDTH / 2) // rear right
+      new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), // front left
+      new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), // front right
+      new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), // rear left
+      new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2) // rear right
     };
 
     // angular offsets of the modules, since we use absolute encoders
@@ -210,14 +230,14 @@ public final class Constants {
       Math.PI / 2 // rear right
     };
 
-    public static final PIDConstants CARTESIAN = new PIDConstants(0.6, 0, 0);
-    public static final PIDConstants ANGULAR = new PIDConstants(0.8, 0, 0.5);
-    public static final PIDConstants BALANCE = new PIDConstants(0.017, 0, 0);
-    // public static final double PITCH_TOLERANCE = 11.5; // deg
-    public static final double MIN_PITCH = 11; // 12.5; // deg
+    public static final PIDConstants TRANSLATION = new PIDConstants(0.6, 0, 0);
+    public static final PIDConstants ROTATION = new PIDConstants(0.4, 0, 0);
+
+    public static final double MIN_PITCH = 12.5; // 12.5; // deg
     public static final double BALANCE_SPEED = 0.35; // m / s
 
-    public static final PathConstraints CONSTRAINTS = new PathConstraints(MAX_SPEED / 2, MAX_ACCEL);
+    public static final PathConstraints CONSTRAINTS =
+        new PathConstraints(MAX_SPEED / 1.8, MAX_ACCEL / 1.2);
   }
 
   public static final class SwerveModule {
@@ -234,11 +254,6 @@ public final class Constants {
               .multiplyGearing(15.0)
               .multiplyGearing(14.0); // pinion teeth
 
-      // OLD (WORKING)
-      //   public static final PIDConstants PID = new PIDConstants(0.1, 0, 0.06);
-      //   public static final SystemConstants FF = new SystemConstants(0.3, 0.65, 0.25);
-
-      // TESTING
       public static final PIDConstants PID = new PIDConstants(0.11, 0, 0.06);
       public static final SystemConstants FF = new SystemConstants(0.3, 2.7, 0.25);
     }
@@ -267,15 +282,19 @@ public final class Constants {
     public static final PlacementState STOW =
         PlacementState.fromRelative(0, 1.21834, Math.PI / 2.0);
 
+    // LOWEST COG
+    public static final PlacementState BALANCE =
+        PlacementState.fromRelative(Elevator.ZERO_OFFSET, Elbow.ELBOW_OFFSET + 0.1, 3);
+
     public static final PlacementState PASS_OLD =
         PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0);
     public static final PlacementState PASS_TO_BACK =
-        PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI);
+        PlacementState.fromAbsolute(0.03, Math.PI / 2.0, Math.PI);
     public static final PlacementState PASS_TO_FRONT =
-        PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 4.0);
+        PlacementState.fromAbsolute(0.05, Math.PI / 2.0, Math.PI / 4.0);
 
     public static final PlacementState FRONT_INTAKE =
-        PlacementState.fromAbsolute(0.44, -0.983, -0.09);
+        PlacementState.fromAbsolute(0.454, -0.983, -0.055);
     public static final PlacementState BACK_INTAKE = STOW; // TODO
 
     public static final PlacementState FRONT_SINGLE_SUBSTATION_CONE =
@@ -299,48 +318,39 @@ public final class Constants {
 
     public static final PlacementState BACK_MID_CUBE = FRONT_MID_CUBE; // TODO
     public static final PlacementState BACK_HIGH_CUBE =
-        PlacementState.fromAbsolute(0.253, 3.072, 2.868);
+        PlacementState.fromAbsolute(0.245, 2.75, 3.17);
   }
 
   public static final class Auto {
     public static final double CUBE_OUTTAKE_TIME = 0.5; // seconds
     public static final double CONE_OUTTAKE_TIME = 3; // seconds
+    public static final double INITIAL_INTAKE_TIME = 0.3; // seconds
+    public static final double MOVING_INTAKE_TIME = 4; // seconds
   }
 
   public static final class Field {
-    public static final Map<Integer, Translation2d> INTAKE_POINTS =
-        Map.ofEntries(
-            Map.entry(1, new Translation2d(5, 2)),
-            Map.entry(2, new Translation2d(5, 3)),
-            Map.entry(3, new Translation2d(5, 4)),
-            Map.entry(4, new Translation2d(5, 5)));
-
+    // public static final Map<Integer, Translation2d> INTAKE_POINTS =
+    //     Map.ofEntries(
+    //         Map.entry(1, new Translation2d(5, 2)),
+    //         Map.entry(2, new Translation2d(5, 3)),
+    //         Map.entry(3, new Translation2d(5, 4)),
+    //         Map.entry(4, new Translation2d(5, 5)));
     public static final Map<Integer, Translation2d> SCORING_POINTS_CUBE =
         Map.ofEntries(
-            Map.entry(1, new Translation2d(1, 2)),
-            Map.entry(2, new Translation2d(1, 3)),
-            Map.entry(3, new Translation2d(1, 4)),
-            Map.entry(1, new Translation2d(1, 2)),
-            Map.entry(2, new Translation2d(1, 3)),
-            Map.entry(3, new Translation2d(1, 4)),
-            Map.entry(1, new Translation2d(1, 2)),
-            Map.entry(2, new Translation2d(1, 3)),
-            Map.entry(3, new Translation2d(1, 4)));
+            Map.entry(1, new Translation2d(1.83, 4.42)),
+            Map.entry(2, new Translation2d(1.83, 2.75)),
+            Map.entry(3, new Translation2d(1.83, 1.06)));
     public static final Map<Integer, Translation2d> SCORING_POINTS_CONE =
         Map.ofEntries(
-            Map.entry(1, new Translation2d(2, 2)),
-            Map.entry(2, new Translation2d(2, 3)),
-            Map.entry(3, new Translation2d(2, 4)),
-            Map.entry(4, new Translation2d(1, 2)),
-            Map.entry(5, new Translation2d(1, 3)),
-            Map.entry(6, new Translation2d(1, 4)),
-            Map.entry(8, new Translation2d(1, 4)),
-            Map.entry(9, new Translation2d(2, 4)));
-    public static final Map<Integer, Translation2d> BALANCE_POINTS =
-        Map.ofEntries(Map.entry(1, new Translation2d(3, 5)), Map.entry(2, new Translation2d(1, 5)));
+            Map.entry(1, new Translation2d(1.83, 5.00)),
+            Map.entry(2, new Translation2d(1.83, 3.85)),
+            Map.entry(3, new Translation2d(1.83, 3.34)),
+            Map.entry(4, new Translation2d(1.83, 2.17)),
+            Map.entry(5, new Translation2d(1.83, 1.63)),
+            Map.entry(6, new Translation2d(1.83, 0.51)));
   }
 
-  public static final class led {
+  public static final class LED {
     public static final int buffer1Length = 60;
 
     public static final int buffer2Length = 60;
@@ -350,11 +360,5 @@ public final class Constants {
     public static Color yellow = new Color(237, 237, 12);
     public static Color blue = new Color(0, 0, 228);
     public static Color rainbow1stPixel = new Color(255, 0, 0);
-  }
-
-  public static final class ledConst {
-    public static final int buffer1Length = 60;
-
-    // public static final int buffer2Length = 60;
   }
 }

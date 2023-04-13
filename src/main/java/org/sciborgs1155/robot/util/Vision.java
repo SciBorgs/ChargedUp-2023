@@ -31,6 +31,7 @@ public class Vision {
    * camera
    */
   public enum Mode {
+    NONE,
     REAL,
     SIM,
     SIM_WITH_CAM;
@@ -129,6 +130,10 @@ public class Vision {
     if (mode == Mode.SIM) {
       simFront.processFrame(lastPose);
       simBack.processFrame(lastPose);
+    }
+
+    if (mode == Mode.NONE) {
+      return new EstimatedRobotPose[0];
     }
 
     return Stream.of(frontEstimator, backEstimator)

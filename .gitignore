@@ -1,7 +1,8 @@
 # This gitignore has been specially created by the WPILib team.
 # If you remove items from this file, intellisense might break.
 
-# python venv
+
+# python
 __pycache__/
 include/
 venv
@@ -171,3 +172,6 @@ bin/
 
 # Simulation GUI and other tools window save file
 *-window.json
+
+# Trajectory Cache
+arm_trajectory_cache.json

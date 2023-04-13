@@ -20,9 +20,11 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
@@ -115,8 +117,6 @@ public class Drive extends SubsystemBase implements Loggable {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    // tmp
-    speedMultiplier = 1;
     xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed) * MAX_SPEED * speedMultiplier;
     ySpeed = Math.copySign(ySpeed * ySpeed, ySpeed) * MAX_SPEED * speedMultiplier;
     rot = Math.copySign(rot * rot, rot) * MAX_ANGULAR_SPEED * speedMultiplier;
@@ -236,17 +236,14 @@ public class Drive extends SubsystemBase implements Loggable {
    *     following
    * @return The command that follows the trajectory
    */
-  public Command follow(
-      PathPlannerTrajectory trajectory, boolean resetPosition, boolean useAllianceColor) {
-    if (resetPosition) resetOdometry(trajectory.getInitialPose());
-
+  public Command follow(PathPlannerTrajectory trajectory, boolean useAllianceColor) {
     return new PPSwerveControllerCommand(
             trajectory,
             this::getPose,
             kinematics,
-            new PIDController(CARTESIAN.p(), CARTESIAN.i(), CARTESIAN.d()),
-            new PIDController(CARTESIAN.p(), CARTESIAN.i(), CARTESIAN.d()),
-            new PIDController(ANGULAR.p(), ANGULAR.i(), ANGULAR.d()),
+            new PIDController(TRANSLATION.p(), TRANSLATION.i(), TRANSLATION.d()),
+            new PIDController(TRANSLATION.p(), TRANSLATION.i(), TRANSLATION.d()),
+            new PIDController(ROTATION.p(), ROTATION.i(), ROTATION.d()),
             this::setModuleStates,
             useAllianceColor)
         .andThen(stop());
@@ -255,7 +252,20 @@ public class Drive extends SubsystemBase implements Loggable {
   /** Follows the specified path planner path given a path name */
   public Command follow(String pathName, boolean resetPosition, boolean useAllianceColor) {
     PathPlannerTrajectory loadedPath = PathPlanner.loadPath(pathName, CONSTRAINTS);
-    return follow(loadedPath, resetPosition, useAllianceColor);
+    return (resetPosition ? pathOdometryReset(loadedPath, useAllianceColor) : Commands.none())
+        .andThen(follow(loadedPath, useAllianceColor));
+  }
+
+  /** Resets odometry to first pose in path, using ppl to reflects if using alliance color */
+  public Command pathOdometryReset(PathPlannerTrajectory trajectory, boolean useAllianceColor) {
+    var initialState =
+        useAllianceColor
+            ? PathPlannerTrajectory.transformStateForAlliance(
+                trajectory.getInitialState(), DriverStation.getAlliance())
+            : trajectory.getInitialState();
+    Pose2d initialPose =
+        new Pose2d(initialState.poseMeters.getTranslation(), initialState.holonomicRotation);
+    return Commands.runOnce(() -> resetOdometry(initialPose), this);
   }
 
   /** Drives robot based on three double suppliers (x,y and rot) */
@@ -270,34 +280,14 @@ public class Drive extends SubsystemBase implements Loggable {
                 fieldRelative));
   }
 
-  // public Command balance() {
-  //   PIDController controller = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
-  //   controller.setTolerance(PITCH_TOLERANCE);
-  //   return run(() ->
-  //           setSpeeds(new ChassisSpeeds(MAX_SPEED * controller.calculate(getPitch()), 0, 0)))
-  //       .until(controller::atSetpoint)
-  //       .andThen(lock());
-  // }
-
   public Command balance() {
     DoubleUnaryOperator velocity =
         pitch -> Math.signum(MathUtil.applyDeadband(pitch, MIN_PITCH)) * BALANCE_SPEED;
 
     return run(() -> setSpeeds(new ChassisSpeeds(velocity.applyAsDouble(getPitch()), 0, 0)))
         .until(() -> Math.abs(getPitch()) < MIN_PITCH)
-        .andThen(lock());
+        .andThen(stop());
   }
-
-  // public Command balanceOrthogonal() {
-  //   PIDController x = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
-  //   PIDController y = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
-  //   x.setTolerance(PITCH_TOLERANCE);
-  //   y.setTolerance(PITCH_TOLERANCE);
-  //   return run(() -> drive(x.calculate(getPitch()), y.calculate(getRoll()), 0, false))
-  //       .until(() -> x.atSetpoint() && y.atSetpoint())
-  //       .andThen(lock());
-  //   // TODO see if pitch and yaw have to be switched
-  // }
 
   /** Stops drivetrain */
   public Command stop() {
@@ -311,20 +301,14 @@ public class Drive extends SubsystemBase implements Loggable {
     return run(() -> setModuleStates(new SwerveModuleState[] {front, back, back, front}));
   }
 
-  public Rotation2d headingToPose(Pose2d currentPose, Pose2d desiredPose) {
-    return new Rotation2d(
-        Math.atan2(
-            desiredPose.getY() - currentPose.getY(), desiredPose.getX() - currentPose.getX()));
-  }
-
   /** Creates and follows trajectroy for swerve from startPose to desiredPose */
   public Command driveToPose(Pose2d startPose, Pose2d desiredPose, boolean useAllianceColor) {
-    Rotation2d heading = headingToPose(startPose, desiredPose);
+    Rotation2d heading = desiredPose.minus(startPose).getTranslation().getAngle();
     PathPoint start = new PathPoint(startPose.getTranslation(), heading, startPose.getRotation());
     PathPoint goal =
         new PathPoint(desiredPose.getTranslation(), heading, desiredPose.getRotation());
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(CONSTRAINTS, start, goal);
-    return follow(trajectory, false, useAllianceColor);
+    return follow(trajectory, useAllianceColor);
   }
 
   /** Creates and follows trajectory for swerve from current pose to desiredPose */

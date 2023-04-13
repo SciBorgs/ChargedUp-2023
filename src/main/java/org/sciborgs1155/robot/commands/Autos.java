@@ -18,6 +18,7 @@ import org.sciborgs1155.robot.Constants.*;
 import org.sciborgs1155.robot.commands.Scoring.*;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
+import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;
 
 public final class Autos implements Sendable {
 
@@ -47,7 +48,17 @@ public final class Autos implements Sendable {
     this.intake = intake;
     this.placement = placement;
 
-    eventMarkers = genEventMarkers();
+    eventMarkers =
+        Map.ofEntries(
+            Map.entry("backHighCone", placement.goTo(BACK_HIGH_CONE)),
+            Map.entry("backHighCube", placement.goTo(BACK_HIGH_CUBE)),
+            Map.entry("frontHighCube", placement.goTo(FRONT_HIGH_CUBE)),
+            Map.entry("outtakeCone", outtake(GamePiece.CONE)),
+            Map.entry("outtakeCube", outtake(GamePiece.CUBE)),
+            Map.entry("frontIntake", frontMovingIntake()),
+            Map.entry("stow", placement.goTo(STOW)),
+            Map.entry("balanceState", placement.goTo(BALANCE)),
+            Map.entry("initialIntake", initialIntake()));
 
     startingPosChooser = new SendableChooser<StartingPos>();
     startingPosChooser.setDefaultOption("substation", StartingPos.SUBSTATION);
@@ -59,40 +70,35 @@ public final class Autos implements Sendable {
             drive::getPose,
             drive::resetOdometry,
             drive.kinematics,
-            Constants.Drive.CARTESIAN.toPPL(),
-            Constants.Drive.ANGULAR.toPPL(),
+            Constants.Drive.TRANSLATION.toPPL(),
+            Constants.Drive.ROTATION.toPPL(),
             drive::setModuleStates,
             eventMarkers,
             true,
             drive);
   }
 
-  private Map<String, Command> genEventMarkers() {
-    return Map.ofEntries(
-        Map.entry("backHighCone", placement.safeToState(BACK_HIGH_CONE)),
-        Map.entry("backHighCube", placement.safeToState(BACK_HIGH_CUBE)),
-        Map.entry("frontHighCube", placement.safeToState(FRONT_HIGH_CUBE)),
-        Map.entry(
-            "outtakeCone",
-            intake.outtake().withTimeout(Auto.CONE_OUTTAKE_TIME).andThen(intake.stop())),
-        Map.entry(
-            "outtakeCube",
-            intake.outtake().withTimeout(Auto.CUBE_OUTTAKE_TIME).andThen(intake.stop())),
-        Map.entry("score", intake.outtake().withTimeout(3).andThen(intake.stop())),
-        Map.entry(
-            "frontIntake",
-            Commands.sequence(
-                placement.safeToState(Constants.Positions.FRONT_INTAKE),
-                intake.intake().withTimeout(4),
-                intake.stop())),
-        Map.entry(
-            "backIntake",
-            Commands.sequence(
-                placement.safeToState(Constants.Positions.BACK_INTAKE),
-                intake.intake().withTimeout(4),
-                intake.stop())),
-        Map.entry("stow", placement.safeToState(STOW)),
-        Map.entry("initialIntake", intake.intake().withTimeout(0.6).andThen(intake.stop())));
+  private Command outtake(GamePiece gamePiece) {
+    return Commands.sequence(
+        intake
+            .outtake()
+            .withTimeout(
+                switch (gamePiece) {
+                  case CONE -> Auto.CONE_OUTTAKE_TIME;
+                  case CUBE -> Auto.CUBE_OUTTAKE_TIME;
+                }),
+        intake.stop());
+  }
+
+  private Command frontMovingIntake() {
+    return Commands.sequence(
+        placement.goTo(Constants.Positions.FRONT_INTAKE),
+        intake.intake().withTimeout(Auto.MOVING_INTAKE_TIME),
+        intake.stop());
+  }
+
+  private Command initialIntake() {
+    return Commands.sequence(intake.intake().withTimeout(Auto.INITIAL_INTAKE_TIME), intake.stop());
   }
 
   private Command followAutoPath(String pathName) {
@@ -104,60 +110,79 @@ public final class Autos implements Sendable {
     return followAutoPath("cone cube" + startingPosChooser.getSelected().suffix);
   }
 
-  public Command driveToBalance() {
-    return Commands.run(() -> drive.drive(0.75, 0, 0, false), drive)
-        .until(() -> Math.abs(drive.getPitch()) >= 14.5);
+  public Command fullBalance() {
+    // return drive
+    // .follow("balance", true, true).withTimeout(4)
+    return Commands.run(() -> drive.drive(0.6, 0, 0, false), drive)
+        .until(() -> Math.abs(drive.getPitch()) >= 13.5)
+        .withTimeout(4)
+        .andThen(drive.balance())
+        .andThen(Commands.run(() -> drive.drive(-0.3, 0, 0, false), drive).withTimeout(0.1))
+        .andThen(drive.lock())
+        .withName("balance auto");
   }
 
   public Command highConeScore() {
     return Commands.sequence(
         defaultOdometryReset(GamePiece.CONE, Rotation2d.fromRadians(0)),
-        eventMarkers.get("initialIntake"),
-        eventMarkers.get("backHighCone"),
-        eventMarkers.get("score"));
+        initialIntake(),
+        placement.goTo(BACK_HIGH_CONE).withTimeout(5),
+        outtake(GamePiece.CONE));
   }
 
   public Command backHighCubeScore() {
     return Commands.sequence(
         defaultOdometryReset(GamePiece.CUBE, Rotation2d.fromRadians(0)),
-        eventMarkers.get("backHighCone"),
-        eventMarkers.get("outtakeCube"));
+        placement.goTo(BACK_HIGH_CUBE).withTimeout(5),
+        // Commands.print("going to state..."),
+        // placement.goTo(FRONT_HIGH_CUBE,
+        // Commands.print("got to state!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"),
+        outtake(GamePiece.CUBE));
   }
 
   public Command frontHighCubeScore() {
     return Commands.sequence(
         defaultOdometryReset(GamePiece.CUBE, Rotation2d.fromRadians(Math.PI)),
-        eventMarkers.get("frontHighCube"),
-        eventMarkers.get("score"));
-  }
-
-  /** no PPL */
-  public Command balance() {
-    return Commands.sequence(driveToBalance(), drive.balance());
+        placement.goTo(FRONT_HIGH_CUBE).withTimeout(5),
+        outtake(GamePiece.CUBE));
   }
 
   /** no PPL */
   public Command cubeBalance() {
-    return Commands.sequence(backHighCubeScore(), balance().alongWith(placement.toState(STOW)));
+    return Commands.sequence(
+        backHighCubeScore(), placement.goTo(BALANCE).withTimeout(3.5), fullBalance());
   }
 
   /** no PPL */
   public Command coneBalance() {
-    return Commands.sequence(highConeScore(), balance().alongWith(placement.toState(STOW)));
+    return Commands.sequence(highConeScore(), fullBalance().alongWith(placement.goTo(BALANCE)));
   }
 
   public Command coneLeave() {
-    StartingPos startingPos = startingPosChooser.getSelected();
-    return followAutoPath("cone leaveComm" + startingPos.suffix);
+    return followAutoPath("cone leaveComm" + startingPosChooser.getSelected().suffix);
   }
 
   public Command cubeLeave() {
-    StartingPos startingPos = startingPosChooser.getSelected();
-    return followAutoPath("cube leaveComm" + startingPos.suffix);
+    return followAutoPath("cube leaveComm" + startingPosChooser.getSelected().suffix);
+  }
+
+  public Command cubeIntake() {
+    return followAutoPath("cube intake l");
+  }
+
+  public Command lowCubeLeave() {
+    return Commands.sequence(
+        placement.goTo(FRONT_INTAKE),
+        outtake(GamePiece.CUBE),
+        followAutoPath("leaveComm l backwards"));
   }
 
   /** backup: no arm */
   public Command leave() {
+    StartingPos startingPos = startingPosChooser.getSelected();
+    if (startingPos == StartingPos.CENTER) {
+      return leaveNoOdometry();
+    }
     return followAutoPath("leaveComm" + startingPosChooser.getSelected().suffix);
   }
 
@@ -168,10 +193,25 @@ public final class Autos implements Sendable {
 
   /** backup: no odometry, no arm */
   public Command coneLeaveNoOdometry() {
-    return this.highConeScore().andThen(leaveNoOdometry());
+    return Commands.sequence(highConeScore(), leaveNoOdometry().alongWith(placement.goTo(STOW)));
+  }
+
+  /** backup: no odometry, no arm */
+  public Command cubeLeaveNoOdometry() {
+    return Commands.sequence(
+        backHighCubeScore(), leaveNoOdometry().alongWith(placement.goTo(STOW)));
+  }
+
+  public Command scoreOneMeterTest() {
+    return Commands.sequence(backHighCubeScore(), followAutoPath("one meter"));
   }
 
   public Command defaultOdometryReset(GamePiece gamePiece, Rotation2d rotation) {
+    return defaultOdometryReset(gamePiece, rotation, startingPosChooser.getSelected());
+  }
+
+  public Command defaultOdometryReset(
+      GamePiece gamePiece, Rotation2d rotation, StartingPos startingPos) {
     return Commands.runOnce(
         () ->
             drive.resetOdometry(
@@ -181,7 +221,7 @@ public final class Autos implements Sendable {
                       case Red -> 14.67;
                       case Invalid -> -1; // should never happen!
                     },
-                    switch (startingPosChooser.getSelected()) {
+                    switch (startingPos) {
                       case SUBSTATION -> switch (gamePiece) {
                         case CONE -> 5.0;
                         case CUBE -> 4.42;
@@ -200,6 +240,43 @@ public final class Autos implements Sendable {
                       case Red -> Rotation2d.fromRadians(Math.PI - rotation.getRadians());
                       case Invalid -> rotation; // should never happen!
                     })),
+        drive);
+  }
+
+  public Command betterDefaultOdometryReset(GamePiece gamePiece, Rotation2d rotation) {
+    return Commands.runOnce(
+        () ->
+            drive.resetOdometry(
+                new Pose2d(
+                    switch (DriverStation.getAlliance()) {
+                      case Blue -> 1.83;
+                      case Red -> 14.67;
+                      case Invalid -> -1; // should never happen!
+                    },
+                    switch (gamePiece) {
+                      case CONE -> Constants.Field.SCORING_POINTS_CONE
+                          .get(
+                              switch (startingPosChooser.getSelected()) {
+                                case SUBSTATION -> 1;
+                                case CENTER -> 3;
+                                case CORNER -> 6;
+                              })
+                          .getY();
+                      case CUBE -> Constants.Field.SCORING_POINTS_CUBE
+                          .get(
+                              switch (startingPosChooser.getSelected()) {
+                                case SUBSTATION -> 1;
+                                case CENTER -> 2;
+                                case CORNER -> 3;
+                              })
+                          .getY();
+                    },
+                    switch (DriverStation.getAlliance()) {
+                      case Blue -> rotation;
+                      case Red -> Rotation2d.fromRadians(Math.PI - rotation.getRadians());
+                      case Invalid -> rotation;
+                    } // should never happen!
+                    )),
         drive);
   }
 

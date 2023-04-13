@@ -1,0 +1,93 @@
+# supported constraints are:
+
+# minX = [value]
+# maxX = [value]
+# minY = [value]
+# maxY = [value]
+# circle = [center_x, center_y, radius]
+# rectangle = [x_0, y_0, x_1, y_1]
+
+origin: [ -0.127, 0.5203698 ]
+
+solver:
+  interiorPoints: 20
+  maxVoltageElbow: 11
+  maxVoltageWrist: 9
+  maxVoltageLift: 10
+  maxAccelerationElbow: 3.05
+  maxAccelerationWrist: 2.9
+  maxAccelerationLift: 3.2
+  maxJerk: 45
+
+lift:
+  mass: 6.80389
+  minHeight: 0
+  maxHeight: 0.66
+  motor:
+    type: neo
+    count: 3
+    reduction: 30.0
+
+elbow:
+  mass: 4.08233
+  length: 0.927
+  cgRadius: 0.52
+  moi: 0.1427
+  minAngle: -1.57079632679
+  maxAngle: 4.71238898038
+  motor:
+    type: neo
+    count: 3
+    reduction: 63.75
+
+wrist:
+  mass: 3.85554
+  length: 0.488
+  cgRadius: 0.16 # estimated
+  moi: 0.0435
+  minRelAngle: -3.1415
+  maxRelAngle: 3.1415
+  motor:
+    type: neo
+    count: 1
+    reduction: 53.125
+
+constraints:
+  floor:
+    type: minY,
+    point: end
+    args: [ 0.1 ]
+  heightLimitEnd:
+    type: maxY
+    point: end
+    args: [ 1.75 ]
+  heightLimitWrist:
+    type: maxY
+    point: wrist
+    args: [ 1.75 ]
+  extensionLimitR:
+    type: maxX
+    point: end
+    args: [1.5192]
+  extensionLimitL:
+    type: minX
+    point: end
+    args: [-1.5192]
+  robotBody:
+    type: rectangle
+    point: end
+    args: [
+      -0.3, 0,
+      0.3, 0.25
+    ]
+  elevator:
+    type: rectangle
+    point: wrist
+    args: [
+      # 0.127m wide
+      # starting height is 1.3208m
+      # offset by -0.127
+      # -0.254, 0,
+      -0.427, 0.3,
+      0, 1.65
+    ]

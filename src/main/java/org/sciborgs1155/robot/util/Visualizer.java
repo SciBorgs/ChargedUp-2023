@@ -8,59 +8,40 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import org.sciborgs1155.robot.Constants.Dimensions;
+import org.sciborgs1155.robot.Constants.Elevator;
 
 /** Visualization class specific for our charged up bot */
 public class Visualizer implements Sendable {
 
-  private static Color8Bit POSITION_COLOR = new Color8Bit(255, 0, 0);
-  private static Color8Bit SETPOINT_COLOR = new Color8Bit(0, 0, 255);
   private static double WEIGHT = 4;
   private static Rotation2d RIGHT_ANGLE = Rotation2d.fromRadians(Math.PI / 2.0);
 
-  private final Mechanism2d mech =
-      new Mechanism2d(Dimensions.ARM_LENGTH * 3.0, Dimensions.ELEVATOR_MAX_HEIGHT * 3.0 / 2.0);
+  private final Mechanism2d mech = new Mechanism2d(4, 2);
   private final MechanismRoot2d chassis =
-      mech.getRoot("Chassis", Dimensions.ARM_LENGTH * 3.0 / 2.0, 0);
+      mech.getRoot("Chassis", 2 + Dimensions.BASE_OFFSET, Dimensions.BASE_HEIGHT);
 
-  private final MechanismLigament2d elevatorPosition =
-      chassis.append(
-          new MechanismLigament2d(
-              "Elevator Position", Dimensions.ELEVATOR_MAX_HEIGHT, 90, WEIGHT, POSITION_COLOR));
-  private final MechanismLigament2d forearmPosition =
-      elevatorPosition.append(
-          new MechanismLigament2d(
-              "Forearm Position", Dimensions.FOREARM_LENGTH, 0, WEIGHT, POSITION_COLOR));
-  private final MechanismLigament2d clawPosition =
-      forearmPosition.append(
-          new MechanismLigament2d(
-              "Wrist Position", Dimensions.CLAW_LENGTH, 0, WEIGHT, POSITION_COLOR));
+  private final MechanismLigament2d elevator, forearm, claw;
 
-  private final MechanismLigament2d elevatorSetpoint =
-      chassis.append(
-          new MechanismLigament2d(
-              "Elevator Setpoint", Dimensions.ELEVATOR_MAX_HEIGHT, 90, WEIGHT, SETPOINT_COLOR));
-  private final MechanismLigament2d forearmSetpoint =
-      elevatorSetpoint.append(
-          new MechanismLigament2d(
-              "Forearm Setpoint", Dimensions.FOREARM_LENGTH, 0, WEIGHT, SETPOINT_COLOR));
-  private final MechanismLigament2d clawSetpoint =
-      forearmSetpoint.append(
-          new MechanismLigament2d(
-              "Wrist Setpoint", Dimensions.CLAW_LENGTH, 0, WEIGHT, SETPOINT_COLOR));
-
-  public void setElevator(double position, double goal) {
-    elevatorPosition.setLength(position);
-    elevatorSetpoint.setLength(goal);
+  public Visualizer(Color8Bit color) {
+    elevator =
+        chassis.append(
+            new MechanismLigament2d("Elevator Position", Elevator.MAX_HEIGHT, 90, WEIGHT, color));
+    forearm =
+        elevator.append(
+            new MechanismLigament2d(
+                "Forearm Position", Dimensions.FOREARM_LENGTH, 90, WEIGHT, color));
+    claw =
+        forearm.append(
+            new MechanismLigament2d("Wrist Position", Dimensions.CLAW_LENGTH, 0, WEIGHT, color));
   }
 
-  public void setElbow(Rotation2d position, Rotation2d goal) {
-    forearmPosition.setAngle(position.minus(RIGHT_ANGLE));
-    forearmSetpoint.setAngle(goal.minus(RIGHT_ANGLE));
+  public void setArmAngles(Rotation2d elbowAngle, Rotation2d wristAngle) {
+    forearm.setAngle(elbowAngle.minus(RIGHT_ANGLE));
+    claw.setAngle(wristAngle);
   }
 
-  public void setWrist(Rotation2d position, Rotation2d goal) {
-    clawPosition.setAngle(position);
-    clawSetpoint.setAngle(goal);
+  public void setElevatorHeight(double height) {
+    elevator.setLength(height);
   }
 
   @Override

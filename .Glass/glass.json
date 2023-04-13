@@ -9,7 +9,6 @@
           "elbow feedback": {
             "open": true
           },
-          "open": true,
           "wrist feedback": {
             "open": true
           }
@@ -51,25 +50,22 @@
           "drive": {
             "open": true
           },
-          "open": true,
           "scoring": {
             "open": true
           }
         },
         "open": true
       },
-      "SmartDashboard": {
-        "open": true
-      },
       "photonvision": {
         "Microsoft_LifeCam_HD-3000 (1)": {
           "open": true
-        },
-        "open": true
+        }
       }
     },
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Arm/elbow feedback": "PIDController",
+      "/Shuffleboard/Arm/wrist feedback": "PIDController",
       "/Shuffleboard/Autos/Drive/field2d": "Field2d",
       "/Shuffleboard/Autos/Drive/imu": "Gyro",
       "/Shuffleboard/Autos/autoChooser": "String Chooser",
@@ -79,6 +75,7 @@
       "/Shuffleboard/Drive/imu": "Gyro",
       "/Shuffleboard/Drivetrain/field2d": "Field2d",
       "/Shuffleboard/Drivetrain/gyro": "Gyro",
+      "/Shuffleboard/Elevator/pid": "PIDController",
       "/Shuffleboard/RobotContainer/arm": "Subsystem",
       "/Shuffleboard/RobotContainer/auto path chooser": "String Chooser",
       "/Shuffleboard/RobotContainer/autos": "String Chooser",
@@ -86,14 +83,28 @@
       "/Shuffleboard/RobotContainer/elevator": "Subsystem",
       "/Shuffleboard/RobotContainer/intake": "Subsystem",
       "/Shuffleboard/RobotContainer/led": "Subsystem",
+      "/Shuffleboard/RobotContainer/position": "Mechanism2d",
+      "/Shuffleboard/RobotContainer/setpoint": "Mechanism2d",
       "/Shuffleboard/RobotContainer/starting position chooser": "String Chooser",
       "/Shuffleboard/RobotContainer/visualizer": "Mechanism2d",
       "/SmartDashboard/backPhotonVision Sim Field": "Field2d",
       "/SmartDashboard/frontPhotonVision Sim Field": "Field2d"
+    },
+    "windows": {
+      "/Shuffleboard/RobotContainer/position": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/RobotContainer/setpoint": {
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "NetworkTables Settings": {
-    "mode": "Client (NT4)",
+    "mode": "Client (NT3)",
     "serverTeam": "1155"
   },
   "Plots": {

@@ -23,7 +23,7 @@ public interface SwerveModule extends Sendable {
   public static SwerveModule create(int drivePort, int turnPort, double angularOffset) {
     return Robot.isReal()
         ? new MAXSwerveModule(drivePort, turnPort, angularOffset)
-        : new SimSwerveModule();
+        : new GoalSwerveModule();
   }
 
   /**
