@@ -43,7 +43,6 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   // private final AbsoluteEncoder offsetEncoder = right.getAbsoluteEncoder(Type.kDutyCycle);
 
   private final ElevatorFeedforward ff = new ElevatorFeedforward(FF.s(), FF.g(), FF.v(), FF.a());
-  // set ports V
 
   private DigitalInput bottomSwitch = new DigitalInput(LIMIT_SWITCH);
 
@@ -155,7 +154,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
    * is dangerous. This method returns a debounced trigger for when the elbow encoder is likely
    * failing/not plugged in.
    */
-  public Trigger onFailin() {
+  public Trigger onFailing() {
     return new Trigger(() -> encoderUnplugged).debounce(FAILING_DEBOUNCE_TIME);
   }
 

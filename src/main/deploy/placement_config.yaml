@@ -65,6 +65,14 @@ constraints:
     type: maxY
     point: wrist
     args: [ 1.75 ]
+  extensionLimitR:
+    type: maxX
+    point: end
+    args: [1.5192]
+  extensionLimitL:
+    type: minX
+    point: end
+    args: [-1.5192]
   robotBody:
     type: rectangle
     point: end

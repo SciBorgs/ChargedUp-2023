@@ -275,7 +275,7 @@ public class RobotContainer implements Loggable {
     operator.rightBumper().onTrue(intake.outtake()).onFalse(intake.stop());
 
     arm.onElbowFailing().onTrue(placement.setStopped(true));
-    elevator.onFailin().onTrue(placement.setStopped(true));
+    elevator.onFailing().onTrue(placement.setStopped(true));
   }
 
   /** A command to run when the robot is enabled */
@@ -289,8 +289,7 @@ public class RobotContainer implements Loggable {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // return placement.setSetpoint(Positions.INITIAL).andThen(autoChooser.getSelected().get());
-    return autoChooser.getSelected().get();
+    return placement.setSetpoint(Positions.INITIAL).andThen(autoChooser.getSelected().get());
   }
 
   public Command getTestCommand() {
