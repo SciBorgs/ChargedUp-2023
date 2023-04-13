@@ -2,6 +2,7 @@ package org.sciborgs1155.lib;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -9,6 +10,20 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * edu.wpi.first.wpilibj.IterativeRobotBase}
  */
 public class CommandRobot extends TimedRobot {
+
+  protected CommandRobot(double period) {
+    super(period);
+  }
+
+  @Override
+  public void robotPeriodic() {
+    CommandScheduler.getInstance().run();
+  }
+
+  @Override
+  public void testInit() {
+    CommandScheduler.getInstance().cancelAll();
+  }
 
   public Trigger robot() {
     return new Trigger(() -> true);

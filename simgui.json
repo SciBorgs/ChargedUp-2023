@@ -37,6 +37,15 @@
       "/Shuffleboard/Drive/field2d": "Field2d",
       "/Shuffleboard/Drive/imu": "Gyro",
       "/Shuffleboard/Elevator/pid": "PIDController",
+      "/Shuffleboard/Robot/arm": "Subsystem",
+      "/Shuffleboard/Robot/auto path chooser": "String Chooser",
+      "/Shuffleboard/Robot/drive": "Subsystem",
+      "/Shuffleboard/Robot/elevator": "Subsystem",
+      "/Shuffleboard/Robot/intake": "Subsystem",
+      "/Shuffleboard/Robot/led": "Subsystem",
+      "/Shuffleboard/Robot/position": "Mechanism2d",
+      "/Shuffleboard/Robot/setpoint": "Mechanism2d",
+      "/Shuffleboard/Robot/starting position chooser": "String Chooser",
       "/Shuffleboard/RobotContainer/arm": "Subsystem",
       "/Shuffleboard/RobotContainer/auto path chooser": "String Chooser",
       "/Shuffleboard/RobotContainer/autoChooser": "String Chooser",
@@ -59,17 +68,17 @@
           "visible": true
         }
       },
+      "/Shuffleboard/Robot/position": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Robot/setpoint": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Shuffleboard/RobotContainer/auto path chooser": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/Shuffleboard/RobotContainer/position": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/Shuffleboard/RobotContainer/setpoint": {
         "window": {
           "visible": true
         }
