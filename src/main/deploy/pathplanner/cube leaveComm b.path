@@ -7,8 +7,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0255994610117147,
-        "y": 0.5582693907197497
+        "x": 2.0622208000461253,
+        "y": 0.8016939946711419
       },
       "holonomicAngle": 0.0,
       "isReversal": false,
@@ -21,6 +21,31 @@
           "outtakeCube"
         ],
         "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 3.4007385901862297,
+        "y": 0.717670250180595
+      },
+      "prevControl": {
+        "x": 3.1770448764427788,
+        "y": 0.7297638841536398
+      },
+      "nextControl": {
+        "x": 3.542601935535385,
+        "y": 0.7100006409451207
+      },
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": 0.5,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
       }
