@@ -50,6 +50,10 @@ public final class Scoring implements Sendable {
     return gamePiece;
   }
 
+  public Side side() {
+    return side;
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.addStringProperty("Game Piece", () -> gamePiece.name(), null);
