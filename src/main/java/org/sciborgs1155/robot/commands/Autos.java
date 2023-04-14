@@ -80,7 +80,7 @@ public final class Autos implements Sendable {
             Map.entry("initialIntake", initialIntake()));
 
     autoChooser = new SendableChooser<Supplier<Command>>();
-    configureAutoChooser();
+    configureMainAutos();
 
     builder =
         new SwerveAutoBuilder(
@@ -95,9 +95,7 @@ public final class Autos implements Sendable {
             drive);
   }
 
-  private void configureAutoChooser() {
-    // ambitious path
-
+  private void configureMainAutos() {
     /* 2 gamepiece setup instructions:
      * gamepiece: cone
      * orientation: away from grid
@@ -105,28 +103,54 @@ public final class Autos implements Sendable {
      */
     autoChooser.addOption("2 gamepiece (flat)", () -> twoGamepiece(StartingPos.FLAT));
 
-    // simple balances (no PPL)
-
-    /* balance setup instructions:
-     * gamepiece: none
-     * orientation: away from grid
-     * starting location: in front of charge station
-     */
-    autoChooser.addOption("balance", this::justBalance);
-
     /* cube balance setup instructions:
      * gamepiece: cube
      * orientation: away from grid
-     * starting pos: center
      * starting location: cube scoring, center
      */
     autoChooser.addOption("cube, balance", this::cubeBalance);
 
+    /* cube intake setup instructions:
+     * gamepiece: cube
+     * orientation: away from grid
+     * starting location: cube scoring, flat side
+     */
+    autoChooser.addOption("cube, intake (flat)", this::cubeIntake);
+
+    // backups
+
+    /* cube score setup instructions:
+     * gamepiece: cube
+     * orientation: away from grid
+     * starting location: cube scoring (preferably flat)
+     */
+    autoChooser.addOption("cube score (no drive)", () -> backHighCubeScore(StartingPos.FLAT));
+
+    /* cone score setup instructions:
+     * gamepiece: cone
+     * orientation: away from grid
+     * set starting pos: no
+     * starting location: cone scoring (preferably flat)
+     */
+    autoChooser.setDefaultOption("cone score (no drive)", () -> highConeScore(StartingPos.FLAT));
+
+    // ultimate backup
+    autoChooser.addOption("none", Commands::none);
+
+  }
+
+  private void configureExtraAutos() {
+    /* balance setup instructions:
+     * gamepiece: none
+     * orientation: away from grid
+     * starting location: in front of charge station, preferably cube scoring
+     */
+    autoChooser.addOption("balance", this::justBalance);
+
     /* cone balance setup instructions:
      * gamepiece: cone
      * orientation: away from grid
-     * starting location: cone scoring, off-center (right/left doesn't matter, as long as it's
-     * in front of charge)
+     * starting location: cone scoring, off-center (preferably left of center)
      */
     autoChooser.addOption("cone, balance", this::coneBalance);
 
@@ -160,29 +184,7 @@ public final class Autos implements Sendable {
      */
     autoChooser.addOption("cube, leave (bump)", () -> cubeLeave(StartingPos.BUMP));
 
-    /* cube leave setup instructions:
-     * gamepiece: cube
-     * orientation: away from grid
-     * starting location: cube scoring, flat side
-     */
-    autoChooser.addOption("cube, intake (flat)", this::cubeIntake);
-
     // backups
-
-    /* cube score setup instructions:
-     * gamepiece: cube
-     * orientation: away from grid
-     * starting location: cube scoring (preferably flat)
-     */
-    autoChooser.addOption("cube score (no drive)", () -> backHighCubeScore(StartingPos.FLAT));
-
-    /* cone score setup instructions:
-     * gamepiece: cone
-     * orientation: away from grid
-     * set starting pos: no
-     * starting location: cone scoring (preferably flat)
-     */
-    autoChooser.setDefaultOption("cone score (no drive)", () -> highConeScore(StartingPos.FLAT));
 
     /* cone leave (no odometry) setup instructions:
      * gamepiece: cone
@@ -203,10 +205,9 @@ public final class Autos implements Sendable {
     /* leave (no odometry) setup instructions:
      * gamepiece: none
      * orientation: away from grid
-     * set starting pos: no
      * starting location: against grid, to one side (it should have a clear path straight forward)
      */
-    // autoChooser.addOption("backup (no arm, no odometry): leave", this::leaveNoOdometry);
+    autoChooser.addOption("leave (no arm, no odometry)", this::leaveNoOdometry);
 
     /* leave setup instructions:
      * gamepiece: none
@@ -225,9 +226,16 @@ public final class Autos implements Sendable {
     autoChooser.addOption("bump leave (no arm)", () -> leave(StartingPos.BUMP));
 
     autoChooser.addOption("low cube, leave (flat)", this::lowCubeLeave);
+  }
 
-    // ultimate backup
-    autoChooser.addOption("none", Commands::none);
+  private void configureTestAutos() {
+    autoChooser.addOption("one meter test", () -> builder.fullAuto(Paths.ONE_METER_TEST));
+  }
+
+  private void configureAllAutos() {
+    configureMainAutos();
+    configureExtraAutos();
+    configureTestAutos();
   }
 
   private Command outtake(GamePiece gamePiece) {

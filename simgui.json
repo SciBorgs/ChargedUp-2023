@@ -59,10 +59,7 @@
     },
     "windows": {
       "/Shuffleboard/Drive/field2d": {
-        "image": "./field/2023-field.png",
-        "window": {
-          "visible": true
-        }
+        "image": "./field/2023-field.png"
       },
       "/Shuffleboard/Robot/auto path chooser!": {
         "window": {
