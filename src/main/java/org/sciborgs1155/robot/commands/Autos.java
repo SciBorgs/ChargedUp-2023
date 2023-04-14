@@ -1,5 +1,8 @@
 package org.sciborgs1155.robot.commands;
 
+import static org.sciborgs1155.robot.Constants.Auto.*;
+import static org.sciborgs1155.robot.Constants.Drive.*;
+import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.Constants.Positions.*;
 
 import com.pathplanner.lib.PathPlanner;
@@ -16,8 +19,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
-import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Constants.*;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;
@@ -31,31 +32,24 @@ public final class Autos implements Sendable {
   }
 
   public static final class Paths {
-    public static final List<PathPlannerTrajectory> TWO_GAMEPIECE_BUMP =
-        loadAutoPath("cone cube r");
-    public static final List<PathPlannerTrajectory> TWO_GAMEPIECE_FLAT =
-        loadAutoPath("cone cube l");
+    public static final List<PathPlannerTrajectory> TWO_GAMEPIECE_BUMP = loadPath("cone cube r");
+    public static final List<PathPlannerTrajectory> TWO_GAMEPIECE_FLAT = loadPath("cone cube l");
 
-    public static final List<PathPlannerTrajectory> CONE_LEAVE_BUMP =
-        loadAutoPath("cone leaveComm r");
-    public static final List<PathPlannerTrajectory> CONE_LEAVE_FLAT =
-        loadAutoPath("cone leaveComm l");
+    public static final List<PathPlannerTrajectory> CONE_LEAVE_BUMP = loadPath("cone leaveComm r");
+    public static final List<PathPlannerTrajectory> CONE_LEAVE_FLAT = loadPath("cone leaveComm l");
 
-    public static final List<PathPlannerTrajectory> CUBE_LEAVE_BUMP =
-        loadAutoPath("cube leaveComm r");
-    public static final List<PathPlannerTrajectory> CUBE_LEAVE_FLAT =
-        loadAutoPath("cube leaveComm l");
+    public static final List<PathPlannerTrajectory> CUBE_LEAVE_BUMP = loadPath("cube leaveComm r");
+    public static final List<PathPlannerTrajectory> CUBE_LEAVE_FLAT = loadPath("cube leaveComm l");
 
-    public static final List<PathPlannerTrajectory> CUBE_INTAKE_FLAT =
-        loadAutoPath("cube intake l");
+    public static final List<PathPlannerTrajectory> CUBE_INTAKE_FLAT = loadPath("cube intake l");
 
-    public static final List<PathPlannerTrajectory> LEAVE_BUMP = loadAutoPath("leaveComm r");
-    public static final List<PathPlannerTrajectory> LEAVE_FLAT = loadAutoPath("leaveComm l");
+    public static final List<PathPlannerTrajectory> LEAVE_BUMP = loadPath("leaveComm r");
+    public static final List<PathPlannerTrajectory> LEAVE_FLAT = loadPath("leaveComm l");
 
     public static final List<PathPlannerTrajectory> LEAVE_FLAT_BACKWARDS =
-        loadAutoPath("leaveComm l backwards");
+        loadPath("leaveComm l backwards");
 
-    public static final List<PathPlannerTrajectory> ONE_METER_TEST = loadAutoPath("one meter");
+    public static final List<PathPlannerTrajectory> ONE_METER_TEST = loadPath("one meter");
   }
 
   private final Drive drive;
@@ -93,8 +87,8 @@ public final class Autos implements Sendable {
             drive::getPose,
             drive::resetOdometry,
             drive.kinematics,
-            Constants.Drive.TRANSLATION.toPPL(),
-            Constants.Drive.ROTATION.toPPL(),
+            TRANSLATION.toPPL(),
+            ROTATION.toPPL(),
             drive::setModuleStates,
             eventMarkers,
             true,
@@ -242,25 +236,25 @@ public final class Autos implements Sendable {
             .outtake()
             .withTimeout(
                 switch (gamePiece) {
-                  case CONE -> Auto.CONE_OUTTAKE_TIME;
-                  case CUBE -> Auto.CUBE_OUTTAKE_TIME;
+                  case CONE -> CONE_OUTTAKE_TIME;
+                  case CUBE -> CUBE_OUTTAKE_TIME;
                 }),
         intake.stop());
   }
 
   private Command frontMovingIntake() {
     return Commands.sequence(
-        placement.goTo(Constants.Positions.FRONT_INTAKE),
-        intake.intake().withTimeout(Auto.MOVING_INTAKE_TIME),
+        placement.goTo(FRONT_INTAKE),
+        intake.intake().withTimeout(MOVING_INTAKE_TIME),
         intake.stop());
   }
 
   private Command initialIntake() {
-    return Commands.sequence(intake.intake().withTimeout(Auto.INITIAL_INTAKE_TIME), intake.stop());
+    return Commands.sequence(intake.intake().withTimeout(INITIAL_INTAKE_TIME), intake.stop());
   }
 
-  private static List<PathPlannerTrajectory> loadAutoPath(String pathName) {
-    return PathPlanner.loadPathGroup(pathName, Constants.Drive.CONSTRAINTS);
+  private static List<PathPlannerTrajectory> loadPath(String pathName) {
+    return PathPlanner.loadPathGroup(pathName, CONSTRAINTS);
   }
 
   /** back cone, cube intake, back cube */
@@ -311,17 +305,6 @@ public final class Autos implements Sendable {
     return Commands.sequence(
         defaultOdometryReset(GamePiece.CUBE, Rotation2d.fromRadians(0), startingPos),
         placement.goTo(BACK_HIGH_CUBE).withTimeout(5),
-        outtake(GamePiece.CUBE));
-  }
-
-  private Command frontHighCubeScore() {
-    return frontHighCubeScore(StartingPos.FLAT);
-  }
-
-  private Command frontHighCubeScore(StartingPos startingPos) {
-    return Commands.sequence(
-        defaultOdometryReset(GamePiece.CUBE, Rotation2d.fromRadians(Math.PI), startingPos),
-        placement.goTo(FRONT_HIGH_CUBE).withTimeout(5),
         outtake(GamePiece.CUBE));
   }
 
@@ -406,7 +389,7 @@ public final class Autos implements Sendable {
                       case Invalid -> -1; // should never happen!
                     },
                     switch (gamePiece) {
-                      case CONE -> Constants.Field.SCORING_POINTS_CONE
+                      case CONE -> SCORING_POINTS_CONE
                           .get(
                               switch (startingPos) {
                                 case FLAT -> 1;
@@ -414,7 +397,7 @@ public final class Autos implements Sendable {
                                 case BUMP -> 6;
                               })
                           .getY();
-                      case CUBE -> Constants.Field.SCORING_POINTS_CUBE
+                      case CUBE -> SCORING_POINTS_CUBE
                           .get(
                               switch (startingPos) {
                                 case FLAT -> 1;
@@ -438,6 +421,6 @@ public final class Autos implements Sendable {
   }
 
   public Command get() {
-    return placement.setSetpoint(Positions.INITIAL).andThen(autoChooser.getSelected().get());
+    return placement.setSetpoint(INITIAL).andThen(autoChooser.getSelected().get());
   }
 }
