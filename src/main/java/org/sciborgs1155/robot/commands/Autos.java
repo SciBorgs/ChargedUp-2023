@@ -136,7 +136,6 @@ public final class Autos implements Sendable {
 
     // ultimate backup
     autoChooser.addOption("none", Commands::none);
-
   }
 
   private void configureExtraAutos() {
