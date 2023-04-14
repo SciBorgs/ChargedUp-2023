@@ -1,10 +1,5 @@
 {
   "HALProvider": {
-    "DIO": {
-      "window": {
-        "visible": true
-      }
-    },
     "Other Devices": {
       "window": {
         "visible": false
@@ -39,6 +34,7 @@
       "/Shuffleboard/Elevator/pid": "PIDController",
       "/Shuffleboard/Robot/arm": "Subsystem",
       "/Shuffleboard/Robot/auto path chooser": "String Chooser",
+      "/Shuffleboard/Robot/auto path chooser!": "String Chooser",
       "/Shuffleboard/Robot/drive": "Subsystem",
       "/Shuffleboard/Robot/elevator": "Subsystem",
       "/Shuffleboard/Robot/intake": "Subsystem",
@@ -68,22 +64,17 @@
           "visible": true
         }
       },
+      "/Shuffleboard/Robot/auto path chooser!": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Shuffleboard/Robot/position": {
         "window": {
           "visible": true
         }
       },
       "/Shuffleboard/Robot/setpoint": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/Shuffleboard/RobotContainer/auto path chooser": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/Shuffleboard/RobotContainer/starting position chooser": {
         "window": {
           "visible": true
         }
@@ -127,5 +118,8 @@
         "open": true
       }
     }
+  },
+  "NetworkTables View": {
+    "visible": false
   }
 }

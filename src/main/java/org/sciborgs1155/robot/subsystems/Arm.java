@@ -249,10 +249,10 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Override
   public void periodic() {
     // SAFETY CHECKS
-    wristLimp =
-        wristEncoder.getPosition() == 0
-            && wristEncoder.getVelocity() == 0
-            && wristSetpoint.position() != 0;
+    wristLimp = false;
+    //     wristEncoder.getPosition() == 0
+    //         && wristEncoder.getVelocity() == 0
+    //         && wristSetpoint.position() != 0;
     butAScratch =
         elbowEncoder.getPosition() == 0 // no position reading
             && elbowEncoder.getVelocity() == 0 // no velocity reading
