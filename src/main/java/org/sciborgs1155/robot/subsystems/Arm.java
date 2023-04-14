@@ -248,17 +248,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Override
   public void periodic() {
-    // SAFETY CHECKS
-    wristLimp =
-        wristEncoder.getPosition() == 0
-            && wristEncoder.getVelocity() == 0
-            && wristSetpoint.position() != 0;
-    butAScratch =
-        elbowEncoder.getPosition() == 0 // no position reading
-            && elbowEncoder.getVelocity() == 0 // no velocity reading
-            && elbowSetpoint.position() != Elbow.ELBOW_OFFSET // elbow is not going to 0
-            && elbow.getAppliedOutput() != 0; // elbow is trying to move
-
     double elbowFB =
         elbowFeedback.calculate(getElbowPosition().getRadians(), elbowSetpoint.position());
     double elbowFF =
@@ -286,6 +275,17 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     setpointVisualizer.setArmAngles(
         Rotation2d.fromRadians(elbowFeedback.getSetpoint()),
         Rotation2d.fromRadians(wristFeedback.getSetpoint()));
+
+    // SAFETY CHECKS
+    wristLimp =
+        wristEncoder.getPosition() == 0
+            && wristEncoder.getVelocity() == 0
+            && wristSetpoint.position() != 0;
+    butAScratch =
+        elbowEncoder.getPosition() == 0 // no position reading
+            && elbowEncoder.getVelocity() == 0 // no velocity reading
+            && elbowSetpoint.position() != Elbow.ELBOW_OFFSET // elbow is not going to 0
+            && elbow.getAppliedOutput() != 0; // elbow is trying to move
   }
 
   @Override
