@@ -1,5 +1,7 @@
 # Copyright (c) 2023 FRC 6328
 # http://github.com/Mechanical-Advantage
+# Copyright (c) 2023 FRC 1155
+# https://github.com/SciBorgs
 
 import math
 import time
