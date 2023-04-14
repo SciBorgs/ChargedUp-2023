@@ -32,22 +32,22 @@ public final class Autos implements Sendable {
   }
 
   public static final class Paths {
-    public static final List<PathPlannerTrajectory> TWO_GAMEPIECE_BUMP = loadPath("cone cube r");
-    public static final List<PathPlannerTrajectory> TWO_GAMEPIECE_FLAT = loadPath("cone cube l");
+    public static final List<PathPlannerTrajectory> TWO_GAMEPIECE_BUMP = loadPath("cone cube b");
+    public static final List<PathPlannerTrajectory> TWO_GAMEPIECE_FLAT = loadPath("cone cube f");
 
-    public static final List<PathPlannerTrajectory> CONE_LEAVE_BUMP = loadPath("cone leaveComm r");
-    public static final List<PathPlannerTrajectory> CONE_LEAVE_FLAT = loadPath("cone leaveComm l");
+    public static final List<PathPlannerTrajectory> CONE_LEAVE_BUMP = loadPath("cone leaveComm b");
+    public static final List<PathPlannerTrajectory> CONE_LEAVE_FLAT = loadPath("cone leaveComm f");
 
-    public static final List<PathPlannerTrajectory> CUBE_LEAVE_BUMP = loadPath("cube leaveComm r");
-    public static final List<PathPlannerTrajectory> CUBE_LEAVE_FLAT = loadPath("cube leaveComm l");
+    public static final List<PathPlannerTrajectory> CUBE_LEAVE_BUMP = loadPath("cube leaveComm b");
+    public static final List<PathPlannerTrajectory> CUBE_LEAVE_FLAT = loadPath("cube leaveComm f");
 
-    public static final List<PathPlannerTrajectory> CUBE_INTAKE_FLAT = loadPath("cube intake l");
+    public static final List<PathPlannerTrajectory> CUBE_INTAKE_FLAT = loadPath("cube intake f");
 
-    public static final List<PathPlannerTrajectory> LEAVE_BUMP = loadPath("leaveComm r");
-    public static final List<PathPlannerTrajectory> LEAVE_FLAT = loadPath("leaveComm l");
+    public static final List<PathPlannerTrajectory> LEAVE_BUMP = loadPath("leaveComm b");
+    public static final List<PathPlannerTrajectory> LEAVE_FLAT = loadPath("leaveComm f");
 
     public static final List<PathPlannerTrajectory> LEAVE_FLAT_BACKWARDS =
-        loadPath("leaveComm l backwards");
+        loadPath("leaveComm f backwards");
 
     public static final List<PathPlannerTrajectory> ONE_METER_TEST = loadPath("one meter");
   }
