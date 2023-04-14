@@ -384,7 +384,8 @@ public final class Autos implements Sendable {
         backHighCubeScore(), leaveNoOdometry().alongWith(placement.goTo(STOW)));
   }
 
-  public Command defaultOdometryReset(
+  /** resets odometry where feild is static (doesn't depend on alliance) */
+  public Command staticOdometryReset(
       GamePiece gamePiece, Rotation2d rotation, StartingPos startingPos) {
     return Commands.runOnce(
         () ->
@@ -420,6 +421,40 @@ public final class Autos implements Sendable {
                     } // should never happen!
                     )),
         drive);
+  }
+
+  /** resets odometry like pp does */
+  public Command defaultOdometryReset(
+      GamePiece gamePiece, Rotation2d rotation, StartingPos startingPos) {
+    Pose2d bluePose =
+        new Pose2d(
+            switch (gamePiece) {
+              case CONE -> SCORING_POINTS_CONE.get(
+                  switch (startingPos) {
+                    case FLAT -> 1;
+                    case CENTER -> 3;
+                    case BUMP -> 6;
+                  });
+              case CUBE -> SCORING_POINTS_CUBE.get(
+                  switch (startingPos) {
+                    case FLAT -> 1;
+                    case CENTER -> 2;
+                    case BUMP -> 3;
+                  });
+            },
+            rotation);
+    return Commands.runOnce(
+        () -> drive.resetOdometry(transformPoseForAllaince(bluePose, DriverStation.getAlliance())),
+        drive);
+  }
+
+  private Pose2d transformPoseForAllaince(Pose2d pose, DriverStation.Alliance alliance) {
+    return switch (alliance) {
+      case Red -> new Pose2d(
+          pose.getX(), FIELD_WIDTH_METERS - pose.getY(), pose.getRotation().times(-1));
+      case Blue -> pose;
+      case Invalid -> pose; // should never happen
+    };
   }
 
   @Override
