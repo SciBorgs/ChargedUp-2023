@@ -23,7 +23,7 @@ def calculate_func(trajectory):
     if solver == None:
         with open(os.path.join("src", "main", "deploy", "placement_config.yaml"), "r") as f:
             config = yaml.safe_load(f)
-        solver = Solver(config, silence=True)
+        solver = Solver(config)
 
 
     # Generate trajectory

@@ -224,8 +224,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
                                         new State(
                                             state.position,
                                             state.velocity,
-                                            wristAccel.calculate(state.velocity)))),
-                this))
+                                            wristAccel.calculate(state.velocity))))))
         .withName("following profile");
   }
 

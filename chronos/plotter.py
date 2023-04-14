@@ -68,5 +68,5 @@ def plot(result, config):
         ax.set_ylim([-0.5, 2.6])
 
     # Show plot
-    animation = matplotlib.animation.FuncAnimation(fig, animate, interval=10)
+    animation = matplotlib.animation.FuncAnimation(fig, animate, interval=20)
     plt.show()

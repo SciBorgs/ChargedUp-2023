@@ -57,9 +57,7 @@ public class Robot extends CommandRobot implements Loggable {
   // Command factories
   private final Placement placement = new Placement(arm, elevator);
   @Log private final Scoring scoring = new Scoring(placement, led);
-
-  @Log(name = "auto path chooser!")
-  private final Autos autos = new Autos(drive, placement, intake);
+  @Log private final Autos autos = new Autos(drive, placement, intake);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public Robot() {
@@ -78,7 +76,8 @@ public class Robot extends CommandRobot implements Loggable {
         .onTrue(Commands.runOnce(DataLogManager::start))
         .whileTrue(Commands.runOnce(Logger::updateEntries));
 
-    autonomous().onTrue(getAutonomousCommand().until(() -> !DriverStation.isAutonomous()));
+    // autonomous().onTrue(autos.get().until(() -> !DriverStation.isAutonomous()));
+    autonomous().onTrue(getAutonomousCommand());
 
     teleop().onTrue(getEnableCommand());
   }
@@ -149,6 +148,8 @@ public class Robot extends CommandRobot implements Loggable {
 
   /** The commamnd to be ran in autonomous */
   public Command getAutonomousCommand() {
-    return new DeferredCommand(() -> autos.get());
+    return new DeferredCommand(autos::get, drive, arm, elevator)
+        .until(() -> !DriverStation.isAutonomous())
+        .withName("auto");
   }
 }
