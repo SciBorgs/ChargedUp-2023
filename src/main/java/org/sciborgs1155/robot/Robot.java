@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
@@ -38,50 +37,56 @@ import org.sciborgs1155.robot.util.placement.PlacementState.Side;
  */
 public class Robot extends CommandRobot implements Loggable {
 
-  // Vision instance
-  private final Vision vision = new Vision(Mode.SIM);
+  private final Vision vision = new Vision(Mode.NONE);
   @Log private final Visualizer position = new Visualizer(new Color8Bit(255, 0, 0));
   @Log private final Visualizer setpoint = new Visualizer(new Color8Bit(0, 0, 255));
 
-  // Subsystems
+  // SUBSYSTEMS
   @Log private final Drive drive = new Drive(vision);
   @Log private final Elevator elevator = new Elevator(position, setpoint);
   @Log private final Arm arm = new Arm(position, setpoint);
   @Log private final Intake intake = new Intake();
   @Log private final LED led = new LED();
 
-  // Input devices
+  // INPUT DEVICES
   private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
   private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
 
-  // Command factories
+  // COMMANDS
   private final Placement placement = new Placement(arm, elevator);
   @Log private final Scoring scoring = new Scoring(placement, led);
   @Log private final Autos autos = new Autos(drive, placement, intake);
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /** The robot contains subsystems, OI devices, and commands. */
   public Robot() {
     super(Constants.RATE);
 
+    configureGameBehavior();
+    configureBindings();
+    configureSubsystemDefaults();
+  }
+
+  /** Configures basic behavior during different parts of the game. */
+  private void configureGameBehavior() {
     if (isSimulation()) {
       DriverStation.silenceJoystickConnectionWarning(true);
     }
 
     Logger.configureLoggingAndConfig(this, false);
 
-    configureBindings();
-    configureSubsystemDefaults();
-
     robot()
         .onTrue(Commands.runOnce(DataLogManager::start))
         .whileTrue(Commands.runOnce(Logger::updateEntries));
 
-    // autonomous().onTrue(autos.get().until(() -> !DriverStation.isAutonomous()));
     autonomous().onTrue(getAutonomousCommand());
 
     teleop().onTrue(getEnableCommand());
   }
 
+  /**
+   * Configures subsystem default commands. Default commands are scheduled when no other command is
+   * running on a subsystem.
+   */
   private void configureSubsystemDefaults() {
     drive.setDefaultCommand(
         drive
@@ -92,19 +97,11 @@ public class Robot extends CommandRobot implements Loggable {
     intake.setDefaultCommand(intake.set(Constants.Intake.DEFAULT_SPEED).withName("passive intake"));
   }
 
-  /**
-   * Use this method to define your trigger->command mappings. Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-   * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-   * joysticks}.
-   */
+  /** Configures trigger -> command bindings */
   private void configureBindings() {
+    // DRIVER INPUT
     driver.b().onTrue(drive.zeroHeading());
 
-    // SPEED SWITCHING
     driver
         .leftBumper()
         .onTrue(drive.setSpeedMultiplier(SpeedMultiplier.SLOW))
@@ -137,6 +134,7 @@ public class Robot extends CommandRobot implements Loggable {
     operator.leftBumper().onTrue(intake.intake()).onFalse(intake.stop());
     operator.rightBumper().onTrue(intake.outtake()).onFalse(intake.stop());
 
+    // FAILURE MODES
     arm.onElbowFailing().onTrue(placement.setStopped(true));
     elevator.onFailing().onTrue(placement.setStopped(true));
   }
