@@ -5,7 +5,6 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.sciborgs1155.lib.DeferredCommand;
-import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.LED;
 import org.sciborgs1155.robot.util.placement.PlacementState;
 import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;

@@ -13,11 +13,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
-
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.*;
 import org.sciborgs1155.robot.subsystems.Drive;
@@ -33,21 +31,29 @@ public final class Autos implements Sendable {
   }
 
   public static final class Paths {
-    public static final List<PathPlannerTrajectory> TWO_GAMEPIECE_BUMP = loadAutoPath("cone cube r");
-    public static final List<PathPlannerTrajectory> TWO_GAMEPIECE_FLAT = loadAutoPath("cone cube l");
+    public static final List<PathPlannerTrajectory> TWO_GAMEPIECE_BUMP =
+        loadAutoPath("cone cube r");
+    public static final List<PathPlannerTrajectory> TWO_GAMEPIECE_FLAT =
+        loadAutoPath("cone cube l");
 
-    public static final List<PathPlannerTrajectory> CONE_LEAVE_BUMP = loadAutoPath("cone leaveComm r");
-    public static final List<PathPlannerTrajectory> CONE_LEAVE_FLAT = loadAutoPath("cone leaveComm l");
+    public static final List<PathPlannerTrajectory> CONE_LEAVE_BUMP =
+        loadAutoPath("cone leaveComm r");
+    public static final List<PathPlannerTrajectory> CONE_LEAVE_FLAT =
+        loadAutoPath("cone leaveComm l");
 
-    public static final List<PathPlannerTrajectory> CUBE_LEAVE_BUMP = loadAutoPath("cube leaveComm r");
-    public static final List<PathPlannerTrajectory> CUBE_LEAVE_FLAT = loadAutoPath("cube leaveComm l");
+    public static final List<PathPlannerTrajectory> CUBE_LEAVE_BUMP =
+        loadAutoPath("cube leaveComm r");
+    public static final List<PathPlannerTrajectory> CUBE_LEAVE_FLAT =
+        loadAutoPath("cube leaveComm l");
 
-    public static final List<PathPlannerTrajectory> CUBE_INTAKE_FLAT = loadAutoPath("cube intake l");
+    public static final List<PathPlannerTrajectory> CUBE_INTAKE_FLAT =
+        loadAutoPath("cube intake l");
 
     public static final List<PathPlannerTrajectory> LEAVE_BUMP = loadAutoPath("leaveComm r");
     public static final List<PathPlannerTrajectory> LEAVE_FLAT = loadAutoPath("leaveComm l");
 
-    public static final List<PathPlannerTrajectory> LEAVE_FLAT_BACKWARDS = loadAutoPath("leaveComm l backwards");
+    public static final List<PathPlannerTrajectory> LEAVE_FLAT_BACKWARDS =
+        loadAutoPath("leaveComm l backwards");
 
     public static final List<PathPlannerTrajectory> ONE_METER_TEST = loadAutoPath("one meter");
   }
@@ -78,7 +84,7 @@ public final class Autos implements Sendable {
             Map.entry("stow", placement.goTo(STOW)),
             Map.entry("balanceState", placement.goTo(BALANCE)),
             Map.entry("initialIntake", initialIntake()));
-    
+
     autoChooser = new SendableChooser<Supplier<Command>>();
     configureAutoChooser();
 
@@ -139,7 +145,7 @@ public final class Autos implements Sendable {
      */
     autoChooser.addOption("cone, leave (flat)", () -> coneLeave(StartingPos.FLAT));
 
-        /* cone leave setup instructions:
+    /* cone leave setup instructions:
      * gamepiece: cone
      * orientation: away from grid
      * starting location: cone scoring, bump side
@@ -215,7 +221,7 @@ public final class Autos implements Sendable {
      * starting location: against grid, to one side (it should have a clear path straight forward)
      */
     autoChooser.addOption("flat leave (no arm)", () -> leave(StartingPos.FLAT));
-    
+
     /* leave setup instructions:
      * gamepiece: none
      * orientation: away from grid
@@ -260,18 +266,17 @@ public final class Autos implements Sendable {
   /** back cone, cube intake, back cube */
   public Command twoGamepiece(StartingPos startingPos) {
     return builder.fullAuto(
-      switch (startingPos) {
-        case BUMP -> Paths.TWO_GAMEPIECE_BUMP;
-        case FLAT -> Paths.TWO_GAMEPIECE_FLAT;
-        case CENTER -> Paths.TWO_GAMEPIECE_FLAT;
-      }
-    );
+        switch (startingPos) {
+          case BUMP -> Paths.TWO_GAMEPIECE_BUMP;
+          case FLAT -> Paths.TWO_GAMEPIECE_FLAT;
+          case CENTER -> Paths.TWO_GAMEPIECE_FLAT;
+        });
   }
 
   private Command justBalance() {
     return Commands.sequence(
-      defaultOdometryReset(GamePiece.CUBE, Rotation2d.fromRadians(0), StartingPos.CENTER),
-      fullBalance());
+        defaultOdometryReset(GamePiece.CUBE, Rotation2d.fromRadians(0), StartingPos.CENTER),
+        fullBalance());
   }
 
   private Command fullBalance() {
@@ -323,7 +328,9 @@ public final class Autos implements Sendable {
   /** no PPL */
   private Command cubeBalance() {
     return Commands.sequence(
-        backHighCubeScore(StartingPos.CENTER), placement.goTo(BALANCE).withTimeout(3.5), fullBalance());
+        backHighCubeScore(StartingPos.CENTER),
+        placement.goTo(BALANCE).withTimeout(3.5),
+        fullBalance());
   }
 
   /** no PPL */
@@ -333,19 +340,21 @@ public final class Autos implements Sendable {
   }
 
   private Command coneLeave(StartingPos startingPos) {
-    return builder.fullAuto(switch (startingPos) {
-      case BUMP -> Paths.CONE_LEAVE_BUMP;
-      case FLAT -> Paths.CONE_LEAVE_FLAT;
-      case CENTER -> Paths.CONE_LEAVE_FLAT;
-    });
+    return builder.fullAuto(
+        switch (startingPos) {
+          case BUMP -> Paths.CONE_LEAVE_BUMP;
+          case FLAT -> Paths.CONE_LEAVE_FLAT;
+          case CENTER -> Paths.CONE_LEAVE_FLAT;
+        });
   }
 
   private Command cubeLeave(StartingPos startingPos) {
-    return builder.fullAuto(switch (startingPos) {
-      case BUMP -> Paths.CUBE_LEAVE_BUMP;
-      case FLAT -> Paths.CUBE_LEAVE_FLAT;
-      case CENTER -> Paths.CONE_LEAVE_FLAT;
-    });
+    return builder.fullAuto(
+        switch (startingPos) {
+          case BUMP -> Paths.CUBE_LEAVE_BUMP;
+          case FLAT -> Paths.CUBE_LEAVE_FLAT;
+          case CENTER -> Paths.CONE_LEAVE_FLAT;
+        });
   }
 
   private Command cubeIntake() {
@@ -361,11 +370,12 @@ public final class Autos implements Sendable {
 
   /** backup: no arm */
   private Command leave(StartingPos startingPos) {
-    return builder.fullAuto(switch (startingPos) {
-      case BUMP -> Paths.LEAVE_BUMP;
-      case FLAT -> Paths.LEAVE_FLAT;
-      case CENTER -> Paths.LEAVE_FLAT;
-    });
+    return builder.fullAuto(
+        switch (startingPos) {
+          case BUMP -> Paths.LEAVE_BUMP;
+          case FLAT -> Paths.LEAVE_FLAT;
+          case CENTER -> Paths.LEAVE_FLAT;
+        });
   }
 
   /** backup: no odometry */
@@ -384,7 +394,8 @@ public final class Autos implements Sendable {
         backHighCubeScore(), leaveNoOdometry().alongWith(placement.goTo(STOW)));
   }
 
-  public Command defaultOdometryReset(GamePiece gamePiece, Rotation2d rotation, StartingPos startingPos) {
+  public Command defaultOdometryReset(
+      GamePiece gamePiece, Rotation2d rotation, StartingPos startingPos) {
     return Commands.runOnce(
         () ->
             drive.resetOdometry(
