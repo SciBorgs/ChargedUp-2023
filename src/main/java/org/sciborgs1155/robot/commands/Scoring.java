@@ -4,7 +4,6 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.robot.subsystems.LED;
 import org.sciborgs1155.robot.util.placement.PlacementState;
 import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;
@@ -39,11 +38,6 @@ public final class Scoring implements Sendable {
    */
   public PlacementState state(Level level) {
     return PlacementState.fromOperator(level, gamePiece, side);
-  }
-
-  /** Returns a command that goes to the approperiate level, using {@link this#state(Level)} */
-  public Command goTo(Level level) {
-    return new DeferredCommand(() -> placement.goTo(state(level)));
   }
 
   public GamePiece gamePiece() {
