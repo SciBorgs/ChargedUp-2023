@@ -21,8 +21,8 @@ public class Alignment {
     this.scoring = scoring;
   }
 
-  public Command odometryAlign(Side side) {
-    return odometryAlign(drive.getPose(), side);
+  public Command odometryAlign() {
+    return odometryAlign(drive.getPose(), scoring.side());
   }
 
   public Command odometryAlign(Pose2d startPose, Side side) {
