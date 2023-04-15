@@ -147,9 +147,10 @@
       "stopEvent": {
         "names": [
           "backHighCube",
-          "outtakeCube"
+          "outtakeCube",
+          "balanceState"
         ],
-        "executionBehavior": "parallel",
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }

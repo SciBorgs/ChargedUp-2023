@@ -71,9 +71,10 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "initialIntake"
+          "initialIntake",
+          "stow"
         ],
-        "executionBehavior": "parallel",
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }
@@ -96,9 +97,10 @@
       "stopEvent": {
         "names": [
           "backHighCube",
-          "outtakeCube"
+          "outtakeCube",
+          "balanceState"
         ],
-        "executionBehavior": "parallel",
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0.5
       }
@@ -112,12 +114,6 @@
       "position": 0.0,
       "names": [
         "frontIntake"
-      ]
-    },
-    {
-      "position": 2.02,
-      "names": [
-        "backHighCube"
       ]
     }
   ]
