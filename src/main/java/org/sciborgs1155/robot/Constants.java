@@ -136,7 +136,7 @@ public final class Constants {
       public static final SystemConstants FF =
           new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
-      public static final Constraints CONSTRAINTS = new Constraints(2.9, 3.05);
+      public static final Constraints CONSTRAINTS = new Constraints(2.9, 3.4);
 
       public static final double MAX_ANGLE = 3.0 * Math.PI / 2.0;
       public static final double MIN_ANGLE = -Math.PI / 2.0;
@@ -172,7 +172,7 @@ public final class Constants {
     public static final int SAMPLE_SIZE_TAPS = 3;
     public static final int CURRENT_THRESHOLD = 40; // TODO this might be too high/unreasonable
 
-    public static final Constraints CONSTRAINTS = new Constraints(3, 3.2);
+    public static final Constraints CONSTRAINTS = new Constraints(3, 3.35);
 
     public static final double ZERO_OFFSET = 0.61842;
 

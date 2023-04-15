@@ -13,11 +13,11 @@ solver:
   interiorPoints: 20
   maxVoltageElbow: 11
   maxVoltageWrist: 9
-  maxVoltageLift: 10
-  maxAccelerationElbow: 3.05
+  maxVoltageLift: 11
+  maxAccelerationElbow: 3.4
   maxAccelerationWrist: 2.9
-  maxAccelerationLift: 3.2
-  maxJerk: 45
+  maxAccelerationLift: 3.35
+  maxJerk: 800
 
 lift:
   mass: 6.80389
