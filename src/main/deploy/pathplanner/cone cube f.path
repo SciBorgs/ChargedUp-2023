@@ -71,8 +71,7 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "initialIntake",
-          "stow"
+          "initialIntake"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -114,6 +113,13 @@
       "position": 0.0,
       "names": [
         "frontIntake"
+      ]
+    },
+    {
+      "position": 2.2859019886363665,
+      "names": [
+        "event",
+        "stow"
       ]
     }
   ]
