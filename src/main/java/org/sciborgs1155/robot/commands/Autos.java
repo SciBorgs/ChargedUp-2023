@@ -80,6 +80,7 @@ public final class Autos implements Sendable {
             Map.entry("initialIntake", initialIntake()));
 
     autoChooser = new SendableChooser<Supplier<Command>>();
+    configureTestAutos();
     configureMainAutos();
 
     builder =
@@ -229,6 +230,7 @@ public final class Autos implements Sendable {
 
   private void configureTestAutos() {
     autoChooser.addOption("one meter test", () -> builder.fullAuto(Paths.ONE_METER_TEST));
+    autoChooser.addOption("2 gamepeice (bump)", () -> twoGamepiece(StartingPos.BUMP));
   }
 
   private void configureAllAutos() {

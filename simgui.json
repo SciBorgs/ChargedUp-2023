@@ -4,6 +4,11 @@
       "window": {
         "visible": false
       }
+    },
+    "Timing": {
+      "window": {
+        "visible": false
+      }
     }
   },
   "NTProvider": {
@@ -35,6 +40,7 @@
       "/Shuffleboard/Robot/arm": "Subsystem",
       "/Shuffleboard/Robot/auto path chooser": "String Chooser",
       "/Shuffleboard/Robot/auto path chooser!": "String Chooser",
+      "/Shuffleboard/Robot/autos": "String Chooser",
       "/Shuffleboard/Robot/drive": "Subsystem",
       "/Shuffleboard/Robot/elevator": "Subsystem",
       "/Shuffleboard/Robot/intake": "Subsystem",
@@ -64,7 +70,12 @@
           "visible": true
         }
       },
-      "/Shuffleboard/Robot/auto path chooser!": {
+      "/Shuffleboard/Robot/arm": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Robot/autos": {
         "window": {
           "visible": true
         }
@@ -91,12 +102,7 @@
     "transitory": {
       "Shuffleboard": {
         "Arm": {
-          "elbow feedback": {
-            "open": true
-          },
-          "wrist feedback": {
-            "open": true
-          }
+          "open": true
         },
         "Elevator": {
           "pid": {
@@ -118,8 +124,5 @@
         "open": true
       }
     }
-  },
-  "NetworkTables View": {
-    "visible": false
   }
 }

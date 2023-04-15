@@ -21,6 +21,21 @@ public class CommandRobot extends TimedRobot {
   }
 
   @Override
+  public void simulationPeriodic() {}
+
+  @Override
+  public void disabledPeriodic() {}
+
+  @Override
+  public void autonomousPeriodic() {}
+
+  @Override
+  public void teleopPeriodic() {}
+
+  @Override
+  public void testPeriodic() {}
+
+  @Override
   public void testInit() {
     CommandScheduler.getInstance().cancelAll();
   }

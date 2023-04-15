@@ -237,7 +237,7 @@ public final class Constants {
     public static final double BALANCE_SPEED = 0.35; // m / s
 
     public static final PathConstraints CONSTRAINTS =
-        new PathConstraints(MAX_SPEED / 1.8, MAX_ACCEL / 1.2);
+        new PathConstraints(MAX_SPEED / 1.9, MAX_ACCEL / 1.4);
   }
 
   public static final class SwerveModule {
