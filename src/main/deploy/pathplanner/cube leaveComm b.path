@@ -75,10 +75,9 @@
   ],
   "markers": [
     {
-      "position": 0.12265624999999998,
+      "position": 0.04,
       "names": [
-        "event",
-        "stow"
+        "balanceState"
       ]
     }
   ]
