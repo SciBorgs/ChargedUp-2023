@@ -124,7 +124,8 @@ public final class Autos implements Sendable {
      * orientation: away from grid
      * starting location: cube scoring (preferably flat)
      */
-    autoChooser.setDefaultOption("cube score (no drive)", () -> backHighCubeScore(StartingPos.FLAT));
+    autoChooser.setDefaultOption(
+        "cube score (no drive)", () -> backHighCubeScore(StartingPos.FLAT));
 
     /* cone score setup instructions:
      * gamepiece: cone
