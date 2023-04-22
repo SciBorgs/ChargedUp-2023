@@ -260,13 +260,10 @@ public final class Autos implements Sendable {
   }
 
   private Command fullBalance() {
-    // return drive
-    // .follow("balance", true, true).withTimeout(4)
-    return Commands.run(() -> drive.drive(0.6, 0, 0, false), drive)
-        .until(() -> Math.abs(drive.getPitch()) >= 13.5)
+    return drive
+        .follow("balance", true, true)
         .withTimeout(4)
         .andThen(drive.balance())
-        .andThen(Commands.run(() -> drive.drive(-0.3, 0, 0, false), drive).withTimeout(0.1))
         .andThen(drive.lock())
         .withName("balance auto");
   }
