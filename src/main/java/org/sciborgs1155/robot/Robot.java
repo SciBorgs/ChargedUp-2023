@@ -90,8 +90,7 @@ public class Robot extends CommandRobot implements Loggable {
   private void configureSubsystemDefaults() {
     drive.setDefaultCommand(
         drive
-            .drive(
-                () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX(), true)
+            .drive(() -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX())
             .withName("teleop driving"));
 
     intake.setDefaultCommand(intake.set(Constants.Intake.DEFAULT_SPEED).withName("passive intake"));

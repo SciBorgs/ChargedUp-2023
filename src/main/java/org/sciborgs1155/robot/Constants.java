@@ -205,9 +205,9 @@ public final class Constants {
       }
     }
 
-    public static final double MAX_SPEED = 3.25; // m / s
+    public static final double MAX_SPEED = 4; // m / s
     public static final double MAX_ANGULAR_SPEED = 1.5 * Math.PI; // rad / s
-    public static final double MAX_ACCEL = 7.8; // m / s^2
+    public static final double MAX_ACCEL = 7; // m / s^2
 
     public static final double TRACK_WIDTH = 0.5715;
     // Distance between centers of right and left wheels on robot

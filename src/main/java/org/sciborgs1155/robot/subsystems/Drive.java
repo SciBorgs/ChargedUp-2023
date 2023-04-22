@@ -108,31 +108,44 @@ public class Drive extends SubsystemBase implements Loggable {
     odometry.resetPosition(getHeading(), getModulePositions(), pose);
   }
 
-  /**
-   * Method to drive the robot using joystick info.
-   *
-   * @param xSpeed Speed of the robot in the x direction (forward).
-   * @param ySpeed Speed of the robot in the y direction (sideways).
-   * @param rot Angular rate of the robot.
-   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
-   */
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed) * MAX_SPEED * speedMultiplier;
-    ySpeed = Math.copySign(ySpeed * ySpeed, ySpeed) * MAX_SPEED * speedMultiplier;
-    rot = Math.copySign(rot * rot, rot) * MAX_ANGULAR_SPEED * speedMultiplier;
-
-    if (fieldRelative) {
-      xSpeed = xLimiter.calculate(xSpeed);
-      ySpeed = yLimiter.calculate(ySpeed);
-    }
-
-    var speeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
-
-    setSpeeds(fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getHeading()) : speeds);
+  /** Deadbands and squares inputs */
+  private static double scale(double input) {
+    input = MathUtil.applyDeadband(input, Constants.DEADBAND);
+    return Math.copySign(input * input, input);
   }
 
-  /** Sets the swerve ModuleStates via a {@link ChassisSpeeds} */
-  public void setSpeeds(ChassisSpeeds speeds) {
+  /** Drives the robot based on a {@link DoubleSupplier} for x y and omega velocities */
+  public Command drive(DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier vOmega) {
+    return run(
+        () ->
+            drive(
+                ChassisSpeeds.fromFieldRelativeSpeeds(
+                    xLimiter.calculate(scale(vx.getAsDouble()) * MAX_SPEED * speedMultiplier),
+                    yLimiter.calculate(scale(vy.getAsDouble()) * MAX_SPEED * speedMultiplier),
+                    scale(vOmega.getAsDouble()) * MAX_ANGULAR_SPEED * speedMultiplier,
+                    getHeading())));
+  }
+
+  /**
+   * Drives the robot based on profided {@link ChassisSpeeds}.
+   *
+   * <p>This method uses {@link Pose2d#log(Pose2d)} to reduce skew.
+   *
+   * @param speeds The desired chassis speeds.
+   */
+  public void drive(ChassisSpeeds speeds) {
+    var target =
+        new Pose2d(
+            speeds.vxMetersPerSecond * Constants.RATE,
+            speeds.vyMetersPerSecond * Constants.RATE,
+            Rotation2d.fromRadians(speeds.omegaRadiansPerSecond * Constants.RATE));
+
+    var twist = new Pose2d().log(target);
+
+    speeds =
+        new ChassisSpeeds(
+            twist.dx / Constants.RATE, twist.dy / Constants.RATE, twist.dtheta / Constants.RATE);
+
     setModuleStates(kinematics.toSwerveModuleStates(speeds));
   }
 
@@ -268,30 +281,18 @@ public class Drive extends SubsystemBase implements Loggable {
     return Commands.runOnce(() -> resetOdometry(initialPose), this);
   }
 
-  /** Drives robot based on three double suppliers (x,y and rot) */
-  public Command drive(
-      DoubleSupplier x, DoubleSupplier y, DoubleSupplier rot, boolean fieldRelative) {
-    return run(
-        () ->
-            drive(
-                MathUtil.applyDeadband(x.getAsDouble(), Constants.DEADBAND),
-                MathUtil.applyDeadband(y.getAsDouble(), Constants.DEADBAND),
-                MathUtil.applyDeadband(rot.getAsDouble(), Constants.DEADBAND),
-                fieldRelative));
-  }
-
   public Command balance() {
     DoubleUnaryOperator velocity =
         pitch -> Math.signum(MathUtil.applyDeadband(pitch, MIN_PITCH)) * BALANCE_SPEED;
 
-    return run(() -> setSpeeds(new ChassisSpeeds(velocity.applyAsDouble(getPitch()), 0, 0)))
+    return run(() -> drive(new ChassisSpeeds(velocity.applyAsDouble(getPitch()), 0, 0)))
         .until(() -> Math.abs(getPitch()) < MIN_PITCH)
         .andThen(stop());
   }
 
   /** Stops drivetrain */
   public Command stop() {
-    return drive(() -> 0, () -> 0, () -> 0, false);
+    return runOnce(() -> drive(new ChassisSpeeds()));
   }
 
   /** Sets the drivetrain to an "X" configuration, preventing movement */

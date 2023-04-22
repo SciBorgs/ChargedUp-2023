@@ -186,29 +186,6 @@ public final class Autos implements Sendable {
 
     // backups
 
-    /* cone leave (no odometry) setup instructions:
-     * gamepiece: cone
-     * orientation: away from grid
-     * set starting pos: no
-     * starting location: cone scoring, all the way to one side
-     */
-    autoChooser.addOption("cone, leave (no odometry)", this::coneLeaveNoOdometry);
-
-    /* cube leave (no odometry) setup instructions:
-     * gamepiece: cube
-     * orientation: away from grid
-     * set starting pos: no
-     * starting location: cube scoring, all the way to one side
-     */
-    autoChooser.addOption("cube, leave (no odometry)", this::cubeLeaveNoOdometry);
-
-    /* leave (no odometry) setup instructions:
-     * gamepiece: none
-     * orientation: away from grid
-     * starting location: against grid, to one side (it should have a clear path straight forward)
-     */
-    autoChooser.addOption("leave (no arm, no odometry)", this::leaveNoOdometry);
-
     /* leave setup instructions:
      * gamepiece: none
      * orientation: away from grid
@@ -368,22 +345,6 @@ public final class Autos implements Sendable {
           case FLAT -> Paths.LEAVE_FLAT;
           case CENTER -> Paths.LEAVE_FLAT;
         });
-  }
-
-  /** backup: no odometry */
-  private Command leaveNoOdometry() {
-    return drive.drive(() -> 0.75, () -> 0, () -> 0, false).withTimeout(2.4);
-  }
-
-  /** backup: no odometry, no arm */
-  private Command coneLeaveNoOdometry() {
-    return Commands.sequence(highConeScore(), leaveNoOdometry().alongWith(placement.goTo(STOW)));
-  }
-
-  /** backup: no odometry, no arm */
-  private Command cubeLeaveNoOdometry() {
-    return Commands.sequence(
-        backHighCubeScore(), leaveNoOdometry().alongWith(placement.goTo(STOW)));
   }
 
   /** resets odometry where feild is static (doesn't depend on alliance) */
