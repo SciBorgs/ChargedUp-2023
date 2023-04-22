@@ -30,7 +30,6 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import java.util.function.DoubleSupplier;
-import java.util.function.DoubleUnaryOperator;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 import org.sciborgs1155.robot.util.Vision;
@@ -279,15 +278,6 @@ public class Drive extends SubsystemBase implements Loggable {
     Pose2d initialPose =
         new Pose2d(initialState.poseMeters.getTranslation(), initialState.holonomicRotation);
     return Commands.runOnce(() -> resetOdometry(initialPose), this);
-  }
-
-  public Command balance() {
-    DoubleUnaryOperator velocity =
-        pitch -> Math.signum(MathUtil.applyDeadband(pitch, MIN_PITCH)) * BALANCE_SPEED;
-
-    return run(() -> drive(new ChassisSpeeds(velocity.applyAsDouble(getPitch()), 0, 0)))
-        .until(() -> Math.abs(getPitch()) < MIN_PITCH)
-        .andThen(stop());
   }
 
   /** Stops drivetrain */

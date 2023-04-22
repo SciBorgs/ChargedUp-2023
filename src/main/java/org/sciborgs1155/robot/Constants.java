@@ -233,9 +233,6 @@ public final class Constants {
     public static final PIDConstants TRANSLATION = new PIDConstants(0.6, 0, 0);
     public static final PIDConstants ROTATION = new PIDConstants(0.4, 0, 0);
 
-    public static final double MIN_PITCH = 12.5; // 12.5; // deg
-    public static final double BALANCE_SPEED = 0.35; // m / s
-
     public static final PathConstraints CONSTRAINTS =
         new PathConstraints(MAX_SPEED / 1.9, MAX_ACCEL / 1.4);
   }
@@ -283,8 +280,8 @@ public final class Constants {
         PlacementState.fromRelative(0, 1.21834, Math.PI / 2.0);
 
     // LOWEST COG
-    public static final PlacementState BALANCE =
-        PlacementState.fromRelative(Elevator.ZERO_OFFSET, Elbow.ELBOW_OFFSET + 0.1, 3);
+    public static final PlacementState SAFE =
+        PlacementState.fromAbsolute(Elevator.ZERO_OFFSET, Elbow.ELBOW_OFFSET + 0.1, Math.PI / 2);
 
     public static final PlacementState PASS_OLD =
         PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0);
@@ -326,6 +323,10 @@ public final class Constants {
     public static final double CONE_OUTTAKE_TIME = 3; // seconds
     public static final double INITIAL_INTAKE_TIME = 0.3; // seconds
     public static final double MOVING_INTAKE_TIME = 4; // seconds
+
+    public static final PIDConstants BALANCE = new PIDConstants(0.05, 0, 0);
+
+    public static final double PITCH_TOLERANCE = 12.5; // 12.5; // deg
   }
 
   public static final class Field {

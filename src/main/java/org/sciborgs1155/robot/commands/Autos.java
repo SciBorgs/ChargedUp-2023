@@ -8,8 +8,10 @@ import static org.sciborgs1155.robot.Constants.Positions.*;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -76,7 +78,7 @@ public final class Autos implements Sendable {
             Map.entry("outtakeCube", outtake(GamePiece.CUBE)),
             Map.entry("frontIntake", frontMovingIntake()),
             Map.entry("stow", placement.goTo(STOW)),
-            Map.entry("balanceState", placement.goTo(BALANCE)),
+            Map.entry("balanceState", placement.goTo(SAFE)),
             Map.entry("initialIntake", initialIntake()));
 
     autoChooser = new SendableChooser<Supplier<Command>>();
@@ -216,6 +218,18 @@ public final class Autos implements Sendable {
     configureTestAutos();
   }
 
+  public Command balance() {
+    var controller = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
+    controller.setTolerance(PITCH_TOLERANCE);
+    controller.setSetpoint(0);
+
+    return Commands.run(
+            () -> drive.drive(new ChassisSpeeds(controller.calculate(drive.getPitch()), 0, 0)),
+            drive)
+        .until(controller::atSetpoint)
+        .andThen(drive.lock());
+  }
+
   private Command outtake(GamePiece gamePiece) {
     return Commands.sequence(
         intake
@@ -263,7 +277,7 @@ public final class Autos implements Sendable {
     return drive
         .follow("balance", true, true)
         .withTimeout(4)
-        .andThen(drive.balance())
+        .andThen(balance())
         .andThen(drive.lock())
         .withName("balance auto");
   }
@@ -295,14 +309,14 @@ public final class Autos implements Sendable {
   private Command cubeBalance() {
     return Commands.sequence(
         backHighCubeScore(StartingPos.CENTER),
-        placement.goTo(BALANCE).withTimeout(3.5),
+        placement.goTo(SAFE).withTimeout(3.5),
         fullBalance());
   }
 
   /** no PPL */
   private Command coneBalance() {
     return Commands.sequence(
-        highConeScore(StartingPos.CENTER), placement.goTo(BALANCE).withTimeout(3.5), fullBalance());
+        highConeScore(StartingPos.CENTER), placement.goTo(SAFE).withTimeout(3.5), fullBalance());
   }
 
   private Command coneLeave(StartingPos startingPos) {
