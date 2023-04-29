@@ -130,7 +130,7 @@ public final class Constants {
               .multiplyGearing(12)
               .divideGearing(72)
               .withUnits(Conversion.Units.RADIANS)
-              .withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
+              .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
 
       public static final PIDConstants PID = new PIDConstants(12, 0, 1.1); // d = 2.18954
       public static final SystemConstants FF =
@@ -158,7 +158,7 @@ public final class Constants {
         Conversion.base()
             .multiplyRadius(0.0181864)
             .withUnits(Conversion.Units.RADIANS)
-            .withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
+            .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
     // units field for sysid is 0.1143
     public static final Conversion ABSOLUTE_CONVERSION =
         RELATIVE_CONVERSION.withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);

@@ -7,7 +7,6 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
@@ -16,6 +15,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -43,7 +43,9 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log(name = "wrist applied output", methodName = "getAppliedOutput")
   private final CANSparkMax wrist = Wrist.MOTOR.build(MotorType.kBrushless, WRIST_MOTOR);
 
-  private final RelativeEncoder elbowEncoder = elbow.getAlternateEncoder(Constants.THROUGHBORE_CPR);
+  // private final RelativeEncoder elbowEncoder =
+  // elbow.getAlternateEncoder(Constants.THROUGHBORE_CPR);
+  private final Encoder elbowEncoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
 
   @Log(name = "wrist velocity", methodName = "getVelocity")
   private final AbsoluteEncoder wristEncoder = wrist.getAbsoluteEncoder(Type.kDutyCycle);
@@ -104,8 +106,9 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowLeft.follow(elbow);
     elbowRight.follow(elbow);
 
-    elbowEncoder.setPositionConversionFactor(Elbow.CONVERSION.factor());
-    elbowEncoder.setVelocityConversionFactor(Elbow.CONVERSION.factor() / 60.0);
+    // elbowEncoder.setPositionConversionFactor(Elbow.CONVERSION.factor());
+    // elbowEncoder.setVelocityConversionFactor(Elbow.CONVERSION.factor() / 60.0);
+    elbowEncoder.setDistancePerPulse(Elbow.CONVERSION.factor());
     wristEncoder.setPositionConversionFactor(Wrist.CONVERSION.factor());
     wristEncoder.setVelocityConversionFactor(Wrist.CONVERSION.factor() / 60.0);
 
@@ -127,7 +130,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     this.positionVisualizer = positionVisualizer;
     this.setpointVisualizer = setpointVisualizer;
 
-    elbowEncoder.setPosition(Elbow.ELBOW_OFFSET);
+    // elbowEncoder.setPosition(Elbow.ELBOW_OFFSET);
     wristFeedback.setTolerance(0.3);
     elbowFeedback.setTolerance(0.3);
   }
@@ -135,7 +138,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   /** Elbow position relative to the chassis */
   @Log(name = "elbow position", methodName = "getRadians")
   public Rotation2d getElbowPosition() {
-    return Rotation2d.fromRadians(elbowEncoder.getPosition() + Elbow.ELBOW_OFFSET);
+    return Rotation2d.fromRadians(elbowEncoder.getDistance() + Elbow.ELBOW_OFFSET);
   }
 
   /** Wrist position relative to the forearm */
@@ -281,8 +284,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             && wristEncoder.getVelocity() == 0
             && wristSetpoint.position() != 0;
     butAScratch =
-        elbowEncoder.getPosition() == 0 // no position reading
-            && elbowEncoder.getVelocity() == 0 // no velocity reading
+        elbowEncoder.getDistance() == 0 // no position reading
+            && elbowEncoder.getRate() == 0 // no velocity reading
             && elbowSetpoint.position() != Elbow.ELBOW_OFFSET // elbow is not going to 0
             && elbow.getAppliedOutput() != 0; // elbow is trying to move
   }
@@ -291,7 +294,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   public void simulationPeriodic() {
     elbowSim.setInputVoltage(elbow.getAppliedOutput());
     elbowSim.update(Constants.RATE);
-    elbowEncoder.setPosition(elbowSim.getAngleRads());
+    // elbowEncoder.setPosition(elbowSim.getAngleRads());
 
     wristSim.setInputVoltage(wrist.getAppliedOutput());
     wristSim.update(Constants.RATE);

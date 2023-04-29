@@ -38,7 +38,7 @@ public record Conversion(double pulsesPerRev, double gearing, double units) {
   /**
    * The position factor for the encoder.
    *
-   * @return The product of gearing and units per rotation, divded by pulses per revolution
+   * @return The product of gearing and units per rotation, divided by pulses per revolution
    */
   public double factor() {
     return gearing * units / pulsesPerRev;
