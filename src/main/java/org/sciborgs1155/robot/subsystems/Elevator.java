@@ -27,6 +27,7 @@ import org.sciborgs1155.lib.Trajectory;
 import org.sciborgs1155.lib.Trajectory.State;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
+import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.util.Visualizer;
 
 public class Elevator extends TestableSubsystem implements Loggable {
@@ -105,7 +106,7 @@ public class Elevator extends TestableSubsystem implements Loggable {
   /** Returns the height of the elevator, in meters */
   @Log(name = "position")
   public double getPosition() {
-    return encoder.getDistance() + offset;
+    return Robot.isReal() ? encoder.getDistance() + offset : simEncoder.getDistance();
   }
 
   /** Sets the elevator's setpoint height */
@@ -195,6 +196,7 @@ public class Elevator extends TestableSubsystem implements Loggable {
   public void simulationPeriodic() {
     sim.setInputVoltage(lead.getAppliedOutput());
     sim.update(Constants.RATE);
+    simEncoder.setDistance(sim.getPositionMeters());
   }
 
   @Override
@@ -203,5 +205,6 @@ public class Elevator extends TestableSubsystem implements Loggable {
     left.close();
     right.close();
     bottomSwitch.close();
+    encoder.close();
   }
 }

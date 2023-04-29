@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.subsystems;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.sciborgs1155.robot.Constants.Elevator.*;
 import static org.sciborgs1155.robot.TestingUtil.*;
 
 import edu.wpi.first.hal.HAL;
@@ -9,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.util.Visualizer;
 
 public class ElevatorTest {
@@ -25,7 +25,7 @@ public class ElevatorTest {
     CommandScheduler.getInstance().run();
     // check that it starts at 0
     assertEquals(0, elevator.getPosition(), delta);
-    // set setpoint to 0
+    // set setpoint to position
     run(elevator.setSetpoint(elevator.getPosition()));
     assertEquals(elevator.getPosition(), elevator.getSetpoint().position(), delta);
   }
@@ -33,15 +33,15 @@ public class ElevatorTest {
   @AfterEach
   void destroy() {
     closeSubsystem(elevator);
+    elevator.close();
   }
 
   @ParameterizedTest
-  @ValueSource(doubles = {-0.2, 0.3, 0.5, 0.8})
+  @ValueSource(doubles = {-0.2, 0.3, 0.5, 0.7, 0.8})
   void goTo(double setpoint) {
     // set setpoint and test that it was set and clamped correctly
     run(elevator.setSetpoint(setpoint));
-    double clamped =
-        MathUtil.clamp(setpoint, Constants.Elevator.MIN_HEIGHT, Constants.Elevator.MAX_HEIGHT);
+    double clamped = MathUtil.clamp(setpoint, MIN_HEIGHT, MAX_HEIGHT);
     assertEquals(clamped, elevator.getSetpoint().position(), "failed to set elevator setpoint");
     fastForward();
     // check that it has reached it's goal
