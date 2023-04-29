@@ -33,7 +33,6 @@ public class ElevatorTest {
   @AfterEach
   void destroy() {
     closeSubsystem(elevator);
-    elevator.close();
   }
 
   @ParameterizedTest
