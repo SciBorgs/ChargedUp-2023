@@ -141,7 +141,7 @@ public final class Constants {
       public static final double MAX_ANGLE = 3.0 * Math.PI / 2.0;
       public static final double MIN_ANGLE = -Math.PI / 2.0;
 
-      public static final double ELBOW_OFFSET = -1.248660;
+      public static final double OFFSET = -1.248660;
 
       public static final double FAILING_DEBOUNCE_TIME = 0.2;
     }
@@ -275,13 +275,13 @@ public final class Constants {
   public static final class Positions {
 
     public static final PlacementState INITIAL =
-        PlacementState.fromRelative(Elevator.ZERO_OFFSET, Elbow.ELBOW_OFFSET, Math.PI);
+        PlacementState.fromRelative(Elevator.ZERO_OFFSET, Elbow.OFFSET, Math.PI);
     public static final PlacementState STOW =
         PlacementState.fromRelative(0, 1.21834, Math.PI / 2.0);
 
     // LOWEST COG
     public static final PlacementState SAFE =
-        PlacementState.fromAbsolute(Elevator.ZERO_OFFSET, Elbow.ELBOW_OFFSET + 0.1, Math.PI / 2);
+        PlacementState.fromAbsolute(Elevator.ZERO_OFFSET, Elbow.OFFSET + 0.1, Math.PI / 2);
 
     public static final PlacementState PASS_OLD =
         PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0);

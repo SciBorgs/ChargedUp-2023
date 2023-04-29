@@ -135,7 +135,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   /** Elbow position relative to the chassis */
   @Log(name = "elbow position", methodName = "getRadians")
   public Rotation2d getElbowPosition() {
-    return Rotation2d.fromRadians(elbowEncoder.getDistance() + Elbow.ELBOW_OFFSET);
+    return Rotation2d.fromRadians(elbowEncoder.getDistance() + Elbow.OFFSET);
   }
 
   /** Wrist position relative to the forearm */
@@ -283,7 +283,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     butAScratch =
         elbowEncoder.getDistance() == 0 // no position reading
             && elbowEncoder.getRate() == 0 // no velocity reading
-            && elbowSetpoint.position() != Elbow.ELBOW_OFFSET // elbow is not going to 0
+            && elbowSetpoint.position() != Elbow.OFFSET // elbow is not going to 0
             && elbow.getAppliedOutput() != 0; // elbow is trying to move
   }
 
