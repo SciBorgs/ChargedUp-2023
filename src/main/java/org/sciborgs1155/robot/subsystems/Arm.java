@@ -24,13 +24,13 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.lib.Derivative;
+import org.sciborgs1155.lib.TestableSubsystem;
 import org.sciborgs1155.lib.Trajectory;
 import org.sciborgs1155.lib.Trajectory.State;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.util.Visualizer;
-import org.sciborgs1155.lib.TestableSubsystem;
 
 public class Arm extends TestableSubsystem implements Loggable {
 

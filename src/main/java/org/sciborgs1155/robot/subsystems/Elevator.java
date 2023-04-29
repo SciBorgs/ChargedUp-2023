@@ -33,10 +33,9 @@ public class Elevator extends TestableSubsystem implements Loggable {
 
   @Log(name = "applied output", methodName = "getAppliedOutput")
   private CANSparkMax lead = MOTOR.build(MotorType.kBrushless, RIGHT_MOTOR);
-  
+
   private CANSparkMax left = MOTOR.build(MotorType.kBrushless, LEFT_MOTOR);
   private CANSparkMax right = MOTOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
-
 
   @Log private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1], true);
   private final EncoderSim simEncoder = new EncoderSim(encoder);

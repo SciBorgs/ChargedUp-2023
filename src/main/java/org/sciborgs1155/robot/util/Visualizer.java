@@ -36,10 +36,10 @@ public class Visualizer implements Sendable {
             new MechanismLigament2d("Wrist Position", Dimensions.CLAW_LENGTH, 0, WEIGHT, color));
   }
 
-  /** 
-   * returns a new visualizer with a defualt color (black)
-   * use if color doesn't matter (i.e. unit tests) 
-   * */
+  /**
+   * returns a new visualizer with a defualt color (black) use if color doesn't matter (i.e. unit
+   * tests)
+   */
   public static Visualizer basicVisualizer() {
     return new Visualizer(new Color8Bit(Color.kBlack));
   }

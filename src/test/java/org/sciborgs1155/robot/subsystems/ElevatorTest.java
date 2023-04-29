@@ -21,8 +21,7 @@ public class ElevatorTest {
   @BeforeEach
   void setup() {
     assert HAL.initialize(500, 0);
-    elevator =
-        new Elevator(Visualizer.basicVisualizer(), Visualizer.basicVisualizer());
+    elevator = new Elevator(Visualizer.basicVisualizer(), Visualizer.basicVisualizer());
     CommandScheduler.getInstance().run();
     // check that it starts at 0
     assertEquals(0, elevator.getPosition(), delta);
