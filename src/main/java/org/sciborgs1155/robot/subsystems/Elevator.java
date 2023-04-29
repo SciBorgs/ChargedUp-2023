@@ -38,7 +38,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   private final CANSparkMax right = MOTOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
 
   @Log private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1], true);
-  private final EncoderSim simEncoder = new EncoderSim(encoder);
+  private final EncoderSim encoderSim = new EncoderSim(encoder);
 
   // private final AbsoluteEncoder offsetEncoder = right.getAbsoluteEncoder(Type.kDutyCycle);
 
@@ -189,6 +189,8 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   public void simulationPeriodic() {
     sim.setInputVoltage(lead.getAppliedOutput());
     sim.update(Constants.RATE);
+    encoderSim.setDistance(sim.getPositionMeters());
+    encoderSim.setRate(sim.getVelocityMetersPerSecond());
   }
 
   @Override
