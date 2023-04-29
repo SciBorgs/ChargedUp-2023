@@ -1,16 +1,21 @@
 // package org.sciborgs1155.robot.subsystems;
 
 // import static org.junit.jupiter.api.Assertions.*;
+// import static org.sciborgs1155.robot.TestingUtil.*;
 
 // import edu.wpi.first.hal.HAL;
 // import edu.wpi.first.math.geometry.Rotation2d;
+// import edu.wpi.first.wpilibj.util.Color;
+// import edu.wpi.first.wpilibj.util.Color8Bit;
+
 // import java.util.stream.Stream;
 // import org.junit.jupiter.api.*;
 // import org.junit.jupiter.params.ParameterizedTest;
 // import org.junit.jupiter.params.provider.Arguments;
 // import org.junit.jupiter.params.provider.MethodSource;
 // import org.junit.jupiter.params.provider.ValueSource;
-// import org.sciborgs1155.lib.Visualizer;
+// import org.sciborgs1155.robot.Constants;
+// import org.sciborgs1155.robot.util.Visualizer;
 
 // public class ArmTest {
 //   Arm arm;
@@ -18,19 +23,19 @@
 //   @BeforeEach
 //   void setup() {
 //     assert HAL.initialize(500, 0);
-//     arm = new Arm(new Visualizer());
+//     arm = new Arm(Visualizer.basicVisualizer(), Visualizer.basicVisualizer());
 //   }
 
 //   @AfterEach
 //   void reset() {
-//     arm.close();
+//     closeSubsystem(arm);
 //   }
 
 //   @Test
-//   void setElbowGoalTest() {
-//     Rotation2d newElbowGoal = new Rotation2d(2);
-//     arm.setElbowGoal(newElbowGoal).ignoringDisable(true).schedule();
-//     assertEquals(newElbowGoal, arm.getElbowGoal());
+//   void elbowGoTo() {
+//     // set elbow setpoint
+//     assertEquals(arm.getElbowPosition(), Constants.Arm.Elbow.ELBOW_OFFSET);
+//     run(arm.setSetpoints(arm.getElbowPosition(), arm.getRelativeWristPosition()));
 //   }
 
 //   @Test

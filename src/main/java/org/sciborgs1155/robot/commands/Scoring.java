@@ -12,14 +12,12 @@ import org.sciborgs1155.robot.util.placement.PlacementState.Side;
 
 public final class Scoring implements Sendable {
 
-  private final Placement placement;
   private final LED led;
 
   private Side side = Side.BACK;
   private GamePiece gamePiece = GamePiece.CONE;
 
   public Scoring(Placement placement, LED led) {
-    this.placement = placement;
     this.led = led;
   }
 

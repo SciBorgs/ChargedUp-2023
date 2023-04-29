@@ -8,7 +8,7 @@ import org.sciborgs1155.lib.constants.Conversion;
 import org.sciborgs1155.lib.constants.Conversion.PulsesPerRev;
 import org.sciborgs1155.lib.constants.Conversion.Units;
 
-public class ConfigTests {
+public class ConfigTest {
 
   // REV MAX SWERVE DEFAULT CONSTANTS
   public static final class ModuleConstants {

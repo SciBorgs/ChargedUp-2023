@@ -16,26 +16,27 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.lib.Derivative;
+import org.sciborgs1155.lib.TestableSubsystem;
 import org.sciborgs1155.lib.Trajectory;
 import org.sciborgs1155.lib.Trajectory.State;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.util.Visualizer;
 
-public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
+public class Elevator extends TestableSubsystem implements Loggable {
 
   @Log(name = "applied output", methodName = "getAppliedOutput")
-  private final CANSparkMax lead = MOTOR.build(MotorType.kBrushless, RIGHT_MOTOR);
+  private CANSparkMax lead = MOTOR.build(MotorType.kBrushless, RIGHT_MOTOR);
+  
+  private CANSparkMax left = MOTOR.build(MotorType.kBrushless, LEFT_MOTOR);
+  private CANSparkMax right = MOTOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
 
-  private final CANSparkMax left = MOTOR.build(MotorType.kBrushless, LEFT_MOTOR);
-  private final CANSparkMax right = MOTOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
 
   @Log private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1], true);
   private final EncoderSim simEncoder = new EncoderSim(encoder);
@@ -77,6 +78,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   private final Visualizer setpointVisualizer;
 
   public Elevator(Visualizer positionVisualizer, Visualizer setpointVisualizer) {
+
     left.follow(lead);
     right.follow(lead);
     encoder.setDistancePerPulse(RELATIVE_CONVERSION.factor());
@@ -157,8 +159,13 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     return runOnce(() -> this.stopped = stopped);
   }
 
+  public boolean stopped() {
+    return stopped;
+  }
+
   @Override
   public void periodic() {
+
     // if (bottomSwitch.get()) {
     //   offset = -encoder.getPosition();
     // }
@@ -196,5 +203,6 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     lead.close();
     left.close();
     right.close();
+    bottomSwitch.close();
   }
 }

@@ -8,7 +8,7 @@ import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.Robot;
 
 /** Interface to represent a swerve module */
-public interface SwerveModule extends Sendable {
+public interface SwerveModule extends Sendable, AutoCloseable {
 
   /**
    * Creates a swerve module.
@@ -80,4 +80,7 @@ public interface SwerveModule extends Sendable {
         "target velocity", () -> getDesiredState().speedMetersPerSecond, null);
     builder.addDoubleProperty("target angle", () -> getDesiredState().angle.getRadians(), null);
   }
+
+  @Override
+  public void close();
 }

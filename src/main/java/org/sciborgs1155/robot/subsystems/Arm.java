@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Loggable;
@@ -31,8 +30,9 @@ import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.util.Visualizer;
+import org.sciborgs1155.lib.TestableSubsystem;
 
-public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
+public class Arm extends TestableSubsystem implements Loggable {
 
   @Log(name = "elbow applied output", methodName = "getAppliedOutput")
   private final CANSparkMax elbow = Elbow.MOTOR.build(MotorType.kBrushless, MIDDLE_ELBOW_MOTOR);

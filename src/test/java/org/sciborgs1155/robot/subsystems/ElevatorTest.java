@@ -1,50 +1,61 @@
-// package org.sciborgs1155.robot.subsystems;
+package org.sciborgs1155.robot.subsystems;
 
-// import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.sciborgs1155.robot.TestingUtil.*;
 
-// import edu.wpi.first.hal.HAL;
-// import org.junit.jupiter.api.*;
-// import org.junit.jupiter.params.ParameterizedTest;
-// import org.junit.jupiter.params.provider.ValueSource;
-// import org.sciborgs1155.lib.Visualizer;
-// import org.sciborgs1155.robot.Constants.Dimensions;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.util.Visualizer;
 
-// public class ElevatorTest {
+public class ElevatorTest {
 
-//   Elevator elevator;
+  Elevator elevator;
 
-//   @BeforeEach
-//   void setup() {
-//     assert HAL.initialize(500, 0);
-//     elevator = new Elevator(new Visualizer());
-//   }
+  static final double delta = 5e-2;
 
-//   @AfterEach
-//   void destroy() {
-//     elevator.close();
-//   }
+  @BeforeEach
+  void setup() {
+    assert HAL.initialize(500, 0);
+    elevator =
+        new Elevator(Visualizer.basicVisualizer(), Visualizer.basicVisualizer());
+    CommandScheduler.getInstance().run();
+    // check that it starts at 0
+    assertEquals(0, elevator.getPosition(), delta);
+    // set setpoint to 0
+    run(elevator.setSetpoint(elevator.getPosition()));
+    assertEquals(elevator.getPosition(), elevator.getSetpoint().position(), delta);
+  }
 
-//   @Test
-//   void setGoal() {
-//     elevator.setGoal(1).ignoringDisable(true).schedule();
-//     assertEquals(1, elevator.getGoal());
+  @AfterEach
+  void destroy() {
+    closeSubsystem(elevator);
+  }
 
-//     elevator.setGoal(Dimensions.ELEVATOR_MAX_HEIGHT + 5).ignoringDisable(true).schedule();
-//     assertEquals(Dimensions.ELEVATOR_MAX_HEIGHT, elevator.getGoal());
+  @ParameterizedTest
+  @ValueSource(doubles = {-0.2, 0.3, 0.5, 0.8})
+  void goTo(double setpoint) {
+    // set setpoint and test that it was set and clamped correctly
+    run(elevator.setSetpoint(setpoint));
+    double clamped =
+        MathUtil.clamp(setpoint, Constants.Elevator.MIN_HEIGHT, Constants.Elevator.MAX_HEIGHT);
+    assertEquals(clamped, elevator.getSetpoint().position(), "failed to set elevator setpoint");
+    fastForward();
+    // check that it has reached it's goal
+    assertEquals(clamped, elevator.getPosition(), 1e-2, "failed to reach elevator setpoint");
+  }
 
-//     elevator.setGoal(-3).ignoringDisable(true).schedule();
-//     assertEquals(Dimensions.ELEVATOR_MIN_HEIGHT, elevator.getGoal());
-//   }
-
-//   @Disabled
-//   @ParameterizedTest
-//   @ValueSource(doubles = {2, 3, 6, 9, 39, 40})
-//   void moveToGoal(double height) {
-//     elevator.setGoal(height).ignoringDisable(true).schedule();
-//     for (int i = 0; i < 1000; i++) {
-//       elevator.periodic();
-//       elevator.simulationPeriodic();
-//     }
-//     assertEquals(height, elevator.getHeight(), 1e-1);
-//   }
-// }
+  @Test
+  void safety() {
+    // tests if it stops moving when stopped
+    run(elevator.setStopped(true));
+    double position = elevator.getPosition();
+    run(elevator.setSetpoint(0.3));
+    fastForward();
+    assertEquals(position, elevator.getPosition(), delta);
+  }
+}
