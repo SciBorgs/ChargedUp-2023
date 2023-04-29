@@ -40,8 +40,6 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   @Log private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1], true);
   private final EncoderSim simEncoder = new EncoderSim(encoder);
 
-  // private final RelativeEncoder encoder = lead.getAlternateEncoder(Constants.THROUGHBORE_CPR);
-
   // private final AbsoluteEncoder offsetEncoder = right.getAbsoluteEncoder(Type.kDutyCycle);
 
   private final ElevatorFeedforward ff = new ElevatorFeedforward(FF.s(), FF.g(), FF.v(), FF.a());
@@ -82,11 +80,6 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     left.follow(lead);
     right.follow(lead);
     encoder.setDistancePerPulse(RELATIVE_CONVERSION.factor());
-
-    // Commented code below for the encoders on sparks
-    // encoder.setInverted(true);
-    // encoder.setPositionConversionFactor(RELATIVE_CONVERSION.factor());
-    // encoder.setVelocityConversionFactor(RELATIVE_CONVERSION.factor() / 60.0);
     // offsetEncoder.setPositionConversionFactor(ABSOLUTE_CONVERSION.factor());
 
     // for (int i = 0; i < 100; i++) System.out.println(offsetEncoder.getPosition());
@@ -104,8 +97,6 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
     this.positionVisualizer = positionVisualizer;
     this.setpointVisualizer = setpointVisualizer;
-
-    // encoder.setPosition(offset);
 
     setpoint = new State(getPosition(), 0, 0);
   }
@@ -198,7 +189,6 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   public void simulationPeriodic() {
     sim.setInputVoltage(lead.getAppliedOutput());
     sim.update(Constants.RATE);
-    // encoder.setPosition(sim.getPositionMeters() - offset);
   }
 
   @Override

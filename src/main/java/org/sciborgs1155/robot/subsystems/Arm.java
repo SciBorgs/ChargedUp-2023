@@ -43,8 +43,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log(name = "wrist applied output", methodName = "getAppliedOutput")
   private final CANSparkMax wrist = Wrist.MOTOR.build(MotorType.kBrushless, WRIST_MOTOR);
 
-  // private final RelativeEncoder elbowEncoder =
-  // elbow.getAlternateEncoder(Constants.THROUGHBORE_CPR);
   private final Encoder elbowEncoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
 
   @Log(name = "wrist velocity", methodName = "getVelocity")
@@ -106,8 +104,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowLeft.follow(elbow);
     elbowRight.follow(elbow);
 
-    // elbowEncoder.setPositionConversionFactor(Elbow.CONVERSION.factor());
-    // elbowEncoder.setVelocityConversionFactor(Elbow.CONVERSION.factor() / 60.0);
     elbowEncoder.setDistancePerPulse(Elbow.CONVERSION.factor());
     wristEncoder.setPositionConversionFactor(Wrist.CONVERSION.factor());
     wristEncoder.setVelocityConversionFactor(Wrist.CONVERSION.factor() / 60.0);
@@ -130,7 +126,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     this.positionVisualizer = positionVisualizer;
     this.setpointVisualizer = setpointVisualizer;
 
-    // elbowEncoder.setPosition(Elbow.ELBOW_OFFSET);
     wristFeedback.setTolerance(0.3);
     elbowFeedback.setTolerance(0.3);
   }
@@ -294,7 +289,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   public void simulationPeriodic() {
     elbowSim.setInputVoltage(elbow.getAppliedOutput());
     elbowSim.update(Constants.RATE);
-    // elbowEncoder.setPosition(elbowSim.getAngleRads());
 
     wristSim.setInputVoltage(wrist.getAppliedOutput());
     wristSim.update(Constants.RATE);
