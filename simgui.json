@@ -109,6 +109,12 @@
             "open": true
           }
         },
+        "Robot": {
+          "open": true,
+          "scoring": {
+            "open": true
+          }
+        },
         "RobotContainer": {
           "arm": {
             "open": true

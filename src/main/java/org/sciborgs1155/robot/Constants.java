@@ -130,7 +130,7 @@ public final class Constants {
               .multiplyGearing(12)
               .divideGearing(72)
               .withUnits(Conversion.Units.RADIANS)
-              .withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
+              .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
 
       public static final PIDConstants PID = new PIDConstants(12, 0, 1.1); // d = 2.18954
       public static final SystemConstants FF =
@@ -158,7 +158,7 @@ public final class Constants {
         Conversion.base()
             .multiplyRadius(0.0181864)
             .withUnits(Conversion.Units.RADIANS)
-            .withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
+            .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
     // units field for sysid is 0.1143
     public static final Conversion ABSOLUTE_CONVERSION =
         RELATIVE_CONVERSION.withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
@@ -205,9 +205,9 @@ public final class Constants {
       }
     }
 
-    public static final double MAX_SPEED = 3.25; // m / s
+    public static final double MAX_SPEED = 4; // m / s
     public static final double MAX_ANGULAR_SPEED = 1.5 * Math.PI; // rad / s
-    public static final double MAX_ACCEL = 7.8; // m / s^2
+    public static final double MAX_ACCEL = 7; // m / s^2
 
     public static final double TRACK_WIDTH = 0.5715;
     // Distance between centers of right and left wheels on robot
@@ -232,9 +232,6 @@ public final class Constants {
 
     public static final PIDConstants TRANSLATION = new PIDConstants(0.6, 0, 0);
     public static final PIDConstants ROTATION = new PIDConstants(0.4, 0, 0);
-
-    public static final double MIN_PITCH = 12.5; // 12.5; // deg
-    public static final double BALANCE_SPEED = 0.35; // m / s
 
     public static final PathConstraints CONSTRAINTS =
         new PathConstraints(MAX_SPEED / 1.9, MAX_ACCEL / 1.4);
@@ -283,8 +280,8 @@ public final class Constants {
         PlacementState.fromRelative(0, 1.21834, Math.PI / 2.0);
 
     // LOWEST COG
-    public static final PlacementState BALANCE =
-        PlacementState.fromRelative(Elevator.ZERO_OFFSET, Elbow.ELBOW_OFFSET + 0.1, 3);
+    public static final PlacementState SAFE =
+        PlacementState.fromAbsolute(Elevator.ZERO_OFFSET, Elbow.ELBOW_OFFSET + 0.1, Math.PI / 2);
 
     public static final PlacementState PASS_OLD =
         PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0);
@@ -326,6 +323,10 @@ public final class Constants {
     public static final double CONE_OUTTAKE_TIME = 3; // seconds
     public static final double INITIAL_INTAKE_TIME = 0.3; // seconds
     public static final double MOVING_INTAKE_TIME = 4; // seconds
+
+    public static final PIDConstants BALANCE = new PIDConstants(0.05, 0, 0);
+
+    public static final double PITCH_TOLERANCE = 12.5; // 12.5; // deg
   }
 
   public static final class Field {

@@ -8,8 +8,10 @@ import static org.sciborgs1155.robot.Constants.Positions.*;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -76,7 +78,7 @@ public final class Autos implements Sendable {
             Map.entry("outtakeCube", outtake(GamePiece.CUBE)),
             Map.entry("frontIntake", frontMovingIntake()),
             Map.entry("stow", placement.goTo(STOW)),
-            Map.entry("balanceState", placement.goTo(BALANCE)),
+            Map.entry("balanceState", placement.goTo(SAFE)),
             Map.entry("initialIntake", initialIntake()));
 
     autoChooser = new SendableChooser<Supplier<Command>>();
@@ -186,29 +188,6 @@ public final class Autos implements Sendable {
 
     // backups
 
-    /* cone leave (no odometry) setup instructions:
-     * gamepiece: cone
-     * orientation: away from grid
-     * set starting pos: no
-     * starting location: cone scoring, all the way to one side
-     */
-    autoChooser.addOption("cone, leave (no odometry)", this::coneLeaveNoOdometry);
-
-    /* cube leave (no odometry) setup instructions:
-     * gamepiece: cube
-     * orientation: away from grid
-     * set starting pos: no
-     * starting location: cube scoring, all the way to one side
-     */
-    autoChooser.addOption("cube, leave (no odometry)", this::cubeLeaveNoOdometry);
-
-    /* leave (no odometry) setup instructions:
-     * gamepiece: none
-     * orientation: away from grid
-     * starting location: against grid, to one side (it should have a clear path straight forward)
-     */
-    autoChooser.addOption("leave (no arm, no odometry)", this::leaveNoOdometry);
-
     /* leave setup instructions:
      * gamepiece: none
      * orientation: away from grid
@@ -237,6 +216,18 @@ public final class Autos implements Sendable {
     configureMainAutos();
     configureExtraAutos();
     configureTestAutos();
+  }
+
+  public Command balance() {
+    var controller = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
+    controller.setTolerance(PITCH_TOLERANCE);
+    controller.setSetpoint(0);
+
+    return Commands.run(
+            () -> drive.drive(new ChassisSpeeds(controller.calculate(drive.getPitch()), 0, 0)),
+            drive)
+        .until(controller::atSetpoint)
+        .andThen(drive.lock());
   }
 
   private Command outtake(GamePiece gamePiece) {
@@ -283,13 +274,10 @@ public final class Autos implements Sendable {
   }
 
   private Command fullBalance() {
-    // return drive
-    // .follow("balance", true, true).withTimeout(4)
-    return Commands.run(() -> drive.drive(0.6, 0, 0, false), drive)
-        .until(() -> Math.abs(drive.getPitch()) >= 13.5)
+    return drive
+        .follow("balance", true, true)
         .withTimeout(4)
-        .andThen(drive.balance())
-        .andThen(Commands.run(() -> drive.drive(-0.3, 0, 0, false), drive).withTimeout(0.1))
+        .andThen(balance())
         .andThen(drive.lock())
         .withName("balance auto");
   }
@@ -321,14 +309,14 @@ public final class Autos implements Sendable {
   private Command cubeBalance() {
     return Commands.sequence(
         backHighCubeScore(StartingPos.CENTER),
-        placement.goTo(BALANCE).withTimeout(3.5),
+        placement.goTo(SAFE).withTimeout(3.5),
         fullBalance());
   }
 
   /** no PPL */
   private Command coneBalance() {
     return Commands.sequence(
-        highConeScore(StartingPos.CENTER), placement.goTo(BALANCE).withTimeout(3.5), fullBalance());
+        highConeScore(StartingPos.CENTER), placement.goTo(SAFE).withTimeout(3.5), fullBalance());
   }
 
   private Command coneLeave(StartingPos startingPos) {
@@ -368,22 +356,6 @@ public final class Autos implements Sendable {
           case FLAT -> Paths.LEAVE_FLAT;
           case CENTER -> Paths.LEAVE_FLAT;
         });
-  }
-
-  /** backup: no odometry */
-  private Command leaveNoOdometry() {
-    return drive.drive(() -> 0.75, () -> 0, () -> 0, false).withTimeout(2.4);
-  }
-
-  /** backup: no odometry, no arm */
-  private Command coneLeaveNoOdometry() {
-    return Commands.sequence(highConeScore(), leaveNoOdometry().alongWith(placement.goTo(STOW)));
-  }
-
-  /** backup: no odometry, no arm */
-  private Command cubeLeaveNoOdometry() {
-    return Commands.sequence(
-        backHighCubeScore(), leaveNoOdometry().alongWith(placement.goTo(STOW)));
   }
 
   /** resets odometry where feild is static (doesn't depend on alliance) */
