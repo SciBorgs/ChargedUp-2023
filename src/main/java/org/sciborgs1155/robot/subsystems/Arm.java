@@ -45,7 +45,7 @@ public class Arm extends TestableSubsystem implements Loggable {
   private final CANSparkMax wrist = Wrist.MOTOR.build(MotorType.kBrushless, WRIST_MOTOR);
 
   private final Encoder elbowEncoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
-  private final EncoderSim elbowSimEncoder = new EncoderSim(elbowEncoder);
+  private final EncoderSim elbowEncoderSim = new EncoderSim(elbowEncoder);
 
   @Log(name = "wrist velocity", methodName = "getVelocity")
   private final AbsoluteEncoder wristEncoder = wrist.getAbsoluteEncoder(Type.kDutyCycle);
@@ -136,9 +136,9 @@ public class Arm extends TestableSubsystem implements Loggable {
   @Log(name = "elbow position", methodName = "getRadians")
   public Rotation2d getElbowPosition() {
     return Rotation2d.fromRadians(
-        Robot.isReal()
-            ? elbowEncoder.getDistance() + Elbow.ELBOW_OFFSET
-            : elbowSimEncoder.getDistance());
+        (Robot.isReal()
+            ? elbowEncoder.getDistance()
+            : elbowEncoderSim.getDistance()) + Elbow.OFFSET);
   }
 
   /** Wrist position relative to the forearm */
@@ -192,6 +192,20 @@ public class Arm extends TestableSubsystem implements Loggable {
     return wristSetpoint;
   }
 
+  private TrapezoidProfile createElbowProfile(Rotation2d goal) {
+    return new TrapezoidProfile(
+        Elbow.CONSTRAINTS,
+        new TrapezoidProfile.State(goal.getRadians(), 0),
+        elbowSetpoint.trapezoidState());
+  }
+
+  private TrapezoidProfile createWristProfile(Rotation2d goal) {
+    return new TrapezoidProfile(
+        Wrist.CONSTRAINTS,
+        new TrapezoidProfile.State(goal.getRadians(), 0),
+        wristSetpoint.trapezoidState());
+  }
+
   /** Follows a {@link TrapezoidProfile} for each joint's relative position */
   public Command followProfile(Rotation2d elbowGoal, Rotation2d wristGoal) {
     var elbowAccel = new Derivative();
@@ -206,10 +220,7 @@ public class Arm extends TestableSubsystem implements Loggable {
             new DeferredCommand(
                 () ->
                     new TrapezoidProfileCommand(
-                            new TrapezoidProfile(
-                                Elbow.CONSTRAINTS,
-                                new TrapezoidProfile.State(elbowGoal.getRadians(), 0),
-                                elbowSetpoint.trapezoidState()),
+                            createElbowProfile(elbowGoal),
                             state ->
                                 elbowSetpoint =
                                     new State(
@@ -218,10 +229,7 @@ public class Arm extends TestableSubsystem implements Loggable {
                                         elbowAccel.calculate(state.velocity)))
                         .alongWith(
                             new TrapezoidProfileCommand(
-                                new TrapezoidProfile(
-                                    Wrist.CONSTRAINTS,
-                                    new TrapezoidProfile.State(wristGoal.getRadians(), 0),
-                                    wristSetpoint.trapezoidState()),
+                                createWristProfile(wristGoal),
                                 state ->
                                     wristSetpoint =
                                         new State(
@@ -287,18 +295,19 @@ public class Arm extends TestableSubsystem implements Loggable {
     butAScratch =
         elbowEncoder.getDistance() == 0 // no position reading
             && elbowEncoder.getRate() == 0 // no velocity reading
-            && elbowSetpoint.position() != Elbow.ELBOW_OFFSET // elbow is not going to 0
+            && elbowSetpoint.position() != Elbow.OFFSET // elbow is not going to 0
             && elbow.getAppliedOutput() != 0; // elbow is trying to move
   }
 
   @Override
   public void simulationPeriodic() {
     elbowSim.setInputVoltage(elbow.getAppliedOutput());
-    elbowSim.update(Constants.RATE);
-    elbowSimEncoder.setDistance(elbowSim.getAngleRads());
+    elbowSim.update(Constants.PERIOD);
+    elbowEncoderSim.setDistance(elbowSim.getAngleRads() - Elbow.OFFSET);
+    elbowEncoderSim.setRate(elbowSim.getVelocityRadPerSec());
 
     wristSim.setInputVoltage(wrist.getAppliedOutput());
-    wristSim.update(Constants.RATE);
+    wristSim.update(Constants.PERIOD);
   }
 
   @Override

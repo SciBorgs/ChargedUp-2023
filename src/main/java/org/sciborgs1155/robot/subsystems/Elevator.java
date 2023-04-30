@@ -11,7 +11,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
@@ -39,13 +38,9 @@ public class Elevator extends TestableSubsystem implements Loggable {
   private CANSparkMax right = MOTOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
 
   @Log private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1], true);
-  private final EncoderSim simEncoder = new EncoderSim(encoder);
-
-  // private final AbsoluteEncoder offsetEncoder = right.getAbsoluteEncoder(Type.kDutyCycle);
+  private final EncoderSim encoderSim = new EncoderSim(encoder);
 
   private final ElevatorFeedforward ff = new ElevatorFeedforward(FF.s(), FF.g(), FF.v(), FF.a());
-
-  private DigitalInput bottomSwitch = new DigitalInput(LIMIT_SWITCH);
 
   @Log
   @Log(name = "at setpoint", methodName = "atSetpoint")
@@ -82,16 +77,6 @@ public class Elevator extends TestableSubsystem implements Loggable {
     left.follow(lead);
     right.follow(lead);
     encoder.setDistancePerPulse(RELATIVE_CONVERSION.factor());
-    // offsetEncoder.setPositionConversionFactor(ABSOLUTE_CONVERSION.factor());
-
-    // for (int i = 0; i < 100; i++) System.out.println(offsetEncoder.getPosition());
-    // if (Robot.isReal()) {
-    //   offset = offsetEncoder.getPosition() + ZERO_OFFSET;
-    // }
-
-    // SmartDashboard.putNumber("start", offsetEncoder.getPosition());
-    // STARTING POSITION ****MUST**** BE ABOVE THE ZERO LOCATION
-    // VALUES NEAR THE RED TAPE MARKING ARE GOOD
 
     lead.burnFlash();
     left.burnFlash();
@@ -106,7 +91,7 @@ public class Elevator extends TestableSubsystem implements Loggable {
   /** Returns the height of the elevator, in meters */
   @Log(name = "position")
   public double getPosition() {
-    return Robot.isReal() ? encoder.getDistance() + offset : simEncoder.getDistance();
+    return (Robot.isReal() ? encoder.getDistance() : encoderSim.getDistance()) + offset;
   }
 
   /** Sets the elevator's setpoint height */
@@ -165,10 +150,6 @@ public class Elevator extends TestableSubsystem implements Loggable {
 
   @Override
   public void periodic() {
-
-    // if (bottomSwitch.get()) {
-    //   offset = -encoder.getPosition();
-    // }
     encoderUnplugged =
         encoder.getDistance() == 0
             && encoder.getRate() == 0
@@ -195,8 +176,9 @@ public class Elevator extends TestableSubsystem implements Loggable {
   @Override
   public void simulationPeriodic() {
     sim.setInputVoltage(lead.getAppliedOutput());
-    sim.update(Constants.RATE);
-    simEncoder.setDistance(sim.getPositionMeters());
+    sim.update(Constants.PERIOD);
+    encoderSim.setDistance(sim.getPositionMeters() - Constants.Elevator.ZERO_OFFSET);
+    encoderSim.setRate(sim.getVelocityMetersPerSecond());
   }
 
   @Override
@@ -204,7 +186,6 @@ public class Elevator extends TestableSubsystem implements Loggable {
     lead.close();
     left.close();
     right.close();
-    bottomSwitch.close();
     encoder.close();
   }
 }

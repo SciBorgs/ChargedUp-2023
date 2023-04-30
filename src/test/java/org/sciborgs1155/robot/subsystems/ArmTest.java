@@ -34,7 +34,7 @@ public class ArmTest {
   void reset() {
     closeSubsystem(arm);
   }
-
+  
   @ParameterizedTest
   @ValueSource(doubles = {Elbow.MIN_ANGLE, -1, 0, 1, 1.8, 3, Elbow.MAX_ANGLE})
   void elbowGoTo(double setpoint) {

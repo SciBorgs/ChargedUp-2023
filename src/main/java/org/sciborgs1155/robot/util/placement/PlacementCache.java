@@ -2,7 +2,9 @@ package org.sciborgs1155.robot.util.placement;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -28,7 +30,8 @@ public class PlacementCache {
           mapper.readValue(
               new File(Filesystem.getDeployDirectory(), cacheFilename), StoredTrajectory.class);
     } catch (IOException e) {
-      throw new RuntimeException("Failed to parse");
+      DriverStation.reportError("COULD NOT LOAD TRAJECTORY CACHE, THE FILE CANNOT BE READ", false);
+      return Map.of();
     }
 
     Map<Integer, PlacementTrajectory> trajectories = new HashMap<Integer, PlacementTrajectory>();
@@ -102,6 +105,47 @@ public class PlacementCache {
 
     File cacheFile = Path.of(System.getProperty("java.io.tmpdir"), cacheRequestFilename).toFile();
     mapper.writeValue(cacheFile, new StoredTrajectory(id, generatedTrajectories));
+
+    // run casadi solver on tmp file
+    Process python = runPython();
+    printOutput(python);
+    System.exit(python.exitValue());
+  }
+
+  private static Process runPython() throws IOException, InterruptedException {
+    ProcessBuilder pythonBuilder;
+    String pythonPath;
+    if (System.getProperty("os.name").startsWith("Windows")) {
+      pythonPath = "./venv/Scripts/python";
+    } else {
+      pythonPath = "./venv/bin/python";
+    }
+
+    pythonBuilder = new ProcessBuilder(pythonPath, "chronos" + File.separator + "run_gen_cache.py");
+    System.out.println("Starting chronos process.");
+    Process python = pythonBuilder.start();
+    System.out.println("Generating cache... (this may take a while)");
+    python.waitFor();
+    return python;
+  }
+
+  private static void printOutput(Process process) throws IOException {
+    BufferedReader stdoutReader = process.inputReader();
+    BufferedReader stderrReader = process.errorReader();
+    while (true) {
+      String line = stdoutReader.readLine();
+      if (line == null) {
+        break;
+      }
+      System.out.println("Output: " + line);
+    }
+    while (true) {
+      String line = stderrReader.readLine();
+      if (line == null) {
+        break;
+      }
+      System.out.println("Error: " + line);
+    }
   }
 
   public static record CachedTrajectory(
