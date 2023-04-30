@@ -19,13 +19,14 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.lib.Derivative;
-import org.sciborgs1155.lib.TestableSubsystem;
+import org.sciborgs1155.lib.SciClosable;
 import org.sciborgs1155.lib.Trajectory;
 import org.sciborgs1155.lib.Trajectory.State;
 import org.sciborgs1155.robot.Constants;
@@ -33,7 +34,7 @@ import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.util.Visualizer;
 
-public class Arm extends TestableSubsystem implements Loggable {
+public class Arm extends SubsystemBase implements Loggable, SciClosable {
 
   @Log(name = "elbow applied output", methodName = "getAppliedOutput")
   private final CANSparkMax elbow = Elbow.MOTOR.build(MotorType.kBrushless, MIDDLE_ELBOW_MOTOR);
@@ -135,9 +136,7 @@ public class Arm extends TestableSubsystem implements Loggable {
   /** Elbow position relative to the chassis */
   @Log(name = "elbow position", methodName = "getRadians")
   public Rotation2d getElbowPosition() {
-    return Rotation2d.fromRadians(
-        (Robot.isReal() ? elbowEncoder.getDistance() : elbowEncoderSim.getDistance())
-            + Elbow.OFFSET);
+    return Rotation2d.fromRadians(elbowEncoder.getDistance() + Elbow.OFFSET);
   }
 
   /** Wrist position relative to the forearm */

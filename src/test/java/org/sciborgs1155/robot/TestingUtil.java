@@ -2,9 +2,11 @@ package org.sciborgs1155.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import org.sciborgs1155.lib.TestableSubsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.sciborgs1155.lib.SciClosable;
 
 public class TestingUtil {
+
   /**
    * runs CommandScheduler repeatedly to fast forward subsystems and run commands
    *
@@ -47,7 +49,8 @@ public class TestingUtil {
    *
    * @param subsystem
    */
-  public static void closeSubsystem(TestableSubsystem subsystem) {
+  public static <TestableSubsystem extends SubsystemBase & SciClosable> void closeSubsystem(
+      TestableSubsystem subsystem) {
     CommandScheduler.getInstance().unregisterSubsystem(subsystem);
     subsystem.close();
   }

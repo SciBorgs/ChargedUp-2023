@@ -25,16 +25,17 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import java.util.function.DoubleSupplier;
-import org.sciborgs1155.lib.TestableSubsystem;
+import org.sciborgs1155.lib.SciClosable;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 import org.sciborgs1155.robot.util.Vision;
 
-public class Drive extends TestableSubsystem implements Loggable {
+public class Drive extends SubsystemBase implements Loggable, SciClosable {
 
   @Log
   private final SwerveModule frontLeft =
