@@ -16,6 +16,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
@@ -44,6 +45,7 @@ public class Arm extends TestableSubsystem implements Loggable {
   private final CANSparkMax wrist = Wrist.MOTOR.build(MotorType.kBrushless, WRIST_MOTOR);
 
   private final Encoder elbowEncoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
+  private final EncoderSim elbowSimEncoder = new EncoderSim(elbowEncoder);
 
   @Log(name = "wrist velocity", methodName = "getVelocity")
   private final AbsoluteEncoder wristEncoder = wrist.getAbsoluteEncoder(Type.kDutyCycle);
@@ -133,7 +135,10 @@ public class Arm extends TestableSubsystem implements Loggable {
   /** Elbow position relative to the chassis */
   @Log(name = "elbow position", methodName = "getRadians")
   public Rotation2d getElbowPosition() {
-    return Rotation2d.fromRadians(elbowEncoder.getDistance() + Elbow.ELBOW_OFFSET);
+    return Rotation2d.fromRadians(
+        Robot.isReal()
+            ? elbowEncoder.getDistance() + Elbow.ELBOW_OFFSET
+            : elbowSimEncoder.getDistance());
   }
 
   /** Wrist position relative to the forearm */
@@ -277,7 +282,8 @@ public class Arm extends TestableSubsystem implements Loggable {
     wristLimp =
         wristEncoder.getPosition() == 0
             && wristEncoder.getVelocity() == 0
-            && wristSetpoint.position() != 0;
+            && wristSetpoint.position() != 0
+            && Robot.isReal();
     butAScratch =
         elbowEncoder.getDistance() == 0 // no position reading
             && elbowEncoder.getRate() == 0 // no velocity reading
@@ -289,6 +295,7 @@ public class Arm extends TestableSubsystem implements Loggable {
   public void simulationPeriodic() {
     elbowSim.setInputVoltage(elbow.getAppliedOutput());
     elbowSim.update(Constants.RATE);
+    elbowSimEncoder.setDistance(elbowSim.getAngleRads());
 
     wristSim.setInputVoltage(wrist.getAppliedOutput());
     wristSim.update(Constants.RATE);
@@ -300,5 +307,6 @@ public class Arm extends TestableSubsystem implements Loggable {
     elbowLeft.close();
     elbowRight.close();
     wrist.close();
+    elbowEncoder.close();
   }
 }

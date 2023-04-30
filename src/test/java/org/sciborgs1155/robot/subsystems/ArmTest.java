@@ -1,96 +1,99 @@
-// package org.sciborgs1155.robot.subsystems;
+package org.sciborgs1155.robot.subsystems;
 
-// import static org.junit.jupiter.api.Assertions.*;
-// import static org.sciborgs1155.robot.TestingUtil.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.sciborgs1155.robot.Constants.Arm.*;
+import static org.sciborgs1155.robot.TestingUtil.*;
 
-// import edu.wpi.first.hal.HAL;
-// import edu.wpi.first.math.geometry.Rotation2d;
-// import edu.wpi.first.wpilibj.util.Color;
-// import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.sciborgs1155.robot.util.Visualizer;
 
-// import java.util.stream.Stream;
-// import org.junit.jupiter.api.*;
-// import org.junit.jupiter.params.ParameterizedTest;
-// import org.junit.jupiter.params.provider.Arguments;
-// import org.junit.jupiter.params.provider.MethodSource;
-// import org.junit.jupiter.params.provider.ValueSource;
-// import org.sciborgs1155.robot.Constants;
-// import org.sciborgs1155.robot.util.Visualizer;
+public class ArmTest {
+  Arm arm;
 
-// public class ArmTest {
-//   Arm arm;
+  static final double ELBOW_DELTA = 3e-2;
+  static final double WRIST_DELTA = 2e-1;
 
-//   @BeforeEach
-//   void setup() {
-//     assert HAL.initialize(500, 0);
-//     arm = new Arm(Visualizer.basicVisualizer(), Visualizer.basicVisualizer());
-//   }
+  @BeforeEach
+  void setup() {
+    assert HAL.initialize(500, 0);
+    arm = new Arm(Visualizer.basicVisualizer(), Visualizer.basicVisualizer());
+    CommandScheduler.getInstance().run();
+    assertEquals(0, arm.getElbowPosition().getRadians(), ELBOW_DELTA);
+    assertEquals(0, arm.getRelativeWristPosition().getRadians(), WRIST_DELTA);
+  }
 
-//   @AfterEach
-//   void reset() {
-//     closeSubsystem(arm);
-//   }
+  @AfterEach
+  void reset() {
+    closeSubsystem(arm);
+  }
 
-//   @Test
-//   void elbowGoTo() {
-//     // set elbow setpoint
-//     assertEquals(arm.getElbowPosition(), Constants.Arm.Elbow.ELBOW_OFFSET);
-//     run(arm.setSetpoints(arm.getElbowPosition(), arm.getRelativeWristPosition()));
-//   }
+  @ParameterizedTest
+  @ValueSource(doubles = {Elbow.MIN_ANGLE, -1, 0, 1, 1.8, 3, Elbow.MAX_ANGLE})
+  void elbowGoTo(double setpoint) {
+    // set elbow setpoint
+    run(arm.setSetpoints(Rotation2d.fromRadians(setpoint), arm.getRelativeWristPosition()));
+    assertEquals(setpoint, arm.getElbowSetpoint().position());
 
-//   @Test
-//   void setWristGoalTest() {
-//     Rotation2d newWristGoal = new Rotation2d(1.3);
-//     arm.setWristGoal(newWristGoal).ignoringDisable(true).schedule();
-//     assertEquals(newWristGoal, arm.getRelativeWristGoal());
-//   }
+    // run to goal
+    fastForward();
+    assertEquals(setpoint, arm.getElbowPosition().getRadians(), ELBOW_DELTA);
+  }
 
-//   @Disabled
-//   @ParameterizedTest
-//   @ValueSource(doubles = {-0.7, -0.3, 0.0, 0.3, 0.7})
-//   void moveElbowToGoal(double radGoal) {
-//     Rotation2d goal = new Rotation2d(radGoal);
-//     arm.runToGoals(goal, new Rotation2d(0)).ignoringDisable(true).schedule();
-//     for (int i = 0; i < 400; i++) {
-//       arm.periodic();
-//       arm.simulationPeriodic();
-//     }
-//     assertEquals(radGoal, arm.getElbowPosition().getRadians(), 5e-2);
-//   }
+  @ParameterizedTest
+  @ValueSource(doubles = {Wrist.MIN_ANGLE, -2, -1, 0, 1, 2, Wrist.MAX_ANGLE})
+  void wristGoTo(double setpoint) {
+    // check that wrist is not limp
+    assertTrue(arm.allowPassOver(), "not allowing passover");
 
-//   @Disabled
-//   @ParameterizedTest
-//   @ValueSource(doubles = {-0.7, -0.3, 0.0, 0.3, 0.7})
-//   void moveWristToGoal(double radGoal) {
-//     Rotation2d goal = new Rotation2d(radGoal);
-//     arm.runWristToGoal(goal).ignoringDisable(true).schedule();
-//     for (int i = 0; i < 1000; i++) {
-//       arm.periodic();
-//       arm.simulationPeriodic();
-//     }
-//     assertEquals(radGoal, arm.getRelativeWristPosition().getRadians(), 5e-2);
-//   }
+    // set wrist setpoint
+    run(arm.setSetpoints(arm.getElbowPosition(), Rotation2d.fromRadians(setpoint)));
+    assertEquals(setpoint, arm.getWristSetpoint().position());
 
-//   @Disabled
-//   @ParameterizedTest
-//   @MethodSource
-//   void moveToGoal(double elbowRadGoal, double wristRadGoal) {
-//     Rotation2d elbowGoal = new Rotation2d(elbowRadGoal);
-//     Rotation2d wristGoal = new Rotation2d(wristRadGoal);
-//     arm.runToGoals(elbowGoal, wristGoal).ignoringDisable(true).schedule();
-//     for (int i = 0; i < 1000; i++) {
-//       arm.periodic();
-//       arm.simulationPeriodic();
-//     }
-//     assertEquals(elbowRadGoal, arm.getElbowPosition().getRadians(), 5e-2);
-//     assertEquals(wristRadGoal, arm.getRelativeWristPosition().getRadians(), 5e-2);
-//   }
+    // run to goal
+    fastForward();
+    assertEquals(setpoint, arm.getRelativeWristPosition().getRadians(), WRIST_DELTA);
+  }
 
-//   static Stream<Arguments> moveToGoal() {
-//     return Stream.of(
-//         Arguments.arguments(-1, -0.8),
-//         Arguments.arguments(-1, 0.7),
-//         Arguments.arguments(0, 0),
-//         Arguments.arguments(0.3, 1));
-//   }
-// }
+  @ParameterizedTest
+  @MethodSource("factory")
+  void goTo(double elbowSetpoint, double wristSetpoint) {
+    // check that wrist is not limp
+    assertTrue(arm.allowPassOver(), "wrist is");
+
+    // set setpoints
+    run(
+        arm.setSetpoints(
+            Rotation2d.fromRadians(elbowSetpoint), Rotation2d.fromRadians(wristSetpoint)));
+    assertEquals(elbowSetpoint, arm.getElbowSetpoint().position());
+    assertEquals(wristSetpoint, arm.getWristSetpoint().position());
+
+    // run to goal
+    fastForward();
+    assertEquals(elbowSetpoint, arm.getElbowPosition().getRadians(), ELBOW_DELTA);
+    assertEquals(wristSetpoint, arm.getRelativeWristPosition().getRadians(), WRIST_DELTA);
+  }
+
+  static Stream<Arguments> factory() {
+    return Stream.of(
+        Arguments.of(Elbow.MIN_ANGLE, Wrist.MIN_ANGLE),
+        Arguments.of(0, -2),
+        Arguments.of(2, 1),
+        Arguments.of(Elbow.MAX_ANGLE, Wrist.MAX_ANGLE));
+  }
+
+  void safety() {
+    arm.setStopped(true);
+    double elbowPos = arm.getElbowPosition().getRadians();
+    arm.setSetpoints(Rotation2d.fromRadians(0.4), Rotation2d.fromRadians(0.8));
+    fastForward();
+    assertEquals(elbowPos, arm.getElbowPosition().getRadians(), 1.5e-1);
+  }
+}
