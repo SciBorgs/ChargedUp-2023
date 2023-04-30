@@ -136,9 +136,8 @@ public class Arm extends TestableSubsystem implements Loggable {
   @Log(name = "elbow position", methodName = "getRadians")
   public Rotation2d getElbowPosition() {
     return Rotation2d.fromRadians(
-        (Robot.isReal()
-            ? elbowEncoder.getDistance()
-            : elbowEncoderSim.getDistance()) + Elbow.OFFSET);
+        (Robot.isReal() ? elbowEncoder.getDistance() : elbowEncoderSim.getDistance())
+            + Elbow.OFFSET);
   }
 
   /** Wrist position relative to the forearm */
