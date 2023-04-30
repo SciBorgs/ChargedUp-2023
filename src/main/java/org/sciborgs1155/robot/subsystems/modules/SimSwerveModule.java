@@ -62,9 +62,9 @@ public class SimSwerveModule implements SwerveModule {
         turnFeedback.calculate(turn.getAngularPositionRad(), setpoint.angle.getRadians());
 
     drive.setInputVoltage(driveFB + driveFF);
-    drive.update(Constants.RATE);
+    drive.update(Constants.PERIOD);
     turn.setInputVoltage(turnFB);
-    turn.update(Constants.RATE);
+    turn.update(Constants.PERIOD);
   }
 
   @Override

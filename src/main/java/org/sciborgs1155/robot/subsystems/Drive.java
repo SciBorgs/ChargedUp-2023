@@ -135,15 +135,17 @@ public class Drive extends SubsystemBase implements Loggable {
   public void drive(ChassisSpeeds speeds) {
     var target =
         new Pose2d(
-            speeds.vxMetersPerSecond * Constants.RATE,
-            speeds.vyMetersPerSecond * Constants.RATE,
-            Rotation2d.fromRadians(speeds.omegaRadiansPerSecond * Constants.RATE));
+            speeds.vxMetersPerSecond * Constants.PERIOD,
+            speeds.vyMetersPerSecond * Constants.PERIOD,
+            Rotation2d.fromRadians(speeds.omegaRadiansPerSecond * Constants.PERIOD));
 
     var twist = new Pose2d().log(target);
 
     speeds =
         new ChassisSpeeds(
-            twist.dx / Constants.RATE, twist.dy / Constants.RATE, twist.dtheta / Constants.RATE);
+            twist.dx / Constants.PERIOD,
+            twist.dy / Constants.PERIOD,
+            twist.dtheta / Constants.PERIOD);
 
     setModuleStates(kinematics.toSwerveModuleStates(speeds));
   }
@@ -228,7 +230,7 @@ public class Drive extends SubsystemBase implements Loggable {
         .addHeading(
             Units.radiansToDegrees(
                     kinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond)
-                * Constants.RATE);
+                * Constants.PERIOD);
 
     vision.updateSeenTags();
   }

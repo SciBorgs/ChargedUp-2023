@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
@@ -59,7 +58,7 @@ public class Robot extends CommandRobot implements Loggable {
 
   /** The robot contains subsystems, OI devices, and commands. */
   public Robot() {
-    super(Constants.RATE);
+    super(Constants.PERIOD);
 
     configureGameBehavior();
     configureBindings();
@@ -74,9 +73,9 @@ public class Robot extends CommandRobot implements Loggable {
 
     Logger.configureLoggingAndConfig(this, false);
 
-    robot()
-        .onTrue(Commands.runOnce(DataLogManager::start))
-        .whileTrue(Commands.runOnce(Logger::updateEntries));
+    DataLogManager.start();
+
+    addPeriodic(Logger::updateEntries, Constants.PERIOD);
 
     autonomous().onTrue(getAutonomousCommand());
 

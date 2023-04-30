@@ -173,10 +173,11 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   /** Sets the position setpoints for the elbow and wrist, in radians */
   public Command setSetpoints(Rotation2d elbowAngle, Rotation2d wristAngle) {
     return runOnce(
-        () -> {
-          elbowSetpoint = new State(elbowAngle.getRadians(), 0, 0);
-          wristSetpoint = new State(wristAngle.getRadians(), 0, 0);
-        });
+            () -> {
+              elbowSetpoint = new State(elbowAngle.getRadians(), 0, 0);
+              wristSetpoint = new State(wristAngle.getRadians(), 0, 0);
+            })
+        .re;
   }
 
   /** Returns the elbow setpoint as a {@link State} */
@@ -187,6 +188,20 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   /** Returns the wrist setpoint as a {@link State} */
   public State getWristSetpoint() {
     return wristSetpoint;
+  }
+
+  private TrapezoidProfile createElbowProfile(Rotation2d goal) {
+    return new TrapezoidProfile(
+        Elbow.CONSTRAINTS,
+        new TrapezoidProfile.State(goal.getRadians(), 0),
+        elbowSetpoint.trapezoidState());
+  }
+
+  private TrapezoidProfile createWristProfile(Rotation2d goal) {
+    return new TrapezoidProfile(
+        Wrist.CONSTRAINTS,
+        new TrapezoidProfile.State(goal.getRadians(), 0),
+        wristSetpoint.trapezoidState());
   }
 
   /** Follows a {@link TrapezoidProfile} for each joint's relative position */
@@ -203,10 +218,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             new DeferredCommand(
                 () ->
                     new TrapezoidProfileCommand(
-                            new TrapezoidProfile(
-                                Elbow.CONSTRAINTS,
-                                new TrapezoidProfile.State(elbowGoal.getRadians(), 0),
-                                elbowSetpoint.trapezoidState()),
+                            createElbowProfile(elbowGoal),
                             state ->
                                 elbowSetpoint =
                                     new State(
@@ -215,10 +227,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
                                         elbowAccel.calculate(state.velocity)))
                         .alongWith(
                             new TrapezoidProfileCommand(
-                                new TrapezoidProfile(
-                                    Wrist.CONSTRAINTS,
-                                    new TrapezoidProfile.State(wristGoal.getRadians(), 0),
-                                    wristSetpoint.trapezoidState()),
+                                createWristProfile(wristGoal),
                                 state ->
                                     wristSetpoint =
                                         new State(
@@ -235,7 +244,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
           "SUPPLIED ELBOW AND WRIST TRAJECTORIES DO NOT HAVE EQUAL TOTAL TIMES", false);
     }
 
-    return elbowTrajectory
+    return elbowTrajectory 
         .follow(state -> elbowSetpoint = state)
         .alongWith(wristTrajectory.follow(state -> wristSetpoint = state, this))
         .withName("following trajectory");
@@ -290,12 +299,12 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Override
   public void simulationPeriodic() {
     elbowSim.setInputVoltage(elbow.getAppliedOutput());
-    elbowSim.update(Constants.RATE);
+    elbowSim.update(Constants.PERIOD);
     elbowEncoderSim.setDistance(elbowSim.getAngleRads() - Elbow.OFFSET);
     elbowEncoderSim.setRate(elbowSim.getVelocityRadPerSec());
 
     wristSim.setInputVoltage(wrist.getAppliedOutput());
-    wristSim.update(Constants.RATE);
+    wristSim.update(Constants.PERIOD);
   }
 
   @Override

@@ -41,7 +41,7 @@ import org.sciborgs1155.robot.util.placement.PlacementState;
  */
 public final class Constants {
 
-  public static final double RATE = 0.02; // roborio tickrate (s)
+  public static final double PERIOD = 0.02; // roborio tickrate (s)
   public static final double DEADBAND = 0.1;
   public static final int THROUGHBORE_CPR = 8192;
 
