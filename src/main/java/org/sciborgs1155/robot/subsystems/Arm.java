@@ -173,11 +173,10 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   /** Sets the position setpoints for the elbow and wrist, in radians */
   public Command setSetpoints(Rotation2d elbowAngle, Rotation2d wristAngle) {
     return runOnce(
-            () -> {
-              elbowSetpoint = new State(elbowAngle.getRadians(), 0, 0);
-              wristSetpoint = new State(wristAngle.getRadians(), 0, 0);
-            })
-        .re;
+        () -> {
+          elbowSetpoint = new State(elbowAngle.getRadians(), 0, 0);
+          wristSetpoint = new State(wristAngle.getRadians(), 0, 0);
+        });
   }
 
   /** Returns the elbow setpoint as a {@link State} */
@@ -244,7 +243,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
           "SUPPLIED ELBOW AND WRIST TRAJECTORIES DO NOT HAVE EQUAL TOTAL TIMES", false);
     }
 
-    return elbowTrajectory 
+    return elbowTrajectory
         .follow(state -> elbowSetpoint = state)
         .alongWith(wristTrajectory.follow(state -> wristSetpoint = state, this))
         .withName("following trajectory");
