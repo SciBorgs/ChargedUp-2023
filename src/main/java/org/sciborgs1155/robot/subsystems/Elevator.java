@@ -171,7 +171,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   public void simulationPeriodic() {
     sim.setInputVoltage(lead.getAppliedOutput());
     sim.update(Constants.RATE);
-    encoderSim.setDistance(sim.getPositionMeters());
+    encoderSim.setDistance(sim.getPositionMeters() - Constants.Elevator.ZERO_OFFSET);
     encoderSim.setRate(sim.getVelocityMetersPerSecond());
   }
 

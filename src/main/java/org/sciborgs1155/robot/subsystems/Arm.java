@@ -291,7 +291,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   public void simulationPeriodic() {
     elbowSim.setInputVoltage(elbow.getAppliedOutput());
     elbowSim.update(Constants.RATE);
-    elbowEncoderSim.setDistance(elbowSim.getAngleRads());
+    elbowEncoderSim.setDistance(elbowSim.getAngleRads() - Elbow.OFFSET);
     elbowEncoderSim.setRate(elbowSim.getVelocityRadPerSec());
 
     wristSim.setInputVoltage(wrist.getAppliedOutput());
