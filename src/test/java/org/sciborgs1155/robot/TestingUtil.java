@@ -56,9 +56,7 @@ public class TestingUtil {
     subsystem.close();
   }
 
-  /**
-   * calls HAL.initialize with default values and asserts that it doesn't fail
-   */
+  /** calls HAL.initialize with default values and asserts that it doesn't fail */
   public static void setupHAL() {
     assert HAL.initialize(500, 0);
   }
