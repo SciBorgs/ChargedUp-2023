@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.sciborgs1155.robot.Constants.Elevator.*;
 import static org.sciborgs1155.robot.TestingUtil.*;
 
-import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.junit.jupiter.api.*;
@@ -20,7 +19,7 @@ public class ElevatorTest {
 
   @BeforeEach
   void setup() {
-    assert HAL.initialize(500, 0);
+    setupHAL();
     elevator = new Elevator(Visualizer.basicVisualizer(), Visualizer.basicVisualizer());
     CommandScheduler.getInstance().run();
     // check that it starts at 0

@@ -23,7 +23,7 @@ public class ArmTest {
 
   @BeforeEach
   void setup() {
-    assert HAL.initialize(500, 0);
+    setupHAL();
     arm = new Arm(Visualizer.basicVisualizer(), Visualizer.basicVisualizer());
     CommandScheduler.getInstance().run();
     assertEquals(0, arm.getElbowPosition().getRadians(), ELBOW_DELTA);

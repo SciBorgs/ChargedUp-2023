@@ -17,7 +17,7 @@ public final class Scoring implements Sendable {
   private Side side = Side.BACK;
   private GamePiece gamePiece = GamePiece.CONE;
 
-  public Scoring(Placement placement, LED led) {
+  public Scoring(LED led) {
     this.led = led;
   }
 

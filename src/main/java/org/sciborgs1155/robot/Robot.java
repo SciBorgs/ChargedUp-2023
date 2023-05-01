@@ -53,7 +53,7 @@ public class Robot extends CommandRobot implements Loggable {
 
   // COMMANDS
   private final Placement placement = new Placement(arm, elevator);
-  @Log private final Scoring scoring = new Scoring(placement, led);
+  @Log private final Scoring scoring = new Scoring(led);
   @Log private final Autos autos = new Autos(drive, placement, intake);
 
   /** The robot contains subsystems, OI devices, and commands. */
