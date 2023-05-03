@@ -1,5 +1,7 @@
 # Copyright (c) 2023 FRC 6328
 # http://github.com/Mechanical-Advantage
+# Copyright (c) 2023 FRC 1155
+# https://github.com/SciBorgs
 
 import yaml
 from math import pi
@@ -16,8 +18,8 @@ if __name__ == "__main__":
         # "initial": [0.44, -1.110857, 0.1],
         # "initial": [0.425006, 0.128855, -0.305],
         # back high to front intake
-        "initial": [0.2475, 3.072, 2.5],
-        "final": [0.455, -0.983, -0.09],
+        "final": [0.2475, 3.072, 2.5],
+        "initial": [0.455, -0.983, -0.09],
         "constraintOverrides": [],
     }
     result = solver.solve(request)

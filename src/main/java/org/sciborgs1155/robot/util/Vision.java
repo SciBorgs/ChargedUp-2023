@@ -33,7 +33,6 @@ public class Vision {
   public enum Mode {
     NONE,
     REAL,
-    SIM,
     SIM_WITH_CAM;
   }
 
@@ -67,7 +66,7 @@ public class Vision {
           MIN_TARGET_AREA);
 
   public Vision() {
-    this(Robot.isReal() ? Mode.REAL : Mode.SIM);
+    this(Mode.REAL);
   }
 
   public Vision(Mode mode) {
@@ -127,7 +126,7 @@ public class Vision {
     frontEstimator.setReferencePose(lastPose);
     backEstimator.setReferencePose(lastPose);
 
-    if (mode == Mode.SIM) {
+    if (Robot.isSimulation()) {
       simFront.processFrame(lastPose);
       simBack.processFrame(lastPose);
     }
@@ -140,17 +139,6 @@ public class Vision {
         .map(PhotonPoseEstimator::update)
         .flatMap(Optional::stream)
         .toArray(EstimatedRobotPose[]::new);
-    // var frontCamEstimate =
-    //     frontEstimator.update(
-    //         new PhotonPipelineResult(
-    //             frontCam.getLatestResult().getLatencyMillis(),
-    //             filterTargets(frontCam)));
-    // var backCamEstimate =
-    //     backEstimator.update(
-    //         new PhotonPipelineResult(
-    //             backCam.getLatestResult().getLatencyMillis(),
-    //             filterTargets(backCam)));
-    // return new EstimatedRobotPose[] {frontCamEstimate.get(), backCamEstimate.get()};
   }
 
   private List<PhotonTrackedTarget> filterTargets(PhotonCamera cam) {

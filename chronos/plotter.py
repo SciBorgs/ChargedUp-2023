@@ -1,5 +1,7 @@
 # Copyright (c) 2023 FRC 6328
 # http://github.com/Mechanical-Advantage
+# Copyright (c) 2023 FRC 1155
+# https://github.com/SciBorgs
 
 import math
 import time
@@ -66,5 +68,5 @@ def plot(result, config):
         ax.set_ylim([-0.5, 2.6])
 
     # Show plot
-    animation = matplotlib.animation.FuncAnimation(fig, animate, interval=10)
+    animation = matplotlib.animation.FuncAnimation(fig, animate, interval=20)
     plt.show()

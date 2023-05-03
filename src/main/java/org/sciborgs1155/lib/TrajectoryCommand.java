@@ -16,7 +16,7 @@ public class TrajectoryCommand extends CommandBase {
   private final Trajectory trajectory;
   private final Consumer<State> output;
 
-  private final Timer m_timer = new Timer();
+  private final Timer timer = new Timer();
 
   /**
    * Creates a new TrajectoryCommand that will execute the given {@link Trajectory}. Output will be
@@ -35,21 +35,21 @@ public class TrajectoryCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    m_timer.restart();
+    timer.restart();
   }
 
   @Override
   public void execute() {
-    output.accept(trajectory.sample(m_timer.get()));
+    output.accept(trajectory.sample(timer.get()));
   }
 
   @Override
   public void end(boolean interrupted) {
-    m_timer.stop();
+    timer.stop();
   }
 
   @Override
   public boolean isFinished() {
-    return m_timer.hasElapsed(trajectory.totalTime());
+    return timer.hasElapsed(trajectory.totalTime());
   }
 }

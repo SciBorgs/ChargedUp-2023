@@ -2,23 +2,24 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.83,
-        "y": 1.05684284203982
+        "x": 1.825242358818051,
+        "y": 5.020539865732509
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0255994610117147,
-        "y": 0.5582693907197497
+        "x": 2.227098943781221,
+        "y": 4.998214499901222
       },
-      "holonomicAngle": 0.0,
+      "holonomicAngle": 0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "backHighCube",
-          "outtakeCube"
+          "initialIntake",
+          "backHighCone",
+          "outtakeCone"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -27,15 +28,15 @@
     },
     {
       "anchorPoint": {
-        "x": 5.711178921487156,
-        "y": 0.7217911460704983
+        "x": 5.019213877647979,
+        "y": 4.837790113734574
       },
       "prevControl": {
-        "x": 5.564528176742608,
-        "y": 0.7323429651460553
+        "x": 5.056656473574972,
+        "y": 4.839750369025948
       },
       "nextControl": null,
-      "holonomicAngle": 0.0,
+      "holonomicAngle": 0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -50,10 +51,9 @@
   ],
   "markers": [
     {
-      "position": 0.12265624999999998,
+      "position": 0.12556818181818186,
       "names": [
-        "event",
-        "stow"
+        "balanceState"
       ]
     }
   ]

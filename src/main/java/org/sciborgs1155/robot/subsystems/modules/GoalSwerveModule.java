@@ -24,7 +24,7 @@ public class GoalSwerveModule implements SwerveModule {
   @Override
   public void setDesiredState(SwerveModuleState desiredState) {
     state = SwerveModuleState.optimize(desiredState, state.angle);
-    distance += state.speedMetersPerSecond * Constants.RATE;
+    distance += state.speedMetersPerSecond * Constants.PERIOD;
   }
 
   @Override

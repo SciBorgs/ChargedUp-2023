@@ -1,5 +1,4 @@
 casadi==3.5.5
-numpy==1.24.1
 pyntcore==2023.*
 PyYAML==6.*
-matplotlib==3.7
+matplotlib>=3.7.1

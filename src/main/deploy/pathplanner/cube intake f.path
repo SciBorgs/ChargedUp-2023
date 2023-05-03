@@ -2,13 +2,13 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.83,
-        "y": 0.4946653701809754
+        "x": 1.830403287542686,
+        "y": 4.41
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.1561267303784613,
-        "y": 0.6485654245088621
+        "x": 2.3229362930332513,
+        "y": 4.682694500460275
       },
       "holonomicAngle": 0.0,
       "isReversal": false,
@@ -17,9 +17,8 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "initialIntake",
-          "backHighCone",
-          "outtakeCone"
+          "backHighCube",
+          "outtakeCube"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -28,26 +27,24 @@
     },
     {
       "anchorPoint": {
-        "x": 7.162338515649254,
-        "y": 0.9167317101995316
+        "x": 4.363982888944718,
+        "y": 4.6610706725703634
       },
       "prevControl": {
-        "x": 7.172776349024921,
-        "y": 0.9054240573758918
+        "x": 4.13272218753876,
+        "y": 4.666346582108141
       },
       "nextControl": {
-        "x": 7.172776349024921,
-        "y": 0.9054240573758918
+        "x": 4.593371507212658,
+        "y": 4.655837472153605
       },
-      "holonomicAngle": 0.0,
-      "isReversal": true,
-      "velOverride": null,
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": 0.7,
       "isLocked": false,
-      "isStopPoint": true,
+      "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "initialIntake"
-        ],
+        "names": [],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
@@ -55,12 +52,12 @@
     },
     {
       "anchorPoint": {
-        "x": 1.83,
-        "y": 1.06
+        "x": 6.749126487245923,
+        "y": 4.59918147792796
       },
       "prevControl": {
-        "x": 2.743484384260435,
-        "y": 0.7090568467248044
+        "x": 5.790933383359715,
+        "y": 4.644875992928101
       },
       "nextControl": null,
       "holonomicAngle": 0.0,
@@ -70,7 +67,7 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "outtakeCube"
+          "initialIntake"
         ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
@@ -78,20 +75,11 @@
       }
     }
   ],
-  "maxVelocity": null,
-  "maxAcceleration": 8.0,
-  "isReversed": null,
   "markers": [
     {
-      "position": 0.01,
+      "position": 0.03,
       "names": [
         "frontIntake"
-      ]
-    },
-    {
-      "position": 1.2832031250000004,
-      "names": [
-        "backHighCube"
       ]
     }
   ]

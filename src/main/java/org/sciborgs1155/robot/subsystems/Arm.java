@@ -7,7 +7,6 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
@@ -16,6 +15,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -43,7 +44,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log(name = "wrist applied output", methodName = "getAppliedOutput")
   private final CANSparkMax wrist = Wrist.MOTOR.build(MotorType.kBrushless, WRIST_MOTOR);
 
-  private final RelativeEncoder elbowEncoder = elbow.getAlternateEncoder(Constants.THROUGHBORE_CPR);
+  private final Encoder elbowEncoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
+  private final EncoderSim elbowEncoderSim = new EncoderSim(elbowEncoder);
 
   @Log(name = "wrist velocity", methodName = "getVelocity")
   private final AbsoluteEncoder wristEncoder = wrist.getAbsoluteEncoder(Type.kDutyCycle);
@@ -104,8 +106,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowLeft.follow(elbow);
     elbowRight.follow(elbow);
 
-    elbowEncoder.setPositionConversionFactor(Elbow.CONVERSION.factor());
-    elbowEncoder.setVelocityConversionFactor(Elbow.CONVERSION.factor() / 60.0);
+    elbowEncoder.setDistancePerPulse(Elbow.CONVERSION.factor());
     wristEncoder.setPositionConversionFactor(Wrist.CONVERSION.factor());
     wristEncoder.setVelocityConversionFactor(Wrist.CONVERSION.factor() / 60.0);
 
@@ -127,7 +128,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     this.positionVisualizer = positionVisualizer;
     this.setpointVisualizer = setpointVisualizer;
 
-    elbowEncoder.setPosition(Elbow.ELBOW_OFFSET);
     wristFeedback.setTolerance(0.3);
     elbowFeedback.setTolerance(0.3);
   }
@@ -135,7 +135,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   /** Elbow position relative to the chassis */
   @Log(name = "elbow position", methodName = "getRadians")
   public Rotation2d getElbowPosition() {
-    return Rotation2d.fromRadians(elbowEncoder.getPosition() + Elbow.ELBOW_OFFSET);
+    return Rotation2d.fromRadians(elbowEncoder.getDistance() + Elbow.OFFSET);
   }
 
   /** Wrist position relative to the forearm */
@@ -189,6 +189,20 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     return wristSetpoint;
   }
 
+  private TrapezoidProfile createElbowProfile(Rotation2d goal) {
+    return new TrapezoidProfile(
+        Elbow.CONSTRAINTS,
+        new TrapezoidProfile.State(goal.getRadians(), 0),
+        elbowSetpoint.trapezoidState());
+  }
+
+  private TrapezoidProfile createWristProfile(Rotation2d goal) {
+    return new TrapezoidProfile(
+        Wrist.CONSTRAINTS,
+        new TrapezoidProfile.State(goal.getRadians(), 0),
+        wristSetpoint.trapezoidState());
+  }
+
   /** Follows a {@link TrapezoidProfile} for each joint's relative position */
   public Command followProfile(Rotation2d elbowGoal, Rotation2d wristGoal) {
     var elbowAccel = new Derivative();
@@ -203,10 +217,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             new DeferredCommand(
                 () ->
                     new TrapezoidProfileCommand(
-                            new TrapezoidProfile(
-                                Elbow.CONSTRAINTS,
-                                new TrapezoidProfile.State(elbowGoal.getRadians(), 0),
-                                elbowSetpoint.trapezoidState()),
+                            createElbowProfile(elbowGoal),
                             state ->
                                 elbowSetpoint =
                                     new State(
@@ -215,17 +226,13 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
                                         elbowAccel.calculate(state.velocity)))
                         .alongWith(
                             new TrapezoidProfileCommand(
-                                new TrapezoidProfile(
-                                    Wrist.CONSTRAINTS,
-                                    new TrapezoidProfile.State(wristGoal.getRadians(), 0),
-                                    wristSetpoint.trapezoidState()),
+                                createWristProfile(wristGoal),
                                 state ->
                                     wristSetpoint =
                                         new State(
                                             state.position,
                                             state.velocity,
-                                            wristAccel.calculate(state.velocity)))),
-                this))
+                                            wristAccel.calculate(state.velocity))))))
         .withName("following profile");
   }
 
@@ -248,17 +255,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Override
   public void periodic() {
-    // SAFETY CHECKS
-    wristLimp =
-        wristEncoder.getPosition() == 0
-            && wristEncoder.getVelocity() == 0
-            && wristSetpoint.position() != 0;
-    butAScratch =
-        elbowEncoder.getPosition() == 0 // no position reading
-            && elbowEncoder.getVelocity() == 0 // no velocity reading
-            && elbowSetpoint.position() != Elbow.ELBOW_OFFSET // elbow is not going to 0
-            && elbow.getAppliedOutput() != 0; // elbow is trying to move
-
     double elbowFB =
         elbowFeedback.calculate(getElbowPosition().getRadians(), elbowSetpoint.position());
     double elbowFF =
@@ -286,16 +282,28 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     setpointVisualizer.setArmAngles(
         Rotation2d.fromRadians(elbowFeedback.getSetpoint()),
         Rotation2d.fromRadians(wristFeedback.getSetpoint()));
+
+    // SAFETY CHECKS
+    wristLimp =
+        wristEncoder.getPosition() == 0
+            && wristEncoder.getVelocity() == 0
+            && wristSetpoint.position() != 0;
+    butAScratch =
+        elbowEncoder.getDistance() == 0 // no position reading
+            && elbowEncoder.getRate() == 0 // no velocity reading
+            && elbowSetpoint.position() != Elbow.OFFSET // elbow is not going to 0
+            && elbow.getAppliedOutput() != 0; // elbow is trying to move
   }
 
   @Override
   public void simulationPeriodic() {
     elbowSim.setInputVoltage(elbow.getAppliedOutput());
-    elbowSim.update(Constants.RATE);
-    elbowEncoder.setPosition(elbowSim.getAngleRads());
+    elbowSim.update(Constants.PERIOD);
+    elbowEncoderSim.setDistance(elbowSim.getAngleRads() - Elbow.OFFSET);
+    elbowEncoderSim.setRate(elbowSim.getVelocityRadPerSec());
 
     wristSim.setInputVoltage(wrist.getAppliedOutput());
-    wristSim.update(Constants.RATE);
+    wristSim.update(Constants.PERIOD);
   }
 
   @Override

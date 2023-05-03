@@ -2,121 +2,150 @@ package org.sciborgs1155.robot;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
-import org.sciborgs1155.lib.CustomPeriodRunnables;
+import io.github.oblarg.oblog.annotations.Log;
+import org.sciborgs1155.lib.CommandRobot;
+import org.sciborgs1155.lib.DeferredCommand;
+import org.sciborgs1155.robot.Constants.Drive.SpeedMultiplier;
+import org.sciborgs1155.robot.Constants.Positions;
+import org.sciborgs1155.robot.Ports.OI;
+import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.Placement;
+import org.sciborgs1155.robot.commands.Scoring;
+import org.sciborgs1155.robot.subsystems.Arm;
+import org.sciborgs1155.robot.subsystems.Drive;
+import org.sciborgs1155.robot.subsystems.Elevator;
+import org.sciborgs1155.robot.subsystems.Intake;
+import org.sciborgs1155.robot.subsystems.LED;
+import org.sciborgs1155.robot.util.Vision;
+import org.sciborgs1155.robot.util.Vision.Mode;
+import org.sciborgs1155.robot.util.Visualizer;
+import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;
+import org.sciborgs1155.robot.util.placement.PlacementState.Level;
+import org.sciborgs1155.robot.util.placement.PlacementState.Side;
 
 /**
- * The VM is configured to automatically run this class, and to call the functions corresponding to
- * each mode, as described in the TimedRobot documentation. If you change the name of this class or
- * the package after creating this project, you must also update the build.gradle file in the
- * project.
+ * This class is where the bulk of the robot should be declared. Since Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * subsystems, commands, and trigger mappings) should be declared here.
  */
-public class Robot extends TimedRobot {
+public class Robot extends CommandRobot implements Loggable {
 
-  private Command autonomousCommand;
+  private final Vision vision = new Vision(Mode.NONE);
+  @Log private final Visualizer position = new Visualizer(new Color8Bit(255, 0, 0));
+  @Log private final Visualizer setpoint = new Visualizer(new Color8Bit(0, 0, 255));
 
-  private RobotContainer robotContainer;
+  // SUBSYSTEMS
+  @Log private final Drive drive = new Drive(vision);
+  @Log private final Elevator elevator = new Elevator(position, setpoint);
+  @Log private final Arm arm = new Arm(position, setpoint);
+  @Log private final Intake intake = new Intake();
+  @Log private final LED led = new LED();
 
+  // INPUT DEVICES
+  private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
+  private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
+
+  // COMMANDS
+  private final Placement placement = new Placement(arm, elevator);
+  @Log private final Scoring scoring = new Scoring(led);
+  @Log private final Autos autos = new Autos(drive, placement, intake);
+
+  /** The robot contains subsystems, OI devices, and commands. */
   public Robot() {
-    super(Constants.RATE);
+    super(Constants.PERIOD);
+
+    configureGameBehavior();
+    configureBindings();
+    configureSubsystemDefaults();
   }
 
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
-  @Override
-  public void robotInit() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
-    robotContainer = new RobotContainer();
-    // Start networktables logger
-    DataLogManager.start();
-    // binds FunctionRegistry to be ran at 0.01 hertz
-    CustomPeriodRunnables.forEachRunnable(this::addPeriodic);
-
+  /** Configures basic behavior during different parts of the game. */
+  private void configureGameBehavior() {
     if (isSimulation()) {
       DriverStation.silenceJoystickConnectionWarning(true);
     }
+
+    Logger.configureLoggingAndConfig(this, false);
+
+    DataLogManager.start();
+
+    addPeriodic(Logger::updateEntries, Constants.PERIOD);
+
+    autonomous().onTrue(getAutonomousCommand());
+
+    teleop().onTrue(getEnableCommand());
   }
 
   /**
-   * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
-   * that you want ran during disabled, autonomous, teleoperated and test.
-   *
-   * <p>This runs after the mode specific periodic functions, but before LiveWindow and
-   * SmartDashboard integrated updating.
+   * Configures subsystem default commands. Default commands are scheduled when no other command is
+   * running on a subsystem.
    */
-  @Override
-  public void robotPeriodic() {
-    // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
-    // commands, running already-scheduled commands, removing finished or interrupted commands,
-    // and running subsystem periodic() methods.  This must be called from the robot's periodic
-    // block in order for anything in the Command-based framework to work.
-    CommandScheduler.getInstance().run();
-    Logger.updateEntries();
+  private void configureSubsystemDefaults() {
+    drive.setDefaultCommand(
+        drive
+            .drive(() -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX())
+            .withName("teleop driving"));
+
+    intake.setDefaultCommand(intake.set(Constants.Intake.DEFAULT_SPEED).withName("passive intake"));
   }
 
-  /** This function is called once each time the robot enters Disabled mode. */
-  @Override
-  public void disabledInit() {}
+  /** Configures trigger -> command bindings */
+  private void configureBindings() {
+    // DRIVER INPUT
+    driver.b().onTrue(drive.zeroHeading());
 
-  @Override
-  public void disabledPeriodic() {}
+    driver
+        .leftBumper()
+        .onTrue(drive.setSpeedMultiplier(SpeedMultiplier.SLOW))
+        .onFalse(drive.setSpeedMultiplier(SpeedMultiplier.NORMAL));
 
-  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
-  @Override
-  public void autonomousInit() {
-    autonomousCommand = robotContainer.getAutonomousCommand();
+    driver
+        .rightBumper()
+        .onTrue(drive.setSpeedMultiplier(SpeedMultiplier.SLOW))
+        .onFalse(drive.setSpeedMultiplier(SpeedMultiplier.NORMAL));
 
-    // schedule the autonomous command (example)
-    if (autonomousCommand != null) {
-      autonomousCommand.schedule();
-    }
+    // STATE SWITCHING
+    operator.b().onTrue(scoring.setSide(Side.FRONT));
+    operator.x().onTrue(scoring.setSide(Side.BACK));
+    operator.a().onTrue(scoring.setGamePiece(GamePiece.CUBE));
+    operator.y().onTrue(scoring.setGamePiece(GamePiece.CONE));
+
+    // SCORING
+    operator.povUp().onTrue(placement.goTo(() -> scoring.state(Level.HIGH)));
+    operator.povRight().onTrue(placement.goTo(() -> scoring.state(Level.MID)));
+    operator.povDown().onTrue(placement.goTo(() -> scoring.state(Level.LOW)));
+    operator.povLeft().onTrue(placement.goTo(Positions.STOW));
+
+    operator.leftTrigger().onTrue(placement.goTo(() -> scoring.state(Level.SINGLE_SUBSTATION)));
+    operator.rightTrigger().onTrue(placement.goTo(() -> scoring.state(Level.DOUBLE_SUBSTATION)));
+
+    operator.rightStick().onTrue(placement.goTo(Positions.SAFE));
+    operator.leftStick().onTrue(placement.goTo(Positions.SAFE));
+
+    // INTAKING
+    operator.leftBumper().onTrue(intake.intake()).onFalse(intake.stop());
+    operator.rightBumper().onTrue(intake.outtake()).onFalse(intake.stop());
+
+    // FAILURE MODES
+    arm.onElbowFailing().onTrue(placement.setStopped(true));
+    elevator.onFailing().onTrue(placement.setStopped(true));
   }
 
-  /** This function is called periodically during autonomous. */
-  @Override
-  public void autonomousPeriodic() {}
-
-  @Override
-  public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
-    if (autonomousCommand != null) {
-      autonomousCommand.cancel();
-    }
-
-    // Resets goal positions to ensure safety of nearby humans...
-    robotContainer.getEnableCommand().schedule();
+  /** The command to run when the robot is enabled */
+  public Command getEnableCommand() {
+    return new DeferredCommand(() -> placement.setSetpoint(placement.state()), arm, elevator);
   }
 
-  /** This function is called periodically during operator control. */
-  @Override
-  public void teleopPeriodic() {}
-
-  @Override
-  public void testInit() {
-    // Cancels all running commands at the start of test mode.
-    CommandScheduler.getInstance().cancelAll();
+  /** The commamnd to be ran in autonomous */
+  public Command getAutonomousCommand() {
+    return new DeferredCommand(autos::get, drive, arm, elevator)
+        .until(() -> !DriverStation.isAutonomous())
+        .withName("auto");
   }
-
-  /** This function is called periodically during test mode. */
-  @Override
-  public void testPeriodic() {
-    CommandScheduler.getInstance().run();
-  }
-
-  /** This function is called once when the robot is first started up. */
-  @Override
-  public void simulationInit() {}
-
-  /** This function is called periodically whilst in simulation. */
-  @Override
-  public void simulationPeriodic() {}
 }
