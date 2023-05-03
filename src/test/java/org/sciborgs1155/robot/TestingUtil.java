@@ -4,7 +4,6 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.sciborgs1155.lib.SciClosable;
 
 public class TestingUtil {
 
@@ -50,8 +49,8 @@ public class TestingUtil {
    *
    * @param subsystem
    */
-  public static <TestableSubsystem extends SubsystemBase & SciClosable> void closeSubsystem(
-      TestableSubsystem subsystem) {
+  public static <TestableSubsystem extends SubsystemBase & AutoCloseable> void closeSubsystem(
+      TestableSubsystem subsystem) throws Exception {
     CommandScheduler.getInstance().unregisterSubsystem(subsystem);
     subsystem.close();
   }

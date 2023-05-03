@@ -30,12 +30,11 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import java.util.function.DoubleSupplier;
-import org.sciborgs1155.lib.SciClosable;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 import org.sciborgs1155.robot.util.Vision;
 
-public class Drive extends SubsystemBase implements Loggable, SciClosable {
+public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log
   private final SwerveModule frontLeft =

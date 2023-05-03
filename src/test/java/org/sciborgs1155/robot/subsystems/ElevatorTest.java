@@ -30,7 +30,7 @@ public class ElevatorTest {
   }
 
   @AfterEach
-  void destroy() {
+  void destroy() throws Exception {
     closeSubsystem(elevator);
   }
 

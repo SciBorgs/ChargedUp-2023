@@ -3,10 +3,9 @@ package org.sciborgs1155.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.sciborgs1155.lib.SciClosable;
 import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;
 
-public class LED extends SubsystemBase implements SciClosable {
+public class LED extends SubsystemBase implements AutoCloseable {
 
   // private static AddressableLED led1;
   // private static AddressableLED led2;

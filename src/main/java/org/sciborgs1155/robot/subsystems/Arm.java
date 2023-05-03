@@ -26,7 +26,6 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.lib.Derivative;
-import org.sciborgs1155.lib.SciClosable;
 import org.sciborgs1155.lib.Trajectory;
 import org.sciborgs1155.lib.Trajectory.State;
 import org.sciborgs1155.robot.Constants;
@@ -34,7 +33,7 @@ import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.util.Visualizer;
 
-public class Arm extends SubsystemBase implements Loggable, SciClosable {
+public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log(name = "elbow applied output", methodName = "getAppliedOutput")
   private final CANSparkMax elbow = Elbow.MOTOR.build(MotorType.kBrushless, MIDDLE_ELBOW_MOTOR);
