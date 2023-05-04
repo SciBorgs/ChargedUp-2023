@@ -34,7 +34,7 @@ import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 import org.sciborgs1155.robot.util.Vision;
 
-public class Drive extends SubsystemBase implements Loggable {
+public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log
   private final SwerveModule frontLeft =
@@ -307,5 +307,14 @@ public class Drive extends SubsystemBase implements Loggable {
   /** Creates and follows trajectory for swerve from current pose to desiredPose */
   public Command driveToPose(Pose2d desiredPose, boolean useAllianceColor) {
     return driveToPose(getPose(), desiredPose, useAllianceColor);
+  }
+
+  public void close() {
+    frontLeft.close();
+    frontRight.close();
+    rearLeft.close();
+    rearRight.close();
+    imu.close();
+    vision.close();
   }
 }

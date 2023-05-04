@@ -287,7 +287,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     wristLimp =
         wristEncoder.getPosition() == 0
             && wristEncoder.getVelocity() == 0
-            && wristSetpoint.position() != 0;
+            && wristSetpoint.position() != 0
+            && Robot.isReal();
     butAScratch =
         elbowEncoder.getDistance() == 0 // no position reading
             && elbowEncoder.getRate() == 0 // no velocity reading
@@ -312,5 +313,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     elbowLeft.close();
     elbowRight.close();
     wrist.close();
+    elbowEncoder.close();
   }
 }

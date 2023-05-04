@@ -84,11 +84,6 @@
         "window": {
           "visible": true
         }
-      },
-      "/Shuffleboard/Robot/setpoint": {
-        "window": {
-          "visible": true
-        }
       }
     }
   },
@@ -105,6 +100,7 @@
           "open": true
         },
         "Elevator": {
+          "open": true,
           "pid": {
             "open": true
           }

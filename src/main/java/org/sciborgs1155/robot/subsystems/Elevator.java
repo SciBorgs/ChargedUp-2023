@@ -31,10 +31,10 @@ import org.sciborgs1155.robot.util.Visualizer;
 public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log(name = "applied output", methodName = "getAppliedOutput")
-  private final CANSparkMax lead = MOTOR.build(MotorType.kBrushless, RIGHT_MOTOR);
+  private CANSparkMax lead = MOTOR.build(MotorType.kBrushless, RIGHT_MOTOR);
 
-  private final CANSparkMax left = MOTOR.build(MotorType.kBrushless, LEFT_MOTOR);
-  private final CANSparkMax right = MOTOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
+  private CANSparkMax left = MOTOR.build(MotorType.kBrushless, LEFT_MOTOR);
+  private CANSparkMax right = MOTOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
 
   @Log private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1], true);
   private final EncoderSim encoderSim = new EncoderSim(encoder);
@@ -72,6 +72,7 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
   private final Visualizer setpointVisualizer;
 
   public Elevator(Visualizer positionVisualizer, Visualizer setpointVisualizer) {
+
     left.follow(lead);
     right.follow(lead);
     encoder.setDistancePerPulse(RELATIVE_CONVERSION.factor());
@@ -142,6 +143,10 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     return runOnce(() -> this.stopped = stopped);
   }
 
+  public boolean stopped() {
+    return stopped;
+  }
+
   @Override
   public void periodic() {
     encoderUnplugged =
@@ -180,5 +185,6 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     lead.close();
     left.close();
     right.close();
+    encoder.close();
   }
 }

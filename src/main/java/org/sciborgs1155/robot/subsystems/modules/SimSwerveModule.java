@@ -87,4 +87,7 @@ public class SimSwerveModule implements SwerveModule {
   public void setDrivePID(PIDConstants constants) {
     driveFeedback.setPID(constants.p(), constants.i(), constants.d());
   }
+
+  @Override
+  public void close() {}
 }

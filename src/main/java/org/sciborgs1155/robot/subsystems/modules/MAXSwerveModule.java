@@ -133,4 +133,10 @@ public class MAXSwerveModule implements SwerveModule {
     driveFeedback.setI(constants.i());
     driveFeedback.setD(constants.d());
   }
+
+  @Override
+  public void close() {
+    driveMotor.close();
+    turnMotor.close();
+  }
 }

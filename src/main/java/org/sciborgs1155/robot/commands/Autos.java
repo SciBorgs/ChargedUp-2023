@@ -82,7 +82,6 @@ public final class Autos implements Sendable {
             Map.entry("initialIntake", initialIntake()));
 
     autoChooser = new SendableChooser<Supplier<Command>>();
-    configureTestAutos();
     configureMainAutos();
 
     builder =
@@ -127,7 +126,8 @@ public final class Autos implements Sendable {
      * orientation: away from grid
      * starting location: cube scoring (preferably flat)
      */
-    autoChooser.addOption("cube score (no drive)", () -> backHighCubeScore(StartingPos.FLAT));
+    autoChooser.setDefaultOption(
+        "cube score (no drive)", () -> backHighCubeScore(StartingPos.FLAT));
 
     /* cone score setup instructions:
      * gamepiece: cone
@@ -135,7 +135,7 @@ public final class Autos implements Sendable {
      * set starting pos: no
      * starting location: cone scoring (preferably flat)
      */
-    autoChooser.setDefaultOption("cone score (no drive)", () -> highConeScore(StartingPos.FLAT));
+    autoChooser.addOption("cone score (no drive)", () -> highConeScore(StartingPos.FLAT));
 
     // ultimate backup
     autoChooser.addOption("none", Commands::none);

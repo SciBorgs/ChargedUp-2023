@@ -24,7 +24,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import org.sciborgs1155.robot.Robot;
 
 /** Wrapper class for photonvision */
-public class Vision {
+public class Vision implements AutoCloseable {
 
   /**
    * Mode of the camera, not the same as {@link Robot#isReal()}, so we can run sim with a real
@@ -185,5 +185,11 @@ public class Vision {
       data[i * 7 + 6] = poses[i].getRotation().getQuaternion().getZ();
     }
     return data;
+  }
+
+  @Override
+  public void close() {
+    frontCam.close();
+    backCam.close();
   }
 }

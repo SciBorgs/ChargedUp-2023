@@ -40,4 +40,7 @@ public class GoalSwerveModule implements SwerveModule {
 
   @Override
   public void setDrivePID(PIDConstants constants) {}
+
+  @Override
+  public void close() {}
 }

@@ -6,6 +6,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Elevator;
@@ -33,6 +34,14 @@ public class Visualizer implements Sendable {
     claw =
         forearm.append(
             new MechanismLigament2d("Wrist Position", Dimensions.CLAW_LENGTH, 0, WEIGHT, color));
+  }
+
+  /**
+   * returns a new visualizer with a defualt color (black) use if color doesn't matter (i.e. unit
+   * tests)
+   */
+  public static Visualizer basicVisualizer() {
+    return new Visualizer(new Color8Bit(Color.kBlack));
   }
 
   public void setArmAngles(Rotation2d elbowAngle, Rotation2d wristAngle) {
