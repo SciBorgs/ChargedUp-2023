@@ -219,7 +219,8 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
     field2d.setRobotPose(getPose());
 
     for (int i = 0; i < modules2d.length; i++) {
-      var transform = new Transform2d(MODULE_OFFSET[i], modules.get(i).getPosition().angle);
+      var module = modules.get(i);
+      var transform = new Transform2d(MODULE_OFFSET[i], module.getPosition().angle);
       modules2d[i].setPose(getPose().transformBy(transform));
     }
   }
