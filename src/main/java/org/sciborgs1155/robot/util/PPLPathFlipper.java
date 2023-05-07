@@ -21,6 +21,14 @@ public class PPLPathFlipper {
     return path;
   }
 
+  public static PathPlannerTrajectory pathForAlliance(
+      PathPlannerTrajectory path, DriverStation.Alliance alliance) {
+    if (alliance == Alliance.Red) {
+      return flipPath(path);
+    }
+    return path;
+  }
+
   public static List<PathPlannerTrajectory> flipPathGroup(List<PathPlannerTrajectory> pathGroup) {
     List<PathPlannerTrajectory> flippedPathGroup = new ArrayList<PathPlannerTrajectory>();
     for (PathPlannerTrajectory path : pathGroup) {

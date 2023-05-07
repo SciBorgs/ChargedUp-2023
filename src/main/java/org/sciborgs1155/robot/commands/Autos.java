@@ -4,7 +4,10 @@ import static org.sciborgs1155.robot.Constants.Auto.*;
 import static org.sciborgs1155.robot.Constants.Drive.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.Constants.Positions.*;
+import static org.sciborgs1155.robot.commands.Autos.StartingPos.*;
 import static org.sciborgs1155.robot.util.PPLPathFlipper.*;
+import static org.sciborgs1155.robot.util.placement.PlacementState.GamePiece.*;
+import static org.sciborgs1155.robot.util.placement.PlacementState.Side.*;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -25,6 +28,7 @@ import java.util.function.Supplier;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;
+import org.sciborgs1155.robot.util.placement.PlacementState.Side;
 
 public final class Autos implements Sendable {
 
@@ -75,8 +79,8 @@ public final class Autos implements Sendable {
             Map.entry("backHighCone", placement.goTo(BACK_HIGH_CONE)),
             Map.entry("backHighCube", placement.goTo(BACK_HIGH_CUBE)),
             Map.entry("frontHighCube", placement.goTo(FRONT_HIGH_CUBE)),
-            Map.entry("outtakeCone", outtake(GamePiece.CONE)),
-            Map.entry("outtakeCube", outtake(GamePiece.CUBE)),
+            Map.entry("outtakeCone", outtake(CONE)),
+            Map.entry("outtakeCube", outtake(CUBE)),
             Map.entry("frontIntake", frontMovingIntake()),
             Map.entry("stow", placement.goTo(STOW)),
             Map.entry("balanceState", placement.goTo(SAFE)),
@@ -104,7 +108,7 @@ public final class Autos implements Sendable {
      * orientation: away from grid
      * starting position: cone scoring, flat side
      */
-    autoChooser.addOption("2 gamepiece (flat)", () -> twoGamepiece(StartingPos.FLAT));
+    autoChooser.addOption("2 gamepiece (flat)", () -> twoGamepiece(FLAT));
 
     /* cube balance setup instructions:
      * gamepiece: cube
@@ -127,16 +131,14 @@ public final class Autos implements Sendable {
      * orientation: away from grid
      * starting location: cube scoring (preferably flat)
      */
-    autoChooser.setDefaultOption(
-        "cube score (no drive)", () -> backHighCubeScore(StartingPos.FLAT));
-
+    autoChooser.setDefaultOption("cube score (no drive)", () -> justScore(CUBE, FLAT));
     /* cone score setup instructions:
      * gamepiece: cone
      * orientation: away from grid
      * set starting pos: no
      * starting location: cone scoring (preferably flat)
      */
-    autoChooser.addOption("cone score (no drive)", () -> highConeScore(StartingPos.FLAT));
+    autoChooser.addOption("cone score (no drive)", () -> justScore(CONE, FLAT));
 
     // ultimate backup
     autoChooser.addOption("none", Commands::none);
@@ -164,28 +166,28 @@ public final class Autos implements Sendable {
      * orientation: away from grid
      * starting location: cone scoring, flat side
      */
-    autoChooser.addOption("cone, leave (flat)", () -> coneLeave(StartingPos.FLAT));
+    autoChooser.addOption("cone, leave (flat)", () -> coneLeave(FLAT));
 
     /* cone leave setup instructions:
      * gamepiece: cone
      * orientation: away from grid
      * starting location: cone scoring, bump side
      */
-    autoChooser.addOption("cone, leave (bump)", () -> coneLeave(StartingPos.BUMP));
+    autoChooser.addOption("cone, leave (bump)", () -> coneLeave(BUMP));
 
     /* cube leave setup instructions:
      * gamepiece: cube
      * orientation: away from grid
      * starting location: cube scoring, flat side
      */
-    autoChooser.addOption("cube, leave (flat)", () -> cubeLeave(StartingPos.FLAT));
+    autoChooser.addOption("cube, leave (flat)", () -> cubeLeave(FLAT));
 
     /* cube leave setup instructions:
      * gamepiece: cube
      * orientation: away from grid
      * starting location: cube scoring, bump side
      */
-    autoChooser.addOption("cube, leave (bump)", () -> cubeLeave(StartingPos.BUMP));
+    autoChooser.addOption("cube, leave (bump)", () -> cubeLeave(BUMP));
 
     // backups
 
@@ -195,7 +197,7 @@ public final class Autos implements Sendable {
      * set starting pos: yes
      * starting location: against grid, to one side (it should have a clear path straight forward)
      */
-    autoChooser.addOption("flat leave (no arm)", () -> leave(StartingPos.FLAT));
+    autoChooser.addOption("flat leave (no arm)", () -> leave(FLAT));
 
     /* leave setup instructions:
      * gamepiece: none
@@ -203,14 +205,14 @@ public final class Autos implements Sendable {
      * set starting pos: yes
      * starting location: against grid, to one side (it should have a clear path straight forward)
      */
-    autoChooser.addOption("bump leave (no arm)", () -> leave(StartingPos.BUMP));
+    autoChooser.addOption("bump leave (no arm)", () -> leave(BUMP));
 
     autoChooser.addOption("low cube, leave (flat)", this::lowCubeLeave);
   }
 
   private void configureTestAutos() {
     autoChooser.addOption("one meter test", () -> followPath(Paths.ONE_METER_TEST));
-    autoChooser.addOption("2 gamepeice (bump)", () -> twoGamepiece(StartingPos.BUMP));
+    autoChooser.addOption("2 gamepeice (bump)", () -> twoGamepiece(BUMP));
   }
 
   private void configureAllAutos() {
@@ -221,6 +223,12 @@ public final class Autos implements Sendable {
 
   public Command followPath(List<PathPlannerTrajectory> path) {
     return builder.fullAuto(pathForAlliance(path, DriverStation.getAlliance()));
+  }
+
+  public Command followPath(PathPlannerTrajectory path, boolean resetOdometry) {
+    var newPath = pathForAlliance(path, DriverStation.getAlliance());
+    return (resetOdometry ? drive.pathOdometryReset(newPath) : Commands.none())
+        .andThen(drive.follow(newPath));
   }
 
   public Command balance() {
@@ -264,23 +272,30 @@ public final class Autos implements Sendable {
 
   /** back cone, cube intake, back cube */
   public Command twoGamepiece(StartingPos startingPos) {
-    return followPath(
+    var pathGroup =
         switch (startingPos) {
           case BUMP -> Paths.TWO_GAMEPIECE_BUMP;
           case FLAT -> Paths.TWO_GAMEPIECE_FLAT;
           case CENTER -> Paths.TWO_GAMEPIECE_FLAT;
-        });
+        };
+    return Commands.sequence(
+        staticOdometryReset(CONE, Rotation2d.fromRadians(0), startingPos),
+        highConeScore(),
+        Commands.parallel(followPath(pathGroup.get(0), false), frontMovingIntake()),
+        initialIntake(),
+        Commands.parallel(followPath(pathGroup.get(1), false), placement.goTo(STOW)),
+        backHighCubeScore(),
+        placement.goTo(SAFE));
   }
 
   private Command justBalance() {
     return Commands.sequence(
-        defaultOdometryReset(GamePiece.CUBE, Rotation2d.fromRadians(0), StartingPos.CENTER),
-        fullBalance());
+        staticOdometryReset(CUBE, Rotation2d.fromRadians(0), CENTER), fullBalance());
   }
 
   private Command fullBalance() {
     return drive
-        .follow("balance", true, true)
+        .follow("balance", true)
         .withTimeout(4)
         .andThen(balance())
         .andThen(drive.lock())
@@ -288,32 +303,28 @@ public final class Autos implements Sendable {
   }
 
   private Command highConeScore() {
-    return highConeScore(StartingPos.FLAT);
+    return Commands.sequence(
+        initialIntake(), placement.goTo(BACK_HIGH_CONE).withTimeout(5), outtake(CONE));
   }
 
-  private Command highConeScore(StartingPos startingPos) {
+  private Command justScore(GamePiece gamePiece, StartingPos startingPos) {
     return Commands.sequence(
-        defaultOdometryReset(GamePiece.CONE, Rotation2d.fromRadians(0), startingPos),
-        initialIntake(),
-        placement.goTo(BACK_HIGH_CONE).withTimeout(5),
-        outtake(GamePiece.CONE));
+        staticOdometryReset(gamePiece, Rotation2d.fromDegrees(0), startingPos),
+        switch (gamePiece) {
+          case CONE -> highConeScore();
+          case CUBE -> backHighCubeScore();
+        });
   }
 
   private Command backHighCubeScore() {
-    return backHighCubeScore(StartingPos.FLAT);
-  }
-
-  private Command backHighCubeScore(StartingPos startingPos) {
-    return Commands.sequence(
-        defaultOdometryReset(GamePiece.CUBE, Rotation2d.fromRadians(0), startingPos),
-        placement.goTo(BACK_HIGH_CUBE).withTimeout(5),
-        outtake(GamePiece.CUBE));
+    return Commands.sequence(placement.goTo(BACK_HIGH_CUBE).withTimeout(5), outtake(CUBE));
   }
 
   /** no PPL */
   private Command cubeBalance() {
     return Commands.sequence(
-        backHighCubeScore(StartingPos.CENTER),
+        staticOdometryReset(CUBE, BACK, CENTER),
+        backHighCubeScore(),
         placement.goTo(SAFE).withTimeout(3.5),
         fullBalance());
   }
@@ -321,7 +332,10 @@ public final class Autos implements Sendable {
   /** no PPL */
   private Command coneBalance() {
     return Commands.sequence(
-        highConeScore(StartingPos.CENTER), placement.goTo(SAFE).withTimeout(3.5), fullBalance());
+        staticOdometryReset(CONE, BACK, CENTER),
+        highConeScore(),
+        placement.goTo(SAFE).withTimeout(3.5),
+        fullBalance());
   }
 
   private Command coneLeave(StartingPos startingPos) {
@@ -348,9 +362,7 @@ public final class Autos implements Sendable {
 
   private Command lowCubeLeave() {
     return Commands.sequence(
-        placement.goTo(FRONT_INTAKE),
-        outtake(GamePiece.CUBE),
-        followPath(Paths.LEAVE_FLAT_BACKWARDS));
+        placement.goTo(FRONT_INTAKE), outtake(CUBE), followPath(Paths.LEAVE_FLAT_BACKWARDS));
   }
 
   /** backup: no arm */
@@ -361,6 +373,11 @@ public final class Autos implements Sendable {
           case FLAT -> Paths.LEAVE_FLAT;
           case CENTER -> Paths.LEAVE_FLAT;
         });
+  }
+
+  public Command staticOdometryReset(GamePiece gamePiece, Side side, StartingPos startingPos) {
+    return staticOdometryReset(
+        gamePiece, Rotation2d.fromRadians(Math.PI - side.rads()), startingPos);
   }
 
   /** resets odometry where feild is static (doesn't depend on alliance) */
@@ -403,7 +420,7 @@ public final class Autos implements Sendable {
   }
 
   /** resets odometry like pp does */
-  public Command defaultOdometryReset(
+  public Command PPLOdometryReset(
       GamePiece gamePiece, Rotation2d rotation, StartingPos startingPos) {
     Pose2d bluePose =
         new Pose2d(

@@ -26,7 +26,7 @@ public class Alignment {
   }
 
   public Command odometryAlign(Pose2d startPose, Side side) {
-    return drive.driveToPose(startPose, closestScoringPoint(startPose, side), true);
+    return drive.driveToPose(startPose, closestScoringPoint(startPose, side));
   }
 
   private Pose2d closestScoringPoint(Pose2d pose, Side side) {
@@ -35,7 +35,9 @@ public class Alignment {
           case CONE -> SCORING_POINTS_CONE.values();
           case CUBE -> SCORING_POINTS_CUBE.values();
         };
-    Translation2d point = pose.getTranslation().nearest(List.copyOf(scoringPoints));
+    Translation2d point =
+        pose.getTranslation()
+            .nearest(List.copyOf(scoringPoints)); // TODO change side based on alliance
     return new Pose2d(point, Rotation2d.fromRadians(side.rads()));
   }
 }

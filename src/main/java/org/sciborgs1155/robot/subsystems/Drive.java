@@ -20,7 +20,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -251,7 +250,7 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
    *     following
    * @return The command that follows the trajectory
    */
-  public Command follow(PathPlannerTrajectory trajectory, boolean useAllianceColor) {
+  public Command follow(PathPlannerTrajectory trajectory) {
     return new PPSwerveControllerCommand(
             trajectory,
             this::getPose,
@@ -260,24 +259,20 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
             new PIDController(TRANSLATION.p(), TRANSLATION.i(), TRANSLATION.d()),
             new PIDController(ROTATION.p(), ROTATION.i(), ROTATION.d()),
             this::setModuleStates,
-            useAllianceColor)
+            false)
         .andThen(stop());
   }
 
   /** Follows the specified path planner path given a path name */
-  public Command follow(String pathName, boolean resetPosition, boolean useAllianceColor) {
+  public Command follow(String pathName, boolean resetPosition) {
     PathPlannerTrajectory loadedPath = PathPlanner.loadPath(pathName, CONSTRAINTS);
-    return (resetPosition ? pathOdometryReset(loadedPath, useAllianceColor) : Commands.none())
-        .andThen(follow(loadedPath, useAllianceColor));
+    return (resetPosition ? pathOdometryReset(loadedPath) : Commands.none())
+        .andThen(follow(loadedPath));
   }
 
   /** Resets odometry to first pose in path, using ppl to reflects if using alliance color */
-  public Command pathOdometryReset(PathPlannerTrajectory trajectory, boolean useAllianceColor) {
-    var initialState =
-        useAllianceColor
-            ? PathPlannerTrajectory.transformStateForAlliance(
-                trajectory.getInitialState(), DriverStation.getAlliance())
-            : trajectory.getInitialState();
+  public Command pathOdometryReset(PathPlannerTrajectory trajectory) {
+    var initialState = trajectory.getInitialState();
     Pose2d initialPose =
         new Pose2d(initialState.poseMeters.getTranslation(), initialState.holonomicRotation);
     return Commands.runOnce(() -> resetOdometry(initialPose), this);
@@ -296,18 +291,18 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Creates and follows trajectroy for swerve from startPose to desiredPose */
-  public Command driveToPose(Pose2d startPose, Pose2d desiredPose, boolean useAllianceColor) {
+  public Command driveToPose(Pose2d startPose, Pose2d desiredPose) {
     Rotation2d heading = desiredPose.minus(startPose).getTranslation().getAngle();
     PathPoint start = new PathPoint(startPose.getTranslation(), heading, startPose.getRotation());
     PathPoint goal =
         new PathPoint(desiredPose.getTranslation(), heading, desiredPose.getRotation());
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(CONSTRAINTS, start, goal);
-    return follow(trajectory, useAllianceColor);
+    return follow(trajectory);
   }
 
   /** Creates and follows trajectory for swerve from current pose to desiredPose */
-  public Command driveToPose(Pose2d desiredPose, boolean useAllianceColor) {
-    return driveToPose(getPose(), desiredPose, useAllianceColor);
+  public Command driveToPose(Pose2d desiredPose) {
+    return driveToPose(getPose(), desiredPose);
   }
 
   public void close() {
