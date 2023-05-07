@@ -4,24 +4,21 @@ import static org.sciborgs1155.robot.Constants.Auto.*;
 import static org.sciborgs1155.robot.Constants.Drive.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.Constants.Positions.*;
+import static org.sciborgs1155.robot.util.PPLPathFlipper.*;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -224,53 +221,6 @@ public final class Autos implements Sendable {
 
   public Command followPath(List<PathPlannerTrajectory> path) {
     return builder.fullAuto(pathForAlliance(path, DriverStation.getAlliance()));
-  }
-
-  public static List<PathPlannerTrajectory> pathForAlliance(
-      List<PathPlannerTrajectory> path, DriverStation.Alliance alliance) {
-    if (alliance == Alliance.Red) {
-      return flipPathGroup(path);
-    }
-    return path;
-  }
-
-  public static List<PathPlannerTrajectory> flipPathGroup(List<PathPlannerTrajectory> pathGroup) {
-    List<PathPlannerTrajectory> flippedPathGroup = new ArrayList<PathPlannerTrajectory>();
-    for (PathPlannerTrajectory path : pathGroup) {
-      flippedPathGroup.add(flipPath(path));
-    }
-    return flippedPathGroup;
-  }
-
-  public static PathPlannerTrajectory flipPath(PathPlannerTrajectory path) {
-    List<State> flippedStates = new ArrayList<State>();
-    for (int i = 0; i < path.getStates().size(); i++) {
-      flippedStates.add(flipPPState(path.getState(i)));
-    }
-    return new PathPlannerTrajectory(
-        flippedStates,
-        path.getMarkers(),
-        path.getStartStopEvent(),
-        path.getEndStopEvent(),
-        path.fromGUI);
-  }
-
-  public static PathPlannerState flipPPState(PathPlannerState state) {
-    var flippedState = new PathPlannerState();
-    flippedState.accelerationMetersPerSecondSq = state.accelerationMetersPerSecondSq;
-    flippedState.angularVelocityRadPerSec = -state.angularVelocityRadPerSec;
-    flippedState.curvatureRadPerMeter = -state.curvatureRadPerMeter;
-    flippedState.timeSeconds = state.timeSeconds;
-    flippedState.velocityMetersPerSecond = state.velocityMetersPerSecond;
-    flippedState.holonomicAngularVelocityRadPerSec = -state.holonomicAngularVelocityRadPerSec;
-    flippedState.holonomicRotation =
-        Rotation2d.fromRadians(Math.PI - state.holonomicRotation.getRadians());
-    flippedState.poseMeters =
-        new Pose2d(
-            FIELD_LENGTH_METERS - state.poseMeters.getX(),
-            state.poseMeters.getY(),
-            Rotation2d.fromRadians(Math.PI - state.poseMeters.getRotation().getRadians()));
-    return flippedState;
   }
 
   public Command balance() {
