@@ -7,20 +7,26 @@ import static org.sciborgs1155.robot.Constants.Positions.*;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;
@@ -82,7 +88,7 @@ public final class Autos implements Sendable {
             Map.entry("initialIntake", initialIntake()));
 
     autoChooser = new SendableChooser<Supplier<Command>>();
-    configureMainAutos();
+    configureAllAutos();
 
     builder =
         new SwerveAutoBuilder(
@@ -93,7 +99,7 @@ public final class Autos implements Sendable {
             ROTATION.toPPL(),
             drive::setModuleStates,
             eventMarkers,
-            true,
+            false,
             drive);
   }
 
@@ -208,7 +214,7 @@ public final class Autos implements Sendable {
   }
 
   private void configureTestAutos() {
-    autoChooser.addOption("one meter test", () -> builder.fullAuto(Paths.ONE_METER_TEST));
+    autoChooser.addOption("one meter test", () -> followPath(Paths.ONE_METER_TEST));
     autoChooser.addOption("2 gamepeice (bump)", () -> twoGamepiece(StartingPos.BUMP));
   }
 
@@ -216,6 +222,52 @@ public final class Autos implements Sendable {
     configureMainAutos();
     configureExtraAutos();
     configureTestAutos();
+  }
+
+  public Command followPath(List<PathPlannerTrajectory> path) {
+    return builder.fullAuto(pathForAlliance(path, DriverStation.getAlliance()));
+  }
+
+  public static List<PathPlannerTrajectory> pathForAlliance(List<PathPlannerTrajectory> path, DriverStation.Alliance alliance) {
+    if (alliance == Alliance.Red) {
+      return flipPathGroup(path);
+    }
+    return path;
+  }
+
+  public static List<PathPlannerTrajectory> flipPathGroup(List<PathPlannerTrajectory> pathGroup) {
+    List<PathPlannerTrajectory> flippedPathGroup = new ArrayList<PathPlannerTrajectory>();
+    for (PathPlannerTrajectory path : pathGroup) {
+      flippedPathGroup.add(flipPath(path));
+    }
+    return flippedPathGroup;
+  }
+
+  public static PathPlannerTrajectory flipPath(PathPlannerTrajectory path) {
+    List<State> flippedStates = new ArrayList<State>();
+    for (int i = 0; i < path.getStates().size(); i++) {
+      flippedStates.add(flipPPState(path.getState(i)));
+    }
+    return
+     new PathPlannerTrajectory(flippedStates, path.getMarkers(), path.getStartStopEvent(), path.getEndStopEvent(), path.fromGUI);
+  }
+
+  public static PathPlannerState flipPPState(PathPlannerState state) {
+    var flippedState = new PathPlannerState();
+    flippedState.accelerationMetersPerSecondSq = state.accelerationMetersPerSecondSq;
+    flippedState.angularVelocityRadPerSec = - state.angularVelocityRadPerSec;
+    flippedState.curvatureRadPerMeter = - state.curvatureRadPerMeter;
+    flippedState.timeSeconds = state.timeSeconds;
+    flippedState.velocityMetersPerSecond = state.velocityMetersPerSecond;
+    flippedState.holonomicAngularVelocityRadPerSec = - state.holonomicAngularVelocityRadPerSec;
+    flippedState.holonomicRotation = Rotation2d.fromRadians(Math.PI - state.holonomicRotation.getRadians());
+    flippedState.poseMeters =
+      new Pose2d(
+        FIELD_LENGTH_METERS - state.poseMeters.getX(),
+        state.poseMeters.getY(),
+        Rotation2d.fromRadians(Math.PI - state.poseMeters.getRotation().getRadians())
+      );
+    return flippedState;
   }
 
   public Command balance() {
@@ -259,7 +311,7 @@ public final class Autos implements Sendable {
 
   /** back cone, cube intake, back cube */
   public Command twoGamepiece(StartingPos startingPos) {
-    return builder.fullAuto(
+    return followPath(
         switch (startingPos) {
           case BUMP -> Paths.TWO_GAMEPIECE_BUMP;
           case FLAT -> Paths.TWO_GAMEPIECE_FLAT;
@@ -320,7 +372,7 @@ public final class Autos implements Sendable {
   }
 
   private Command coneLeave(StartingPos startingPos) {
-    return builder.fullAuto(
+    return followPath(
         switch (startingPos) {
           case BUMP -> Paths.CONE_LEAVE_BUMP;
           case FLAT -> Paths.CONE_LEAVE_FLAT;
@@ -329,7 +381,7 @@ public final class Autos implements Sendable {
   }
 
   private Command cubeLeave(StartingPos startingPos) {
-    return builder.fullAuto(
+    return followPath(
         switch (startingPos) {
           case BUMP -> Paths.CUBE_LEAVE_BUMP;
           case FLAT -> Paths.CUBE_LEAVE_FLAT;
@@ -338,19 +390,19 @@ public final class Autos implements Sendable {
   }
 
   private Command cubeIntake() {
-    return builder.fullAuto(Paths.CUBE_INTAKE_FLAT);
+    return followPath(Paths.CUBE_INTAKE_FLAT);
   }
 
   private Command lowCubeLeave() {
     return Commands.sequence(
         placement.goTo(FRONT_INTAKE),
         outtake(GamePiece.CUBE),
-        builder.fullAuto(Paths.LEAVE_FLAT_BACKWARDS));
+        followPath(Paths.LEAVE_FLAT_BACKWARDS));
   }
 
   /** backup: no arm */
   private Command leave(StartingPos startingPos) {
-    return builder.fullAuto(
+    return followPath(
         switch (startingPos) {
           case BUMP -> Paths.LEAVE_BUMP;
           case FLAT -> Paths.LEAVE_FLAT;
