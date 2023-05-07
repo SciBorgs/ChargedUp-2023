@@ -21,12 +21,10 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
-
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;
@@ -228,7 +226,8 @@ public final class Autos implements Sendable {
     return builder.fullAuto(pathForAlliance(path, DriverStation.getAlliance()));
   }
 
-  public static List<PathPlannerTrajectory> pathForAlliance(List<PathPlannerTrajectory> path, DriverStation.Alliance alliance) {
+  public static List<PathPlannerTrajectory> pathForAlliance(
+      List<PathPlannerTrajectory> path, DriverStation.Alliance alliance) {
     if (alliance == Alliance.Red) {
       return flipPathGroup(path);
     }
@@ -248,25 +247,29 @@ public final class Autos implements Sendable {
     for (int i = 0; i < path.getStates().size(); i++) {
       flippedStates.add(flipPPState(path.getState(i)));
     }
-    return
-     new PathPlannerTrajectory(flippedStates, path.getMarkers(), path.getStartStopEvent(), path.getEndStopEvent(), path.fromGUI);
+    return new PathPlannerTrajectory(
+        flippedStates,
+        path.getMarkers(),
+        path.getStartStopEvent(),
+        path.getEndStopEvent(),
+        path.fromGUI);
   }
 
   public static PathPlannerState flipPPState(PathPlannerState state) {
     var flippedState = new PathPlannerState();
     flippedState.accelerationMetersPerSecondSq = state.accelerationMetersPerSecondSq;
-    flippedState.angularVelocityRadPerSec = - state.angularVelocityRadPerSec;
-    flippedState.curvatureRadPerMeter = - state.curvatureRadPerMeter;
+    flippedState.angularVelocityRadPerSec = -state.angularVelocityRadPerSec;
+    flippedState.curvatureRadPerMeter = -state.curvatureRadPerMeter;
     flippedState.timeSeconds = state.timeSeconds;
     flippedState.velocityMetersPerSecond = state.velocityMetersPerSecond;
-    flippedState.holonomicAngularVelocityRadPerSec = - state.holonomicAngularVelocityRadPerSec;
-    flippedState.holonomicRotation = Rotation2d.fromRadians(Math.PI - state.holonomicRotation.getRadians());
+    flippedState.holonomicAngularVelocityRadPerSec = -state.holonomicAngularVelocityRadPerSec;
+    flippedState.holonomicRotation =
+        Rotation2d.fromRadians(Math.PI - state.holonomicRotation.getRadians());
     flippedState.poseMeters =
-      new Pose2d(
-        FIELD_LENGTH_METERS - state.poseMeters.getX(),
-        state.poseMeters.getY(),
-        Rotation2d.fromRadians(Math.PI - state.poseMeters.getRotation().getRadians())
-      );
+        new Pose2d(
+            FIELD_LENGTH_METERS - state.poseMeters.getX(),
+            state.poseMeters.getY(),
+            Rotation2d.fromRadians(Math.PI - state.poseMeters.getRotation().getRadians()));
     return flippedState;
   }
 
