@@ -236,9 +236,10 @@ public final class Autos implements Sendable {
         };
     return Commands.sequence(
         staticOdometryReset(CONE, Rotation2d.fromRadians(0), startingPos),
-        highConeScore(),
-        Commands.parallel(followPath(pathGroup.get(0), false), frontMovingIntake()),
-        initialIntake(),
+        highConeScore(true),
+        Commands.parallel(
+            Commands.sequence(Commands.waitSeconds(0.5), followPath(pathGroup.get(0), false)),
+            frontMovingIntake()),
         Commands.parallel(followPath(pathGroup.get(1), false), placement.goTo(STOW)),
         backHighCubeScore(),
         placement.goTo(SAFE));
@@ -266,22 +267,24 @@ public final class Autos implements Sendable {
         followPath(Paths.BALANCE.get(0), true).withTimeout(4), balance(), drive.lock());
   }
 
-  private Command highConeScore() {
-    return Commands.sequence(
-        initialIntake(), placement.goTo(BACK_HIGH_CONE).withTimeout(5), outtake(CONE));
-  }
-
   private Command justScore(GamePiece gamePiece, StartingPos startingPos) {
     return Commands.sequence(
         staticOdometryReset(gamePiece, Rotation2d.fromDegrees(0), startingPos),
         switch (gamePiece) {
-          case CONE -> highConeScore();
+          case CONE -> highConeScore(true);
           case CUBE -> backHighCubeScore();
         });
   }
 
   private Command backHighCubeScore() {
     return Commands.sequence(placement.goTo(BACK_HIGH_CUBE).withTimeout(5), outtake(CUBE));
+  }
+
+  private Command highConeScore(boolean preloaded) {
+    return Commands.sequence(
+        preloaded ? initialIntake() : Commands.none(),
+        placement.goTo(BACK_HIGH_CONE).withTimeout(5),
+        outtake(CONE));
   }
 
   /** no PPL */
@@ -297,7 +300,7 @@ public final class Autos implements Sendable {
   private Command coneBalance() {
     return Commands.sequence(
         staticOdometryReset(CONE, BACK, CENTER),
-        highConeScore(),
+        highConeScore(true),
         placement.goTo(SAFE).withTimeout(3.5),
         fullBalance());
   }
@@ -311,7 +314,7 @@ public final class Autos implements Sendable {
         };
     return Commands.sequence(
         staticOdometryReset(CONE, BACK, startingPos),
-        highConeScore(),
+        highConeScore(true),
         Commands.parallel(followPath(pathGroup.get(0), false), placement.goTo(SAFE)));
   }
 
@@ -332,7 +335,10 @@ public final class Autos implements Sendable {
     return Commands.sequence(
         staticOdometryReset(CUBE, BACK, FLAT),
         backHighCubeScore(),
-        Commands.parallel(followPath(Paths.CUBE_INTAKE_FLAT.get(0), false), frontMovingIntake()),
+        Commands.parallel(
+            Commands.sequence(
+                Commands.waitSeconds(0.5), followPath(Paths.CUBE_INTAKE_FLAT.get(0), false)),
+            frontMovingIntake()),
         initialIntake());
   }
 
