@@ -55,6 +55,8 @@ public final class Autos implements Sendable {
         loadPath("leaveComm f backwards");
 
     public static final List<PathPlannerTrajectory> ONE_METER_TEST = loadPath("one meter");
+
+    public static final List<PathPlannerTrajectory> BALANCE = loadPath("balance");
   }
 
   private final Drive drive;
@@ -201,18 +203,6 @@ public final class Autos implements Sendable {
         .andThen(drive.follow(newPath));
   }
 
-  public Command balance() {
-    var controller = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
-    controller.setTolerance(PITCH_TOLERANCE);
-    controller.setSetpoint(0);
-
-    return Commands.run(
-            () -> drive.drive(new ChassisSpeeds(controller.calculate(drive.getPitch()), 0, 0)),
-            drive)
-        .until(controller::atSetpoint)
-        .andThen(drive.lock());
-  }
-
   private Command outtake(GamePiece gamePiece) {
     return Commands.sequence(
         intake
@@ -259,13 +249,21 @@ public final class Autos implements Sendable {
         staticOdometryReset(CUBE, Rotation2d.fromRadians(0), CENTER), fullBalance());
   }
 
-  private Command fullBalance() { // TODO check if this is good
-    return drive
-        .follow("balance", true)
-        .withTimeout(4)
-        .andThen(balance())
-        .andThen(drive.lock())
-        .withName("balance auto");
+  public Command balance() {
+    var controller = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
+    controller.setTolerance(PITCH_TOLERANCE);
+    controller.setSetpoint(0);
+
+    return Commands.run(
+            () -> drive.drive(new ChassisSpeeds(controller.calculate(drive.getPitch()), 0, 0)),
+            drive)
+        .until(controller::atSetpoint)
+        .andThen(drive.lock());
+  }
+
+  private Command fullBalance() {
+    return Commands.sequence(
+        followPath(Paths.BALANCE.get(0), true).withTimeout(4), balance(), drive.lock());
   }
 
   private Command highConeScore() {
