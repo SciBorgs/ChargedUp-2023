@@ -58,17 +58,17 @@ public class PathFlipper {
     flippedState.holonomicRotation =
         Rotation2d.fromRadians(Math.PI - state.holonomicRotation.getRadians());
     flippedState.poseMeters = flipPose(state.poseMeters);
-        // new Pose2d(
-        //     FIELD_LENGTH_METERS - state.poseMeters.getX(),
-        //     state.poseMeters.getY(),
-        //     Rotation2d.fromRadians(Math.PI - state.poseMeters.getRotation().getRadians()));
+    // new Pose2d(
+    //     FIELD_LENGTH_METERS - state.poseMeters.getX(),
+    //     state.poseMeters.getY(),
+    //     Rotation2d.fromRadians(Math.PI - state.poseMeters.getRotation().getRadians()));
     return flippedState;
   }
 
   public static Pose2d flipPose(Pose2d pose) {
     return new Pose2d(
-      FIELD_LENGTH_METERS - pose.getX(),
-      pose.getY(),
-      Rotation2d.fromRadians(Math.PI - pose.getRotation().getRadians()));
+        FIELD_LENGTH_METERS - pose.getX(),
+        pose.getY(),
+        Rotation2d.fromRadians(Math.PI - pose.getRotation().getRadians()));
   }
 }

@@ -31,7 +31,6 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import java.util.function.DoubleSupplier;
-
 import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
@@ -306,8 +305,7 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
 
   /** Creates and follows trajectory for swerve from current pose to desiredPose */
   public Command driveToPose(Pose2d desiredPose) {
-    return new DeferredCommand(() -> 
-      driveToPose(getPose(), desiredPose), this);
+    return new DeferredCommand(() -> driveToPose(getPose(), desiredPose), this);
   }
 
   public static List<PathPlannerTrajectory> loadPath(String pathName) {
@@ -316,8 +314,7 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
 
   public Command followPath(PathPlannerTrajectory path, boolean resetOdometry) {
     var newPath = pathForAlliance(path, DriverStation.getAlliance());
-    return (resetOdometry ? pathOdometryReset(newPath) : Commands.none())
-        .andThen(follow(newPath));
+    return (resetOdometry ? pathOdometryReset(newPath) : Commands.none()).andThen(follow(newPath));
   }
 
   public void close() {

@@ -4,9 +4,9 @@ import static org.sciborgs1155.robot.Constants.Auto.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.Constants.Positions.*;
 import static org.sciborgs1155.robot.commands.Autos.StartingPos.*;
+import static org.sciborgs1155.robot.subsystems.Drive.loadPath;
 import static org.sciborgs1155.robot.util.placement.PlacementState.GamePiece.*;
 import static org.sciborgs1155.robot.util.placement.PlacementState.Side.*;
-import static org.sciborgs1155.robot.subsystems.Drive.loadPath;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.controller.PIDController;
@@ -181,7 +181,8 @@ public final class Autos implements Sendable {
   }
 
   private void configureTestAutos() {
-    autoChooser.addOption("one meter test", () -> drive.followPath(Paths.ONE_METER_TEST.get(0), true));
+    autoChooser.addOption(
+        "one meter test", () -> drive.followPath(Paths.ONE_METER_TEST.get(0), true));
     autoChooser.addOption("2 gamepeice (bump)", () -> twoGamepiece(BUMP));
   }
 

@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
-
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.robot.Constants.Drive.SpeedMultiplier;
