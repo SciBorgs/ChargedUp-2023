@@ -11,7 +11,6 @@ import static org.sciborgs1155.robot.util.placement.PlacementState.Side.*;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,7 +22,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
@@ -65,41 +63,13 @@ public final class Autos implements Sendable {
 
   private final SendableChooser<Supplier<Command>> autoChooser;
 
-  private final SwerveAutoBuilder builder;
-
-  private final Map<String, Command> eventMarkers;
-
   public Autos(Drive drive, Placement placement, Intake intake) {
     this.drive = drive;
     this.intake = intake;
     this.placement = placement;
 
-    eventMarkers =
-        Map.ofEntries(
-            Map.entry("backHighCone", placement.goTo(BACK_HIGH_CONE)),
-            Map.entry("backHighCube", placement.goTo(BACK_HIGH_CUBE)),
-            Map.entry("frontHighCube", placement.goTo(FRONT_HIGH_CUBE)),
-            Map.entry("outtakeCone", outtake(CONE)),
-            Map.entry("outtakeCube", outtake(CUBE)),
-            Map.entry("frontIntake", frontMovingIntake()),
-            Map.entry("stow", placement.goTo(STOW)),
-            Map.entry("balanceState", placement.goTo(SAFE)),
-            Map.entry("initialIntake", initialIntake()));
-
     autoChooser = new SendableChooser<Supplier<Command>>();
     configureAllAutos();
-
-    builder =
-        new SwerveAutoBuilder(
-            drive::getPose,
-            drive::resetOdometry,
-            drive.kinematics,
-            TRANSLATION.toPPL(),
-            ROTATION.toPPL(),
-            drive::setModuleStates,
-            eventMarkers,
-            false,
-            drive);
   }
 
   private void configureMainAutos() {
@@ -211,7 +181,7 @@ public final class Autos implements Sendable {
   }
 
   private void configureTestAutos() {
-    autoChooser.addOption("one meter test", () -> followPath(Paths.ONE_METER_TEST));
+    autoChooser.addOption("one meter test", () -> followPath(Paths.ONE_METER_TEST.get(0), true));
     autoChooser.addOption("2 gamepeice (bump)", () -> twoGamepiece(BUMP));
   }
 
@@ -221,8 +191,8 @@ public final class Autos implements Sendable {
     configureTestAutos();
   }
 
-  public Command followPath(List<PathPlannerTrajectory> path) {
-    return builder.fullAuto(pathForAlliance(path, DriverStation.getAlliance()));
+  private static List<PathPlannerTrajectory> loadPath(String pathName) {
+    return PathPlanner.loadPathGroup(pathName, CONSTRAINTS);
   }
 
   public Command followPath(PathPlannerTrajectory path, boolean resetOdometry) {
@@ -266,10 +236,6 @@ public final class Autos implements Sendable {
     return Commands.sequence(intake.intake().withTimeout(INITIAL_INTAKE_TIME), intake.stop());
   }
 
-  private static List<PathPlannerTrajectory> loadPath(String pathName) {
-    return PathPlanner.loadPathGroup(pathName, CONSTRAINTS);
-  }
-
   /** back cone, cube intake, back cube */
   public Command twoGamepiece(StartingPos startingPos) {
     var pathGroup =
@@ -293,7 +259,7 @@ public final class Autos implements Sendable {
         staticOdometryReset(CUBE, Rotation2d.fromRadians(0), CENTER), fullBalance());
   }
 
-  private Command fullBalance() {
+  private Command fullBalance() { // TODO check if this is good
     return drive
         .follow("balance", true)
         .withTimeout(4)
@@ -339,45 +305,72 @@ public final class Autos implements Sendable {
   }
 
   private Command coneLeave(StartingPos startingPos) {
-    return followPath(
+    var pathGroup =
         switch (startingPos) {
           case BUMP -> Paths.CONE_LEAVE_BUMP;
           case FLAT -> Paths.CONE_LEAVE_FLAT;
           case CENTER -> Paths.CONE_LEAVE_FLAT;
-        });
+        };
+    return Commands.sequence(
+      staticOdometryReset(CONE, BACK, startingPos),
+      highConeScore(),
+      Commands.parallel(
+        followPath(pathGroup.get(0), false),
+        placement.goTo(SAFE)
+      )
+    );
   }
 
   private Command cubeLeave(StartingPos startingPos) {
-    return followPath(
+    var pathGroup =
         switch (startingPos) {
           case BUMP -> Paths.CUBE_LEAVE_BUMP;
           case FLAT -> Paths.CUBE_LEAVE_FLAT;
           case CENTER -> Paths.CONE_LEAVE_FLAT;
-        });
+        };
+    return Commands.sequence(
+      staticOdometryReset(CUBE, BACK, startingPos),
+      backHighCubeScore(),
+      Commands.parallel(
+        followPath(pathGroup.get(0), false),
+        placement.goTo(SAFE)
+      )
+    );
   }
 
   private Command cubeIntake() {
-    return followPath(Paths.CUBE_INTAKE_FLAT);
+    return Commands.sequence(
+      staticOdometryReset(CUBE, BACK, FLAT),
+      backHighCubeScore(),
+      Commands.parallel(
+        followPath(Paths.CUBE_INTAKE_FLAT.get(0), false),
+        frontMovingIntake()
+      ),
+      initialIntake()
+    );
   }
 
   private Command lowCubeLeave() {
     return Commands.sequence(
-        placement.goTo(FRONT_INTAKE), outtake(CUBE), followPath(Paths.LEAVE_FLAT_BACKWARDS));
+        staticOdometryReset(CONE, FRONT, FLAT),
+        placement.goTo(FRONT_INTAKE), 
+        outtake(CUBE),
+        followPath(Paths.LEAVE_FLAT_BACKWARDS.get(0), false));
   }
 
   /** backup: no arm */
   private Command leave(StartingPos startingPos) {
     return followPath(
-        switch (startingPos) {
-          case BUMP -> Paths.LEAVE_BUMP;
-          case FLAT -> Paths.LEAVE_FLAT;
-          case CENTER -> Paths.LEAVE_FLAT;
-        });
+      (switch (startingPos) {
+        case BUMP -> Paths.LEAVE_BUMP;
+        case FLAT -> Paths.LEAVE_FLAT;
+        case CENTER -> Paths.LEAVE_FLAT;
+      }).get(0), true);
   }
 
-  public Command staticOdometryReset(GamePiece gamePiece, Side side, StartingPos startingPos) {
+  public Command staticOdometryReset(GamePiece gamePiece, Side scoringSide, StartingPos startingPos) {
     return staticOdometryReset(
-        gamePiece, Rotation2d.fromRadians(Math.PI - side.rads()), startingPos);
+        gamePiece, Rotation2d.fromRadians(Math.PI - scoringSide.rads()), startingPos);
   }
 
   /** resets odometry where feild is static (doesn't depend on alliance) */
