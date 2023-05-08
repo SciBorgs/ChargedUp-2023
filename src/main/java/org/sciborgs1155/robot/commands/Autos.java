@@ -69,7 +69,7 @@ public final class Autos implements Sendable {
     this.placement = placement;
 
     autoChooser = new SendableChooser<Supplier<Command>>();
-    configureAllAutos();
+    configureMainAutos();
   }
 
   private void configureMainAutos() {
