@@ -312,13 +312,9 @@ public final class Autos implements Sendable {
           case CENTER -> Paths.CONE_LEAVE_FLAT;
         };
     return Commands.sequence(
-      staticOdometryReset(CONE, BACK, startingPos),
-      highConeScore(),
-      Commands.parallel(
-        followPath(pathGroup.get(0), false),
-        placement.goTo(SAFE)
-      )
-    );
+        staticOdometryReset(CONE, BACK, startingPos),
+        highConeScore(),
+        Commands.parallel(followPath(pathGroup.get(0), false), placement.goTo(SAFE)));
   }
 
   private Command cubeLeave(StartingPos startingPos) {
@@ -329,31 +325,23 @@ public final class Autos implements Sendable {
           case CENTER -> Paths.CONE_LEAVE_FLAT;
         };
     return Commands.sequence(
-      staticOdometryReset(CUBE, BACK, startingPos),
-      backHighCubeScore(),
-      Commands.parallel(
-        followPath(pathGroup.get(0), false),
-        placement.goTo(SAFE)
-      )
-    );
+        staticOdometryReset(CUBE, BACK, startingPos),
+        backHighCubeScore(),
+        Commands.parallel(followPath(pathGroup.get(0), false), placement.goTo(SAFE)));
   }
 
   private Command cubeIntake() {
     return Commands.sequence(
-      staticOdometryReset(CUBE, BACK, FLAT),
-      backHighCubeScore(),
-      Commands.parallel(
-        followPath(Paths.CUBE_INTAKE_FLAT.get(0), false),
-        frontMovingIntake()
-      ),
-      initialIntake()
-    );
+        staticOdometryReset(CUBE, BACK, FLAT),
+        backHighCubeScore(),
+        Commands.parallel(followPath(Paths.CUBE_INTAKE_FLAT.get(0), false), frontMovingIntake()),
+        initialIntake());
   }
 
   private Command lowCubeLeave() {
     return Commands.sequence(
         staticOdometryReset(CONE, FRONT, FLAT),
-        placement.goTo(FRONT_INTAKE), 
+        placement.goTo(FRONT_INTAKE),
         outtake(CUBE),
         followPath(Paths.LEAVE_FLAT_BACKWARDS.get(0), false));
   }
@@ -361,14 +349,17 @@ public final class Autos implements Sendable {
   /** backup: no arm */
   private Command leave(StartingPos startingPos) {
     return followPath(
-      (switch (startingPos) {
-        case BUMP -> Paths.LEAVE_BUMP;
-        case FLAT -> Paths.LEAVE_FLAT;
-        case CENTER -> Paths.LEAVE_FLAT;
-      }).get(0), true);
+        (switch (startingPos) {
+              case BUMP -> Paths.LEAVE_BUMP;
+              case FLAT -> Paths.LEAVE_FLAT;
+              case CENTER -> Paths.LEAVE_FLAT;
+            })
+            .get(0),
+        true);
   }
 
-  public Command staticOdometryReset(GamePiece gamePiece, Side scoringSide, StartingPos startingPos) {
+  public Command staticOdometryReset(
+      GamePiece gamePiece, Side scoringSide, StartingPos startingPos) {
     return staticOdometryReset(
         gamePiece, Rotation2d.fromRadians(Math.PI - scoringSide.rads()), startingPos);
   }
