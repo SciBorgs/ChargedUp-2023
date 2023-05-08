@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.subsystems;
 
 import static org.sciborgs1155.robot.Constants.Drive.*;
 import static org.sciborgs1155.robot.Ports.Drive.*;
+import static org.sciborgs1155.robot.util.PathFlipper.*;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.PathPlanner;
@@ -20,6 +21,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,6 +31,8 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import java.util.function.DoubleSupplier;
+
+import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 import org.sciborgs1155.robot.util.Vision;
@@ -302,7 +306,18 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
 
   /** Creates and follows trajectory for swerve from current pose to desiredPose */
   public Command driveToPose(Pose2d desiredPose) {
-    return driveToPose(getPose(), desiredPose);
+    return new DeferredCommand(() -> 
+      driveToPose(getPose(), desiredPose), this);
+  }
+
+  public static List<PathPlannerTrajectory> loadPath(String pathName) {
+    return PathPlanner.loadPathGroup(pathName, CONSTRAINTS);
+  }
+
+  public Command followPath(PathPlannerTrajectory path, boolean resetOdometry) {
+    var newPath = pathForAlliance(path, DriverStation.getAlliance());
+    return (resetOdometry ? pathOdometryReset(newPath) : Commands.none())
+        .andThen(follow(newPath));
   }
 
   public void close() {

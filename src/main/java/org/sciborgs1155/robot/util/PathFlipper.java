@@ -7,26 +7,23 @@ import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory.State;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PPLPathFlipper {
+public class PathFlipper {
   public static List<PathPlannerTrajectory> pathForAlliance(
-      List<PathPlannerTrajectory> path, DriverStation.Alliance alliance) {
-    if (alliance == Alliance.Red) {
-      return flipPathGroup(path);
-    }
-    return path;
+      List<PathPlannerTrajectory> path, Alliance alliance) {
+    return alliance == Alliance.Red ? flipPathGroup(path) : path;
   }
 
   public static PathPlannerTrajectory pathForAlliance(
-      PathPlannerTrajectory path, DriverStation.Alliance alliance) {
-    if (alliance == Alliance.Red) {
-      return flipPath(path);
-    }
-    return path;
+      PathPlannerTrajectory path, Alliance alliance) {
+    return alliance == Alliance.Red ? flipPath(path) : path;
+  }
+
+  public static Pose2d poseForAlliance(Pose2d pose, Alliance alliance) {
+    return alliance == Alliance.Red ? flipPose(pose) : pose;
   }
 
   public static List<PathPlannerTrajectory> flipPathGroup(List<PathPlannerTrajectory> pathGroup) {
@@ -60,11 +57,18 @@ public class PPLPathFlipper {
     flippedState.holonomicAngularVelocityRadPerSec = -state.holonomicAngularVelocityRadPerSec;
     flippedState.holonomicRotation =
         Rotation2d.fromRadians(Math.PI - state.holonomicRotation.getRadians());
-    flippedState.poseMeters =
-        new Pose2d(
-            FIELD_LENGTH_METERS - state.poseMeters.getX(),
-            state.poseMeters.getY(),
-            Rotation2d.fromRadians(Math.PI - state.poseMeters.getRotation().getRadians()));
+    flippedState.poseMeters = flipPose(state.poseMeters);
+        // new Pose2d(
+        //     FIELD_LENGTH_METERS - state.poseMeters.getX(),
+        //     state.poseMeters.getY(),
+        //     Rotation2d.fromRadians(Math.PI - state.poseMeters.getRotation().getRadians()));
     return flippedState;
+  }
+
+  public static Pose2d flipPose(Pose2d pose) {
+    return new Pose2d(
+      FIELD_LENGTH_METERS - pose.getX(),
+      pose.getY(),
+      Rotation2d.fromRadians(Math.PI - pose.getRotation().getRadians()));
   }
 }
