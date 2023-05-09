@@ -16,11 +16,7 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "initialIntake",
-          "backHighCone",
-          "outtakeCone"
-        ],
+        "names": [],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
@@ -70,9 +66,7 @@
       "isLocked": false,
       "isStopPoint": true,
       "stopEvent": {
-        "names": [
-          "initialIntake"
-        ],
+        "names": [],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
@@ -94,11 +88,7 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "backHighCube",
-          "outtakeCube",
-          "balanceState"
-        ],
+        "names": [],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0.5
@@ -108,19 +98,5 @@
   "maxVelocity": 4.0,
   "maxAcceleration": 8.0,
   "isReversed": null,
-  "markers": [
-    {
-      "position": 0.001,
-      "names": [
-        "frontIntake"
-      ]
-    },
-    {
-      "position": 2.19,
-      "names": [
-        "event",
-        "stow"
-      ]
-    }
-  ]
+  "markers": []
 }
