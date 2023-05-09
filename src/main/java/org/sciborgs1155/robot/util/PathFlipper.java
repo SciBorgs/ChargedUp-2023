@@ -58,10 +58,6 @@ public class PathFlipper {
     flippedState.holonomicRotation =
         Rotation2d.fromRadians(Math.PI - state.holonomicRotation.getRadians());
     flippedState.poseMeters = flipPose(state.poseMeters);
-    // new Pose2d(
-    //     FIELD_LENGTH_METERS - state.poseMeters.getX(),
-    //     state.poseMeters.getY(),
-    //     Rotation2d.fromRadians(Math.PI - state.poseMeters.getRotation().getRadians()));
     return flippedState;
   }
 
