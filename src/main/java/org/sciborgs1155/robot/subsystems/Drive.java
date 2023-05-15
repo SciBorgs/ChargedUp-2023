@@ -30,6 +30,8 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import java.util.function.DoubleSupplier;
+
+import org.photonvision.EstimatedRobotPose;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
 import org.sciborgs1155.robot.util.Vision;
@@ -184,38 +186,19 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
   private SwerveModulePosition[] getModulePositions() {
     return modules.stream().map(SwerveModule::getPosition).toArray(SwerveModulePosition[]::new);
   }
+  public void updateEstimates(EstimatedRobotPose[] newEstimates){
+    for (int i = 0; i < newEstimates.length; i++) {
+      odometry.addVisionMeasurement(newEstimates[i].estimatedPose.toPose2d(), newEstimates[i].timestampSeconds);
+      field2d.getObject("Cam-" + i + " Est Pose").setPose(newEstimates[i].estimatedPose.toPose2d());
+    }
 
-  /**
-   * Returns the pitch value recorded by the pigeon.
-   *
-   * @return The pitch value of the pigeon.
-   */
-  @Log
-  public double getPitch() {
-    return imu.getPitch();
-  }
-
-  /**
-   * Returns the roll value recorded by the pigeon.
-   *
-   * @return The roll value of the pigeon.
-   */
-  @Log
-  public double getRoll() {
-    return imu.getRoll();
   }
 
   @Override
   public void periodic() {
     odometry.update(getHeading(), getModulePositions());
 
-    var poses = vision.getPoseEstimates(getPose());
-
-    for (int i = 0; i < poses.length; i++) {
-      odometry.addVisionMeasurement(poses[i].estimatedPose.toPose2d(), poses[i].timestampSeconds);
-      field2d.getObject("Cam-" + i + " Est Pose").setPose(poses[i].estimatedPose.toPose2d());
-    }
-
+    
     field2d.setRobotPose(getPose());
 
     for (int i = 0; i < modules2d.length; i++) {
