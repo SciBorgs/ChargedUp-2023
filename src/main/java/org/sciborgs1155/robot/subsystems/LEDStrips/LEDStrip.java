@@ -4,6 +4,12 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 
 public interface LEDStrip {
 
+  public static LEDStrip create(boolean isWorking, int port){
+    return isWorking 
+      ? new RealLEDStrip(port)
+      : new BrokenLEDStrip();
+  }
+
   public void setLength(int length);
 
   public void setData(AddressableLEDBuffer buffer);

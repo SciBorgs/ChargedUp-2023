@@ -1,11 +1,17 @@
 package org.sciborgs1155.robot.subsystems;
 
+import static org.sciborgs1155.robot.Constants.LED.*;
+
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import org.sciborgs1155.robot.subsystems.LEDStrips.LEDStrip;
 import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;
 
-public class LED extends SubsystemBase implements AutoCloseable {
+public class LED extends SubsystemBase implements AutoCloseable, LEDStrip{
 
   // private static AddressableLED led1;
   // private static AddressableLED led2;
@@ -13,13 +19,20 @@ public class LED extends SubsystemBase implements AutoCloseable {
   // private static AddressableLEDBuffer led2Buffer;
   // static double time = 0.0;
 
+  private static LEDStrip strip1;
+  private static LEDStrip strip2;
+  private static AddressableLEDBuffer ledStrip1Buffer;
+  private static AddressableLEDBuffer ledStrip2Buffer;
+  private static AddressableLEDBuffer ColorBuffer;
+  static double time = 0.0;
+
   public enum LEDColors {
     RAINBOW,
     AUTO,
     ERROR
   }
 
-  public LED() {
+  public LED(boolean isWorking, int port) {
     // led1 = new AddressableLED(Led.led1);
     // led1Buffer = new AddressableLEDBuffer(ledConst.buffer1Length);
     // led1.setLength(led1Buffer.getLength());
@@ -30,6 +43,22 @@ public class LED extends SubsystemBase implements AutoCloseable {
     // led2Buffer = new AddressableLEDBuffer(Constants.led.buffer2Length);
     // led2.setLength(led2Buffer.getLength());
     // led2.start();
+
+    strip1 = LEDStrip.create(isWorking, port);
+    ledStrip1Buffer = new AddressableLEDBuffer(buffer1Length);
+    strip1.setLength(ledStrip1Buffer.getLength());
+    strip1.setData(ledStrip1Buffer);
+    strip1.start();
+
+    strip2 = LEDStrip.create(isWorking, port);
+    ledStrip2Buffer = new AddressableLEDBuffer(buffer2Length);
+    strip2.setLength(ledStrip2Buffer.getLength());
+    strip2.setData(ledStrip2Buffer);
+    strip2.start();
+
+    //adding solidColor buffer
+    ColorBuffer = new AddressableLEDBuffer(ColorBufferLength);
+
   }
   // note: is there a reason that you're using setRGB now instead of setLED?
   // from looking at the source code, it seems like if setRGB works, setLED should work too
@@ -49,6 +78,21 @@ public class LED extends SubsystemBase implements AutoCloseable {
     //   led1.setData(led1Buffer);
     //   led2.setData(led1Buffer);
     // }
+
+       if (gamePiece == GamePiece.CONE) {
+      for (int i = 0; i < ColorBuffer.getLength(); i++) {
+        ColorBuffer.setLED(i, black);
+      }
+      strip1.setData(ColorBuffer);
+      strip2.setData(ColorBuffer);
+
+    } else if (gamePiece == GamePiece.CUBE) {
+      for (int i = 0; i < ColorBuffer.getLength(); i++) {
+        ColorBuffer.setLED(i, lightPurple);
+      }
+      strip1.setData(ColorBuffer);
+      strip2.setData(ColorBuffer);
+    }
   }
 
   public void LedPatterns(LEDColors ledColor) {
@@ -83,6 +127,39 @@ public class LED extends SubsystemBase implements AutoCloseable {
     //   led1.setData(led1Buffer);
     //   led2.setData(led1Buffer);
     // }
+
+
+      if (ledColor == LEDColors.RAINBOW) {
+      time += .005;
+      for (int i = 0; i < ColorBuffer.getLength(); i++) {
+
+        final double constant = i / (ColorBuffer.getLength() * (Math.PI / 2));
+        double green = Math.sin(time + (constant));
+        double blue = Math.cos(time + (constant));
+        double red = -Math.sin(time + (constant));
+
+        green *= 255 / 2;
+        blue *= 255 / 2;
+        red *= 255 / 2;
+
+        green += 255 / 2;
+        blue += 255 / 2;
+        red += 255 / 2;
+
+        ledStrip1Buffer.setRGB(i, (int) red, (int) green, (int) blue);
+        strip1.setData(ColorBuffer);
+        strip2.setData(ColorBuffer);
+      } // for loop
+    } // while loop
+    else if (ledColor == LEDColors.AUTO) {
+
+      for (int i = 0; i < ColorBuffer.getLength(); i++) {
+        if (i < ColorBuffer.getLength() / 2) ColorBuffer.setLED(i, blue);
+        else ColorBuffer.setLED(i, orange);
+      }
+      strip1.setData(ColorBuffer);
+      strip2.setData(ColorBuffer);
+    }
   }
 
   public void errorLED() {
@@ -91,6 +168,8 @@ public class LED extends SubsystemBase implements AutoCloseable {
     // }
     // led1.setData(led1Buffer);
     // led2.setData(led1Buffer);
+
+    
   }
 
   public Command setGamePieceColor(GamePiece gamePiece) {
