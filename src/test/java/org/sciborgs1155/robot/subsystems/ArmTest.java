@@ -91,8 +91,13 @@ public class ArmTest {
   @Test
   void safety() {
     run(arm.setStopped(true));
-    run(arm.setSetpoints(Rotation2d.fromRadians(0.4), Rotation2d.fromRadians(0.8)));
+    assert arm.allowPassOver();
+    run(arm.setSetpoints(Rotation2d.fromRadians(0.4), Rotation2d.fromRadians(0.2)));
     fastForward(600);
     assertEquals(Elbow.MIN_ANGLE, arm.getElbowPosition().getRadians(), ELBOW_DELTA);
+    assertNotEquals(
+        arm.getWristSetpoint().position(),
+        arm.getRelativeWristPosition().getRadians(),
+        WRIST_DELTA);
   }
 }
