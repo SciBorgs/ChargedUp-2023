@@ -2,6 +2,9 @@ package org.sciborgs1155.lib.constants;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
@@ -13,6 +16,18 @@ public record SystemConstants(double s, double g, double v, double a) {
 
   public SystemConstants(double s, double v, double a) {
     this(s, 0, v, a);
+  }
+
+  public SimpleMotorFeedforward createSimpleMotorFF() {
+    return new SimpleMotorFeedforward(s, v, a);
+  }
+
+  public ArmFeedforward createArmFF() {
+    return new ArmFeedforward(s, g, v, a);
+  }
+
+  public ElevatorFeedforward createElevatorFF() {
+    return new ElevatorFeedforward(s, g, v, a);
   }
 
   public DCMotorSim sim(DCMotor gearbox, double gearing) {

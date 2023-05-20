@@ -8,6 +8,9 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
@@ -21,17 +24,54 @@ import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Trajectory;
-import org.sciborgs1155.lib.Trajectory.State;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.subsystems.arm.ElbowIO;
 import org.sciborgs1155.robot.subsystems.arm.JointIO;
+import org.sciborgs1155.robot.subsystems.arm.JointSim;
 import org.sciborgs1155.robot.subsystems.arm.MAXWristJoint;
-import org.sciborgs1155.robot.subsystems.arm.SimJoint;
 import org.sciborgs1155.robot.util.Visualizer;
 
-public class Arm extends SubsystemBase implements Loggable, AutoCloseable, JointIO {
+public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
+
+  public static record JointConfig(
+      DCMotor gearbox,
+      double gearing,
+      double length,
+      double mass,
+      double minAngle,
+      double maxAngle) {}
+
+  public interface Joint extends Sendable, AutoCloseable {
+    public Rotation2d getRotation();
+
+    public State getState();
+
+    public State getDesiredState();
+
+    public void updateDesiredState(State state);
+
+    @Override
+    default void initSendable(SendableBuilder builder) {
+      // TODO Auto-generated method stub
+    }
+  }
+
+  public interface Elevator extends Sendable, AutoCloseable {
+    public double getHeight();
+
+    public State getState();
+
+    public State getDesiredState();
+
+    public void updateDesiredState(State state);
+
+    @Override
+    default void initSendable(SendableBuilder builder) {
+      // TODO Auto-generated method stub
+    }
+  }
 
   @Log(name = "elbow applied output", methodName = "getAppliedOutput")
   // private final CANSparkMax elbow = Elbow.MOTOR.build(MotorType.kBrushless, MIDDLE_ELBOW_MOTOR);
@@ -120,10 +160,10 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable, Joint
       elbowRight = new ElbowIO(newWrist, RIGHT_ELBOW_MOTOR);
       wrist = new MAXWristJoint(newWrist, WRIST_MOTOR);
     } else if (Robot.isReal()) {
-      elbow = new SimJoint();
-      elbowLeft = new SimJoint(newWrist);
-      elbowRight = new SimJoint();
-      wrist = new SimJoint();
+      elbow = new JointSim();
+      elbowLeft = new JointSim(newWrist);
+      elbowRight = new JointSim();
+      wrist = new JointSim();
     }
 
     elbowLeft.follow(elbow);
