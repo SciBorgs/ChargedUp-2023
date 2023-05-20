@@ -4,12 +4,6 @@ import static org.sciborgs1155.robot.Constants.Arm.*;
 import static org.sciborgs1155.robot.Ports.Arm.*;
 
 import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
-import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -31,49 +25,59 @@ import org.sciborgs1155.lib.Trajectory.State;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Robot;
+import org.sciborgs1155.robot.subsystems.arm.ElbowIO;
+import org.sciborgs1155.robot.subsystems.arm.JointIO;
+import org.sciborgs1155.robot.subsystems.arm.SimJoint;
+import org.sciborgs1155.robot.subsystems.arm.MAXWristJoint;
 import org.sciborgs1155.robot.util.Visualizer;
 
-public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
+public class Arm extends SubsystemBase implements Loggable, AutoCloseable, JointIO {
 
   @Log(name = "elbow applied output", methodName = "getAppliedOutput")
-  private final CANSparkMax elbow = Elbow.MOTOR.build(MotorType.kBrushless, MIDDLE_ELBOW_MOTOR);
+  // private final CANSparkMax elbow = Elbow.MOTOR.build(MotorType.kBrushless, MIDDLE_ELBOW_MOTOR);
+  // private final CANSparkMax elbowLeft = Elbow.MOTOR.build(MotorType.kBrushless,
+  // LEFT_ELBOW_MOTOR);
+  // private final CANSparkMax elbowRight = Elbow.MOTOR.build(MotorType.kBrushless,
+  // RIGHT_ELBOW_MOTOR);
+  private boolean working = true;
 
-  private final CANSparkMax elbowLeft = Elbow.MOTOR.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
-  private final CANSparkMax elbowRight = Elbow.MOTOR.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
+  private final JointIO elbow;
+  private final JointIO elbowLeft;
+  private final JointIO elbowRight;
 
   @Log(name = "wrist applied output", methodName = "getAppliedOutput")
-  private final CANSparkMax wrist = Wrist.MOTOR.build(MotorType.kBrushless, WRIST_MOTOR);
+  private final JointIO wrist;
 
   private final Encoder elbowEncoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
   private final EncoderSim elbowEncoderSim = new EncoderSim(elbowEncoder);
 
   @Log(name = "wrist velocity", methodName = "getVelocity")
-  private final AbsoluteEncoder wristEncoder = wrist.getAbsoluteEncoder(Type.kDutyCycle);
+  private final AbsoluteEncoder wristEncoder;
 
-  private final ArmFeedforward elbowFeedforward =
-      new ArmFeedforward(Elbow.FF.s(), Elbow.FF.g(), Elbow.FF.v(), Elbow.FF.a());
-  private final ArmFeedforward wristFeedforward =
-      new ArmFeedforward(Wrist.FF.s(), Wrist.FF.g(), Wrist.FF.v(), Wrist.FF.a());
+  // private final ArmFeedforward elbowFeedforward =
+  //     new ArmFeedforward(Elbow.FF.s(), Elbow.FF.g(), Elbow.FF.v(), Elbow.FF.a());
+  // private final ArmFeedforward wristFeedforward =
+  //     new ArmFeedforward(Wrist.FF.s(), Wrist.FF.g(), Wrist.FF.v(), Wrist.FF.a());
 
-  @Log(name = "elbow feedback")
-  @Log(name = "elbow at setpoint", methodName = "atSetpoint")
-  private final PIDController elbowFeedback =
-      new PIDController(Elbow.PID.p(), Elbow.PID.i(), Elbow.PID.d());
+  // @Log(name = "elbow feedback")
+  // @Log(name = "elbow at setpoint", methodName = "atSetpoint")
+  // private final PIDController elbowFeedback =
+  //     new PIDController(Elbow.PID.p(), Elbow.PID.i(), Elbow.PID.d());
 
-  @Log(name = "wrist feedback")
-  @Log(name = "wrist at setpoint", methodName = "atSetpoint")
-  private final PIDController wristFeedback =
-      new PIDController(Wrist.PID.p(), Wrist.PID.i(), Wrist.PID.d());
+  // @Log(name = "wrist feedback")
+  // @Log(name = "wrist at setpoint", methodName = "atSetpoint")
+  // private final PIDController wristFeedback =
+  //     new PIDController(Wrist.PID.p(), Wrist.PID.i(), Wrist.PID.d());
 
-  @Log(name = "elbow position setpoint", methodName = "position")
-  @Log(name = "elbow velocity setpoint", methodName = "velocity")
-  @Log(name = "elbow acceleration setpoint", methodName = "acceleration")
-  private State elbowSetpoint;
+  // @Log(name = "elbow position setpoint", methodName = "position")
+  // @Log(name = "elbow velocity setpoint", methodName = "velocity")
+  // @Log(name = "elbow acceleration setpoint", methodName = "acceleration")
+  // private State elbowSetpoint;
 
-  @Log(name = "wrist position setpoint", methodName = "position")
-  @Log(name = "wrist velocity setpoint", methodName = "velocity")
-  @Log(name = "wrist acceleration setpoint", methodName = "acceleration")
-  private State wristSetpoint;
+  // @Log(name = "wrist position setpoint", methodName = "position")
+  // @Log(name = "wrist velocity setpoint", methodName = "velocity")
+  // @Log(name = "wrist acceleration setpoint", methodName = "acceleration")
+  // private State wristSetpoint;
 
   private final SingleJointedArmSim elbowSim =
       new SingleJointedArmSim(
@@ -102,28 +106,47 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log private boolean butAScratch = false;
   @Log private boolean wristLimp = false;
 
-  public Arm(Visualizer positionVisualizer, Visualizer setpointVisualizer) {
+  public Arm(
+      Visualizer positionVisualizer,
+      Visualizer setpointVisualizer,
+      boolean working,
+      boolean newWrist) {
+    // elbow = JointIO.create(MIDDLE_ELBOW_MOTOR, working, newWrist);
+    // elbowLeft = JointIO.create(LEFT_ELBOW_MOTOR, working, newWrist);
+    // elbowRight = JointIO.create(RIGHT_ELBOW_MOTOR, working, newWrist);
+    if (working) {
+      elbow = new ElbowIO(newWrist, MIDDLE_ELBOW_MOTOR);
+      elbowLeft = new ElbowIO(newWrist, LEFT_ELBOW_MOTOR);
+      elbowRight = new ElbowIO(newWrist, RIGHT_ELBOW_MOTOR);
+      wrist = new MAXWristJoint(newWrist, WRIST_MOTOR);
+    } else if (Robot.isReal()) {
+      elbow = new SimJoint();
+      elbowLeft = new SimJoint(newWrist);
+      elbowRight = new SimJoint();
+      wrist = new SimJoint();
+    }
+
     elbowLeft.follow(elbow);
     elbowRight.follow(elbow);
 
-    elbowEncoder.setDistancePerPulse(Elbow.CONVERSION.factor());
+    // elbowEncoder.setDistancePerPulse(Elbow.CONVERSION.factor());
     wristEncoder.setPositionConversionFactor(Wrist.CONVERSION.factor());
     wristEncoder.setVelocityConversionFactor(Wrist.CONVERSION.factor() / 60.0);
 
     // set wrist duty cycle absolute encoder frame periods to be the same as our tickrate
     // periodic frames 3 and 4 are useless to us, so to improve performance we set them to 1155 ms
-    wrist.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1155);
-    wrist.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1155);
-    wrist.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
-    wrist.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
+    // wrist.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1155);
+    // wrist.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1155);
+    // wrist.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
+    // wrist.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
 
-    elbow.burnFlash();
-    elbowLeft.burnFlash();
-    elbowRight.burnFlash();
-    wrist.burnFlash();
+    // elbow.burnFlash();
+    // elbowLeft.burnFlash();
+    // elbowRight.burnFlash();
+    // wrist.burnFlash();
 
-    elbowSetpoint = new State(getElbowPosition().getRadians(), 0, 0);
-    wristSetpoint = new State(Math.PI, 0, 0);
+    // elbowSetpoint = new State(getElbowPosition().getRadians(), 0, 0);
+    // wristSetpoint = new State(Math.PI, 0, 0);
 
     this.positionVisualizer = positionVisualizer;
     this.setpointVisualizer = setpointVisualizer;

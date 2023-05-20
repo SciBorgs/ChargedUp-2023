@@ -30,7 +30,6 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import java.util.function.DoubleSupplier;
-
 import org.photonvision.EstimatedRobotPose;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
@@ -186,19 +185,19 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
   private SwerveModulePosition[] getModulePositions() {
     return modules.stream().map(SwerveModule::getPosition).toArray(SwerveModulePosition[]::new);
   }
-  public void updateEstimates(EstimatedRobotPose[] newEstimates){
+
+  public void updateEstimates(EstimatedRobotPose[] newEstimates) {
     for (int i = 0; i < newEstimates.length; i++) {
-      odometry.addVisionMeasurement(newEstimates[i].estimatedPose.toPose2d(), newEstimates[i].timestampSeconds);
+      odometry.addVisionMeasurement(
+          newEstimates[i].estimatedPose.toPose2d(), newEstimates[i].timestampSeconds);
       field2d.getObject("Cam-" + i + " Est Pose").setPose(newEstimates[i].estimatedPose.toPose2d());
     }
-
   }
 
   @Override
   public void periodic() {
     odometry.update(getHeading(), getModulePositions());
 
-    
     field2d.setRobotPose(getPose());
 
     for (int i = 0; i < modules2d.length; i++) {
