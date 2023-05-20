@@ -67,6 +67,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
     public void updateDesiredState(State state);
 
+    public boolean isFailing();
+
     @Override
     default void initSendable(SendableBuilder builder) {
       // TODO Auto-generated method stub
