@@ -18,10 +18,9 @@ import org.sciborgs1155.lib.BetterArmFeedforward;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.subsystems.Arm.JointIO;
 
 /** Add your docs here. */
-public class ElbowSparkMax implements JointIO {
+public class ElbowIOSparkMax implements JointIO {
   private final CANSparkMax middleMotor;
   private final CANSparkMax leftMotor;
   private final CANSparkMax rightMotor;
@@ -34,7 +33,7 @@ public class ElbowSparkMax implements JointIO {
   private State setpoint;
   private double voltage;
 
-  public ElbowSparkMax(PIDConstants pidConstants, SystemConstants ffConstants) {
+  public ElbowIOSparkMax(PIDConstants pidConstants, SystemConstants ffConstants) {
 
     middleMotor = Wrist.MOTOR.build(MotorType.kBrushless, MIDDLE_ELBOW_MOTOR);
     leftMotor = Wrist.MOTOR.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);

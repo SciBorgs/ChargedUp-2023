@@ -8,7 +8,6 @@ import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.Arm.ElevatorConfig;
-import org.sciborgs1155.robot.subsystems.Arm.ElevatorIO;
 
 public class ElevatorIOSim implements ElevatorIO {
 

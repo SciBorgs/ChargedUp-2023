@@ -13,7 +13,6 @@ import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.Arm.JointConfig;
-import org.sciborgs1155.robot.subsystems.Arm.JointIO;
 
 /** A simulated {@link JointIO} using {@link SingleJointedArmSim} */
 public class JointIOSim implements JointIO {

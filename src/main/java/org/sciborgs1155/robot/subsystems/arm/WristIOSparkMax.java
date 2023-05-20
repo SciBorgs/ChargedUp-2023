@@ -18,10 +18,9 @@ import org.sciborgs1155.lib.BetterArmFeedforward;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.subsystems.Arm.JointIO;
 
 /** Add your docs here. */
-public class WristSparkMax implements JointIO {
+public class WristIOSparkMax implements JointIO {
   private final CANSparkMax motor = Wrist.MOTOR.build(MotorType.kBrushless, WRIST_MOTOR);
   private final DutyCycleEncoder absolute = new DutyCycleEncoder(0); // TODO
   private final Encoder relative = new Encoder(0, 1); // TODO
@@ -34,7 +33,7 @@ public class WristSparkMax implements JointIO {
   private State setpoint;
   private double voltage;
 
-  public WristSparkMax(PIDConstants pidConstants, SystemConstants ffConstants) {
+  public WristIOSparkMax(PIDConstants pidConstants, SystemConstants ffConstants) {
     pid = pidConstants.create();
     ff = ffConstants.createArmFF();
 

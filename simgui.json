@@ -29,6 +29,8 @@
       "/LiveWindow/Ungrouped/Pigeon IMU [42]": "Gyro",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/Shuffleboard/Arm/elbow feedback": "PIDController",
+      "/Shuffleboard/Arm/positionVisualizer": "Mechanism2d",
+      "/Shuffleboard/Arm/setpointVisualizer": "Mechanism2d",
       "/Shuffleboard/Arm/wrist feedback": "PIDController",
       "/Shuffleboard/Autos/Drive/field2d": "Field2d",
       "/Shuffleboard/Autos/Drive/imu": "Gyro",
@@ -64,6 +66,16 @@
       "/SmartDashboard/frontPhotonVision Sim Field": "Field2d"
     },
     "windows": {
+      "/Shuffleboard/Arm/positionVisualizer": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Arm/setpointVisualizer": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Shuffleboard/Drive/field2d": {
         "image": "./field/2023-field.png",
         "window": {

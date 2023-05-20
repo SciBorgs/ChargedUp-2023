@@ -10,15 +10,14 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Encoder;
 import org.sciborgs1155.lib.BetterElevatorFeedforward;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.subsystems.Arm.ElevatorIO;
 
-public class ElevatorSparkMax implements ElevatorIO {
+public class ElevatorIOSparkMax implements ElevatorIO {
 
   private final CANSparkMax lead = MOTOR.build(MotorType.kBrushless, RIGHT_MOTOR);
   private final CANSparkMax left = MOTOR.build(MotorType.kBrushless, LEFT_MOTOR);
   private final CANSparkMax right = MOTOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
 
-  private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1], true); // TODO ?
+  private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1]);
 
   private final PIDController pid = PID.create();
   private final BetterElevatorFeedforward ff = FF.createElevatorFF();
@@ -26,7 +25,7 @@ public class ElevatorSparkMax implements ElevatorIO {
   private State setpoint;
   private double voltage;
 
-  public ElevatorSparkMax() {
+  public ElevatorIOSparkMax() {
     left.follow(lead);
     right.follow(lead);
 
