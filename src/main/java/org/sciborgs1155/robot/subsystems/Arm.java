@@ -3,14 +3,11 @@ package org.sciborgs1155.robot.subsystems;
 import static org.sciborgs1155.robot.Constants.Arm.*;
 import static org.sciborgs1155.robot.Ports.Arm.*;
 
-import com.revrobotics.AbsoluteEncoder;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,20 +22,16 @@ import org.sciborgs1155.lib.Trajectory.State;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Robot;
-import org.sciborgs1155.robot.subsystems.arm.ElbowIO;
 import org.sciborgs1155.robot.subsystems.arm.JointIO;
-import org.sciborgs1155.robot.subsystems.arm.SimJoint;
-import org.sciborgs1155.robot.subsystems.arm.MAXWristJoint;
 import org.sciborgs1155.robot.util.Visualizer;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable, JointIO {
 
   @Log(name = "elbow applied output", methodName = "getAppliedOutput")
-  // private final CANSparkMax elbow = Elbow.MOTOR.build(MotorType.kBrushless, MIDDLE_ELBOW_MOTOR);
-  // private final CANSparkMax elbowLeft = Elbow.MOTOR.build(MotorType.kBrushless,
-  // LEFT_ELBOW_MOTOR);
-  // private final CANSparkMax elbowRight = Elbow.MOTOR.build(MotorType.kBrushless,
-  // RIGHT_ELBOW_MOTOR);
+  private final CANSparkMax elbow = Elbow.MOTOR.build(MotorType.kBrushless, MIDDLE_ELBOW_MOTOR);
+
+  private final CANSparkMax elbowLeft = Elbow.MOTOR.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
+  private final CANSparkMax elbowRight = Elbow.MOTOR.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
   private boolean working = true;
 
   private final JointIO elbow;
@@ -54,30 +47,30 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable, Joint
   @Log(name = "wrist velocity", methodName = "getVelocity")
   private final AbsoluteEncoder wristEncoder;
 
-  // private final ArmFeedforward elbowFeedforward =
-  //     new ArmFeedforward(Elbow.FF.s(), Elbow.FF.g(), Elbow.FF.v(), Elbow.FF.a());
-  // private final ArmFeedforward wristFeedforward =
-  //     new ArmFeedforward(Wrist.FF.s(), Wrist.FF.g(), Wrist.FF.v(), Wrist.FF.a());
+  private final ArmFeedforward elbowFeedforward =
+      new ArmFeedforward(Elbow.FF.s(), Elbow.FF.g(), Elbow.FF.v(), Elbow.FF.a());
+  private final ArmFeedforward wristFeedforward =
+      new ArmFeedforward(Wrist.FF.s(), Wrist.FF.g(), Wrist.FF.v(), Wrist.FF.a());
 
-  // @Log(name = "elbow feedback")
-  // @Log(name = "elbow at setpoint", methodName = "atSetpoint")
-  // private final PIDController elbowFeedback =
-  //     new PIDController(Elbow.PID.p(), Elbow.PID.i(), Elbow.PID.d());
+  @Log(name = "elbow feedback")
+  @Log(name = "elbow at setpoint", methodName = "atSetpoint")
+  private final PIDController elbowFeedback =
+      new PIDController(Elbow.PID.p(), Elbow.PID.i(), Elbow.PID.d());
 
-  // @Log(name = "wrist feedback")
-  // @Log(name = "wrist at setpoint", methodName = "atSetpoint")
-  // private final PIDController wristFeedback =
-  //     new PIDController(Wrist.PID.p(), Wrist.PID.i(), Wrist.PID.d());
+  @Log(name = "wrist feedback")
+  @Log(name = "wrist at setpoint", methodName = "atSetpoint")
+  private final PIDController wristFeedback =
+      new PIDController(Wrist.PID.p(), Wrist.PID.i(), Wrist.PID.d());
 
-  // @Log(name = "elbow position setpoint", methodName = "position")
-  // @Log(name = "elbow velocity setpoint", methodName = "velocity")
-  // @Log(name = "elbow acceleration setpoint", methodName = "acceleration")
-  // private State elbowSetpoint;
+  @Log(name = "elbow position setpoint", methodName = "position")
+  @Log(name = "elbow velocity setpoint", methodName = "velocity")
+  @Log(name = "elbow acceleration setpoint", methodName = "acceleration")
+  private State elbowSetpoint;
 
-  // @Log(name = "wrist position setpoint", methodName = "position")
-  // @Log(name = "wrist velocity setpoint", methodName = "velocity")
-  // @Log(name = "wrist acceleration setpoint", methodName = "acceleration")
-  // private State wristSetpoint;
+  @Log(name = "wrist position setpoint", methodName = "position")
+  @Log(name = "wrist velocity setpoint", methodName = "velocity")
+  @Log(name = "wrist acceleration setpoint", methodName = "acceleration")
+  private State wristSetpoint;
 
   private final SingleJointedArmSim elbowSim =
       new SingleJointedArmSim(
@@ -88,6 +81,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable, Joint
           Elbow.MIN_ANGLE,
           Elbow.MAX_ANGLE,
           true);
+
   private final SingleJointedArmSim wristSim =
       new SingleJointedArmSim(
           DCMotor.getNEO(1),
@@ -106,32 +100,24 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable, Joint
   @Log private boolean butAScratch = false;
   @Log private boolean wristLimp = false;
 
-  public Arm(
-      Visualizer positionVisualizer,
-      Visualizer setpointVisualizer,
-      boolean working,
-      boolean newWrist) {
+  public Arm(Visualizer positionVisualizer, Visualizer setpointVisualizer, boolean working) {
     // elbow = JointIO.create(MIDDLE_ELBOW_MOTOR, working, newWrist);
     // elbowLeft = JointIO.create(LEFT_ELBOW_MOTOR, working, newWrist);
     // elbowRight = JointIO.create(RIGHT_ELBOW_MOTOR, working, newWrist);
-    if (working) {
-      elbow = new ElbowIO(newWrist, MIDDLE_ELBOW_MOTOR);
-      elbowLeft = new ElbowIO(newWrist, LEFT_ELBOW_MOTOR);
-      elbowRight = new ElbowIO(newWrist, RIGHT_ELBOW_MOTOR);
-      wrist = new MAXWristJoint(newWrist, WRIST_MOTOR);
-    } else if (Robot.isReal()) {
-      elbow = new SimJoint();
-      elbowLeft = new SimJoint(newWrist);
-      elbowRight = new SimJoint();
-      wrist = new SimJoint();
-    }
-
-    elbowLeft.follow(elbow);
-    elbowRight.follow(elbow);
-
+    // if (working) {
+    //   elbow = new ElbowIO(newWrist, MIDDLE_ELBOW_MOTOR);
+    //   elbowLeft = new ElbowIO(newWrist, LEFT_ELBOW_MOTOR);
+    //   elbowRight = new ElbowIO(newWrist, RIGHT_ELBOW_MOTOR);
+    //   wrist = new WristSparkMax(newWrist, WRIST_MOTOR);
+    // } else if (Robot.isReal()) {
+    //   elbow = new SimJoint();
+    //   elbowLeft = new SimJoint(newWrist);
+    //   elbowRight = new SimJoint();
+    //   wrist = new SimJoint();
+    // }
     // elbowEncoder.setDistancePerPulse(Elbow.CONVERSION.factor());
-    wristEncoder.setPositionConversionFactor(Wrist.CONVERSION.factor());
-    wristEncoder.setVelocityConversionFactor(Wrist.CONVERSION.factor() / 60.0);
+    // wristEncoder.setPositionConversionFactor(Wrist.CONVERSION.factor());
+    // wristEncoder.setVelocityConversionFactor(Wrist.CONVERSION.factor() / 60.0);
 
     // set wrist duty cycle absolute encoder frame periods to be the same as our tickrate
     // periodic frames 3 and 4 are useless to us, so to improve performance we set them to 1155 ms
@@ -151,17 +137,17 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable, Joint
     this.positionVisualizer = positionVisualizer;
     this.setpointVisualizer = setpointVisualizer;
 
-    wristFeedback.setTolerance(0.3);
-    elbowFeedback.setTolerance(0.3);
+    // wristFeedback.setTolerance(0.3);
+    // elbowFeedback.setTolerance(0.3);
   }
 
-  /** Elbow position relative to the chassis */
+  // /** Elbow position relative to the chassis */
   @Log(name = "elbow position", methodName = "getRadians")
   public Rotation2d getElbowPosition() {
     return Rotation2d.fromRadians(elbowEncoder.getDistance() + Elbow.OFFSET);
   }
 
-  /** Wrist position relative to the forearm */
+  // /** Wrist position relative to the forearm */
   @Log(name = "relative wrist position", methodName = "getRadians")
   public Rotation2d getRelativeWristPosition() {
     // encoder is zeroed fully folded in, which is actually PI, so we offset by -PI

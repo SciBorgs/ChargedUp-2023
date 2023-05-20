@@ -16,9 +16,9 @@ public interface JointIO extends Sendable, AutoCloseable {
 
   public void updateDesiredState(State state);
 
-  public State getDesiredState();
+  public void setBaseAngle(Rotation2d baseAngle);
 
-  public void follow(JointIO joint);
+  public State getDesiredState();
 
   default void initSendable(SendableBuilder builder) {
     // TODO Auto-generated method stub
