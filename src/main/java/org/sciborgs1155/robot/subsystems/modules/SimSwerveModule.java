@@ -12,6 +12,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.subsystems.Drive.SwerveModule;
 
 /** Class to encapsulate a rev max swerve module */
 public class SimSwerveModule implements SwerveModule {
