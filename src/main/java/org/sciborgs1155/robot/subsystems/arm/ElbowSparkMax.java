@@ -72,19 +72,19 @@ public class ElbowSparkMax implements JointIO {
 
   /** Sets, AND moves to a desired state */
   @Override
-  public void updateDesiredState(State desiredState) {
+  public void update(State setpoint) {
     double feedforward =
         ff.calculate(
-            desiredState.position + getBaseAngle().getRadians(),
+            setpoint.position + getBaseAngle().getRadians(),
+            this.setpoint.velocity,
             setpoint.velocity,
-            desiredState.velocity,
             Constants.PERIOD);
-    double feedback = pid.calculate(getRelativeAngle().getRadians(), desiredState.position);
+    double feedback = pid.calculate(getRelativeAngle().getRadians(), setpoint.position);
 
     voltage = feedback + feedforward;
     middleMotor.setVoltage(voltage);
 
-    setpoint = desiredState;
+    this.setpoint = setpoint;
   }
 
   public State getDesiredState() {
@@ -103,7 +103,10 @@ public class ElbowSparkMax implements JointIO {
 
   @Override
   public boolean isFailing() {
-    return false;
+    return encoder.getDistance() == 0 // no position reading
+        && encoder.getRate() == 0 // no velocity reading
+        && encoder.getDistance() != Elbow.OFFSET // elbow is not going to 0
+        && middleMotor.getAppliedOutput() != 0; // elbow is trying to move
   }
 
   @Override

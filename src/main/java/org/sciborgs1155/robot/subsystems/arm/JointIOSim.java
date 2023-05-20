@@ -54,20 +54,20 @@ public class JointIOSim implements JointIO {
   }
 
   @Override
-  public void updateDesiredState(State state) {
+  public void update(State setpoint) {
     double ffVoltage =
         ff.calculate(
             setpoint.position + baseAngle.getRadians(),
+            this.setpoint.velocity,
             setpoint.velocity,
-            state.velocity,
             Constants.PERIOD);
-    double pidVoltage = pid.calculate(getRelativeAngle().getRadians(), state.position);
+    double pidVoltage = pid.calculate(getRelativeAngle().getRadians(), setpoint.position);
 
     voltage = ffVoltage + pidVoltage;
     sim.setInputVoltage(voltage);
     sim.update(Constants.PERIOD);
 
-    setpoint = state;
+    this.setpoint = setpoint;
   }
 
   @Override
@@ -83,6 +83,11 @@ public class JointIOSim implements JointIO {
   @Override
   public Rotation2d getBaseAngle() {
     return baseAngle;
+  }
+
+  @Override
+  public boolean isFailing() {
+    return false;
   }
 
   @Override

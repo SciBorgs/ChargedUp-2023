@@ -78,6 +78,17 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
     return elbowAngle.getCos() > 0 ? Side.FRONT : Side.BACK;
   }
 
+  /**
+   * Returns a goal based on the side being moved to. This is used for on the fly trapezoidal
+   * control.
+   *
+   * @param side The side of the robot being moved to.
+   * @return The "passing over" goal according to the inputted side.
+   */
+  public static PlacementState passOverToSide(Side side) {
+    return side == Side.FRONT ? PASS_TO_FRONT : PASS_TO_BACK;
+  }
+
   /** Returns a PlacementState from scoring parameters */
   public static PlacementState fromOperator(Level height, GamePiece gamePiece, Side side) {
     return switch (height) {

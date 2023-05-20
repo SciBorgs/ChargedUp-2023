@@ -51,15 +51,15 @@ public class ElevatorIOSim implements ElevatorIO {
   }
 
   @Override
-  public void updateDesiredState(State state) {
-    double ffVoltage = ff.calculate(setpoint.velocity, state.velocity, Constants.PERIOD);
-    double pidVoltage = pid.calculate(getHeight(), state.position);
+  public void update(State setpoint) {
+    double ffVoltage = ff.calculate(this.setpoint.velocity, setpoint.velocity, Constants.PERIOD);
+    double pidVoltage = pid.calculate(getHeight(), setpoint.position);
 
     voltage = ffVoltage + pidVoltage;
     sim.setInputVoltage(voltage);
     sim.update(Constants.PERIOD);
 
-    setpoint = state;
+    this.setpoint = setpoint;
   }
 
   @Override

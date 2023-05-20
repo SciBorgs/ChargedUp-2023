@@ -54,14 +54,14 @@ public class ElevatorSparkMax implements ElevatorIO {
   }
 
   @Override
-  public void updateDesiredState(State state) {
-    double ffOutput = ff.calculate(setpoint.velocity, state.velocity, Constants.PERIOD);
-    double fbOutput = pid.calculate(getHeight(), state.position);
+  public void update(State setpoint) {
+    double ffOutput = ff.calculate(this.setpoint.velocity, setpoint.velocity, Constants.PERIOD);
+    double fbOutput = pid.calculate(getHeight(), setpoint.position);
 
     voltage = ffOutput + fbOutput;
     lead.setVoltage(voltage);
 
-    setpoint = state;
+    this.setpoint = setpoint;
   }
 
   @Override

@@ -73,19 +73,19 @@ public class WristSparkMax implements JointIO {
 
   /** Sets, THEN moves to a desired state */
   @Override
-  public void updateDesiredState(State desiredState) {
+  public void update(State setpoint) {
     double feedforward =
         ff.calculate(
-            desiredState.position + getBaseAngle().getRadians(),
+            setpoint.position + getBaseAngle().getRadians(),
+            this.setpoint.velocity,
             setpoint.velocity,
-            desiredState.velocity,
             Constants.PERIOD);
-    double feedback = pid.calculate(getRelativeAngle().getRadians(), desiredState.position);
+    double feedback = pid.calculate(getRelativeAngle().getRadians(), setpoint.position);
 
     voltage = feedback + feedforward;
     motor.setVoltage(voltage);
 
-    setpoint = desiredState;
+    this.setpoint = setpoint;
   }
 
   @Override
@@ -100,7 +100,10 @@ public class WristSparkMax implements JointIO {
 
   @Override
   public boolean isFailing() {
-    return false;
+    return absolute.isConnected();
+    // relative.getDistance() == 0
+    //     && relative.getVelocity() == 0
+    //     && relative.position() != 0;
   }
 
   @Override
