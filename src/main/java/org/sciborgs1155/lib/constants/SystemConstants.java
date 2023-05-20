@@ -1,5 +1,8 @@
 package org.sciborgs1155.lib.constants;
 
+import org.sciborgs1155.lib.BetterArmFeedforward;
+import org.sciborgs1155.lib.BetterElevatorFeedforward;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -22,12 +25,12 @@ public record SystemConstants(double s, double g, double v, double a) {
     return new SimpleMotorFeedforward(s, v, a);
   }
 
-  public ArmFeedforward createArmFF() {
-    return new ArmFeedforward(s, g, v, a);
+  public BetterArmFeedforward createArmFF() {
+    return new BetterArmFeedforward(s, g, v, a);
   }
 
-  public ElevatorFeedforward createElevatorFF() {
-    return new ElevatorFeedforward(s, g, v, a);
+  public BetterElevatorFeedforward createElevatorFF() {
+    return new BetterElevatorFeedforward(s, g, v, a);
   }
 
   public DCMotorSim sim(DCMotor gearbox, double gearing) {

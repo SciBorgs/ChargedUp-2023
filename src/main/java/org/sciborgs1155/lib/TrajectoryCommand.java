@@ -1,6 +1,6 @@
 package org.sciborgs1155.lib;
 
-import static org.sciborgs1155.lib.Trajectory.State;
+import static edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;

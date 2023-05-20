@@ -16,77 +16,100 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.wpilibj.DutyCycle;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Encoder;
 import io.github.oblarg.oblog.annotations.Log;
+
+import org.sciborgs1155.lib.BetterArmFeedforward;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.constants.SystemConstants;
+import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.subsystems.Arm.JointIO;
 
 /** Add your docs here. */
 public class WristSparkMax implements JointIO {
-  private final CANSparkMax motor;
-  private final AbsoluteEncoder encoder;
+  private final CANSparkMax motor = Wrist.MOTOR.build(MotorType.kBrushless, WRIST_MOTOR);
+  private final DutyCycleEncoder absolute = new DutyCycleEncoder(0); // TODO
+  private final Encoder relative = new Encoder(0, 1); // TODO
 
   private final PIDController pid;
-  private final ArmFeedforward ff;
+  private final BetterArmFeedforward ff;
 
-  private double zeroOffset;
-  private Rotation2d baseAngle;
+  private Rotation2d elbowAngle = new Rotation2d();
 
   private State setpoint;
+  private double voltage;
 
   public WristSparkMax(PIDConstants pidConstants, SystemConstants ffConstants) {
-    motor = Wrist.MOTOR.build(MotorType.kBrushless, WRIST_MOTOR);
-    encoder = motor.getAbsoluteEncoder(Type.kDutyCycle);
+    pid = pidConstants.create();
+    ff = ffConstants.createArmFF();
 
-    pid = new PIDController(pidConstants.p(), pidConstants.i(), pidConstants.d());
-    ff = new ArmFeedforward(ffConstants.s(), ffConstants.g(), ffConstants.v(), ffConstants.a());
-
-    zeroOffset = Math.PI;
-    baseAngle = new Rotation2d();
-
-    encoder.setPositionConversionFactor(Wrist.CONVERSION.factor());
-    encoder.setVelocityConversionFactor(Wrist.CONVERSION.factor() / 60.0);
+    absolute.setDistancePerRotation(Wrist.CONVERSION.factor());
+    relative.setDistancePerPulse(Wrist.CONVERSION.factor());
 
     // set wrist duty cycle absolute encoder frame periods to be the same as our tickrate
     // periodic frames 3 and 4 are useless to us, so to improve performance we set them to 1155 ms
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1155);
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1155);
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
+    // motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1155);
+    // motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1155);
+    // motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
+    // motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
 
     motor.burnFlash();
 
     pid.setTolerance(0.3);
 
-    setpoint = new State(Math.PI, 0);
+    // setpoint = new State(Math.PI, 0);
+    setpoint = new State(absolute.getDistance(), 0);
   }
 
-  /** Wrist position relative to the forearm */
-  @Log(name = "relative wrist position", methodName = "getRadians")
-  public Rotation2d getRotation() {
-    // encoder is zeroed fully folded in, which is actually PI, so we offset by -PI
-    return Rotation2d.fromRadians(encoder.getPosition() - zeroOffset);
+  @Override
+  public Rotation2d getRelativeAngle() {
+    return Rotation2d.fromRadians(absolute.getDistance());
   }
 
-  @Log(name = "absolute wrist position", methodName = "getRadians")
-  public Rotation2d getAbsoluteWristPosition() {
-    return getRotation().plus(baseAngle);
+  @Override
+  public State getCurrentState() {
+    return new State(getRelativeAngle().getRadians(), relative.getRate());
   }
 
-  /** Sets, THEN moves to a desired state */
-  public void updateDesiredState(State desiredState) {
-    double feedback = pid.calculate(getRotation().getRadians(), desiredState.position);
-    double feedforward = ff.calculate(desiredState.position, desiredState.velocity, 0);
-    motor.setVoltage(feedback + feedforward);
-  }
-
+  @Override
   public State getDesiredState() {
     return setpoint;
   }
 
-  public void setBaseAngle(Rotation2d baseAngle) {
-    this.baseAngle = baseAngle;
+  /** Sets, THEN moves to a desired state */
+  @Override
+  public void updateDesiredState(State desiredState) {
+    double feedforward = ff.calculate(desiredState.position + getBaseAngle().getRadians(), setpoint.velocity, desiredState.velocity, Constants.PERIOD);
+    double feedback = pid.calculate(getRelativeAngle().getRadians(), desiredState.position);
+
+    voltage = feedback + feedforward;
+    motor.setVoltage(voltage);
+
+    setpoint = desiredState;
   }
 
   @Override
-  public void close() {}
+  public void setBaseAngle(Rotation2d baseAngle) {
+    elbowAngle = baseAngle;
+  }
+
+  @Override
+  public Rotation2d getBaseAngle() {
+    return elbowAngle;
+  }
+
+  @Override
+  public double getVoltage() {
+      // TODO Auto-generated method stub
+      return 0;
+  }
+
+  @Override
+  public void close() throws Exception {
+      motor.close();
+      absolute.close();
+      relative.close();
+  }
 }

@@ -23,10 +23,14 @@ import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Trajectory;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
+import org.sciborgs1155.robot.Constants.Elevator;
 import org.sciborgs1155.robot.Robot;
-import org.sciborgs1155.robot.subsystems.arm.JointIO;
-import org.sciborgs1155.robot.subsystems.arm.JointSim;
-import org.sciborgs1155.robot.subsystems.arm.MAXWristJoint;
+import org.sciborgs1155.robot.subsystems.arm.ElbowSparkMax;
+import org.sciborgs1155.robot.subsystems.arm.ElevatorIOSim;
+import org.sciborgs1155.robot.subsystems.arm.ElevatorSparkMax;
+import org.sciborgs1155.robot.subsystems.arm.JointIOSim;
+import org.sciborgs1155.robot.subsystems.arm.JointIOSim;
+import org.sciborgs1155.robot.subsystems.arm.WristSparkMax;
 import org.sciborgs1155.robot.util.Visualizer;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
@@ -39,22 +43,41 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
       double minAngle,
       double maxAngle) {}
 
-  public interface Joint extends Sendable, AutoCloseable {
-    public Rotation2d getRotation();
+  public static record ElevatorConfig(
+      DCMotor gearbox, double gearing, double mass, double sprocketRadius, double minHeight, double maxHeight) {}
 
-    public State getState();
+  public interface JointIO extends Sendable, AutoCloseable {
+    public Rotation2d getRelativeAngle();
+
+    public State getCurrentState();
 
     public State getDesiredState();
 
     public void updateDesiredState(State state);
 
+    public void setBaseAngle(Rotation2d baseAngle);
+
+    public Rotation2d getBaseAngle();
+
+    public double getVoltage();
+
+    public default Rotation2d getAbsoluteAngle() {
+      return getBaseAngle().plus(getRelativeAngle());
+    }
+
     @Override
     default void initSendable(SendableBuilder builder) {
-      // TODO Auto-generated method stub
+      builder.addDoubleProperty("current angle", () -> getCurrentState().position, null);
+      builder.addDoubleProperty("current angular velocity", () -> getCurrentState().velocity, null);
+      builder.addDoubleProperty("target angle", () -> getDesiredState().position, null);
+      builder.addDoubleProperty("target angular velocity", () -> getDesiredState().velocity, null);
+      builder.addDoubleProperty("base angle", () -> getBaseAngle().getRadians(), null);
+      builder.addDoubleProperty("absolute angle", () -> getAbsoluteAngle().getRadians(), null);
+      builder.addDoubleProperty("applied voltage", this::getVoltage, null);
     }
   }
 
-  public interface Elevator extends Sendable, AutoCloseable {
+  public interface ElevatorIO extends Sendable, AutoCloseable {
     public double getHeight();
 
     public State getState();
@@ -65,76 +88,22 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
     public boolean isFailing();
 
+    public double getVoltage();
+
     @Override
     default void initSendable(SendableBuilder builder) {
-      // TODO Auto-generated method stub
+      builder.addDoubleProperty("position", () -> getState().position, null);
+      builder.addDoubleProperty("velocity", () -> getState().velocity, null);
+      builder.addDoubleProperty("target position", () -> getDesiredState().position, null);
+      builder.addDoubleProperty("target velocity", () -> getDesiredState().velocity, null);
+      builder.addBooleanProperty("failing", this::isFailing, null);
+      builder.addDoubleProperty("applied voltage", this::getVoltage, null);
     }
   }
 
-  @Log(name = "elbow applied output", methodName = "getAppliedOutput")
-  private final CANSparkMax elbow = Elbow.MOTOR.build(MotorType.kBrushless, MIDDLE_ELBOW_MOTOR);
-
-  private final CANSparkMax elbowLeft = Elbow.MOTOR.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
-  private final CANSparkMax elbowRight = Elbow.MOTOR.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
-  private boolean working = true;
-
-  private final JointIO elbow;
-  private final JointIO elbowLeft;
-  private final JointIO elbowRight;
-
-  @Log(name = "wrist applied output", methodName = "getAppliedOutput")
-  private final JointIO wrist;
-
-  private final Encoder elbowEncoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
-  private final EncoderSim elbowEncoderSim = new EncoderSim(elbowEncoder);
-
-  @Log(name = "wrist velocity", methodName = "getVelocity")
-  private final AbsoluteEncoder wristEncoder;
-
-  private final ArmFeedforward elbowFeedforward =
-      new ArmFeedforward(Elbow.FF.s(), Elbow.FF.g(), Elbow.FF.v(), Elbow.FF.a());
-  private final ArmFeedforward wristFeedforward =
-      new ArmFeedforward(Wrist.FF.s(), Wrist.FF.g(), Wrist.FF.v(), Wrist.FF.a());
-
-  @Log(name = "elbow feedback")
-  @Log(name = "elbow at setpoint", methodName = "atSetpoint")
-  private final PIDController elbowFeedback =
-      new PIDController(Elbow.PID.p(), Elbow.PID.i(), Elbow.PID.d());
-
-  @Log(name = "wrist feedback")
-  @Log(name = "wrist at setpoint", methodName = "atSetpoint")
-  private final PIDController wristFeedback =
-      new PIDController(Wrist.PID.p(), Wrist.PID.i(), Wrist.PID.d());
-
-  @Log(name = "elbow position setpoint", methodName = "position")
-  @Log(name = "elbow velocity setpoint", methodName = "velocity")
-  @Log(name = "elbow acceleration setpoint", methodName = "acceleration")
-  private State elbowSetpoint;
-
-  @Log(name = "wrist position setpoint", methodName = "position")
-  @Log(name = "wrist velocity setpoint", methodName = "velocity")
-  @Log(name = "wrist acceleration setpoint", methodName = "acceleration")
-  private State wristSetpoint;
-
-  private final SingleJointedArmSim elbowSim =
-      new SingleJointedArmSim(
-          DCMotor.getNEO(3),
-          Elbow.GEARING,
-          SingleJointedArmSim.estimateMOI(Dimensions.FOREARM_LENGTH, Dimensions.FOREARM_MASS),
-          Dimensions.FOREARM_LENGTH,
-          Elbow.MIN_ANGLE,
-          Elbow.MAX_ANGLE,
-          true);
-
-  private final SingleJointedArmSim wristSim =
-      new SingleJointedArmSim(
-          DCMotor.getNEO(1),
-          Wrist.GEARING,
-          SingleJointedArmSim.estimateMOI(Dimensions.CLAW_LENGTH, Dimensions.CLAW_MASS),
-          Dimensions.CLAW_LENGTH,
-          Wrist.MIN_ANGLE,
-          Wrist.MAX_ANGLE,
-          false);
+  @Log private final ElevatorIO elevator;
+  @Log private final JointIO elbow;
+  @Log private final JointIO wrist;
 
   private final Visualizer positionVisualizer;
   private final Visualizer setpointVisualizer;
@@ -144,69 +113,20 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log private boolean butAScratch = false;
   @Log private boolean wristLimp = false;
 
-  public Arm(Visualizer positionVisualizer, Visualizer setpointVisualizer, boolean working) {
-    // elbow = JointIO.create(MIDDLE_ELBOW_MOTOR, working, newWrist);
-    // elbowLeft = JointIO.create(LEFT_ELBOW_MOTOR, working, newWrist);
-    // elbowRight = JointIO.create(RIGHT_ELBOW_MOTOR, working, newWrist);
-    if (working) {
-      elbow = new ElbowIO(newWrist, MIDDLE_ELBOW_MOTOR);
-      elbowLeft = new ElbowIO(newWrist, LEFT_ELBOW_MOTOR);
-      elbowRight = new ElbowIO(newWrist, RIGHT_ELBOW_MOTOR);
-      wrist = new MAXWristJoint(newWrist, WRIST_MOTOR);
-    } else if (Robot.isReal()) {
-      elbow = new JointSim();
-      elbowLeft = new JointSim(newWrist);
-      elbowRight = new JointSim();
-      wrist = new JointSim();
+  public Arm(Visualizer positionVisualizer, Visualizer setpointVisualizer) {
+    
+    if (Robot.isReal()) {
+      elevator = new ElevatorSparkMax();
+      elbow = new ElbowSparkMax(Elbow.PID, Elbow.FF);
+      wrist = new WristSparkMax(Wrist.PID, Wrist.FF);
+    } else {
+      elevator = new ElevatorIOSim(Elevator.PID, Elevator.FF, Elevator.CONFIG, true);
+      elbow = new JointIOSim(Elbow.PID, Elbow.FF, Elbow.CONFIG, true);
+      wrist = new JointIOSim(Wrist.PID, Wrist.FF, Wrist.CONFIG, false);
     }
-
-    elbowLeft.follow(elbow);
-    elbowRight.follow(elbow);
-
-    // elbowEncoder.setDistancePerPulse(Elbow.CONVERSION.factor());
-    // wristEncoder.setPositionConversionFactor(Wrist.CONVERSION.factor());
-    // wristEncoder.setVelocityConversionFactor(Wrist.CONVERSION.factor() / 60.0);
-
-    // set wrist duty cycle absolute encoder frame periods to be the same as our tickrate
-    // periodic frames 3 and 4 are useless to us, so to improve performance we set them to 1155 ms
-    // wrist.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1155);
-    // wrist.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1155);
-    // wrist.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
-    // wrist.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
-
-    // elbow.burnFlash();
-    // elbowLeft.burnFlash();
-    // elbowRight.burnFlash();
-    // wrist.burnFlash();
-
-    // elbowSetpoint = new State(getElbowPosition().getRadians(), 0, 0);
-    // wristSetpoint = new State(Math.PI, 0, 0);
 
     this.positionVisualizer = positionVisualizer;
     this.setpointVisualizer = setpointVisualizer;
-
-    // wristFeedback.setTolerance(0.3);
-    // elbowFeedback.setTolerance(0.3);
-  }
-
-  // /** Elbow position relative to the chassis */
-  @Log(name = "elbow position", methodName = "getRadians")
-  public Rotation2d getElbowPosition() {
-    return Rotation2d.fromRadians(elbowEncoder.getDistance() + Elbow.OFFSET);
-  }
-
-  // /** Wrist position relative to the forearm */
-  @Log(name = "relative wrist position", methodName = "getRadians")
-  public Rotation2d getRelativeWristPosition() {
-    // encoder is zeroed fully folded in, which is actually PI, so we offset by -PI
-    return Rotation2d.fromRadians(
-        Robot.isReal() ? wristEncoder.getPosition() - Math.PI : wristSim.getAngleRads());
-  }
-
-  /** Wrist position relative to chassis */
-  @Log(name = "absolute wrist position", methodName = "getRadians")
-  public Rotation2d getAbsoluteWristPosition() {
-    return getRelativeWristPosition().plus(getElbowPosition());
   }
 
   /**

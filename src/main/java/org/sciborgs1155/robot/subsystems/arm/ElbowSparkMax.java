@@ -9,14 +9,17 @@ import static org.sciborgs1155.robot.Ports.Arm.*;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Encoder;
 import io.github.oblarg.oblog.annotations.Log;
+
+import org.sciborgs1155.lib.BetterArmFeedforward;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.constants.SystemConstants;
+import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.subsystems.Arm.JointIO;
 
 /** Add your docs here. */
 public class ElbowSparkMax implements JointIO {
@@ -27,12 +30,10 @@ public class ElbowSparkMax implements JointIO {
   private final Encoder encoder;
 
   private final PIDController pid;
-  private final ArmFeedforward ff;
-
-  private Rotation2d baseAngle;
-  private double zeroOffset;
+  private final BetterArmFeedforward ff;
 
   private State setpoint;
+  private double voltage;
 
   public ElbowSparkMax(PIDConstants pidConstants, SystemConstants ffConstants) {
 
@@ -42,49 +43,66 @@ public class ElbowSparkMax implements JointIO {
 
     encoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
 
-    pid = new PIDController(pidConstants.p(), pidConstants.i(), pidConstants.d());
-    ff = new ArmFeedforward(ffConstants.s(), ffConstants.g(), ffConstants.v(), ffConstants.a());
-
-    setpoint = new State(getRotation().getRadians(), 0);
-
-    baseAngle = new Rotation2d();
-
-    middleMotor.burnFlash();
-    leftMotor.burnFlash();
-    rightMotor.burnFlash();
+    this.pid = pidConstants.create();
+    this.ff = ffConstants.createArmFF();
 
     leftMotor.follow(middleMotor);
     rightMotor.follow(middleMotor);
 
     encoder.setDistancePerPulse(Elbow.CONVERSION.factor());
 
+    middleMotor.burnFlash();
+    leftMotor.burnFlash();
+    rightMotor.burnFlash();
+
+    setpoint = new State(getRelativeAngle().getRadians(), 0);
+
     pid.setTolerance(0.3);
   }
 
   /** Elbow position relative to the chassis */
   @Log(name = "elbow position", methodName = "getRadians")
-  public Rotation2d getRotation() {
-    return Rotation2d.fromRadians(encoder.getDistance() + zeroOffset);
+  public Rotation2d getRelativeAngle() {
+    return Rotation2d.fromRadians(encoder.getDistance() + Elbow.OFFSET);
   }
 
-  /** Sets, THEN moves to a desired state */
+  @Override
+  public State getCurrentState() {
+    return new State(getRelativeAngle().getRadians(), encoder.getRate());
+  }
+
+  /** Sets, AND moves to a desired state */
+  @Override
   public void updateDesiredState(State desiredState) {
+    double feedforward = ff.calculate(desiredState.position + getBaseAngle().getRadians(), setpoint.velocity, desiredState.velocity, Constants.PERIOD);
+    double feedback = pid.calculate(getRelativeAngle().getRadians(), desiredState.position);
+
+    voltage = feedback + feedforward;
+    middleMotor.setVoltage(voltage);
+
     setpoint = desiredState;
-    double feedback = pid.calculate(getRotation().getRadians(), desiredState.position);
-    double feedforward = ff.calculate(desiredState.position, desiredState.velocity, 0);
-    middleMotor.setVoltage(feedback + feedforward);
   }
 
   public State getDesiredState() {
     return setpoint;
   }
 
-  /** Non-functional */
+  @Override
   public void setBaseAngle(Rotation2d baseAngle) {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("elbow should not be offset with a base angle");
+  }
+
+  @Override
+  public Rotation2d getBaseAngle() {
+    return new Rotation2d();
+  }
+
+  @Override
+  public double getVoltage() {
+      return voltage;
   }
 
   @Override
   public void close() {}
-  ;
+
 }

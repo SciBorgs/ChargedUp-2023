@@ -1,6 +1,8 @@
 package org.sciborgs1155.robot;
 
 import com.pathplanner.lib.PathConstraints;
+
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -18,6 +20,7 @@ import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants.Arm.Elbow;
+import org.sciborgs1155.robot.subsystems.Arm.ElevatorConfig;
 import org.sciborgs1155.robot.subsystems.Arm.JointConfig;
 import org.sciborgs1155.robot.util.placement.PlacementState;
 
@@ -108,7 +111,7 @@ public final class Constants {
       // Gearing for motor : angle (radians)
 
       public static final Conversion CONVERSION =
-          Conversion.base().withUnits(Conversion.Units.RADIANS);
+          Conversion.base().withUnits(Conversion.Units.RADIANS).withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
 
       public static final PIDConstants PID = new PIDConstants(5.5, 0, 0.1); // p: 6.1297, d: 0.8453
       public static final SystemConstants FF =
@@ -119,7 +122,9 @@ public final class Constants {
       public static final double MAX_ANGLE = Math.PI;
       public static final double MIN_ANGLE = -Math.PI;
 
-      public static final JointConfig config =
+      public static final Rotation2d ZERO_OFFSET = Rotation2d.fromRadians(0);
+
+      public static final JointConfig CONFIG =
           new JointConfig(
               DCMotor.getNEO(1),
               GEARING,
@@ -152,7 +157,7 @@ public final class Constants {
       public static final double MAX_ANGLE = 3.0 * Math.PI / 2.0;
       public static final double MIN_ANGLE = -Math.PI / 2.0;
 
-      public static final JointConfig config =
+      public static final JointConfig CONFIG =
           new JointConfig(
               DCMotor.getNEO(3),
               GEARING,
@@ -188,6 +193,8 @@ public final class Constants {
 
     public static final double MIN_HEIGHT = 0;
     public static final double MAX_HEIGHT = 0.65;
+
+    public static final ElevatorConfig CONFIG = new ElevatorConfig(DCMotor.getNEO(3), GEARING, Dimensions.CARRIAGE_MASS + Dimensions.FOREARM_MASS + Dimensions.CLAW_MASS, RELATIVE_CONVERSION.gearing(), MIN_HEIGHT, MAX_HEIGHT);
 
     public static final int SAMPLE_SIZE_TAPS = 3;
     public static final int CURRENT_THRESHOLD = 40; // TODO this might be too high/unreasonable

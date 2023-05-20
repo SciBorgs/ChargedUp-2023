@@ -9,23 +9,28 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+
+import org.sciborgs1155.lib.BetterArmFeedforward;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.subsystems.Arm.Joint;
+import org.sciborgs1155.robot.subsystems.Arm.JointIO;
 import org.sciborgs1155.robot.subsystems.Arm.JointConfig;
 
-/** A simulated {@link Joint} using {@link SingleJointedArmSim} */
-public class JointSim implements Joint {
+/** A simulated {@link JointIO} using {@link SingleJointedArmSim} */
+public class JointIOSim implements JointIO {
 
   private final SingleJointedArmSim sim;
 
   private final PIDController pid;
-  private final ArmFeedforward ff;
+  private final BetterArmFeedforward ff;
 
+  private Rotation2d baseAngle = new Rotation2d();
   private State setpoint = new State();
 
-  public JointSim(PIDConstants pid, SystemConstants ff, JointConfig config, boolean gravity) {
+  private double voltage;
+
+  public JointIOSim(PIDConstants pid, SystemConstants ff, JointConfig config, boolean gravity) {
     sim =
         new SingleJointedArmSim(
             config.gearbox(),
@@ -41,21 +46,25 @@ public class JointSim implements Joint {
   }
 
   @Override
-  public Rotation2d getRotation() {
+  public Rotation2d getRelativeAngle() {
     return Rotation2d.fromRadians(sim.getAngleRads());
   }
 
   @Override
-  public State getState() {
+  public State getCurrentState() {
     return new State(sim.getAngleRads(), sim.getVelocityRadPerSec());
   }
 
   @Override
   public void updateDesiredState(State state) {
-    double ffVoltage = ff.calculate(state.position, state.velocity);
-    double pidVoltage = pid.calculate(getRotation().getRadians(), state.position);
-    sim.setInputVoltage(ffVoltage + pidVoltage);
+    double ffVoltage = ff.calculate(setpoint.position + baseAngle.getRadians(), setpoint.velocity, state.velocity, Constants.PERIOD);
+    double pidVoltage = pid.calculate(getRelativeAngle().getRadians(), state.position);
+
+    voltage = ffVoltage + pidVoltage;
+    sim.setInputVoltage(voltage);
     sim.update(Constants.PERIOD);
+    
+    setpoint = state;
   }
 
   @Override
@@ -64,5 +73,21 @@ public class JointSim implements Joint {
   }
 
   @Override
+  public void setBaseAngle(Rotation2d baseAngle) {
+    this.baseAngle = baseAngle;
+  }
+
+  @Override
+  public Rotation2d getBaseAngle() {
+    return baseAngle;
+  }
+
+  @Override
+  public double getVoltage() {
+      return voltage;
+  }
+
+  @Override
   public void close() {}
+
 }

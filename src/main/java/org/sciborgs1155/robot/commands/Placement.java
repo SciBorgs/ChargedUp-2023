@@ -20,11 +20,11 @@ import org.sciborgs1155.robot.util.placement.PlacementTrajectory.Parameters;
 public final class Placement {
 
   private final Arm arm;
-  private final Elevator elevator;
+  private final ElevatorIO elevator;
 
   private final Map<Integer, PlacementTrajectory> trajectories = PlacementCache.loadTrajectories();
 
-  public Placement(Arm arm, Elevator elevator) {
+  public Placement(Arm arm, ElevatorIO elevator) {
     this.arm = arm;
     this.elevator = elevator;
   }

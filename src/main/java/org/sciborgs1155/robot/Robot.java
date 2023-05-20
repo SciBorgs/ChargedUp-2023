@@ -44,7 +44,7 @@ public class Robot extends CommandRobot implements Loggable {
 
   // SUBSYSTEMS
   @Log private final Drive drive = new Drive();
-  @Log private final Elevator elevator = new Elevator(position, setpoint);
+  @Log private final ElevatorIO elevator = new ElevatorIO(position, setpoint);
   @Log private final Arm arm = new Arm(position, setpoint);
   @Log private final Intake intake = new Intake();
   @Log private final LED led = new LED();
