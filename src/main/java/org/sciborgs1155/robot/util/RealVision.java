@@ -7,7 +7,6 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.ArrayList;
@@ -18,25 +17,11 @@ import java.util.stream.Stream;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.SimVisionSystem;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
-import org.sciborgs1155.robot.Robot;
 
 /** Wrapper class for photonvision */
-public class Vision implements AutoCloseable {
-
-  /**
-   * Mode of the camera, not the same as {@link Robot#isReal()}, so we can run sim with a real
-   * camera
-   */
-  public enum Mode {
-    NONE,
-    REAL,
-    SIM_WITH_CAM;
-  }
-
-  private final Mode mode;
+public class RealVision implements VisionIO {
 
   private final PhotonCamera frontCam = new PhotonCamera(FRONT_CAM);
   private final PhotonCamera backCam = new PhotonCamera(BACK_CAM);
@@ -46,30 +31,7 @@ public class Vision implements AutoCloseable {
 
   private AprilTagFieldLayout layout;
 
-  private final SimVisionSystem simFront =
-      new SimVisionSystem(
-          FRONT_CAM,
-          CAM_FOV,
-          ROBOT_TO_FRONT_CAM,
-          LED_RANGE,
-          CAMERA_RES_WIDTH,
-          CAMERA_RES_HEIGHT,
-          MIN_TARGET_AREA);
-  private final SimVisionSystem simBack =
-      new SimVisionSystem(
-          BACK_CAM,
-          CAM_FOV,
-          ROBOT_TO_BACK_CAM,
-          LED_RANGE,
-          CAMERA_RES_WIDTH,
-          CAMERA_RES_HEIGHT,
-          MIN_TARGET_AREA);
-
-  public Vision() {
-    this(Mode.REAL);
-  }
-
-  public Vision(Mode mode) {
+  public RealVision() {
     try {
       layout = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
     } catch (Exception e) {
@@ -84,25 +46,12 @@ public class Vision implements AutoCloseable {
     backEstimator =
         new PhotonPoseEstimator(layout, PRIMARY_POSE_STRATEGY, backCam, ROBOT_TO_BACK_CAM);
 
-    simFront.addVisionTargets(layout);
-    simBack.addVisionTargets(layout);
-
     frontEstimator.setMultiTagFallbackStrategy(SECONDARY_POSE_STRATEGY);
     backEstimator.setMultiTagFallbackStrategy(SECONDARY_POSE_STRATEGY);
+  }
 
-    this.mode = mode;
-
-    // set up networktables if we are in hardware sim mode
-    if (mode == Mode.SIM_WITH_CAM) {
-      if (Robot.isReal()) {
-        throw new IllegalStateException(
-            "The robot is real and cannot be used in mode SIM_WITH_CAM");
-      }
-      var inst = NetworkTableInstance.getDefault();
-      inst.stopServer();
-      inst.setServer("photonvision.local");
-      inst.startClient4("Robot Simulation");
-    }
+  public AprilTagFieldLayout getLayout() {
+    return layout;
   }
 
   public boolean hasTargets() {
@@ -125,15 +74,6 @@ public class Vision implements AutoCloseable {
   public EstimatedRobotPose[] getPoseEstimates(Pose2d lastPose) {
     frontEstimator.setReferencePose(lastPose);
     backEstimator.setReferencePose(lastPose);
-
-    if (Robot.isSimulation()) {
-      simFront.processFrame(lastPose);
-      simBack.processFrame(lastPose);
-    }
-
-    if (mode == Mode.NONE) {
-      return new EstimatedRobotPose[0];
-    }
 
     return Stream.of(frontEstimator, backEstimator)
         .map(PhotonPoseEstimator::update)

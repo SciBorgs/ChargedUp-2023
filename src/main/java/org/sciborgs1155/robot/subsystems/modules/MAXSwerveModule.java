@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import org.sciborgs1155.lib.constants.PIDConstants;
+import org.sciborgs1155.robot.subsystems.Drive.SwerveModule;
 
 /** Class to encapsulate a rev max swerve module */
 public class MAXSwerveModule implements SwerveModule {

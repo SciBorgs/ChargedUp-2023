@@ -20,6 +20,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
@@ -30,41 +32,67 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import java.util.function.DoubleSupplier;
+import org.photonvision.EstimatedRobotPose;
+import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.subsystems.modules.SwerveModule;
-import org.sciborgs1155.robot.util.Vision;
+import org.sciborgs1155.robot.Robot;
+import org.sciborgs1155.robot.subsystems.modules.GoalSwerveModule;
+import org.sciborgs1155.robot.subsystems.modules.MAXSwerveModule;
 
 public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
 
-  @Log
-  private final SwerveModule frontLeft =
-      SwerveModule.create(FRONT_LEFT_DRIVE, FRONT_LEFT_TURNING, ANGULAR_OFFSETS[0]);
+  /** Generalized SwerveModule with closed loop control */
+  public interface SwerveModule extends Sendable, AutoCloseable {
+    /** Returns the current state of the module. */
+    public SwerveModuleState getState();
 
-  @Log
-  private final SwerveModule frontRight =
-      SwerveModule.create(FRONT_RIGHT_DRIVE, FRONT_RIGHT_TURNING, ANGULAR_OFFSETS[1]);
+    /** Returns the current position of the module. */
+    public SwerveModulePosition getPosition();
 
-  @Log
-  private final SwerveModule rearLeft =
-      SwerveModule.create(REAR_LEFT_DRIVE, REAR_LEFT_TURNING, ANGULAR_OFFSETS[2]);
+    /** Sets the desired state for the module. */
+    public void setDesiredState(SwerveModuleState desiredState);
 
-  @Log
-  private final SwerveModule rearRight =
-      SwerveModule.create(REAR_RIGHT_DRIVE, REAR_RIGHT_TURNING, ANGULAR_OFFSETS[3]);
+    /** Returns the desired state for the module. */
+    public SwerveModuleState getDesiredState();
 
-  private final List<SwerveModule> modules = List.of(frontLeft, frontRight, rearLeft, rearRight);
+    /** Zeroes all the drive encoders. */
+    public void resetEncoders();
 
+    /** Sets the turn PID constants for the module. */
+    public void setTurnPID(PIDConstants constants);
+
+    /** Sets the drive PID constants for the module. */
+    public void setDrivePID(PIDConstants constants);
+
+    @Override
+    default void initSendable(SendableBuilder builder) {
+      builder.addDoubleProperty("current velocity", () -> getState().speedMetersPerSecond, null);
+      builder.addDoubleProperty("current angle", () -> getPosition().angle.getRadians(), null);
+      builder.addDoubleProperty("current position", () -> getPosition().distanceMeters, null);
+      builder.addDoubleProperty(
+          "target velocity", () -> getDesiredState().speedMetersPerSecond, null);
+      builder.addDoubleProperty("target angle", () -> getDesiredState().angle.getRadians(), null);
+    }
+  }
+
+  @Log private final SwerveModule frontLeft;
+  @Log private final SwerveModule frontRight;
+  @Log private final SwerveModule rearLeft;
+  @Log private final SwerveModule rearRight;
+
+  private final List<SwerveModule> modules;
+
+  // this should be a generic IMU class, once WPILib implements it
   @Log private final WPI_PigeonIMU imu = new WPI_PigeonIMU(PIGEON);
 
   public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
   // Odometry and pose estimation
-  private final Vision vision;
   private final SwerveDrivePoseEstimator odometry =
       new SwerveDrivePoseEstimator(kinematics, getHeading(), getModulePositions(), new Pose2d());
 
   @Log private final Field2d field2d = new Field2d();
-  private final FieldObject2d[] modules2d = new FieldObject2d[modules.size()];
+  private final FieldObject2d[] modules2d;
 
   // Rate limiting
   private final SlewRateLimiter xLimiter = new SlewRateLimiter(MAX_ACCEL);
@@ -72,8 +100,22 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log private double speedMultiplier = SpeedMultiplier.NORMAL.multiplier;
 
-  public Drive(Vision vision) {
-    this.vision = vision;
+  public Drive() {
+
+    if (Robot.isReal()) {
+      frontLeft = new MAXSwerveModule(FRONT_LEFT_DRIVE, FRONT_LEFT_TURNING, ANGULAR_OFFSETS[0]);
+      frontRight = new MAXSwerveModule(FRONT_RIGHT_DRIVE, FRONT_RIGHT_TURNING, ANGULAR_OFFSETS[1]);
+      rearLeft = new MAXSwerveModule(REAR_LEFT_DRIVE, REAR_LEFT_TURNING, ANGULAR_OFFSETS[2]);
+      rearRight = new MAXSwerveModule(REAR_RIGHT_DRIVE, REAR_RIGHT_TURNING, ANGULAR_OFFSETS[3]);
+    } else {
+      frontLeft = new GoalSwerveModule();
+      frontRight = new GoalSwerveModule();
+      rearLeft = new GoalSwerveModule();
+      rearRight = new GoalSwerveModule();
+    }
+
+    modules = List.of(frontLeft, frontRight, rearLeft, rearRight);
+    modules2d = new FieldObject2d[modules.size()];
 
     for (int i = 0; i < modules2d.length; i++) {
       modules2d[i] = field2d.getObject("module-" + i);
@@ -177,6 +219,11 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
     return runOnce(imu::reset);
   }
 
+  /** Returns the pitch of the drive gyro */
+  public double getPitch() {
+    return imu.getPitch();
+  }
+
   private SwerveModuleState[] getModuleStates() {
     return modules.stream().map(SwerveModule::getState).toArray(SwerveModuleState[]::new);
   }
@@ -185,36 +232,17 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
     return modules.stream().map(SwerveModule::getPosition).toArray(SwerveModulePosition[]::new);
   }
 
-  /**
-   * Returns the pitch value recorded by the pigeon.
-   *
-   * @return The pitch value of the pigeon.
-   */
-  @Log
-  public double getPitch() {
-    return imu.getPitch();
-  }
-
-  /**
-   * Returns the roll value recorded by the pigeon.
-   *
-   * @return The roll value of the pigeon.
-   */
-  @Log
-  public double getRoll() {
-    return imu.getRoll();
+  /** Updates pose estimation based on provided {@link EstimatedRobotPose} */
+  public void updateEstimates(EstimatedRobotPose... poses) {
+    for (int i = 0; i < poses.length; i++) {
+      odometry.addVisionMeasurement(poses[i].estimatedPose.toPose2d(), poses[i].timestampSeconds);
+      field2d.getObject("Cam-" + i + " Est Pose").setPose(poses[i].estimatedPose.toPose2d());
+    }
   }
 
   @Override
   public void periodic() {
     odometry.update(getHeading(), getModulePositions());
-
-    var poses = vision.getPoseEstimates(getPose());
-
-    for (int i = 0; i < poses.length; i++) {
-      odometry.addVisionMeasurement(poses[i].estimatedPose.toPose2d(), poses[i].timestampSeconds);
-      field2d.getObject("Cam-" + i + " Est Pose").setPose(poses[i].estimatedPose.toPose2d());
-    }
 
     field2d.setRobotPose(getPose());
 
@@ -232,8 +260,6 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
             Units.radiansToDegrees(
                     kinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond)
                 * Constants.PERIOD);
-
-    vision.updateSeenTags();
   }
 
   /** Sets a new speed multiplier for the robot, this affects max cartesian and angular speeds */
@@ -310,12 +336,11 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
     return driveToPose(getPose(), desiredPose, useAllianceColor);
   }
 
-  public void close() {
+  public void close() throws Exception {
     frontLeft.close();
     frontRight.close();
     rearLeft.close();
     rearRight.close();
     imu.close();
-    vision.close();
   }
 }

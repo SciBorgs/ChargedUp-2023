@@ -21,8 +21,9 @@ import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.subsystems.LED;
-import org.sciborgs1155.robot.util.Vision;
-import org.sciborgs1155.robot.util.Vision.Mode;
+import org.sciborgs1155.robot.util.RealVision;
+import org.sciborgs1155.robot.util.SimVision;
+import org.sciborgs1155.robot.util.VisionIO;
 import org.sciborgs1155.robot.util.Visualizer;
 import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;
 import org.sciborgs1155.robot.util.placement.PlacementState.Level;
@@ -36,12 +37,13 @@ import org.sciborgs1155.robot.util.placement.PlacementState.Side;
  */
 public class Robot extends CommandRobot implements Loggable {
 
-  private final Vision vision = new Vision(Mode.NONE);
+  private final VisionIO vision = isReal() ? new RealVision() : new SimVision();
+
   @Log private final Visualizer position = new Visualizer(new Color8Bit(255, 0, 0));
   @Log private final Visualizer setpoint = new Visualizer(new Color8Bit(0, 0, 255));
 
   // SUBSYSTEMS
-  @Log private final Drive drive = new Drive(vision);
+  @Log private final Drive drive = new Drive();
   @Log private final Elevator elevator = new Elevator(position, setpoint);
   @Log private final Arm arm = new Arm(position, setpoint);
   @Log private final Intake intake = new Intake();
@@ -76,6 +78,8 @@ public class Robot extends CommandRobot implements Loggable {
     DataLogManager.start();
 
     addPeriodic(Logger::updateEntries, Constants.PERIOD);
+
+    addPeriodic(() -> drive.updateEstimates(vision.getPoseEstimates(drive.getPose())), 0.5);
 
     autonomous().onTrue(getAutonomousCommand());
 
