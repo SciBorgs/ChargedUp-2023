@@ -87,23 +87,23 @@ public class Elevator extends SubsystemBase implements Loggable, AutoCloseable {
     setpoint = new State(getPosition(), 0, 0);
   }
 
-  /** Returns the height of the elevator, in meters */
+  /** Returns the height of the elevator, in meters  */
   @Log(name = "position")
   public double getPosition() {
     return encoder.getDistance() + offset;
   }
 
-  /** Sets the elevator's setpoint height */
+  /** Sets the elevator's setpoint height  */
   public Command setSetpoint(double height) {
     return runOnce(() -> setpoint = new State(height, 0, 0));
   }
 
-  /** Returns the elevator setpoint as a {@link State} */
+  /** Returns the elevator setpoint as a {@link State}  */
   public State getSetpoint() {
     return setpoint;
   }
 
-  /** Follows a {@link TrapezoidProfile} to the desired height */
+  /** Follows a {@link TrapezoidProfile} to the desired height  */
   public Command followProfile(double height) {
     var accel = new Derivative();
 
