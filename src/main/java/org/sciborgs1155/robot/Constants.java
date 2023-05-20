@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import java.awt.Color;
@@ -17,6 +18,7 @@ import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants.Arm.Elbow;
+import org.sciborgs1155.robot.subsystems.Arm.JointConfig;
 import org.sciborgs1155.robot.util.placement.PlacementState;
 
 /**
@@ -116,6 +118,15 @@ public final class Constants {
 
       public static final double MAX_ANGLE = Math.PI;
       public static final double MIN_ANGLE = -Math.PI;
+
+      public static final JointConfig config =
+          new JointConfig(
+              DCMotor.getNEO(1),
+              GEARING,
+              Dimensions.CLAW_LENGTH,
+              Dimensions.CLAW_MASS,
+              MIN_ANGLE,
+              MAX_ANGLE);
     }
 
     public static final class Elbow {
@@ -140,6 +151,15 @@ public final class Constants {
 
       public static final double MAX_ANGLE = 3.0 * Math.PI / 2.0;
       public static final double MIN_ANGLE = -Math.PI / 2.0;
+
+      public static final JointConfig config =
+          new JointConfig(
+              DCMotor.getNEO(3),
+              GEARING,
+              Dimensions.FOREARM_LENGTH,
+              Dimensions.FOREARM_MASS,
+              MIN_ANGLE,
+              MAX_ANGLE);
 
       public static final double OFFSET = -1.248660;
 
