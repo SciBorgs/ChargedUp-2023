@@ -7,20 +7,13 @@ package org.sciborgs1155.robot.subsystems.arm;
 import static org.sciborgs1155.robot.Constants.Arm.*;
 import static org.sciborgs1155.robot.Ports.Arm.*;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
-import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
-import io.github.oblarg.oblog.annotations.Log;
-
 import org.sciborgs1155.lib.BetterArmFeedforward;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.constants.SystemConstants;
@@ -81,7 +74,12 @@ public class WristSparkMax implements JointIO {
   /** Sets, THEN moves to a desired state */
   @Override
   public void updateDesiredState(State desiredState) {
-    double feedforward = ff.calculate(desiredState.position + getBaseAngle().getRadians(), setpoint.velocity, desiredState.velocity, Constants.PERIOD);
+    double feedforward =
+        ff.calculate(
+            desiredState.position + getBaseAngle().getRadians(),
+            setpoint.velocity,
+            desiredState.velocity,
+            Constants.PERIOD);
     double feedback = pid.calculate(getRelativeAngle().getRadians(), desiredState.position);
 
     voltage = feedback + feedforward;
@@ -101,15 +99,19 @@ public class WristSparkMax implements JointIO {
   }
 
   @Override
+  public boolean isFailing() {
+    return false;
+  }
+
+  @Override
   public double getVoltage() {
-      // TODO Auto-generated method stub
-      return 0;
+    return voltage;
   }
 
   @Override
   public void close() throws Exception {
-      motor.close();
-      absolute.close();
-      relative.close();
+    motor.close();
+    absolute.close();
+    relative.close();
   }
 }

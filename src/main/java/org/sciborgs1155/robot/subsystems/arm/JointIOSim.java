@@ -4,18 +4,16 @@
 
 package org.sciborgs1155.robot.subsystems.arm;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-
 import org.sciborgs1155.lib.BetterArmFeedforward;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.subsystems.Arm.JointIO;
 import org.sciborgs1155.robot.subsystems.Arm.JointConfig;
+import org.sciborgs1155.robot.subsystems.Arm.JointIO;
 
 /** A simulated {@link JointIO} using {@link SingleJointedArmSim} */
 public class JointIOSim implements JointIO {
@@ -57,13 +55,18 @@ public class JointIOSim implements JointIO {
 
   @Override
   public void updateDesiredState(State state) {
-    double ffVoltage = ff.calculate(setpoint.position + baseAngle.getRadians(), setpoint.velocity, state.velocity, Constants.PERIOD);
+    double ffVoltage =
+        ff.calculate(
+            setpoint.position + baseAngle.getRadians(),
+            setpoint.velocity,
+            state.velocity,
+            Constants.PERIOD);
     double pidVoltage = pid.calculate(getRelativeAngle().getRadians(), state.position);
 
     voltage = ffVoltage + pidVoltage;
     sim.setInputVoltage(voltage);
     sim.update(Constants.PERIOD);
-    
+
     setpoint = state;
   }
 
@@ -84,10 +87,9 @@ public class JointIOSim implements JointIO {
 
   @Override
   public double getVoltage() {
-      return voltage;
+    return voltage;
   }
 
   @Override
   public void close() {}
-
 }

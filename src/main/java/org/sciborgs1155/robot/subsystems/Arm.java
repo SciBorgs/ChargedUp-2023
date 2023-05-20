@@ -3,6 +3,9 @@ package org.sciborgs1155.robot.subsystems;
 import static org.sciborgs1155.robot.Constants.Arm.*;
 import static org.sciborgs1155.robot.Ports.Arm.*;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -10,28 +13,27 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.DeferredCommand;
-import org.sciborgs1155.lib.Derivative;
 import org.sciborgs1155.lib.Trajectory;
-import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Elevator;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.subsystems.arm.ElbowSparkMax;
 import org.sciborgs1155.robot.subsystems.arm.ElevatorIOSim;
 import org.sciborgs1155.robot.subsystems.arm.ElevatorSparkMax;
 import org.sciborgs1155.robot.subsystems.arm.JointIOSim;
-import org.sciborgs1155.robot.subsystems.arm.JointIOSim;
 import org.sciborgs1155.robot.subsystems.arm.WristSparkMax;
 import org.sciborgs1155.robot.util.Visualizer;
+import org.sciborgs1155.robot.util.placement.PlacementCache;
+import org.sciborgs1155.robot.util.placement.PlacementState;
+import org.sciborgs1155.robot.util.placement.PlacementTrajectory;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
@@ -44,7 +46,12 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
       double maxAngle) {}
 
   public static record ElevatorConfig(
-      DCMotor gearbox, double gearing, double mass, double sprocketRadius, double minHeight, double maxHeight) {}
+      DCMotor gearbox,
+      double gearing,
+      double mass,
+      double sprocketRadius,
+      double minHeight,
+      double maxHeight) {}
 
   public interface JointIO extends Sendable, AutoCloseable {
     public Rotation2d getRelativeAngle();
@@ -58,6 +65,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     public void setBaseAngle(Rotation2d baseAngle);
 
     public Rotation2d getBaseAngle();
+
+    public boolean isFailing();
 
     public double getVoltage();
 
@@ -105,6 +114,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log private final JointIO elbow;
   @Log private final JointIO wrist;
 
+  private final Map<Integer, PlacementTrajectory> trajectories = PlacementCache.loadTrajectories();
+
   private final Visualizer positionVisualizer;
   private final Visualizer setpointVisualizer;
 
@@ -114,7 +125,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log private boolean wristLimp = false;
 
   public Arm(Visualizer positionVisualizer, Visualizer setpointVisualizer) {
-    
+
     if (Robot.isReal()) {
       elevator = new ElevatorSparkMax();
       elbow = new ElbowSparkMax(Elbow.PID, Elbow.FF);
@@ -127,6 +138,16 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
     this.positionVisualizer = positionVisualizer;
     this.setpointVisualizer = setpointVisualizer;
+  }
+
+  /** Returns the current position of the placement mechanisms */
+  public PlacementState getState() {
+    return new PlacementState(elevator.getHeight(), elbow.getRelativeAngle(), wrist.getRelativeAngle());
+  }
+
+  /** Returns the current setpoint of the placement mechanisms */
+  public PlacementState getSetpoint() {
+    return PlacementState.fromRelative(elevator.getDesiredState().position, elbow.getDesiredState().position, wrist.getDesiredState().position);
   }
 
   /**
@@ -147,82 +168,94 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
     return !wristLimp;
   }
 
+  /**
+   * Goes to a {@link PlacementState} in the most optimal way, this is a safe command.
+   *
+   * <p>Uses {@link #followTrajectory(PlacementTrajectory)} based on {@link
+   * #findTrajectory(PlacementState)} if a valid state is cached for the inputted parameters.
+   * Otherwise, falls back on {@link #safeFollowProfile(PlacementState)} for on the fly movements.
+   *
+   * @param goal The goal state.
+   * @param useTrajectories Whether to use trajectories.
+   * @return A command that goes to the goal safely using either custom trajectory following or
+   *     trapezoid profiling.
+   */
+  public Command goTo(Supplier<PlacementState> goal) {
+    return new DeferredCommand(
+            () ->
+                Commands.either(
+                    findTrajectory(goal.get())
+                        .map(this::followTrajectory)
+                        .orElse(safeFollowProfile(goal.get())),
+                    Commands.none(),
+                    () -> arm.allowPassOver() || goal.get().side() == state().side()))
+        .withName("placement goto");
+  }
+
+
+  /**
+   * A (mostly) safe version of {@link #followProfile(PlacementState)} that uses {@link
+   * #passOver(Side)} to reach the other side without height violations or destruction.
+   *
+   * <p>This is implemented by going to a safe intermediate goal if the side of the arm will change,
+   * which is slow, and does not prevent circumstances where the arm hits the ground.
+   *
+   * @param goal The goal goal.
+   * @return A safe following command that will run to a safe goal and then until all mechanisms are
+   *     at their goal.
+   */
+  private Command safeFollowProfile(Supplier<PlacementState> goal) {
+    return Commands.either(
+            followProfile(passOver(goal.side())),
+            Commands.none(),
+            () -> goal.side() != state().side())
+        .andThen(followProfile(goal))
+        .withName("safe follow profile");
+  }
+  
+
   /** Sets the position setpoints for the elbow and wrist, in radians */
-  public Command setSetpoints(Rotation2d elbowAngle, Rotation2d wristAngle) {
-    return runOnce(
-        () -> {
-          elbowSetpoint = new State(elbowAngle.getRadians(), 0, 0);
-          wristSetpoint = new State(wristAngle.getRadians(), 0, 0);
-        });
-  }
-
-  /** Returns the elbow setpoint as a {@link State} */
-  public State getElbowSetpoint() {
-    return elbowSetpoint;
-  }
-
-  /** Returns the wrist setpoint as a {@link State} */
-  public State getWristSetpoint() {
-    return wristSetpoint;
-  }
-
-  private TrapezoidProfile createElbowProfile(Rotation2d goal) {
-    return new TrapezoidProfile(
-        Elbow.CONSTRAINTS,
-        new TrapezoidProfile.State(goal.getRadians(), 0),
-        elbowSetpoint.trapezoidState());
-  }
-
-  private TrapezoidProfile createWristProfile(Rotation2d goal) {
-    return new TrapezoidProfile(
-        Wrist.CONSTRAINTS,
-        new TrapezoidProfile.State(goal.getRadians(), 0),
-        wristSetpoint.trapezoidState());
+  private CommandBase setSetpoints(Supplier<PlacementState> setpoint) {
+    return runOnce(() -> {
+      elevator.updateDesiredState(new State(setpoint.get().elevatorHeight(), 0));
+      elbow.updateDesiredState(new State(setpoint.get().elbowAngle().getRadians(), 0));
+      wrist.updateDesiredState(new State(setpoint.get().wristAngle().getRadians(), 0));
+    }).withName("set setpoints");
   }
 
   /** Follows a {@link TrapezoidProfile} for each joint's relative position */
-  public Command followProfile(Rotation2d elbowGoal, Rotation2d wristGoal) {
-    var elbowAccel = new Derivative();
-    var wristAccel = new Derivative();
-
-    return runOnce(
-            () -> {
-              elbowAccel.reset();
-              wristAccel.reset();
-            })
-        .andThen(
-            new DeferredCommand(
-                () ->
+  private CommandBase followProfile(Supplier<PlacementState> goal) {
+    return new DeferredCommand(
+            () ->
+                Commands.parallel(
                     new TrapezoidProfileCommand(
-                            createElbowProfile(elbowGoal),
-                            state ->
-                                elbowSetpoint =
-                                    new State(
-                                        state.position,
-                                        state.velocity,
-                                        elbowAccel.calculate(state.velocity)))
-                        .alongWith(
-                            new TrapezoidProfileCommand(
-                                createWristProfile(wristGoal),
-                                state ->
-                                    wristSetpoint =
-                                        new State(
-                                            state.position,
-                                            state.velocity,
-                                            wristAccel.calculate(state.velocity))))))
+                        new TrapezoidProfile(
+                            Elevator.CONSTRAINTS,
+                            new State(goal.get().elevatorHeight(), 0),
+                            elevator.getState()),
+                        elevator::updateDesiredState),
+                    new TrapezoidProfileCommand(
+                        new TrapezoidProfile(
+                            Elbow.CONSTRAINTS,
+                            new State(goal.get().elbowAngle().getRadians(), 0),
+                            elbow.getCurrentState()),
+                        elbow::updateDesiredState),
+                    new TrapezoidProfileCommand(
+                        new TrapezoidProfile(
+                            Wrist.CONSTRAINTS,
+                            new State(goal.get().wristAngle().getRadians(), 0),
+                            wrist.getCurrentState()),
+                        wrist::updateDesiredState)),
+            this)
         .withName("following profile");
   }
 
   /** Follows a {@link Trajectory} for each joint's relative position */
-  public Command followTrajectory(Trajectory elbowTrajectory, Trajectory wristTrajectory) {
-    if (elbowTrajectory.totalTime() != wristTrajectory.totalTime()) {
-      DriverStation.reportError(
-          "SUPPLIED ELBOW AND WRIST TRAJECTORIES DO NOT HAVE EQUAL TOTAL TIMES", false);
-    }
-
-    return elbowTrajectory
-        .follow(state -> elbowSetpoint = state)
-        .alongWith(wristTrajectory.follow(state -> wristSetpoint = state, this))
+  private CommandBase followTrajectory(Supplier<PlacementTrajectory> trajectory) {
+    return Commands.parallel(
+            trajectory.get().elevator().follow(elevator::updateDesiredState),
+            trajectory.get().elbow().follow(elbow::updateDesiredState),
+            trajectory.get().wrist().follow(wrist::updateDesiredState, this))
         .withName("following trajectory");
   }
 
@@ -232,28 +265,30 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Override
   public void periodic() {
-    double elbowFB =
-        elbowFeedback.calculate(getElbowPosition().getRadians(), elbowSetpoint.position());
-    double elbowFF =
-        elbowFeedforward.calculate(
-            elbowSetpoint.position(), elbowSetpoint.velocity(), elbowSetpoint.acceleration());
+    // double elbowFB =
+    //     elbowFeedback.calculate(getElbowPosition().getRadians(), elbowSetpoint.position());
+    // double elbowFF =
+    //     elbowFeedforward.calculate(
+    //         elbowSetpoint.position(), elbowSetpoint.velocity(), elbowSetpoint.acceleration());
 
-    elbow.setVoltage(stopped ? 0 : elbowFB + elbowFF);
+    // elbow.setVoltage(stopped ? 0 : elbowFB + elbowFF);
 
-    // wrist feedback is calculated using an absolute angle setpoint, rather than a relative one
-    // this means the extra voltage calculated to cancel out gravity is kG * cos(θ + ϕ), where θ is
-    // the elbow setpoint and ϕ is the wrist setpoint
-    // the elbow angle is used as a setpoint instead of current position because we're using
-    // trajectories, which means setpoints are achievable states, rather than goals
-    double wristFB =
-        wristFeedback.calculate(getRelativeWristPosition().getRadians(), wristSetpoint.position());
-    double wristFF =
-        wristFeedforward.calculate(
-            wristSetpoint.position() + elbowSetpoint.position(),
-            wristSetpoint.velocity(),
-            wristSetpoint.acceleration());
+    // // wrist feedback is calculated using an absolute angle setpoint, rather than a relative one
+    // // this means the extra voltage calculated to cancel out gravity is kG * cos(θ + ϕ), where θ
+    // is
+    // // the elbow setpoint and ϕ is the wrist setpoint
+    // // the elbow angle is used as a setpoint instead of current position because we're using
+    // // trajectories, which means setpoints are achievable states, rather than goals
+    // double wristFB =
+    //     wristFeedback.calculate(getRelativeWristPosition().getRadians(),
+    // wristSetpoint.position());
+    // double wristFF =
+    //     wristFeedforward.calculate(
+    //         wristSetpoint.position() + elbowSetpoint.position(),
+    //         wristSetpoint.velocity(),
+    //         wristSetpoint.acceleration());
 
-    wrist.setVoltage(stopped || wristLimp ? 0 : wristFB + wristFF);
+    // wrist.setVoltage(stopped || wristLimp ? 0 : wristFB + wristFF);
 
     positionVisualizer.setArmAngles(getElbowPosition(), getRelativeWristPosition());
     setpointVisualizer.setArmAngles(
@@ -274,22 +309,9 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   @Override
-  public void simulationPeriodic() {
-    elbowSim.setInputVoltage(elbow.getAppliedOutput());
-    elbowSim.update(Constants.PERIOD);
-    elbowEncoderSim.setDistance(elbowSim.getAngleRads() - Elbow.OFFSET);
-    elbowEncoderSim.setRate(elbowSim.getVelocityRadPerSec());
-
-    wristSim.setInputVoltage(wrist.getAppliedOutput());
-    wristSim.update(Constants.PERIOD);
-  }
-
-  @Override
   public void close() {
+    elevator.close();
     elbow.close();
-    elbowLeft.close();
-    elbowRight.close();
     wrist.close();
-    elbowEncoder.close();
   }
 }

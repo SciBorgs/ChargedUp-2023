@@ -14,7 +14,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Encoder;
 import io.github.oblarg.oblog.annotations.Log;
-
 import org.sciborgs1155.lib.BetterArmFeedforward;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.constants.SystemConstants;
@@ -74,7 +73,12 @@ public class ElbowSparkMax implements JointIO {
   /** Sets, AND moves to a desired state */
   @Override
   public void updateDesiredState(State desiredState) {
-    double feedforward = ff.calculate(desiredState.position + getBaseAngle().getRadians(), setpoint.velocity, desiredState.velocity, Constants.PERIOD);
+    double feedforward =
+        ff.calculate(
+            desiredState.position + getBaseAngle().getRadians(),
+            setpoint.velocity,
+            desiredState.velocity,
+            Constants.PERIOD);
     double feedback = pid.calculate(getRelativeAngle().getRadians(), desiredState.position);
 
     voltage = feedback + feedforward;
@@ -98,11 +102,15 @@ public class ElbowSparkMax implements JointIO {
   }
 
   @Override
+  public boolean isFailing() {
+    return false;
+  }
+
+  @Override
   public double getVoltage() {
-      return voltage;
+    return voltage;
   }
 
   @Override
   public void close() {}
-
 }

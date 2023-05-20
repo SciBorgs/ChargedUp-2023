@@ -1,18 +1,15 @@
 package org.sciborgs1155.lib.constants;
 
-import org.sciborgs1155.lib.BetterArmFeedforward;
-import org.sciborgs1155.lib.BetterElevatorFeedforward;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import org.sciborgs1155.lib.BetterArmFeedforward;
+import org.sciborgs1155.lib.BetterElevatorFeedforward;
 
 /** Record to store static, voltage, and acceleration gains for simple DC motor systems */
 public record SystemConstants(double s, double g, double v, double a) {

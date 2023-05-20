@@ -3,15 +3,12 @@ package org.sciborgs1155.robot.subsystems.arm;
 import static org.sciborgs1155.robot.Constants.Elevator.*;
 import static org.sciborgs1155.robot.Ports.Elevator.*;
 
-import org.sciborgs1155.lib.BetterElevatorFeedforward;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Encoder;
-
+import org.sciborgs1155.lib.BetterElevatorFeedforward;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.Arm.ElevatorIO;
 
@@ -28,7 +25,7 @@ public class ElevatorSparkMax implements ElevatorIO {
 
   private State setpoint;
   private double voltage;
-  
+
   public ElevatorSparkMax() {
     left.follow(lead);
     right.follow(lead);
@@ -60,7 +57,7 @@ public class ElevatorSparkMax implements ElevatorIO {
   public void updateDesiredState(State state) {
     double ffOutput = ff.calculate(setpoint.velocity, state.velocity, Constants.PERIOD);
     double fbOutput = pid.calculate(getHeight(), state.position);
-    
+
     voltage = ffOutput + fbOutput;
     lead.setVoltage(voltage);
 
@@ -74,7 +71,7 @@ public class ElevatorSparkMax implements ElevatorIO {
 
   @Override
   public double getVoltage() {
-      return voltage;
+    return voltage;
   }
 
   @Override

@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.robot.subsystems.Arm;
-import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.util.placement.PlacementCache;
 import org.sciborgs1155.robot.util.placement.PlacementState;
 import org.sciborgs1155.robot.util.placement.PlacementState.Side;
@@ -50,22 +49,6 @@ public final class Placement {
    */
   public Optional<PlacementTrajectory> findTrajectory(PlacementState goal) {
     return findTrajectory(new Parameters(setpoint(), goal));
-  }
-
-  /** Returns the current position goal of the placement mechanisms */
-  public PlacementState state() {
-    return PlacementState.fromRelative(
-        elevator.getPosition(),
-        arm.getElbowPosition().getRadians(),
-        arm.getRelativeWristPosition().getRadians());
-  }
-
-  /** Returns the current position setpoint of placement mechanisms */
-  public PlacementState setpoint() {
-    return PlacementState.fromRelative(
-        elevator.getSetpoint().position(),
-        arm.getElbowSetpoint().position(),
-        arm.getWristSetpoint().position());
   }
 
   /**
@@ -110,21 +93,6 @@ public final class Placement {
   }
 
   /**
-   * Runs elevator and arm to a {@link PlacementState}.
-   *
-   * <p><b>WARNING: THIS IS UNSAFE AND DOES NOT ACCOUNT FOR HITTING THE ROBOT</b>
-   *
-   * @param goal The goal goal.
-   * @return A following command that will run until all mechanisms are at their goal.
-   */
-  private Command followProfile(PlacementState goal) {
-    return Commands.parallel(
-            elevator.followProfile(goal.elevatorHeight()),
-            arm.followProfile(goal.elbowAngle(), goal.wristAngle()))
-        .withName("placement follow profile");
-  }
-
-  /**
    * A (mostly) safe version of {@link #followProfile(PlacementState)} that uses {@link
    * #passOver(Side)} to reach the other side without height violations or destruction.
    *
@@ -143,30 +111,7 @@ public final class Placement {
         .andThen(followProfile(goal))
         .withName("safe follow profile");
   }
-
-  /**
-   * Follows generated trajctories based on a trajectory.
-   *
-   * <p>This is safe and efficient, and should always be prefered to {@link
-   * #safeFollowProfile(PlacementState)}, unless there is no usable cached trajectory.
-   *
-   * @param trajectory The trajectory to follow.
-   * @return A command to follow a generated trajectory.
-   */
-  private Command followTrajectory(PlacementTrajectory trajectory) {
-    return Commands.parallel(
-            elevator.followTrajectory(trajectory.elevator()),
-            arm.followTrajectory(trajectory.elbow(), trajectory.wrist()))
-        .withName("follow trajectory");
-  }
-
-  /** Sets the setpoints, this is generally a very bad idea */
-  public Command setSetpoint(PlacementState setpoint) {
-    return Commands.parallel(
-        elevator.setSetpoint(setpoint.elevatorHeight()),
-        arm.setSetpoints(setpoint.elbowAngle(), setpoint.wristAngle()));
-  }
-
+  
   /** Sets everything to stopped */
   public Command setStopped(boolean stopped) {
     return Commands.parallel(elevator.setStopped(stopped), arm.setStopped(stopped));

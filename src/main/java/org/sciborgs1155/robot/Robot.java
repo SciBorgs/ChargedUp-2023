@@ -18,7 +18,6 @@ import org.sciborgs1155.robot.commands.Placement;
 import org.sciborgs1155.robot.commands.Scoring;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
-import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.subsystems.LED;
 import org.sciborgs1155.robot.util.RealVision;
@@ -44,7 +43,6 @@ public class Robot extends CommandRobot implements Loggable {
 
   // SUBSYSTEMS
   @Log private final Drive drive = new Drive();
-  @Log private final ElevatorIO elevator = new ElevatorIO(position, setpoint);
   @Log private final Arm arm = new Arm(position, setpoint);
   @Log private final Intake intake = new Intake();
   @Log private final LED led = new LED();
@@ -54,7 +52,7 @@ public class Robot extends CommandRobot implements Loggable {
   private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
 
   // COMMANDS
-  private final Placement placement = new Placement(arm, elevator);
+  // private final Placement placement = new Placement(arm, elevator);
   @Log private final Scoring scoring = new Scoring(led);
   @Log private final Autos autos = new Autos(drive, placement, intake);
 
@@ -95,6 +93,8 @@ public class Robot extends CommandRobot implements Loggable {
         drive
             .drive(() -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX())
             .withName("teleop driving"));
+
+    arm.setDefaultCommand(arm.setSetpoints(arm::getState).repeatedly());
 
     intake.setDefaultCommand(intake.set(Constants.Intake.DEFAULT_SPEED).withName("passive intake"));
   }
