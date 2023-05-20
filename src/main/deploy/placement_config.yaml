@@ -40,11 +40,25 @@ elbow:
     count: 3
     reduction: 63.75
 
+# old wrist
+# 
+# wrist:
+#   mass: 3.85554
+#   length: 0.488
+#   cgRadius: 0.16 # estimated
+#   moi: 0.0435
+#   minRelAngle: -3.1415
+#   maxRelAngle: 3.1415
+#   motor:
+#     type: neo
+#     count: 1
+#     reduction: 53.125
+
 wrist:
-  mass: 3.85554
-  length: 0.488
-  cgRadius: 0.16 # estimated
-  moi: 0.0435
+  mass: 2.803201
+  length: 0.3048
+  cgRadius: 0.16 # estimated NOT UPDATED
+  moi: 0.0377
   minRelAngle: -3.1415
   maxRelAngle: 3.1415
   motor:
