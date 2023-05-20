@@ -88,8 +88,7 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
   public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
   // Odometry and pose estimation
-  private final SwerveDrivePoseEstimator odometry =
-      new SwerveDrivePoseEstimator(kinematics, getHeading(), getModulePositions(), new Pose2d());
+  private final SwerveDrivePoseEstimator odometry;
 
   @Log private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d;
@@ -116,6 +115,9 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
 
     modules = List.of(frontLeft, frontRight, rearLeft, rearRight);
     modules2d = new FieldObject2d[modules.size()];
+
+    odometry =
+        new SwerveDrivePoseEstimator(kinematics, getHeading(), getModulePositions(), new Pose2d());
 
     for (int i = 0; i < modules2d.length; i++) {
       modules2d[i] = field2d.getObject("module-" + i);

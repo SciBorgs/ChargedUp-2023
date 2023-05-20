@@ -18,10 +18,9 @@ import org.sciborgs1155.lib.BetterArmFeedforward;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.subsystems.Arm.JointIO;
 
 /** Add your docs here. */
-public class ElbowSparkMax implements JointIO {
+public class ElbowIOSparkMax implements JointIO {
   private final CANSparkMax middleMotor;
   private final CANSparkMax leftMotor;
   private final CANSparkMax rightMotor;
@@ -34,7 +33,7 @@ public class ElbowSparkMax implements JointIO {
   private State setpoint;
   private double voltage;
 
-  public ElbowSparkMax(PIDConstants pidConstants, SystemConstants ffConstants) {
+  public ElbowIOSparkMax(PIDConstants pidConstants, SystemConstants ffConstants) {
 
     middleMotor = Wrist.MOTOR.build(MotorType.kBrushless, MIDDLE_ELBOW_MOTOR);
     leftMotor = Wrist.MOTOR.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
@@ -72,19 +71,19 @@ public class ElbowSparkMax implements JointIO {
 
   /** Sets, AND moves to a desired state */
   @Override
-  public void updateDesiredState(State desiredState) {
+  public void update(State setpoint) {
     double feedforward =
         ff.calculate(
-            desiredState.position + getBaseAngle().getRadians(),
+            setpoint.position + getBaseAngle().getRadians(),
+            this.setpoint.velocity,
             setpoint.velocity,
-            desiredState.velocity,
             Constants.PERIOD);
-    double feedback = pid.calculate(getRelativeAngle().getRadians(), desiredState.position);
+    double feedback = pid.calculate(getRelativeAngle().getRadians(), setpoint.position);
 
     voltage = feedback + feedforward;
     middleMotor.setVoltage(voltage);
 
-    setpoint = desiredState;
+    this.setpoint = setpoint;
   }
 
   public State getDesiredState() {
@@ -103,7 +102,10 @@ public class ElbowSparkMax implements JointIO {
 
   @Override
   public boolean isFailing() {
-    return false;
+    return encoder.getDistance() == 0 // no position reading
+        && encoder.getRate() == 0 // no velocity reading
+        && encoder.getDistance() != Elbow.OFFSET // elbow is not going to 0
+        && middleMotor.getAppliedOutput() != 0; // elbow is trying to move
   }
 
   @Override

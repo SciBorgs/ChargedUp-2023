@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;
@@ -55,7 +56,7 @@ public final class Autos implements Sendable {
   }
 
   private final Drive drive;
-  private final Placement placement;
+  private final Arm arm;
   private final Intake intake;
 
   private final SendableChooser<Supplier<Command>> autoChooser;
@@ -64,21 +65,21 @@ public final class Autos implements Sendable {
 
   private final Map<String, Command> eventMarkers;
 
-  public Autos(Drive drive, Placement placement, Intake intake) {
+  public Autos(Drive drive, Arm arm, Intake intake) {
     this.drive = drive;
     this.intake = intake;
-    this.placement = placement;
+    this.arm = arm;
 
     eventMarkers =
         Map.ofEntries(
-            Map.entry("backHighCone", placement.goTo(BACK_HIGH_CONE)),
-            Map.entry("backHighCube", placement.goTo(BACK_HIGH_CUBE)),
-            Map.entry("frontHighCube", placement.goTo(FRONT_HIGH_CUBE)),
+            Map.entry("backHighCone", arm.goTo(BACK_HIGH_CONE)),
+            Map.entry("backHighCube", arm.goTo(BACK_HIGH_CUBE)),
+            Map.entry("frontHighCube", arm.goTo(FRONT_HIGH_CUBE)),
             Map.entry("outtakeCone", outtake(GamePiece.CONE)),
             Map.entry("outtakeCube", outtake(GamePiece.CUBE)),
             Map.entry("frontIntake", frontMovingIntake()),
-            Map.entry("stow", placement.goTo(STOW)),
-            Map.entry("balanceState", placement.goTo(SAFE)),
+            Map.entry("stow", arm.goTo(STOW)),
+            Map.entry("balanceState", arm.goTo(SAFE)),
             Map.entry("initialIntake", initialIntake()));
 
     autoChooser = new SendableChooser<Supplier<Command>>();
@@ -244,9 +245,7 @@ public final class Autos implements Sendable {
 
   private Command frontMovingIntake() {
     return Commands.sequence(
-        placement.goTo(FRONT_INTAKE),
-        intake.intake().withTimeout(MOVING_INTAKE_TIME),
-        intake.stop());
+        arm.goTo(FRONT_INTAKE), intake.intake().withTimeout(MOVING_INTAKE_TIME), intake.stop());
   }
 
   private Command initialIntake() {
@@ -290,7 +289,7 @@ public final class Autos implements Sendable {
     return Commands.sequence(
         defaultOdometryReset(GamePiece.CONE, Rotation2d.fromRadians(0), startingPos),
         initialIntake(),
-        placement.goTo(BACK_HIGH_CONE).withTimeout(5),
+        arm.goTo(BACK_HIGH_CONE).withTimeout(5),
         outtake(GamePiece.CONE));
   }
 
@@ -301,22 +300,20 @@ public final class Autos implements Sendable {
   private Command backHighCubeScore(StartingPos startingPos) {
     return Commands.sequence(
         defaultOdometryReset(GamePiece.CUBE, Rotation2d.fromRadians(0), startingPos),
-        placement.goTo(BACK_HIGH_CUBE).withTimeout(5),
+        arm.goTo(BACK_HIGH_CUBE).withTimeout(5),
         outtake(GamePiece.CUBE));
   }
 
   /** no PPL */
   private Command cubeBalance() {
     return Commands.sequence(
-        backHighCubeScore(StartingPos.CENTER),
-        placement.goTo(SAFE).withTimeout(3.5),
-        fullBalance());
+        backHighCubeScore(StartingPos.CENTER), arm.goTo(SAFE).withTimeout(3.5), fullBalance());
   }
 
   /** no PPL */
   private Command coneBalance() {
     return Commands.sequence(
-        highConeScore(StartingPos.CENTER), placement.goTo(SAFE).withTimeout(3.5), fullBalance());
+        highConeScore(StartingPos.CENTER), arm.goTo(SAFE).withTimeout(3.5), fullBalance());
   }
 
   private Command coneLeave(StartingPos startingPos) {
@@ -343,7 +340,7 @@ public final class Autos implements Sendable {
 
   private Command lowCubeLeave() {
     return Commands.sequence(
-        placement.goTo(FRONT_INTAKE),
+        arm.goTo(FRONT_INTAKE),
         outtake(GamePiece.CUBE),
         builder.fullAuto(Paths.LEAVE_FLAT_BACKWARDS));
   }
@@ -437,6 +434,6 @@ public final class Autos implements Sendable {
   }
 
   public Command get() {
-    return placement.setSetpoint(INITIAL).andThen(autoChooser.getSelected().get());
+    return arm.setSetpoints(() -> INITIAL).andThen(autoChooser.getSelected().get());
   }
 }

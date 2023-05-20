@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Elevator;
+import org.sciborgs1155.robot.util.placement.PlacementState;
 
 /** Visualization class specific for our charged up bot */
 public class Visualizer implements Sendable {
@@ -44,13 +45,10 @@ public class Visualizer implements Sendable {
     return new Visualizer(new Color8Bit(Color.kBlack));
   }
 
-  public void setArmAngles(Rotation2d elbowAngle, Rotation2d wristAngle) {
-    forearm.setAngle(elbowAngle.minus(RIGHT_ANGLE));
-    claw.setAngle(wristAngle);
-  }
-
-  public void setElevatorHeight(double height) {
-    elevator.setLength(height);
+  public void setState(PlacementState state) {
+    elevator.setLength(state.elevatorHeight());
+    forearm.setAngle(state.elbowAngle().minus(RIGHT_ANGLE));
+    claw.setAngle(state.wristAngle());
   }
 
   @Override
