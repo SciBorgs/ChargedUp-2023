@@ -30,7 +30,9 @@ public final class Ports {
     public static final int MIDDLE_ELBOW_MOTOR = 16;
     public static final int RIGHT_ELBOW_MOTOR = 15;
 
-    public static final int[] ELBOW_ENCODER = {9, 8};
+    public static final int[] ELBOW_ENCODER = {2, 3};
+    public static final int[] WRIST_RELATIVE_ENCODER = {5, 6};
+    public static final int WRIST_ABS_ENCODER = 4;
 
     public static final int WRIST_MOTOR = 7;
   }
@@ -40,7 +42,7 @@ public final class Ports {
     public static final int RIGHT_MOTOR = 24;
     public static final int MIDDLE_MOTOR = 25;
 
-    public static final int[] ENCODER = {6, 7};
+    public static final int[] ENCODER = {0, 1};
 
     public static final int LIMIT_SWITCH = 9;
   }

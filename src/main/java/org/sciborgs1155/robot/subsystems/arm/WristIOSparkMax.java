@@ -22,8 +22,9 @@ import org.sciborgs1155.robot.Constants;
 /** Add your docs here. */
 public class WristIOSparkMax implements JointIO {
   private final CANSparkMax motor = Wrist.MOTOR.build(MotorType.kBrushless, WRIST_MOTOR);
-  private final DutyCycleEncoder absolute = new DutyCycleEncoder(0); // TODO
-  private final Encoder relative = new Encoder(0, 1); // TODO
+  private final DutyCycleEncoder absolute = new DutyCycleEncoder(WRIST_ABS_ENCODER);
+  private final Encoder relative =
+      new Encoder(WRIST_RELATIVE_ENCODER[0], WRIST_RELATIVE_ENCODER[1]);
 
   private final PIDController pid;
   private final BetterArmFeedforward ff;
