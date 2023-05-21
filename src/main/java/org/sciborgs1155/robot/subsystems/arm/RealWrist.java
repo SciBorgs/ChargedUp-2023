@@ -12,6 +12,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import org.sciborgs1155.lib.BetterArmFeedforward;
@@ -20,7 +21,7 @@ import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants;
 
 /** Add your docs here. */
-public class WristIOSparkMax implements JointIO {
+public class RealWrist implements JointIO {
   private final CANSparkMax motor = Wrist.MOTOR.build(MotorType.kBrushless, WRIST_MOTOR);
   private final DutyCycleEncoder absolute = new DutyCycleEncoder(WRIST_ABS_ENCODER);
   private final Encoder relative =
@@ -34,7 +35,7 @@ public class WristIOSparkMax implements JointIO {
   private State setpoint;
   private double voltage;
 
-  public WristIOSparkMax(PIDConstants pidConstants, SystemConstants ffConstants) {
+  public RealWrist(PIDConstants pidConstants, SystemConstants ffConstants) {
     pid = pidConstants.create();
     ff = ffConstants.createArmFF();
 
@@ -109,6 +110,14 @@ public class WristIOSparkMax implements JointIO {
   @Override
   public double getVoltage() {
     return voltage;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    JointIO.super.initSendable(builder);
+    pid.initSendable(builder);
+    absolute.initSendable(builder);
+    relative.initSendable(builder);
   }
 
   @Override

@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.util;
+package org.sciborgs1155.robot.vision;
 
 import static org.sciborgs1155.robot.Constants.Vision.*;
 

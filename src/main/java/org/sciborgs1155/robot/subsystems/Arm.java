@@ -1,7 +1,6 @@
 package org.sciborgs1155.robot.subsystems;
 
 import static org.sciborgs1155.robot.Constants.Arm.*;
-import static org.sciborgs1155.robot.Ports.Arm.*;
 
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -23,18 +22,18 @@ import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.lib.Trajectory;
 import org.sciborgs1155.robot.Constants.Elevator;
 import org.sciborgs1155.robot.Robot;
-import org.sciborgs1155.robot.subsystems.arm.ElbowIOSparkMax;
+import org.sciborgs1155.robot.subsystems.arm.ArmState;
 import org.sciborgs1155.robot.subsystems.arm.ElevatorIO;
-import org.sciborgs1155.robot.subsystems.arm.ElevatorIOSim;
-import org.sciborgs1155.robot.subsystems.arm.ElevatorIOSparkMax;
 import org.sciborgs1155.robot.subsystems.arm.JointIO;
-import org.sciborgs1155.robot.subsystems.arm.JointIOSim;
-import org.sciborgs1155.robot.subsystems.arm.WristIOSparkMax;
-import org.sciborgs1155.robot.util.Visualizer;
-import org.sciborgs1155.robot.util.placement.PlacementCache;
-import org.sciborgs1155.robot.util.placement.PlacementState;
-import org.sciborgs1155.robot.util.placement.PlacementTrajectory;
-import org.sciborgs1155.robot.util.placement.PlacementTrajectory.Parameters;
+import org.sciborgs1155.robot.subsystems.arm.RealElbow;
+import org.sciborgs1155.robot.subsystems.arm.RealElevator;
+import org.sciborgs1155.robot.subsystems.arm.RealWrist;
+import org.sciborgs1155.robot.subsystems.arm.SimElevator;
+import org.sciborgs1155.robot.subsystems.arm.SimJoint;
+import org.sciborgs1155.robot.subsystems.arm.TrajectoryCache;
+import org.sciborgs1155.robot.subsystems.arm.TrajectoryCache.ArmTrajectory;
+import org.sciborgs1155.robot.subsystems.arm.TrajectoryCache.Parameters;
+import org.sciborgs1155.robot.subsystems.arm.Visualizer;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
@@ -58,7 +57,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log private final JointIO elbow;
   @Log private final JointIO wrist;
 
-  private final Map<Integer, PlacementTrajectory> trajectories = PlacementCache.loadTrajectories();
+  private final Map<Integer, ArmTrajectory> trajectories = TrajectoryCache.loadTrajectories();
 
   @Log private final Visualizer positionVisualizer = new Visualizer(new Color8Bit(255, 0, 0));
   @Log private final Visualizer setpointVisualizer = new Visualizer(new Color8Bit(0, 0, 255));
@@ -70,25 +69,24 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   public Arm() {
     if (Robot.isReal()) {
-      elevator = new ElevatorIOSparkMax();
-      elbow = new ElbowIOSparkMax(Elbow.PID, Elbow.FF);
-      wrist = new WristIOSparkMax(Wrist.PID, Wrist.FF);
+      elevator = new RealElevator();
+      elbow = new RealElbow(Elbow.PID, Elbow.FF);
+      wrist = new RealWrist(Wrist.PID, Wrist.FF);
     } else {
-      elevator = new ElevatorIOSim(Elevator.PID, Elevator.FF, Elevator.CONFIG, true);
-      elbow = new JointIOSim(Elbow.PID, Elbow.FF, Elbow.CONFIG, true);
-      wrist = new JointIOSim(Wrist.PID, Wrist.FF, Wrist.CONFIG, false);
+      elevator = new SimElevator(Elevator.PID, Elevator.FF, Elevator.CONFIG, true);
+      elbow = new SimJoint(Elbow.PID, Elbow.FF, Elbow.CONFIG, true);
+      wrist = new SimJoint(Wrist.PID, Wrist.FF, Wrist.CONFIG, false);
     }
   }
 
   /** Returns the current position of the placement mechanisms */
-  public PlacementState getState() {
-    return new PlacementState(
-        elevator.getHeight(), elbow.getRelativeAngle(), wrist.getRelativeAngle());
+  public ArmState getState() {
+    return new ArmState(elevator.getHeight(), elbow.getRelativeAngle(), wrist.getRelativeAngle());
   }
 
   /** Returns the current setpoint of the placement mechanisms */
-  public PlacementState getSetpoint() {
-    return PlacementState.fromRelative(
+  public ArmState getSetpoint() {
+    return ArmState.fromRelative(
         elevator.getDesiredState().position,
         elbow.getDesiredState().position,
         wrist.getDesiredState().position);
@@ -119,7 +117,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
    * @return Optional placement trajectory, empty if the trajectory cannot be found from cashed
    *     values.
    */
-  public Optional<PlacementTrajectory> findTrajectory(Parameters params) {
+  public Optional<ArmTrajectory> findTrajectory(Parameters params) {
     return Optional.ofNullable(trajectories.get(params.hashCode()));
   }
 
@@ -131,27 +129,27 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
    * @return Optional placement trajectory, empty if the trajectory cannot be found from cashed
    *     values.
    */
-  public Optional<PlacementTrajectory> findTrajectory(PlacementState goal) {
+  public Optional<ArmTrajectory> findTrajectory(ArmState goal) {
     return findTrajectory(new Parameters(getSetpoint(), goal));
   }
 
-  public CommandBase goTo(PlacementState goal) {
+  public CommandBase goTo(ArmState goal) {
     return goTo(() -> goal);
   }
 
   /**
-   * Goes to a {@link PlacementState} in the most optimal way, this is a safe command.
+   * Goes to a {@link ArmState} in the most optimal way, this is a safe command.
    *
-   * <p>Uses {@link #followTrajectory(PlacementTrajectory)} based on {@link
-   * #findTrajectory(PlacementState)} if a valid state is cached for the inputted parameters.
-   * Otherwise, falls back on {@link #safeFollowProfile(PlacementState)} for on the fly movements.
+   * <p>Uses {@link #followTrajectory(ArmTrajectory)} based on {@link #findTrajectory(ArmState)} if
+   * a valid state is cached for the inputted parameters. Otherwise, falls back on {@link
+   * #safeFollowProfile(ArmState)} for on the fly movements.
    *
    * @param goal The goal state.
    * @param useTrajectories Whether to use trajectories.
    * @return A command that goes to the goal safely using either custom trajectory following or
    *     trapezoid profiling.
    */
-  public CommandBase goTo(Supplier<PlacementState> goal) {
+  public CommandBase goTo(Supplier<ArmState> goal) {
     return new DeferredCommand(
             () ->
                 Commands.either(
@@ -165,8 +163,8 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /**
-   * A (mostly) safe version of {@link #followProfile(PlacementState)} that uses {@link
-   * #passOver(Side)} to reach the other side without height violations or destruction.
+   * A (mostly) safe version of {@link #followProfile(ArmState)} that uses {@link #passOver(Side)}
+   * to reach the other side without height violations or destruction.
    *
    * <p>This is implemented by going to a safe intermediate goal if the side of the arm will change,
    * which is slow, and does not prevent circumstances where the arm hits the ground.
@@ -175,9 +173,9 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
    * @return A safe following command that will run to a safe goal and then until all mechanisms are
    *     at their goal.
    */
-  private CommandBase safeFollowProfile(Supplier<PlacementState> goal) {
+  private CommandBase safeFollowProfile(Supplier<ArmState> goal) {
     return Commands.either(
-            followProfile(() -> PlacementState.passOverToSide(goal.get().side())),
+            followProfile(() -> ArmState.passOverToSide(goal.get().side())),
             Commands.none(),
             () -> goal.get().side() != getState().side())
         .andThen(followProfile(goal))
@@ -185,7 +183,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Sets the position setpoints for the elbow and wrist, in radians */
-  public CommandBase setSetpoints(Supplier<PlacementState> setpoint) {
+  public CommandBase setSetpoints(Supplier<ArmState> setpoint) {
     return runOnce(
             () -> {
               elevator.update(new State(setpoint.get().elevatorHeight(), 0));
@@ -196,7 +194,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Follows a {@link TrapezoidProfile} for each joint's relative position */
-  private CommandBase followProfile(Supplier<PlacementState> goal) {
+  private CommandBase followProfile(Supplier<ArmState> goal) {
     return new DeferredCommand(
             () ->
                 Commands.parallel(
@@ -223,7 +221,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Follows a {@link Trajectory} for each joint's relative position */
-  private CommandBase followTrajectory(PlacementTrajectory trajectory) {
+  private CommandBase followTrajectory(ArmTrajectory trajectory) {
     return Commands.parallel(
             trajectory.elevator().follow(elevator::update),
             trajectory.elbow().follow(elbow::update),

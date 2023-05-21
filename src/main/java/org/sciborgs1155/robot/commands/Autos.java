@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
-import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;
+import org.sciborgs1155.robot.subsystems.arm.ArmState.GamePiece;
 
 public final class Autos implements Sendable {
 
@@ -232,24 +232,22 @@ public final class Autos implements Sendable {
   }
 
   private Command outtake(GamePiece gamePiece) {
-    return Commands.sequence(
-        intake
-            .outtake()
-            .withTimeout(
-                switch (gamePiece) {
-                  case CONE -> CONE_OUTTAKE_TIME;
-                  case CUBE -> CUBE_OUTTAKE_TIME;
-                }),
-        intake.stop());
+    return intake
+        .outtake(gamePiece)
+        .withTimeout(
+            switch (gamePiece) {
+              case CONE -> CONE_OUTTAKE_TIME;
+              case CUBE -> CUBE_OUTTAKE_TIME;
+            });
   }
 
   private Command frontMovingIntake() {
     return Commands.sequence(
-        arm.goTo(FRONT_INTAKE), intake.intake().withTimeout(MOVING_INTAKE_TIME), intake.stop());
+        arm.goTo(FRONT_INTAKE), intake.intake(GamePiece.CUBE).withTimeout(MOVING_INTAKE_TIME));
   }
 
   private Command initialIntake() {
-    return Commands.sequence(intake.intake().withTimeout(INITIAL_INTAKE_TIME), intake.stop());
+    return Commands.sequence(intake.intake(GamePiece.CUBE).withTimeout(INITIAL_INTAKE_TIME));
   }
 
   private static List<PathPlannerTrajectory> loadPath(String pathName) {

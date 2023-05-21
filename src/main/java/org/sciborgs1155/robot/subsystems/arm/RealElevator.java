@@ -7,17 +7,18 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Encoder;
 import org.sciborgs1155.lib.BetterElevatorFeedforward;
 import org.sciborgs1155.robot.Constants;
 
-public class ElevatorIOSparkMax implements ElevatorIO {
+public class RealElevator implements ElevatorIO {
 
-  private final CANSparkMax lead = MOTOR.build(MotorType.kBrushless, RIGHT_MOTOR);
-  private final CANSparkMax left = MOTOR.build(MotorType.kBrushless, LEFT_MOTOR);
-  private final CANSparkMax right = MOTOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
+  private final CANSparkMax lead;
+  private final CANSparkMax left;
+  private final CANSparkMax right;
 
-  private final Encoder encoder = new Encoder(ENCODER[0], ENCODER[1]);
+  private final Encoder encoder;
 
   private final PIDController pid = PID.create();
   private final BetterElevatorFeedforward ff = FF.createElevatorFF();
@@ -25,15 +26,20 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   private State setpoint;
   private double voltage;
 
-  public ElevatorIOSparkMax() {
+  public RealElevator() {
+    lead = MOTOR.build(MotorType.kBrushless, RIGHT_MOTOR);
+    left = MOTOR.build(MotorType.kBrushless, LEFT_MOTOR);
+    right = MOTOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
+
     left.follow(lead);
     right.follow(lead);
-
-    encoder.setDistancePerPulse(RELATIVE_CONVERSION.factor());
 
     lead.burnFlash();
     left.burnFlash();
     right.burnFlash();
+
+    encoder = new Encoder(ENCODER[0], ENCODER[1]);
+    encoder.setDistancePerPulse(RELATIVE_CONVERSION.factor());
 
     setpoint = new State();
   }
@@ -71,6 +77,13 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   @Override
   public double getVoltage() {
     return voltage;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    ElevatorIO.super.initSendable(builder);
+    pid.initSendable(builder);
+    encoder.initSendable(builder);
   }
 
   @Override

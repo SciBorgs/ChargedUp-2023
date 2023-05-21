@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.util.placement;
+package org.sciborgs1155.robot.subsystems.arm;
 
 import static org.sciborgs1155.robot.Constants.Positions.*;
 
@@ -9,7 +9,7 @@ import java.util.Optional;
 import org.sciborgs1155.robot.Constants.Dimensions;
 
 /** ArmState class to store relative angles for the arm. */
-public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d wristAngle) {
+public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d wristAngle) {
 
   /** Represents the side of the robot the arm is on */
   public enum Side {
@@ -40,29 +40,27 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
   }
 
   /**
-   * Returns a new {@link PlacementState} from angles in radians, with the wrist state relative to
-   * the chassis
+   * Returns a new {@link ArmState} from angles in radians, with the wrist state relative to the
+   * chassis
    */
-  public static PlacementState fromAbsolute(
-      double elevatorHeight, double elbowAngle, double wristAngle) {
-    return new PlacementState(
+  public static ArmState fromAbsolute(double elevatorHeight, double elbowAngle, double wristAngle) {
+    return new ArmState(
         elevatorHeight,
         Rotation2d.fromRadians(elbowAngle),
         Rotation2d.fromRadians(wristAngle - elbowAngle));
   }
 
   /**
-   * Returns a new {@link PlacementState} from angles in radians, with the wrist state relative to
-   * the forearm
+   * Returns a new {@link ArmState} from angles in radians, with the wrist state relative to the
+   * forearm
    */
-  public static PlacementState fromRelative(
-      double elevatorHeight, double elbowAngle, double wristAngle) {
-    return new PlacementState(
+  public static ArmState fromRelative(double elevatorHeight, double elbowAngle, double wristAngle) {
+    return new ArmState(
         elevatorHeight, Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle));
   }
 
   /** Creates a PlacementState from an absolute 3d array */
-  public static PlacementState fromArray(double[] state) {
+  public static ArmState fromArray(double[] state) {
     return fromAbsolute(state[0], state[1], state[2]);
   }
 
@@ -85,12 +83,12 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
    * @param side The side of the robot being moved to.
    * @return The "passing over" goal according to the inputted side.
    */
-  public static PlacementState passOverToSide(Side side) {
+  public static ArmState passOverToSide(Side side) {
     return side == Side.FRONT ? PASS_TO_FRONT : PASS_TO_BACK;
   }
 
   /** Returns a PlacementState from scoring parameters */
-  public static PlacementState fromOperator(Level height, GamePiece gamePiece, Side side) {
+  public static ArmState fromOperator(Level height, GamePiece gamePiece, Side side) {
     return switch (height) {
       case LOW -> side == Side.FRONT ? FRONT_INTAKE : BACK_INTAKE;
       case MID -> switch (gamePiece) {
@@ -113,7 +111,7 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
    * Returns the corresponding arm state given a target Math can be found {@link
    * https://robotacademy.net.au/lesson/inverse-kinematics-for-a-2-joint-robot-arm-using-geometry}
    */
-  public static Optional<PlacementState> fromIK(Translation2d target) {
+  public static Optional<ArmState> fromIK(Translation2d target) {
     // get initial wrist and elbow angles
     double wristAngle =
         -Math.acos(
@@ -143,7 +141,7 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
     return Optional.of(fromRelative(elevatorHeight, elbowAngle, wristAngle));
   }
 
-  public static Optional<PlacementState> fromIK(Pose2d target) {
+  public static Optional<ArmState> fromIK(Pose2d target) {
     double wristAngle = target.getRotation().getRadians();
 
     double elbowAngle =
@@ -175,7 +173,7 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
   }
 
   /** Compares the elevator height, elbow angle, and wrist angle given a margin */
-  public boolean roughlyEquals(PlacementState other, double margin) {
+  public boolean roughlyEquals(ArmState other, double margin) {
     return margin < Math.abs(other.elevatorHeight - this.elevatorHeight)
         ? margin < Math.abs(other.elbowAngle.getRadians() - this.elbowAngle.getRadians())
             ? margin < Math.abs(other.wristAngle.getRadians() - this.wristAngle.getRadians())
@@ -184,7 +182,7 @@ public record PlacementState(double elevatorHeight, Rotation2d elbowAngle, Rotat
   }
 
   /** Compares the end effector positions of Placement States, given a margin */
-  public boolean endRoughlyEquals(PlacementState other, double margin) {
+  public boolean endRoughlyEquals(ArmState other, double margin) {
     return Math.sqrt(
             Math.pow(this.endEffectorPosition().getX() - other.endEffectorPosition().getX(), 2)
                 + Math.pow(

@@ -5,10 +5,10 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.sciborgs1155.robot.subsystems.LED;
-import org.sciborgs1155.robot.util.placement.PlacementState;
-import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;
-import org.sciborgs1155.robot.util.placement.PlacementState.Level;
-import org.sciborgs1155.robot.util.placement.PlacementState.Side;
+import org.sciborgs1155.robot.subsystems.arm.ArmState;
+import org.sciborgs1155.robot.subsystems.arm.ArmState.GamePiece;
+import org.sciborgs1155.robot.subsystems.arm.ArmState.Level;
+import org.sciborgs1155.robot.subsystems.arm.ArmState.Side;
 
 public final class Scoring implements Sendable {
 
@@ -31,11 +31,11 @@ public final class Scoring implements Sendable {
   }
 
   /**
-   * Returns an appropriate {@link PlacementState} based on current parameters and inputted {@link
-   * PlacementState.Level}
+   * Returns an appropriate {@link ArmState} based on current parameters and inputted {@link
+   * ArmState.Level}
    */
-  public PlacementState state(Level level) {
-    return PlacementState.fromOperator(level, gamePiece, side);
+  public ArmState state(Level level) {
+    return ArmState.fromOperator(level, gamePiece, side);
   }
 
   public GamePiece gamePiece() {

@@ -12,6 +12,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Encoder;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.BetterArmFeedforward;
@@ -20,7 +21,7 @@ import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants;
 
 /** Add your docs here. */
-public class ElbowIOSparkMax implements JointIO {
+public class RealElbow implements JointIO {
   private final CANSparkMax middleMotor;
   private final CANSparkMax leftMotor;
   private final CANSparkMax rightMotor;
@@ -33,25 +34,23 @@ public class ElbowIOSparkMax implements JointIO {
   private State setpoint;
   private double voltage;
 
-  public ElbowIOSparkMax(PIDConstants pidConstants, SystemConstants ffConstants) {
-
+  public RealElbow(PIDConstants pidConstants, SystemConstants ffConstants) {
     middleMotor = Wrist.MOTOR.build(MotorType.kBrushless, MIDDLE_ELBOW_MOTOR);
     leftMotor = Wrist.MOTOR.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
     rightMotor = Wrist.MOTOR.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
 
-    encoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
-
-    this.pid = pidConstants.create();
-    this.ff = ffConstants.createArmFF();
-
     leftMotor.follow(middleMotor);
     rightMotor.follow(middleMotor);
-
-    encoder.setDistancePerPulse(Elbow.CONVERSION.factor());
 
     middleMotor.burnFlash();
     leftMotor.burnFlash();
     rightMotor.burnFlash();
+
+    encoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
+    encoder.setDistancePerPulse(Elbow.CONVERSION.factor());
+
+    this.pid = pidConstants.create();
+    this.ff = ffConstants.createArmFF();
 
     setpoint = new State(getRelativeAngle().getRadians(), 0);
 
@@ -111,6 +110,13 @@ public class ElbowIOSparkMax implements JointIO {
   @Override
   public double getVoltage() {
     return voltage;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    JointIO.super.initSendable(builder);
+    pid.initSendable(builder);
+    encoder.initSendable(builder);
   }
 
   @Override

@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.util;
+package org.sciborgs1155.robot.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import org.photonvision.EstimatedRobotPose;

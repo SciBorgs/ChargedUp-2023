@@ -21,7 +21,7 @@ import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants.Arm.Elbow;
 import org.sciborgs1155.robot.subsystems.Arm.ElevatorConfig;
 import org.sciborgs1155.robot.subsystems.Arm.JointConfig;
-import org.sciborgs1155.robot.util.placement.PlacementState;
+import org.sciborgs1155.robot.subsystems.arm.ArmState;
 
 /**
  * Constants is a globally accessible class for storing immutable values. Every value should be
@@ -151,7 +151,8 @@ public final class Constants {
               .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
 
       public static final PIDConstants PID = new PIDConstants(12, 0, 1.1); // d = 2.18954
-      public static final SystemConstants FF = SystemConstants(0.06403, 0.50715, 1.3482, 0.049377);
+      public static final SystemConstants FF =
+          new SystemConstants(0.06403, 0.50715, 1.3482, 0.049377);
       // old: new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
       public static final Constraints CONSTRAINTS = new Constraints(2.9, 3.4);
@@ -206,7 +207,7 @@ public final class Constants {
             MAX_HEIGHT);
 
     public static final int SAMPLE_SIZE_TAPS = 3;
-    public static final int CURRENT_THRESHOLD = 40; // TODO this might be too high/unreasonable
+    public static final int CURRENT_THRESHOLD = 35; // TODO this might be too high/unreasonable
 
     public static final Constraints CONSTRAINTS = new Constraints(3, 3.35);
 
@@ -310,48 +311,41 @@ public final class Constants {
 
   public static final class Positions {
 
-    public static final PlacementState INITIAL =
-        PlacementState.fromRelative(Elevator.ZERO_OFFSET, Elbow.OFFSET, Math.PI);
-    public static final PlacementState STOW =
-        PlacementState.fromRelative(0, 1.21834, Math.PI / 2.0);
+    public static final ArmState INITIAL =
+        ArmState.fromRelative(Elevator.ZERO_OFFSET, Elbow.OFFSET, Math.PI);
+    public static final ArmState STOW = ArmState.fromRelative(0, 1.21834, Math.PI / 2.0);
 
     // LOWEST COG
-    public static final PlacementState SAFE =
-        PlacementState.fromAbsolute(Elevator.ZERO_OFFSET, Elbow.OFFSET + 0.1, Math.PI / 2);
+    public static final ArmState SAFE =
+        ArmState.fromAbsolute(Elevator.ZERO_OFFSET, Elbow.OFFSET + 0.1, Math.PI / 2);
 
-    public static final PlacementState PASS_OLD =
-        PlacementState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0);
-    public static final PlacementState PASS_TO_BACK =
-        PlacementState.fromAbsolute(0.03, Math.PI / 2.0, Math.PI);
-    public static final PlacementState PASS_TO_FRONT =
-        PlacementState.fromAbsolute(0.05, Math.PI / 2.0, Math.PI / 4.0);
+    public static final ArmState PASS_OLD = ArmState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0);
+    public static final ArmState PASS_TO_BACK = ArmState.fromAbsolute(0.03, Math.PI / 2.0, Math.PI);
+    public static final ArmState PASS_TO_FRONT =
+        ArmState.fromAbsolute(0.05, Math.PI / 2.0, Math.PI / 4.0);
 
-    public static final PlacementState FRONT_INTAKE =
-        PlacementState.fromAbsolute(0.454, -0.983, -0.055);
-    public static final PlacementState BACK_INTAKE = STOW; // TODO
+    public static final ArmState FRONT_INTAKE = ArmState.fromAbsolute(0.454, -0.983, -0.055);
+    public static final ArmState BACK_INTAKE = STOW; // TODO
 
-    public static final PlacementState FRONT_SINGLE_SUBSTATION_CONE =
-        PlacementState.fromAbsolute(0.425006, 0.128855, -0.305);
-    public static final PlacementState FRONT_SINGLE_SUBSTATION_CUBE =
-        PlacementState.fromAbsolute(0.543571, -0.367516, 0.445646);
-    public static final PlacementState BACK_DOUBLE_SUBSTATION =
-        PlacementState.fromAbsolute(0, 2.8, Math.PI);
+    public static final ArmState FRONT_SINGLE_SUBSTATION_CONE =
+        ArmState.fromAbsolute(0.425006, 0.128855, -0.305);
+    public static final ArmState FRONT_SINGLE_SUBSTATION_CUBE =
+        ArmState.fromAbsolute(0.543571, -0.367516, 0.445646);
+    public static final ArmState BACK_DOUBLE_SUBSTATION = ArmState.fromAbsolute(0, 2.8, Math.PI);
 
-    public static final PlacementState FRONT_MID_CONE =
-        PlacementState.fromAbsolute(0.061612, 0.493303, 0.001378);
+    public static final ArmState FRONT_MID_CONE =
+        ArmState.fromAbsolute(0.061612, 0.493303, 0.001378);
 
-    public static final PlacementState BACK_MID_CONE = STOW; // TODO
-    public static final PlacementState BACK_HIGH_CONE =
-        PlacementState.fromAbsolute(0.253, 3.072, 2.5);
+    public static final ArmState BACK_MID_CONE = STOW; // TODO
+    public static final ArmState BACK_HIGH_CONE = ArmState.fromAbsolute(0.253, 3.072, 2.5);
     // ele 0.2475
-    public static final PlacementState FRONT_MID_CUBE =
-        PlacementState.fromAbsolute(0.11362, 0.458149, 0.353288);
-    public static final PlacementState FRONT_HIGH_CUBE =
-        PlacementState.fromAbsolute(0.113502, 0.333258, 0.353208);
+    public static final ArmState FRONT_MID_CUBE =
+        ArmState.fromAbsolute(0.11362, 0.458149, 0.353288);
+    public static final ArmState FRONT_HIGH_CUBE =
+        ArmState.fromAbsolute(0.113502, 0.333258, 0.353208);
 
-    public static final PlacementState BACK_MID_CUBE = FRONT_MID_CUBE; // TODO
-    public static final PlacementState BACK_HIGH_CUBE =
-        PlacementState.fromAbsolute(0.245, 2.75, 3.17);
+    public static final ArmState BACK_MID_CUBE = FRONT_MID_CUBE; // TODO
+    public static final ArmState BACK_HIGH_CUBE = ArmState.fromAbsolute(0.245, 2.75, 3.17);
   }
 
   public static final class Auto {

@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;
+import org.sciborgs1155.robot.subsystems.arm.ArmState.GamePiece;
 
 public class Intake extends SubsystemBase implements Loggable, AutoCloseable {
 
@@ -26,7 +26,8 @@ public class Intake extends SubsystemBase implements Loggable, AutoCloseable {
   @Log private double outtakeSpeed = OUTTAKE_SPEED;
 
   public Command set(double percent) {
-    return run(() -> wheels.set(MathUtil.clamp(percent, -1, 1)));
+    return run(() -> wheels.set(MathUtil.clamp(percent, -1, 1)))
+        .finallyDo(_b -> wheels.stopMotor());
   }
 
   public Command intake(GamePiece gamePiece) {

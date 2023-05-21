@@ -18,12 +18,12 @@ import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.subsystems.LED;
-import org.sciborgs1155.robot.util.RealVision;
-import org.sciborgs1155.robot.util.SimVision;
-import org.sciborgs1155.robot.util.VisionIO;
-import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;
-import org.sciborgs1155.robot.util.placement.PlacementState.Level;
-import org.sciborgs1155.robot.util.placement.PlacementState.Side;
+import org.sciborgs1155.robot.subsystems.arm.ArmState.GamePiece;
+import org.sciborgs1155.robot.subsystems.arm.ArmState.Level;
+import org.sciborgs1155.robot.subsystems.arm.ArmState.Side;
+import org.sciborgs1155.robot.vision.RealVision;
+import org.sciborgs1155.robot.vision.SimVision;
+import org.sciborgs1155.robot.vision.VisionIO;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -46,7 +46,6 @@ public class Robot extends CommandRobot implements Loggable {
   private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
 
   // COMMANDS
-  // private final Placement placement = new Placement(arm, elevator);
   @Log private final Scoring scoring = new Scoring(led);
   @Log private final Autos autos = new Autos(drive, arm, intake);
 
@@ -127,8 +126,8 @@ public class Robot extends CommandRobot implements Loggable {
     operator.leftStick().onTrue(arm.goTo(Positions.SAFE));
 
     // INTAKING
-    operator.leftBumper().onTrue(intake.intake(scoring.gamePiece())).onFalse(intake.stop());
-    operator.rightBumper().onTrue(intake.outtake(scoring.gamePiece())).onFalse(intake.stop());
+    operator.leftBumper().whileTrue(intake.intake(scoring.gamePiece()));
+    operator.rightBumper().whileTrue(intake.outtake(scoring.gamePiece()));
 
     // FAILURE MODES
     // arm.onElbowFailing().onTrue(placement.setStopped(true));

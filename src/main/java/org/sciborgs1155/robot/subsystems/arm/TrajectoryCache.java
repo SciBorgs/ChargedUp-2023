@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.util.placement;
+package org.sciborgs1155.robot.subsystems.arm;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,14 +14,28 @@ import java.util.List;
 import java.util.Map;
 import org.sciborgs1155.lib.Trajectory;
 import org.sciborgs1155.robot.Constants.Positions;
-import org.sciborgs1155.robot.util.placement.PlacementTrajectory.Parameters;
 
-public class PlacementCache {
+public class TrajectoryCache {
+
+  public static record ArmTrajectory(
+      Trajectory elevator, Trajectory elbow, Trajectory wrist, Parameters params) {}
+
+  public static record Parameters(ArmState start, ArmState end) {}
+
+  public static record CachedTrajectory(
+      double[] initialPos,
+      double[] finalPos,
+      String[] constraintOverrides,
+      double totalTime,
+      double[] points) {}
+
+  public static record StoredTrajectory(int id, List<CachedTrajectory> trajectories) {}
+
   private static final String cacheFilename = "arm_trajectory_cache.json";
   private static final String cacheRequestFilename = "arm_trajectory_cache_request.json";
 
   /** Reads cached trajectories and returns a list of them */
-  public static Map<Integer, PlacementTrajectory> loadTrajectories() {
+  public static Map<Integer, ArmTrajectory> loadTrajectories() {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     StoredTrajectory cache;
@@ -34,7 +48,7 @@ public class PlacementCache {
       return Map.of();
     }
 
-    Map<Integer, PlacementTrajectory> trajectories = new HashMap<Integer, PlacementTrajectory>();
+    Map<Integer, ArmTrajectory> trajectories = new HashMap<Integer, ArmTrajectory>();
 
     for (var cachedTrajectory : cache.trajectories) {
       List<Double> elevatorStates = new ArrayList<Double>();
@@ -49,12 +63,12 @@ public class PlacementCache {
 
       Parameters params =
           new Parameters(
-              PlacementState.fromArray(cachedTrajectory.initialPos),
-              PlacementState.fromArray(cachedTrajectory.finalPos));
+              ArmState.fromArray(cachedTrajectory.initialPos),
+              ArmState.fromArray(cachedTrajectory.finalPos));
 
       trajectories.put(
           params.hashCode(),
-          new PlacementTrajectory(
+          new ArmTrajectory(
               new Trajectory(elevatorStates, cachedTrajectory.totalTime),
               new Trajectory(elbowStates, cachedTrajectory.totalTime),
               new Trajectory(wristStates, cachedTrajectory.totalTime),
@@ -147,13 +161,4 @@ public class PlacementCache {
       System.out.println("Error: " + line);
     }
   }
-
-  public static record CachedTrajectory(
-      double[] initialPos,
-      double[] finalPos,
-      String[] constraintOverrides,
-      double totalTime,
-      double[] points) {}
-
-  public static record StoredTrajectory(int id, List<CachedTrajectory> trajectories) {}
 }

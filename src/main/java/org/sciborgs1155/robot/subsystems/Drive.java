@@ -20,8 +20,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
@@ -33,54 +31,20 @@ import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import org.photonvision.EstimatedRobotPose;
-import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
-import org.sciborgs1155.robot.subsystems.modules.GoalSwerveModule;
+import org.sciborgs1155.robot.subsystems.modules.IdealModule;
 import org.sciborgs1155.robot.subsystems.modules.MAXSwerveModule;
+import org.sciborgs1155.robot.subsystems.modules.ModuleIO;
 
 public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
 
-  /** Generalized SwerveModule with closed loop control */
-  public interface SwerveModule extends Sendable, AutoCloseable {
-    /** Returns the current state of the module. */
-    public SwerveModuleState getState();
+  @Log private final ModuleIO frontLeft;
+  @Log private final ModuleIO frontRight;
+  @Log private final ModuleIO rearLeft;
+  @Log private final ModuleIO rearRight;
 
-    /** Returns the current position of the module. */
-    public SwerveModulePosition getPosition();
-
-    /** Sets the desired state for the module. */
-    public void setDesiredState(SwerveModuleState desiredState);
-
-    /** Returns the desired state for the module. */
-    public SwerveModuleState getDesiredState();
-
-    /** Zeroes all the drive encoders. */
-    public void resetEncoders();
-
-    /** Sets the turn PID constants for the module. */
-    public void setTurnPID(PIDConstants constants);
-
-    /** Sets the drive PID constants for the module. */
-    public void setDrivePID(PIDConstants constants);
-
-    @Override
-    default void initSendable(SendableBuilder builder) {
-      builder.addDoubleProperty("current velocity", () -> getState().speedMetersPerSecond, null);
-      builder.addDoubleProperty("current angle", () -> getPosition().angle.getRadians(), null);
-      builder.addDoubleProperty("current position", () -> getPosition().distanceMeters, null);
-      builder.addDoubleProperty(
-          "target velocity", () -> getDesiredState().speedMetersPerSecond, null);
-      builder.addDoubleProperty("target angle", () -> getDesiredState().angle.getRadians(), null);
-    }
-  }
-
-  @Log private final SwerveModule frontLeft;
-  @Log private final SwerveModule frontRight;
-  @Log private final SwerveModule rearLeft;
-  @Log private final SwerveModule rearRight;
-
-  private final List<SwerveModule> modules;
+  private final List<ModuleIO> modules;
 
   // this should be a generic IMU class, once WPILib implements it
   @Log private final WPI_PigeonIMU imu = new WPI_PigeonIMU(PIGEON);
@@ -107,10 +71,10 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
       rearLeft = new MAXSwerveModule(REAR_LEFT_DRIVE, REAR_LEFT_TURNING, ANGULAR_OFFSETS[2]);
       rearRight = new MAXSwerveModule(REAR_RIGHT_DRIVE, REAR_RIGHT_TURNING, ANGULAR_OFFSETS[3]);
     } else {
-      frontLeft = new GoalSwerveModule();
-      frontRight = new GoalSwerveModule();
-      rearLeft = new GoalSwerveModule();
-      rearRight = new GoalSwerveModule();
+      frontLeft = new IdealModule();
+      frontRight = new IdealModule();
+      rearLeft = new IdealModule();
+      rearRight = new IdealModule();
     }
 
     modules = List.of(frontLeft, frontRight, rearLeft, rearRight);
@@ -197,7 +161,7 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
   /**
    * Sets the swerve ModuleStates.
    *
-   * @param desiredStates The desired SwerveModule states.
+   * @param desiredStates The desired ModuleIO states.
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     if (desiredStates.length != modules.size()) {
@@ -213,7 +177,7 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
 
   /** Resets the drive encoders to currently read a position of 0. */
   public void resetEncoders() {
-    modules.forEach(SwerveModule::resetEncoders);
+    modules.forEach(ModuleIO::resetEncoders);
   }
 
   /** Zeroes the heading of the robot. */
@@ -227,11 +191,11 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   private SwerveModuleState[] getModuleStates() {
-    return modules.stream().map(SwerveModule::getState).toArray(SwerveModuleState[]::new);
+    return modules.stream().map(ModuleIO::getState).toArray(SwerveModuleState[]::new);
   }
 
   private SwerveModulePosition[] getModulePositions() {
-    return modules.stream().map(SwerveModule::getPosition).toArray(SwerveModulePosition[]::new);
+    return modules.stream().map(ModuleIO::getPosition).toArray(SwerveModulePosition[]::new);
   }
 
   /** Updates pose estimation based on provided {@link EstimatedRobotPose} */

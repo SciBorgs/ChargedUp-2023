@@ -9,7 +9,7 @@ import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.Arm.ElevatorConfig;
 
-public class ElevatorIOSim implements ElevatorIO {
+public class SimElevator implements ElevatorIO {
 
   private final ElevatorSim sim;
 
@@ -19,8 +19,7 @@ public class ElevatorIOSim implements ElevatorIO {
   private State setpoint = new State();
   private double voltage;
 
-  public ElevatorIOSim(
-      PIDConstants pid, SystemConstants ff, ElevatorConfig config, boolean gravity) {
+  public SimElevator(PIDConstants pid, SystemConstants ff, ElevatorConfig config, boolean gravity) {
     sim =
         new ElevatorSim(
             config.gearbox(),

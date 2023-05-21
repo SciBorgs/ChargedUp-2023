@@ -4,10 +4,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.subsystems.Drive.SwerveModule;
 
 /** Ideal swerve module, useful for debugging */
-public class GoalSwerveModule implements SwerveModule {
+public class IdealModule implements ModuleIO {
 
   private SwerveModuleState state = new SwerveModuleState();
   private double distance;

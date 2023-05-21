@@ -15,7 +15,7 @@ import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.Arm.JointConfig;
 
 /** A simulated {@link JointIO} using {@link SingleJointedArmSim} */
-public class JointIOSim implements JointIO {
+public class SimJoint implements JointIO {
 
   private final SingleJointedArmSim sim;
 
@@ -27,7 +27,7 @@ public class JointIOSim implements JointIO {
 
   private double voltage;
 
-  public JointIOSim(PIDConstants pid, SystemConstants ff, JointConfig config, boolean gravity) {
+  public SimJoint(PIDConstants pid, SystemConstants ff, JointConfig config, boolean gravity) {
     sim =
         new SingleJointedArmSim(
             config.gearbox(),

@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import java.util.Collection;
 import java.util.List;
 import org.sciborgs1155.robot.subsystems.Drive;
-import org.sciborgs1155.robot.util.placement.PlacementState.Side;
+import org.sciborgs1155.robot.subsystems.arm.ArmState.Side;
 
 public class Alignment {
 
