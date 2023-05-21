@@ -49,12 +49,11 @@ public class RealElbow implements JointIO {
     encoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
     encoder.setDistancePerPulse(Elbow.CONVERSION.factor());
 
-    this.pid = pidConstants.create();
-    this.ff = ffConstants.createArmFF();
+    pid = pidConstants.create();
+    ff = ffConstants.createArmFF();
+    pid.setTolerance(0.3);
 
     setpoint = new State(getRelativeAngle().getRadians(), 0);
-
-    pid.setTolerance(0.3);
   }
 
   /** Elbow position relative to the chassis */

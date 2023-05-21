@@ -19,7 +19,7 @@ public class SimElevator implements ElevatorIO {
   private State setpoint = new State();
   private double voltage;
 
-  public SimElevator(PIDConstants pid, SystemConstants ff, ElevatorConfig config, boolean gravity) {
+  public SimElevator(PIDConstants pid, SystemConstants ff, ElevatorConfig config) {
     sim =
         new ElevatorSim(
             config.gearbox(),
@@ -28,7 +28,7 @@ public class SimElevator implements ElevatorIO {
             config.sprocketRadius(),
             config.minHeight(),
             config.maxHeight(),
-            gravity);
+            true);
     this.pid = pid.create();
     this.ff = ff.createElevatorFF();
   }

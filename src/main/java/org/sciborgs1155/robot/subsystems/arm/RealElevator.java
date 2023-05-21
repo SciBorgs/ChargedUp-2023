@@ -10,6 +10,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Encoder;
 import org.sciborgs1155.lib.BetterElevatorFeedforward;
+import org.sciborgs1155.lib.constants.PIDConstants;
+import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants;
 
 public class RealElevator implements ElevatorIO {
@@ -20,13 +22,13 @@ public class RealElevator implements ElevatorIO {
 
   private final Encoder encoder;
 
-  private final PIDController pid = PID.create();
-  private final BetterElevatorFeedforward ff = FF.createElevatorFF();
+  private final PIDController pid;
+  private final BetterElevatorFeedforward ff;
 
   private State setpoint;
   private double voltage;
 
-  public RealElevator() {
+  public RealElevator(PIDConstants pidConstants, SystemConstants ffConstants) {
     lead = MOTOR.build(MotorType.kBrushless, RIGHT_MOTOR);
     left = MOTOR.build(MotorType.kBrushless, LEFT_MOTOR);
     right = MOTOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
@@ -40,6 +42,9 @@ public class RealElevator implements ElevatorIO {
 
     encoder = new Encoder(ENCODER[0], ENCODER[1]);
     encoder.setDistancePerPulse(RELATIVE_CONVERSION.factor());
+
+    pid = pidConstants.create();
+    ff = ffConstants.createElevatorFF();
 
     setpoint = new State();
   }

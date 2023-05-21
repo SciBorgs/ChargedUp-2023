@@ -45,9 +45,17 @@ import org.sciborgs1155.robot.subsystems.arm.ArmState;
  */
 public final class Constants {
 
+  public static enum RobotType {
+    WHIPLASH_ROLLER,
+    WHIPLASH_CLAW,
+    CHASSIS;
+  }
+
   public static final double PERIOD = 0.02; // roborio tickrate (s)
   public static final double DEADBAND = 0.1;
   public static final int THROUGHBORE_CPR = 8192;
+
+  public static final RobotType ROBOT_TYPE = RobotType.WHIPLASH_ROLLER;
 
   public static final class Dimensions {
     public static final double BASE_OFFSET = -0.127;
@@ -59,7 +67,8 @@ public final class Constants {
     public static final double FOREARM_LENGTH = 0.927;
     // Distance from elbow pivot to to wrist pivot
 
-    public static final double CLAW_LENGTH = 0.488;
+    public static final double CLAW_LENGTH = 0.3048;
+    public static final double CLAW_LENGTH_OLD = 0.488;
     // Distance (hypotenuse) from wrist joint to tip
 
     public static final double CARRIAGE_MASS = 6.80389;
@@ -68,7 +77,8 @@ public final class Constants {
     public static final double FOREARM_MASS = 4.08233;
     // Mass of the forearm alone
 
-    public static final double CLAW_MASS = 3.85554;
+    public static final double CLAW_MASS = 2.803201;
+    public static final double CLAW_MASS_OLD = 3.85554;
     // Mass of the claw alone
   }
 
@@ -115,9 +125,9 @@ public final class Constants {
               .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
 
       public static final PIDConstants PID = new PIDConstants(5.5, 0, 0.1); // p: 6.1297, d: 0.8453
-      public static final SystemConstants FF =
+      public static final SystemConstants FF_NEW =
           new SystemConstants(0.34613, 0.25692, 0.78381, 0.090836);
-      // old:  SystemConstants(0.1542, 0.6, 0.91, 0.038046); // v =  0.87884
+      public static final SystemConstants FF_OLD = new SystemConstants(0.1542, 0.6, 0.91, 0.038046);
 
       public static final Constraints CONSTRAINTS = new Constraints(2.45, 2.9);
 
@@ -126,7 +136,15 @@ public final class Constants {
 
       public static final Rotation2d ZERO_OFFSET = Rotation2d.fromRadians(0);
 
-      public static final JointConfig CONFIG =
+      public static final JointConfig CONFIG_OLD =
+          new JointConfig(
+              DCMotor.getNEO(1),
+              GEARING,
+              Dimensions.CLAW_LENGTH_OLD,
+              Dimensions.CLAW_MASS_OLD,
+              MIN_ANGLE,
+              MAX_ANGLE);
+      public static final JointConfig CONFIG_NEW =
           new JointConfig(
               DCMotor.getNEO(1),
               GEARING,
@@ -151,9 +169,10 @@ public final class Constants {
               .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
 
       public static final PIDConstants PID = new PIDConstants(12, 0, 1.1); // d = 2.18954
-      public static final SystemConstants FF =
+      public static final SystemConstants FF_NEW =
           new SystemConstants(0.06403, 0.50715, 1.3482, 0.049377);
-      // old: new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
+      public static final SystemConstants FF_OLD =
+          new SystemConstants(0.020283, 0.71, 1.3174, 0.20891);
 
       public static final Constraints CONSTRAINTS = new Constraints(2.9, 3.4);
 

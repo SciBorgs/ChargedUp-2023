@@ -27,6 +27,10 @@ public class SimJoint implements JointIO {
 
   private double voltage;
 
+  public SimJoint(PIDConstants pid, SystemConstants ff, JointConfig config) {
+    this(pid, ff, config, true);
+  }
+
   public SimJoint(PIDConstants pid, SystemConstants ff, JointConfig config, boolean gravity) {
     sim =
         new SingleJointedArmSim(
