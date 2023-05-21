@@ -53,7 +53,7 @@ public class SimJoint implements JointIO {
   }
 
   @Override
-  public void update(State setpoint) {
+  public void updateSetpoint(State setpoint) {
     double ffVoltage =
         ff.calculate(
             setpoint.position + baseAngle.getRadians(),
@@ -67,6 +67,12 @@ public class SimJoint implements JointIO {
     sim.update(Constants.PERIOD);
 
     this.setpoint = setpoint;
+  }
+
+  @Override
+  public void stopMoving() {
+    sim.setInputVoltage(0);
+    sim.update(Constants.PERIOD);
   }
 
   @Override

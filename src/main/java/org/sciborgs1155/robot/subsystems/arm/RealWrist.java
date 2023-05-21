@@ -72,9 +72,8 @@ public class RealWrist implements JointIO {
     return setpoint;
   }
 
-  /** Sets, THEN moves to a desired state */
   @Override
-  public void update(State setpoint) {
+  public void updateSetpoint(State setpoint) {
     double feedforward =
         ff.calculate(
             setpoint.position + getBaseAngle().getRadians(),
@@ -87,6 +86,11 @@ public class RealWrist implements JointIO {
     motor.setVoltage(voltage);
 
     this.setpoint = setpoint;
+  }
+
+  @Override
+  public void stopMoving() {
+    motor.stopMotor();
   }
 
   @Override

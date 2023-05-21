@@ -59,7 +59,7 @@ public class RealElevator implements ElevatorIO {
   }
 
   @Override
-  public void update(State setpoint) {
+  public void updateSetpoint(State setpoint) {
     double ffOutput = ff.calculate(this.setpoint.velocity, setpoint.velocity, Constants.PERIOD);
     double fbOutput = pid.calculate(getHeight(), setpoint.position);
 
@@ -67,6 +67,11 @@ public class RealElevator implements ElevatorIO {
     lead.setVoltage(voltage);
 
     this.setpoint = setpoint;
+  }
+
+  @Override
+  public void stopMoving() {
+    lead.stopMotor();
   }
 
   @Override

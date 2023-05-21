@@ -11,7 +11,9 @@ public interface ElevatorIO extends Sendable, AutoCloseable {
 
   public State getDesiredState();
 
-  public void update(State setpoint);
+  public void updateSetpoint(State setpoint);
+
+  public void stopMoving();
 
   public boolean isFailing();
 

@@ -68,9 +68,8 @@ public class RealElbow implements JointIO {
     return new State(getRelativeAngle().getRadians(), encoder.getRate());
   }
 
-  /** Sets, AND moves to a desired state */
   @Override
-  public void update(State setpoint) {
+  public void updateSetpoint(State setpoint) {
     double feedforward =
         ff.calculate(
             setpoint.position + getBaseAngle().getRadians(),
@@ -83,6 +82,11 @@ public class RealElbow implements JointIO {
     middleMotor.setVoltage(voltage);
 
     this.setpoint = setpoint;
+  }
+
+  @Override
+  public void stopMoving() {
+    middleMotor.stopMotor();
   }
 
   public State getDesiredState() {

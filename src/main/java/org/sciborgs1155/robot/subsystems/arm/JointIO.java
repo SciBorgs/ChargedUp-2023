@@ -12,7 +12,9 @@ public interface JointIO extends Sendable, AutoCloseable {
 
   public State getDesiredState();
 
-  public void update(State setpoint);
+  public void updateSetpoint(State setpoint);
+
+  public void stopMoving();
 
   public void setBaseAngle(Rotation2d baseAngle);
 

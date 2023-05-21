@@ -7,7 +7,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -62,10 +62,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log private final Visualizer positionVisualizer = new Visualizer(new Color8Bit(255, 0, 0));
   @Log private final Visualizer setpointVisualizer = new Visualizer(new Color8Bit(0, 0, 255));
 
-  @Log private boolean stopped = false;
-  // 'tis but a scratch (see: match 42) (the elbow is unplugged)
-  @Log private boolean butAScratch = false;
-  @Log private boolean wristLimp = false;
+  @Log private boolean allowPassOver;
 
   public Arm() {
     if (Robot.isReal()) {
@@ -93,32 +90,18 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /**
-   * If elbow is far enough from setpoint (we always use trapezoid profiling or trajectories), it is
-   * dangerous. This method returns a debounced trigger for when the elbow encoder is likely
-   * failing/not plugged in.
+   * @see RealElbow#isFailing()
    */
-  public Trigger onElbowFailing() {
-    return new Trigger(() -> butAScratch).debounce(Elbow.FAILING_DEBOUNCE_TIME, DebounceType.kBoth);
+  public Trigger elbowFailing() {
+    return new Trigger(elbow::isFailing).debounce(Elbow.FAILING_DEBOUNCE_TIME, DebounceType.kBoth);
   }
 
   /**
-   * If wrist is not working, we cannot pass over. The wrist not working is determined in {@link
-   * #periodic()}
+   * @see RealElevator#isFailing()
    */
-  @Log
-  public boolean allowPassOver() {
-    return !wristLimp;
-  }
-
-  /**
-   * Finds a trajectory with the same start and end positions by hashing parameters.
-   *
-   * @param params Parameters to be hashed, contains start and end positions.
-   * @return Optional placement trajectory, empty if the trajectory cannot be found from cashed
-   *     values.
-   */
-  public Optional<ArmTrajectory> findTrajectory(Parameters params) {
-    return Optional.ofNullable(trajectories.get(params.hashCode()));
+  public Trigger elevatorFailing() {
+    return new Trigger(elevator::isFailing)
+        .debounce(Elevator.FAILING_DEBOUNCE_TIME, DebounceType.kBoth);
   }
 
   /**
@@ -130,9 +113,20 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
    *     values.
    */
   public Optional<ArmTrajectory> findTrajectory(ArmState goal) {
-    return findTrajectory(new Parameters(getSetpoint(), goal));
+    return Optional.ofNullable(trajectories.get(new Parameters(getSetpoint(), goal).hashCode()));
   }
 
+  /**
+   * Goes to a {@link ArmState} in the most optimal way, this is a safe command.
+   *
+   * <p>Uses {@link #followTrajectory(ArmTrajectory)} based on {@link #findTrajectory(ArmState)} if
+   * a valid state is cached for the inputted parameters. Otherwise, falls back on {@link
+   * #safeFollowProfile(ArmState)} for on the fly movements.
+   *
+   * @param goal The goal state.
+   * @return A command that goes to the goal safely using either custom trajectory following or
+   *     trapezoid profiling.
+   */
   public CommandBase goTo(ArmState goal) {
     return goTo(() -> goal);
   }
@@ -144,22 +138,20 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
    * a valid state is cached for the inputted parameters. Otherwise, falls back on {@link
    * #safeFollowProfile(ArmState)} for on the fly movements.
    *
-   * @param goal The goal state.
-   * @param useTrajectories Whether to use trajectories.
+   * @param goal The goal state supplier.
    * @return A command that goes to the goal safely using either custom trajectory following or
    *     trapezoid profiling.
    */
   public CommandBase goTo(Supplier<ArmState> goal) {
     return new DeferredCommand(
-            () ->
-                Commands.either(
-                    findTrajectory(goal.get())
-                        .map(this::followTrajectory)
-                        .orElse(safeFollowProfile(goal)),
-                    Commands.none(),
-                    () -> allowPassOver() || goal.get().side() == getState().side()),
-            this)
-        .withName("placement goto");
+        () ->
+            Commands.either(
+                findTrajectory(goal.get())
+                    .map(this::followTrajectory)
+                    .orElse(safeFollowProfile(goal)),
+                Commands.none(),
+                () -> allowPassOver || goal.get().side() == getState().side()),
+        this);
   }
 
   /**
@@ -186,9 +178,9 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   public CommandBase setSetpoints(Supplier<ArmState> setpoint) {
     return runOnce(
             () -> {
-              elevator.update(new State(setpoint.get().elevatorHeight(), 0));
-              elbow.update(new State(setpoint.get().elbowAngle().getRadians(), 0));
-              wrist.update(new State(setpoint.get().wristAngle().getRadians(), 0));
+              elevator.updateSetpoint(new State(setpoint.get().elevatorHeight(), 0));
+              elbow.updateSetpoint(new State(setpoint.get().elbowAngle().getRadians(), 0));
+              wrist.updateSetpoint(new State(setpoint.get().wristAngle().getRadians(), 0));
             })
         .withName("set setpoints");
   }
@@ -203,19 +195,19 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
                             Elevator.CONSTRAINTS,
                             new State(goal.get().elevatorHeight(), 0),
                             elevator.getState()),
-                        elevator::update),
+                        elevator::updateSetpoint),
                     new TrapezoidProfileCommand(
                         new TrapezoidProfile(
                             Elbow.CONSTRAINTS,
                             new State(goal.get().elbowAngle().getRadians(), 0),
                             elbow.getCurrentState()),
-                        elbow::update),
+                        elbow::updateSetpoint),
                     new TrapezoidProfileCommand(
                         new TrapezoidProfile(
                             Wrist.CONSTRAINTS,
                             new State(goal.get().wristAngle().getRadians(), 0),
                             wrist.getCurrentState()),
-                        wrist::update)),
+                        wrist::updateSetpoint)),
             this)
         .withName("following profile");
   }
@@ -223,20 +215,29 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   /** Follows a {@link Trajectory} for each joint's relative position */
   private CommandBase followTrajectory(ArmTrajectory trajectory) {
     return Commands.parallel(
-            trajectory.elevator().follow(elevator::update),
-            trajectory.elbow().follow(elbow::update),
-            trajectory.wrist().follow(wrist::update, this))
+            trajectory.elevator().follow(elevator::updateSetpoint),
+            trajectory.elbow().follow(elbow::updateSetpoint),
+            trajectory.wrist().follow(wrist::updateSetpoint, this))
         .withName("following trajectory");
   }
 
-  public Command setStopped(boolean stopped) {
-    return runOnce(() -> this.stopped = stopped);
+  /** Disables the arm for the rest of the match */
+  public CommandBase kill() {
+    return run(() -> {
+          elevator.stopMoving();
+          elbow.stopMoving();
+          wrist.stopMoving();
+        })
+        .alongWith(Commands.print("arm is fucked"))
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        .withName("killed");
   }
 
   @Override
   public void periodic() {
     positionVisualizer.setState(getState());
     setpointVisualizer.setState(getSetpoint());
+    allowPassOver = !wrist.isFailing();
   }
 
   @Override

@@ -130,8 +130,8 @@ public class Robot extends CommandRobot implements Loggable {
     operator.rightBumper().whileTrue(intake.outtake(scoring.gamePiece()));
 
     // FAILURE MODES
-    // arm.onElbowFailing().onTrue(placement.setStopped(true));
-    // elevator.onFailing().onTrue(placement.setStopped(true));
+    arm.elbowFailing().onTrue(arm.kill());
+    arm.elevatorFailing().onTrue(arm.kill());
   }
 
   /** The command to run when the robot is enabled */

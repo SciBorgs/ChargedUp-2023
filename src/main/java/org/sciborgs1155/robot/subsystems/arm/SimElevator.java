@@ -49,7 +49,7 @@ public class SimElevator implements ElevatorIO {
   }
 
   @Override
-  public void update(State setpoint) {
+  public void updateSetpoint(State setpoint) {
     double ffVoltage = ff.calculate(this.setpoint.velocity, setpoint.velocity, Constants.PERIOD);
     double pidVoltage = pid.calculate(getHeight(), setpoint.position);
 
@@ -58,6 +58,12 @@ public class SimElevator implements ElevatorIO {
     sim.update(Constants.PERIOD);
 
     this.setpoint = setpoint;
+  }
+
+  @Override
+  public void stopMoving() {
+    sim.setInputVoltage(0);
+    sim.update(Constants.PERIOD);
   }
 
   @Override
