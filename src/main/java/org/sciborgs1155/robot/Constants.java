@@ -117,7 +117,7 @@ public final class Constants {
       public static final PIDConstants PID = new PIDConstants(5.5, 0, 0.1); // p: 6.1297, d: 0.8453
       public static final SystemConstants FF =
           new SystemConstants(0.34613, 0.25692, 0.78381, 0.090836);
-          //old:  SystemConstants(0.1542, 0.6, 0.91, 0.038046); // v =  0.87884
+      // old:  SystemConstants(0.1542, 0.6, 0.91, 0.038046); // v =  0.87884
 
       public static final Constraints CONSTRAINTS = new Constraints(2.45, 2.9);
 
@@ -151,9 +151,8 @@ public final class Constants {
               .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
 
       public static final PIDConstants PID = new PIDConstants(12, 0, 1.1); // d = 2.18954
-      public static final SystemConstants FF =
-        SystemConstants(0.06403, 0.50715, 1.3482, 0.049377);
-         //old: new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
+      public static final SystemConstants FF = SystemConstants(0.06403, 0.50715, 1.3482, 0.049377);
+      // old: new SystemConstants(0.020283, 0.71, 1.3174, 0.20891); // g = 0.63031;
 
       public static final Constraints CONSTRAINTS = new Constraints(2.9, 3.4);
 

@@ -1,5 +1,7 @@
 package org.sciborgs1155.lib;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+
 /**
  * A helper class that computes feedforward outputs for a simple elevator (modeled as a motor acting
  * against the force of gravity).

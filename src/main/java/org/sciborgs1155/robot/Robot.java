@@ -127,8 +127,8 @@ public class Robot extends CommandRobot implements Loggable {
     operator.leftStick().onTrue(arm.goTo(Positions.SAFE));
 
     // INTAKING
-    operator.leftBumper().onTrue(intake.intake()).onFalse(intake.stop());
-    operator.rightBumper().onTrue(intake.outtake()).onFalse(intake.stop());
+    operator.leftBumper().onTrue(intake.intake(scoring.gamePiece())).onFalse(intake.stop());
+    operator.rightBumper().onTrue(intake.outtake(scoring.gamePiece())).onFalse(intake.stop());
 
     // FAILURE MODES
     // arm.onElbowFailing().onTrue(placement.setStopped(true));
