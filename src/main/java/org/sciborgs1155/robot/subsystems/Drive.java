@@ -33,9 +33,9 @@ import java.util.function.DoubleSupplier;
 import org.photonvision.EstimatedRobotPose;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
-import org.sciborgs1155.robot.subsystems.modules.IdealModule;
 import org.sciborgs1155.robot.subsystems.modules.MAXSwerveModule;
 import org.sciborgs1155.robot.subsystems.modules.ModuleIO;
+import org.sciborgs1155.robot.subsystems.modules.SimModule;
 
 public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
 
@@ -61,7 +61,7 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
   private final SlewRateLimiter xLimiter = new SlewRateLimiter(MAX_ACCEL);
   private final SlewRateLimiter yLimiter = new SlewRateLimiter(MAX_ACCEL);
 
-  @Log private double speedMultiplier = SpeedMultiplier.NORMAL.multiplier;
+  @Log private double speedMultiplier = 1;
 
   public Drive() {
 
@@ -71,10 +71,10 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
       rearLeft = new MAXSwerveModule(REAR_LEFT_DRIVE, REAR_LEFT_TURNING, ANGULAR_OFFSETS[2]);
       rearRight = new MAXSwerveModule(REAR_RIGHT_DRIVE, REAR_RIGHT_TURNING, ANGULAR_OFFSETS[3]);
     } else {
-      frontLeft = new IdealModule();
-      frontRight = new IdealModule();
-      rearLeft = new IdealModule();
-      rearRight = new IdealModule();
+      frontLeft = new SimModule();
+      frontRight = new SimModule();
+      rearLeft = new SimModule();
+      rearRight = new SimModule();
     }
 
     modules = List.of(frontLeft, frontRight, rearLeft, rearRight);
@@ -229,8 +229,8 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   /** Sets a new speed multiplier for the robot, this affects max cartesian and angular speeds */
-  public Command setSpeedMultiplier(SpeedMultiplier multiplier) {
-    return runOnce(() -> speedMultiplier = multiplier.multiplier);
+  public Command setSpeedMultiplier(double multiplier) {
+    return runOnce(() -> speedMultiplier = multiplier);
   }
 
   /**

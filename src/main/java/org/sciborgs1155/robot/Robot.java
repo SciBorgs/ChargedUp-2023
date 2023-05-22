@@ -9,7 +9,6 @@ import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.DeferredCommand;
-import org.sciborgs1155.robot.Constants.Drive.SpeedMultiplier;
 import org.sciborgs1155.robot.Constants.Positions;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
@@ -87,9 +86,9 @@ public class Robot extends CommandRobot implements Loggable {
             .drive(() -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX())
             .withName("teleop driving"));
 
-    arm.setDefaultCommand(arm.setSetpoints(arm::getSetpoint).repeatedly());
+    arm.setDefaultCommand(arm.setSetpoints(arm::getSetpoint).repeatedly().withName("holding"));
 
-    intake.setDefaultCommand(intake.set(Constants.Intake.DEFAULT_SPEED).withName("passive intake"));
+    // intake.setDefaultCommand(intake.intake(scoring.gamePiece()).withName("passive intake"));
   }
 
   /** Configures trigger -> command bindings */
@@ -97,15 +96,9 @@ public class Robot extends CommandRobot implements Loggable {
     // DRIVER INPUT
     driver.b().onTrue(drive.zeroHeading());
 
-    driver
-        .leftBumper()
-        .onTrue(drive.setSpeedMultiplier(SpeedMultiplier.SLOW))
-        .onFalse(drive.setSpeedMultiplier(SpeedMultiplier.NORMAL));
+    driver.leftBumper().onTrue(drive.setSpeedMultiplier(0.3)).onFalse(drive.setSpeedMultiplier(1));
 
-    driver
-        .rightBumper()
-        .onTrue(drive.setSpeedMultiplier(SpeedMultiplier.SLOW))
-        .onFalse(drive.setSpeedMultiplier(SpeedMultiplier.NORMAL));
+    driver.rightBumper().onTrue(drive.setSpeedMultiplier(0.3)).onFalse(drive.setSpeedMultiplier(1));
 
     // STATE SWITCHING
     operator.b().onTrue(scoring.setSide(Side.FRONT));

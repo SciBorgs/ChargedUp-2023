@@ -22,20 +22,20 @@ public class Intake extends SubsystemBase implements Loggable, AutoCloseable {
   @Log(name = "velocity", methodName = "getVelocity")
   private final RelativeEncoder encoder = wheels.getEncoder();
 
-  @Log private double intakeSpeed = INTAKE_SPEED;
-  @Log private double outtakeSpeed = OUTTAKE_SPEED;
+  @Log private double coneSpeed = CONE_SPEED;
+  @Log private double cubeSpeed = CUBE_SPEED;
 
   public Command set(double percent) {
     return run(() -> wheels.set(MathUtil.clamp(percent, -1, 1)))
-        .finallyDo(_b -> wheels.stopMotor());
+        .finallyDo(end -> wheels.stopMotor());
   }
 
   public Command intake(GamePiece gamePiece) {
-    return set(gamePiece == GamePiece.CONE ? intakeSpeed : -intakeSpeed).withName("intake");
+    return set(gamePiece == GamePiece.CONE ? CONE_SPEED : CUBE_SPEED).withName("intake");
   }
 
   public Command outtake(GamePiece gamePiece) {
-    return set(gamePiece == GamePiece.CONE ? outtakeSpeed : -outtakeSpeed).withName("outtake");
+    return set(-1 * (gamePiece == GamePiece.CONE ? CONE_SPEED : CUBE_SPEED)).withName("outtake");
   }
 
   public Command stop() {

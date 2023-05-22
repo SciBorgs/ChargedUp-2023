@@ -78,6 +78,23 @@
       },
       "/Shuffleboard/Drive/field2d": {
         "image": "./field/2023-field.png",
+        "module-0": {
+          "arrowSize": 22,
+          "selectable": false,
+          "style": "Line"
+        },
+        "module-1": {
+          "arrowSize": 22,
+          "style": "Line"
+        },
+        "module-2": {
+          "arrowSize": 22,
+          "style": "Line"
+        },
+        "module-3": {
+          "arrowSize": 22,
+          "style": "Line"
+        },
         "window": {
           "visible": true
         }

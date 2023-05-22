@@ -243,27 +243,17 @@ public final class Constants {
             .withInvert(true);
 
     public static final double DEFAULT_SPEED = 0.1;
-    public static final double INTAKE_SPEED = 1;
-    public static final double OUTTAKE_SPEED = -0.3;
+
+    public static final double CONE_SPEED = 0.6;
+    public static final double CUBE_SPEED = -0.4;
 
     public static final double THRESHOLD = 0.5;
   }
 
   public static final class Drive {
-    public enum SpeedMultiplier {
-      NORMAL(1),
-      SLOW(1.0 / 3.0);
-
-      public final double multiplier;
-
-      private SpeedMultiplier(double multiplier) {
-        this.multiplier = multiplier;
-      }
-    }
-
-    public static final double MAX_SPEED = 4; // m / s
-    public static final double MAX_ANGULAR_SPEED = 1.5 * Math.PI; // rad / s
-    public static final double MAX_ACCEL = 7; // m / s^2
+    public static final double MAX_SPEED = 4.8; // m / s
+    public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
+    public static final double MAX_ACCEL = 8; // m / s^2
 
     public static final double TRACK_WIDTH = 0.5715;
     // Distance between centers of right and left wheels on robot
