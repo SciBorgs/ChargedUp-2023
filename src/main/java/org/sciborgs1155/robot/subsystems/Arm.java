@@ -73,11 +73,11 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
       switch (Constants.ROBOT_TYPE) {
         case CHASSIS -> new NoJoint();
         case WHIPLASH_CLAW -> Robot.isReal()
-            ? new RealElbow(Elbow.PID, Elbow.FF_OLD)
-            : new SimJoint(Elbow.PID, Elbow.FF_OLD, Elbow.CONFIG);
+            ? new RealElbow(Elbow.PID_OLD, Elbow.FF_OLD)
+            : new SimJoint(Elbow.PID_OLD, Elbow.FF_OLD, Elbow.CONFIG);
         case WHIPLASH_ROLLER -> Robot.isReal()
-            ? new RealElbow(Elbow.PID, Elbow.FF_NEW)
-            : new SimJoint(Elbow.PID, Elbow.FF_NEW, Elbow.CONFIG);
+            ? new RealElbow(Elbow.PID_NEW, Elbow.FF_NEW)
+            : new SimJoint(Elbow.PID_NEW, Elbow.FF_NEW, Elbow.CONFIG);
       };
 
   @Log
@@ -85,11 +85,11 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
       switch (Constants.ROBOT_TYPE) {
         case CHASSIS -> new NoJoint();
         case WHIPLASH_CLAW -> Robot.isReal()
-            ? new RealWrist(Wrist.PID, Wrist.FF_OLD)
-            : new SimJoint(Wrist.PID, Wrist.FF_OLD, Wrist.CONFIG_OLD, true);
+            ? new RealWrist(Wrist.PID_OLD, Wrist.FF_OLD)
+            : new SimJoint(Wrist.PID_OLD, Wrist.FF_OLD, Wrist.CONFIG_OLD, true);
         case WHIPLASH_ROLLER -> Robot.isReal()
-            ? new RealElbow(Wrist.PID, Wrist.FF_NEW)
-            : new SimJoint(Wrist.PID, Wrist.FF_NEW, Wrist.CONFIG_NEW, true);
+            ? new RealElbow(Wrist.PID_NEW, Wrist.FF_NEW)
+            : new SimJoint(Wrist.PID_NEW, Wrist.FF_NEW, Wrist.CONFIG_NEW, true);
       };
 
   private final Map<Integer, ArmTrajectory> trajectories = TrajectoryCache.loadTrajectories();

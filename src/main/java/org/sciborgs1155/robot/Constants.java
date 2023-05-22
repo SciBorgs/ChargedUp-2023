@@ -124,7 +124,10 @@ public final class Constants {
               .withUnits(Conversion.Units.RADIANS)
               .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
 
-      public static final PIDConstants PID = new PIDConstants(5.5, 0, 0.1); // p: 6.1297, d: 0.8453
+      public static final PIDConstants PID_NEW =
+          new PIDConstants(5.5, 0, 0.1); // p: 6.1297, d: 0.8453
+      public static final PIDConstants PID_OLD =
+          new PIDConstants(5.5, 0, 0.1); // p: 6.1297, d: 0.8453
       public static final SystemConstants FF_NEW =
           new SystemConstants(0.34613, 0.25692, 0.78381, 0.090836);
       public static final SystemConstants FF_OLD = new SystemConstants(0.1542, 0.6, 0.91, 0.038046);
@@ -168,7 +171,8 @@ public final class Constants {
               .withUnits(Conversion.Units.RADIANS)
               .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
 
-      public static final PIDConstants PID = new PIDConstants(12, 0, 1.1); // d = 2.18954
+      public static final PIDConstants PID_NEW = new PIDConstants(12, 0, 1.1); // d = 2.18954
+      public static final PIDConstants PID_OLD = new PIDConstants(12, 0, 1.1); // d = 2.18954
       public static final SystemConstants FF_NEW =
           new SystemConstants(0.06403, 0.50715, 1.3482, 0.049377);
       public static final SystemConstants FF_OLD =
