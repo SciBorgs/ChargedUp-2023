@@ -15,9 +15,6 @@
         },
         "Drive": {
           "open": true,
-          "rearLeft": {
-            "open": true
-          },
           "rearRight": {
             "open": true
           }
@@ -64,7 +61,12 @@
     },
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Arm/elbow": "PIDController",
       "/Shuffleboard/Arm/elbow feedback": "PIDController",
+      "/Shuffleboard/Arm/elevator": "PIDController",
+      "/Shuffleboard/Arm/positionVisualizer": "Mechanism2d",
+      "/Shuffleboard/Arm/setpointVisualizer": "Mechanism2d",
+      "/Shuffleboard/Arm/wrist": "PIDController",
       "/Shuffleboard/Arm/wrist feedback": "PIDController",
       "/Shuffleboard/Autos/Drive/field2d": "Field2d",
       "/Shuffleboard/Autos/Drive/imu": "Gyro",
@@ -76,6 +78,11 @@
       "/Shuffleboard/Drivetrain/field2d": "Field2d",
       "/Shuffleboard/Drivetrain/gyro": "Gyro",
       "/Shuffleboard/Elevator/pid": "PIDController",
+      "/Shuffleboard/Robot/arm": "Subsystem",
+      "/Shuffleboard/Robot/autos": "String Chooser",
+      "/Shuffleboard/Robot/drive": "Subsystem",
+      "/Shuffleboard/Robot/intake": "Subsystem",
+      "/Shuffleboard/Robot/led": "Subsystem",
       "/Shuffleboard/RobotContainer/arm": "Subsystem",
       "/Shuffleboard/RobotContainer/auto path chooser": "String Chooser",
       "/Shuffleboard/RobotContainer/autos": "String Chooser",
@@ -91,12 +98,7 @@
       "/SmartDashboard/frontPhotonVision Sim Field": "Field2d"
     },
     "windows": {
-      "/Shuffleboard/RobotContainer/position": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/Shuffleboard/RobotContainer/setpoint": {
+      "/Shuffleboard/Arm/positionVisualizer": {
         "window": {
           "visible": true
         }
@@ -222,7 +224,7 @@
               "autoFit": true
             }
           ],
-          "height": 275,
+          "height": 0,
           "series": [
             {
               "color": [
@@ -407,7 +409,7 @@
               "autoFit": true
             }
           ],
-          "height": 292,
+          "height": 2,
           "series": [
             {
               "color": [
@@ -435,7 +437,7 @@
               "autoFit": true
             }
           ],
-          "height": 292,
+          "height": 2,
           "series": [
             {
               "color": [

@@ -42,6 +42,7 @@ public class RealElevator implements ElevatorIO {
 
     encoder = new Encoder(ENCODER[0], ENCODER[1]);
     encoder.setDistancePerPulse(RELATIVE_CONVERSION.factor());
+    encoder.setReverseDirection(true);
 
     pid = pidConstants.create();
     ff = ffConstants.createElevatorFF();

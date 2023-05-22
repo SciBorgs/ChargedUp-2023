@@ -88,7 +88,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
             ? new RealWrist(Wrist.PID_OLD, Wrist.FF_OLD)
             : new SimJoint(Wrist.PID_OLD, Wrist.FF_OLD, Wrist.CONFIG_OLD, true);
         case WHIPLASH_ROLLER -> Robot.isReal()
-            ? new RealElbow(Wrist.PID_NEW, Wrist.FF_NEW)
+            ? new RealWrist(Wrist.PID_NEW, Wrist.FF_NEW)
             : new SimJoint(Wrist.PID_NEW, Wrist.FF_NEW, Wrist.CONFIG_NEW, true);
       };
 

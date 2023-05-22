@@ -119,10 +119,14 @@ public final class Constants {
       public static final double GEARING = 53.125 / 1.0;
       // Gearing for motor : angle (radians)
 
-      public static final Conversion CONVERSION =
+      public static final Conversion CONVERSION_RELATIVE =
           Conversion.base()
               .withUnits(Conversion.Units.RADIANS)
               .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
+
+              public static final Conversion CONVERSION_ABS =
+              Conversion.base()
+                  .withUnits(Conversion.Units.RADIANS);
 
       public static final PIDConstants PID_NEW =
           new PIDConstants(5.5, 0, 0.1); // p: 6.1297, d: 0.8453
@@ -137,7 +141,7 @@ public final class Constants {
       public static final double MAX_ANGLE = Math.PI;
       public static final double MIN_ANGLE = -Math.PI;
 
-      public static final Rotation2d ZERO_OFFSET = Rotation2d.fromRadians(0);
+      public static final double ZERO_OFFSET = 0.885; // duty cycle
 
       public static final JointConfig CONFIG_OLD =
           new JointConfig(
@@ -246,10 +250,10 @@ public final class Constants {
             .withCurrentLimit(20)
             .withInvert(true);
 
-    public static final double DEFAULT_SPEED = 0.1;
+    public static final double DEFAULT_SPEED = 0.05;
 
-    public static final double CONE_SPEED = 0.6;
-    public static final double CUBE_SPEED = -0.4;
+    public static final double CONE_SPEED = 0.3;
+    public static final double CUBE_SPEED = -0.2;
 
     public static final double THRESHOLD = 0.5;
   }

@@ -39,8 +39,10 @@ public class RealWrist implements JointIO {
     pid = pidConstants.create();
     ff = ffConstants.createArmFF();
 
-    absolute.setDistancePerRotation(Wrist.CONVERSION.factor());
-    relative.setDistancePerPulse(Wrist.CONVERSION.factor());
+    absolute.setPositionOffset(Wrist.ZERO_OFFSET);
+    absolute.setDistancePerRotation(-Wrist.CONVERSION_ABS.factor());
+    relative.setDistancePerPulse(Wrist.CONVERSION_RELATIVE.factor());
+    relative.setReverseDirection(true);
 
     // set wrist duty cycle absolute encoder frame periods to be the same as our tickrate
     // periodic frames 3 and 4 are useless to us, so to improve performance we set them to 1155 ms
@@ -120,8 +122,8 @@ public class RealWrist implements JointIO {
   public void initSendable(SendableBuilder builder) {
     JointIO.super.initSendable(builder);
     pid.initSendable(builder);
-    absolute.initSendable(builder);
-    relative.initSendable(builder);
+    builder.addDoubleProperty("absolute duty cycle", absolute::getAbsolutePosition, null);
+    builder.addDoubleProperty("relative encoder position", relative::getDistance, null);
   }
 
   @Override

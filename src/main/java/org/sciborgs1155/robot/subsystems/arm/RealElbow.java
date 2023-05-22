@@ -48,6 +48,7 @@ public class RealElbow implements JointIO {
 
     encoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
     encoder.setDistancePerPulse(Elbow.CONVERSION.factor());
+    encoder.setReverseDirection(true);
 
     pid = pidConstants.create();
     ff = ffConstants.createArmFF();

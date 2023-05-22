@@ -20,8 +20,7 @@ import org.sciborgs1155.robot.subsystems.LED;
 import org.sciborgs1155.robot.subsystems.arm.ArmState.GamePiece;
 import org.sciborgs1155.robot.subsystems.arm.ArmState.Level;
 import org.sciborgs1155.robot.subsystems.arm.ArmState.Side;
-import org.sciborgs1155.robot.vision.RealVision;
-import org.sciborgs1155.robot.vision.SimVision;
+import org.sciborgs1155.robot.vision.NoVision;
 import org.sciborgs1155.robot.vision.VisionIO;
 
 /**
@@ -32,7 +31,7 @@ import org.sciborgs1155.robot.vision.VisionIO;
  */
 public class Robot extends CommandRobot implements Loggable {
 
-  private final VisionIO vision = isReal() ? new RealVision() : new SimVision();
+  private final VisionIO vision = new NoVision();
 
   // SUBSYSTEMS
   @Log private final Drive drive = new Drive();
