@@ -1,7 +1,6 @@
 package org.sciborgs1155.robot;
 
 import com.pathplanner.lib.PathConstraints;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -124,9 +123,8 @@ public final class Constants {
               .withUnits(Conversion.Units.RADIANS)
               .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
 
-              public static final Conversion CONVERSION_ABS =
-              Conversion.base()
-                  .withUnits(Conversion.Units.RADIANS);
+      public static final Conversion CONVERSION_ABS =
+          Conversion.base().withUnits(Conversion.Units.RADIANS);
 
       public static final PIDConstants PID_NEW =
           new PIDConstants(5.5, 0, 0.1); // p: 6.1297, d: 0.8453
