@@ -54,7 +54,7 @@ public final class Constants {
   public static final double DEADBAND = 0.1;
   public static final int THROUGHBORE_CPR = 8192;
 
-  public static final RobotType ROBOT_TYPE = RobotType.WHIPLASH_ROLLER;
+  public static final RobotType ROBOT_TYPE = RobotType.CHASSIS;
 
   public static final class Dimensions {
     public static final double BASE_OFFSET = -0.127;
@@ -326,8 +326,12 @@ public final class Constants {
 
   public static final class Positions {
 
+    // public static final ArmState INITIAL =
+    //     ArmState.fromRelative(Elevator.ZERO_OFFSET, Elbow.OFFSET, Math.PI);
+
     public static final ArmState INITIAL =
-        ArmState.fromRelative(Elevator.ZERO_OFFSET, Elbow.OFFSET, Math.PI);
+        ArmState.fromRelative(Elevator.ZERO_OFFSET, Elbow.OFFSET, 2.4);
+
     public static final ArmState STOW = ArmState.fromRelative(0, 1.21834, Math.PI / 2.0);
 
     // LOWEST COG
@@ -340,6 +344,8 @@ public final class Constants {
         ArmState.fromAbsolute(0.05, Math.PI / 2.0, Math.PI / 4.0);
 
     public static final ArmState FRONT_INTAKE = ArmState.fromAbsolute(0.454, -0.983, -0.055);
+
+    public static final ArmState GROUND_CONE_INTAKE = ArmState.fromRelative(0.618, -0.714, -0.723);
     public static final ArmState BACK_INTAKE = STOW; // TODO
 
     public static final ArmState FRONT_SINGLE_SUBSTATION_CONE =

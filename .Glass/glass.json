@@ -9,12 +9,18 @@
           "elbow feedback": {
             "open": true
           },
+          "elevator": {
+            "open": true
+          },
+          "open": true,
+          "wrist": {
+            "open": true
+          },
           "wrist feedback": {
             "open": true
           }
         },
         "Drive": {
-          "open": true,
           "rearRight": {
             "open": true
           }
@@ -40,6 +46,11 @@
           },
           "open": true,
           "pid": {
+            "open": true
+          }
+        },
+        "Robot": {
+          "scoring": {
             "open": true
           }
         },

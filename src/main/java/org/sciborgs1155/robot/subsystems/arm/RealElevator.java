@@ -51,6 +51,7 @@ public class RealElevator implements ElevatorIO {
   }
 
   public double getHeight() {
+    // System.out.println("height = " + (encoder.getDistance() + ZERO_OFFSET));
     return encoder.getDistance() + ZERO_OFFSET;
   }
 

@@ -90,10 +90,16 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
   /** Returns a PlacementState from scoring parameters */
   public static ArmState fromOperator(Level height, GamePiece gamePiece, Side side) {
     return switch (height) {
-      case LOW -> side == Side.FRONT ? FRONT_INTAKE : BACK_INTAKE;
+        // case LOW -> side == Side.FRONT ? FRONT_INTAKE : BACK_INTAKE;
+      case LOW -> switch (gamePiece) {
+        case CONE -> GROUND_CONE_INTAKE;
+        case CUBE -> GROUND_CONE_INTAKE;
+      };
       case MID -> switch (gamePiece) {
         case CONE -> side == Side.FRONT ? FRONT_MID_CONE : BACK_MID_CONE;
-        case CUBE -> side == Side.FRONT ? FRONT_MID_CUBE : BACK_MID_CUBE;
+        case CUBE -> side == Side.FRONT
+            ? FRONT_MID_CUBE
+            : BACK_MID_CUBE; // no cube intake yet, here so no errors
       };
       case HIGH -> switch (gamePiece) {
         case CONE -> BACK_HIGH_CONE;
