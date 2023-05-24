@@ -47,7 +47,7 @@ public class RealElevator implements ElevatorIO {
     pid = pidConstants.create();
     ff = ffConstants.createElevatorFF();
 
-    setpoint = new State();
+    setpoint = new State(getHeight(), 0);
   }
 
   public double getHeight() {
