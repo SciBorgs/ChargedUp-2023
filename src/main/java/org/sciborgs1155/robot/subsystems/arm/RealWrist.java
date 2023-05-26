@@ -16,8 +16,8 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import org.sciborgs1155.lib.BetterArmFeedforward;
+import org.sciborgs1155.lib.constants.ArmFFConstants;
 import org.sciborgs1155.lib.constants.PIDConstants;
-import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants;
 
 /** Add your docs here. */
@@ -35,9 +35,9 @@ public class RealWrist implements JointIO {
   private State setpoint;
   private double voltage;
 
-  public RealWrist(PIDConstants pidConstants, SystemConstants ffConstants) {
-    pid = pidConstants.create();
-    ff = ffConstants.createArmFF();
+  public RealWrist(PIDConstants pidConstants, ArmFFConstants ffConstants) {
+    pid = pidConstants.createPIDController();
+    ff = ffConstants.createFeedforward();
 
     absolute.setPositionOffset(Wrist.ZERO_OFFSET);
     absolute.setDistancePerRotation(Wrist.CONVERSION_ABS);

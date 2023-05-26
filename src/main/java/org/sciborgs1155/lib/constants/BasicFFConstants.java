@@ -8,26 +8,15 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import org.sciborgs1155.lib.BetterArmFeedforward;
-import org.sciborgs1155.lib.BetterElevatorFeedforward;
 
-/** Record to store static, voltage, and acceleration gains for simple DC motor systems */
-public record SystemConstants(double s, double g, double v, double a) {
+public record BasicFFConstants(double s, double v, double a) {
 
-  public SystemConstants(double s, double v, double a) {
-    this(s, 0, v, a);
+  public BasicFFConstants(double s, double v) {
+    this(s, v, 0);
   }
 
-  public SimpleMotorFeedforward createSimpleMotorFF() {
+  public SimpleMotorFeedforward createFeedforward() {
     return new SimpleMotorFeedforward(s, v, a);
-  }
-
-  public BetterArmFeedforward createArmFF() {
-    return new BetterArmFeedforward(s, g, v, a);
-  }
-
-  public BetterElevatorFeedforward createElevatorFF() {
-    return new BetterElevatorFeedforward(s, g, v, a);
   }
 
   public DCMotorSim sim(DCMotor gearbox, double gearing) {

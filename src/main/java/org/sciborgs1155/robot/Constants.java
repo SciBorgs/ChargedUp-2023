@@ -11,10 +11,12 @@ import edu.wpi.first.math.util.Units;
 import java.awt.Color;
 import java.util.Map;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.sciborgs1155.lib.constants.ArmFFConstants;
+import org.sciborgs1155.lib.constants.BasicFFConstants;
+import org.sciborgs1155.lib.constants.ElevatorFFConstants;
 import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
-import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants.Arm.Elbow;
 import org.sciborgs1155.robot.subsystems.Arm.ElevatorConfig;
 import org.sciborgs1155.robot.subsystems.Arm.JointConfig;
@@ -51,7 +53,7 @@ public final class Constants {
   public static final double DEADBAND = 0.1;
   public static final int THROUGHBORE_PPR = 2048;
 
-  public static final RobotType ROBOT_TYPE = RobotType.CHASSIS;
+  public static final RobotType ROBOT_TYPE = RobotType.WHIPLASH_ROLLER;
 
   public static final class Dimensions {
     public static final double BASE_OFFSET = -0.127;
@@ -120,9 +122,9 @@ public final class Constants {
 
       public static final PIDConstants PID_NEW = new PIDConstants(5.5, 0, 0.1);
       public static final PIDConstants PID_OLD = new PIDConstants(5.5, 0, 0.1);
-      public static final SystemConstants FF_NEW =
-          new SystemConstants(0.34613, 0.25692, 0.78381, 0.090836);
-      public static final SystemConstants FF_OLD = new SystemConstants(0.1542, 0.6, 0.91, 0.038046);
+      public static final ArmFFConstants FF_NEW =
+          new ArmFFConstants(0.34613, 0.25692, 0.78381, 0.090836);
+      public static final ArmFFConstants FF_OLD = new ArmFFConstants(0.1542, 0.6, 0.91, 0.038046);
 
       public static final Constraints CONSTRAINTS = new Constraints(2.45, 2.9);
 
@@ -160,10 +162,10 @@ public final class Constants {
 
       public static final PIDConstants PID_NEW = new PIDConstants(12, 0, 1.1); // d = 2.18954
       public static final PIDConstants PID_OLD = new PIDConstants(12, 0, 1.1); // d = 2.18954
-      public static final SystemConstants FF_NEW =
-          new SystemConstants(0.06403, 0.50715, 1.3482, 0.049377);
-      public static final SystemConstants FF_OLD =
-          new SystemConstants(0.020283, 0.71, 1.3174, 0.20891);
+      public static final ArmFFConstants FF_NEW =
+          new ArmFFConstants(0.06403, 0.50715, 1.3482, 0.049377);
+      public static final ArmFFConstants FF_OLD =
+          new ArmFFConstants(0.020283, 0.71, 1.3174, 0.20891);
 
       public static final Constraints CONSTRAINTS = new Constraints(2.9, 3.4);
 
@@ -198,7 +200,8 @@ public final class Constants {
     public static final double CONVERSION_RELATIVE = CIRCUMFERENCE / THROUGHBORE_PPR;
 
     public static final PIDConstants PID = new PIDConstants(50, 0, 1);
-    public static final SystemConstants FF = new SystemConstants(0.4, 0.069335, 33.25, 1.5514);
+    public static final ElevatorFFConstants FF =
+        new ElevatorFFConstants(0.4, 0.069335, 33.25, 1.5514);
 
     public static final double MIN_HEIGHT = 0;
     public static final double MAX_HEIGHT = 0.65;
@@ -283,7 +286,7 @@ public final class Constants {
       public static final double CONVERSION = CIRCUMFERENCE * GEARING;
 
       public static final PIDConstants PID = new PIDConstants(0.11, 0, 0.06);
-      public static final SystemConstants FF = new SystemConstants(0.3, 2.7, 0.25);
+      public static final BasicFFConstants FF = new BasicFFConstants(0.3, 2.7, 0.25);
     }
 
     public static final class Turning {
@@ -298,7 +301,7 @@ public final class Constants {
 
       public static final PIDConstants PID = new PIDConstants(2, 0, 0.1);
       // system constants only used in simulation
-      public static final SystemConstants FF = new SystemConstants(0, 0.25, 0.015);
+      public static final BasicFFConstants FF = new BasicFFConstants(0, 0.25, 0.015);
     }
   }
 

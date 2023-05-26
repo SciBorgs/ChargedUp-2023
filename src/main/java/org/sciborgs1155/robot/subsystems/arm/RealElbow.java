@@ -16,8 +16,8 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Encoder;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.BetterArmFeedforward;
+import org.sciborgs1155.lib.constants.ArmFFConstants;
 import org.sciborgs1155.lib.constants.PIDConstants;
-import org.sciborgs1155.lib.constants.SystemConstants;
 import org.sciborgs1155.robot.Constants;
 
 /** Add your docs here. */
@@ -34,7 +34,7 @@ public class RealElbow implements JointIO {
   private State setpoint;
   private double voltage;
 
-  public RealElbow(PIDConstants pidConstants, SystemConstants ffConstants) {
+  public RealElbow(PIDConstants pidConstants, ArmFFConstants ffConstants) {
     middleMotor = Wrist.MOTOR.build(MotorType.kBrushless, MIDDLE_ELBOW_MOTOR);
     leftMotor = Wrist.MOTOR.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
     rightMotor = Wrist.MOTOR.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
@@ -50,8 +50,8 @@ public class RealElbow implements JointIO {
     encoder.setDistancePerPulse(Elbow.CONVERSION);
     encoder.setReverseDirection(true);
 
-    pid = pidConstants.create();
-    ff = ffConstants.createArmFF();
+    pid = pidConstants.createPIDController();
+    ff = ffConstants.createFeedforward();
     pid.setTolerance(0.3);
 
     setpoint = new State(getRelativeAngle().getRadians(), 0);
