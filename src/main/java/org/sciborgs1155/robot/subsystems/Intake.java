@@ -17,7 +17,7 @@ public class Intake extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log(name = "applied output", methodName = "getAppliedOutput")
   @Log(name = "current", methodName = "getOutputCurrent")
-  private final CANSparkMax wheels = MOTOR.build(MotorType.kBrushless, WHEEL_MOTOR);
+  private final CANSparkMax wheels = MOTOR_CFG.build(MotorType.kBrushless, WHEEL_MOTOR);
 
   @Log(name = "velocity", methodName = "getVelocity")
   private final RelativeEncoder encoder = wheels.getEncoder();

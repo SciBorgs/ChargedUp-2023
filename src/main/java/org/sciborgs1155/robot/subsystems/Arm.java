@@ -1,7 +1,5 @@
 package org.sciborgs1155.robot.subsystems;
 
-import static org.sciborgs1155.robot.Constants.Arm.*;
-
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -21,7 +19,9 @@ import java.util.function.Supplier;
 import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.lib.Trajectory;
 import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.Constants.Elbow;
 import org.sciborgs1155.robot.Constants.Elevator;
+import org.sciborgs1155.robot.Constants.Wrist;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.subsystems.arm.ArmState;
 import org.sciborgs1155.robot.subsystems.arm.ElevatorIO;

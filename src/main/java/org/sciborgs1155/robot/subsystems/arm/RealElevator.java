@@ -29,9 +29,9 @@ public class RealElevator implements ElevatorIO {
   private double voltage;
 
   public RealElevator(PIDConstants pidConstants, ElevatorFFConstants ffConstants) {
-    lead = MOTOR.build(MotorType.kBrushless, RIGHT_MOTOR);
-    left = MOTOR.build(MotorType.kBrushless, LEFT_MOTOR);
-    right = MOTOR.build(MotorType.kBrushless, MIDDLE_MOTOR);
+    lead = MOTOR_CFG.build(MotorType.kBrushless, RIGHT_MOTOR);
+    left = MOTOR_CFG.build(MotorType.kBrushless, LEFT_MOTOR);
+    right = MOTOR_CFG.build(MotorType.kBrushless, MIDDLE_MOTOR);
 
     left.follow(lead);
     right.follow(lead);
@@ -51,7 +51,6 @@ public class RealElevator implements ElevatorIO {
   }
 
   public double getHeight() {
-    // System.out.println("height = " + (encoder.getDistance() + ZERO_OFFSET));
     return encoder.getDistance() + ZERO_OFFSET;
   }
 

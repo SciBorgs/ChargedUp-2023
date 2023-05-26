@@ -1,11 +1,7 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package org.sciborgs1155.robot.subsystems.arm;
 
-import static org.sciborgs1155.robot.Constants.Arm.*;
-import static org.sciborgs1155.robot.Ports.Arm.*;
+import static org.sciborgs1155.robot.Constants.Wrist.*;
+import static org.sciborgs1155.robot.Ports.Wrist.*;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -22,10 +18,9 @@ import org.sciborgs1155.robot.Constants;
 
 /** Add your docs here. */
 public class RealWrist implements JointIO {
-  private final CANSparkMax motor = Wrist.MOTOR.build(MotorType.kBrushless, WRIST_MOTOR);
-  private final DutyCycleEncoder absolute = new DutyCycleEncoder(WRIST_ABS_ENCODER);
-  private final Encoder relative =
-      new Encoder(WRIST_RELATIVE_ENCODER[0], WRIST_RELATIVE_ENCODER[1]);
+  private final CANSparkMax motor = MOTOR_CFG.build(MotorType.kBrushless, MOTOR);
+  private final DutyCycleEncoder absolute = new DutyCycleEncoder(ABS_ENCODER);
+  private final Encoder relative = new Encoder(RELATIVE_ENCODER[0], RELATIVE_ENCODER[1]);
 
   private final PIDController pid;
   private final BetterArmFeedforward ff;
@@ -39,17 +34,10 @@ public class RealWrist implements JointIO {
     pid = pidConstants.createPIDController();
     ff = ffConstants.createFeedforward();
 
-    absolute.setPositionOffset(Wrist.ZERO_OFFSET);
-    absolute.setDistancePerRotation(Wrist.CONVERSION_ABS);
-    relative.setDistancePerPulse(Wrist.CONVERSION_RELATIVE);
+    absolute.setPositionOffset(ZERO_OFFSET);
+    absolute.setDistancePerRotation(CONVERSION_ABS);
+    relative.setDistancePerPulse(CONVERSION_RELATIVE);
     relative.setReverseDirection(true);
-
-    // set wrist duty cycle absolute encoder frame periods to be the same as our tickrate
-    // periodic frames 3 and 4 are useless to us, so to improve performance we set them to 1155 ms
-    // motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 1155);
-    // motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 1155);
-    // motor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
-    // motor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
 
     motor.burnFlash();
 

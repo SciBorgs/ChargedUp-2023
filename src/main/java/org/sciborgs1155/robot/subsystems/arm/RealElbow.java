@@ -1,11 +1,7 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package org.sciborgs1155.robot.subsystems.arm;
 
-import static org.sciborgs1155.robot.Constants.Arm.*;
-import static org.sciborgs1155.robot.Ports.Arm.*;
+import static org.sciborgs1155.robot.Constants.Elbow.*;
+import static org.sciborgs1155.robot.Ports.Elbow.*;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -35,9 +31,9 @@ public class RealElbow implements JointIO {
   private double voltage;
 
   public RealElbow(PIDConstants pidConstants, ArmFFConstants ffConstants) {
-    middleMotor = Wrist.MOTOR.build(MotorType.kBrushless, MIDDLE_ELBOW_MOTOR);
-    leftMotor = Wrist.MOTOR.build(MotorType.kBrushless, LEFT_ELBOW_MOTOR);
-    rightMotor = Wrist.MOTOR.build(MotorType.kBrushless, RIGHT_ELBOW_MOTOR);
+    middleMotor = MOTOR_CFG.build(MotorType.kBrushless, MIDDLE_MOTOR);
+    leftMotor = MOTOR_CFG.build(MotorType.kBrushless, LEFT_MOTOR);
+    rightMotor = MOTOR_CFG.build(MotorType.kBrushless, RIGHT_MOTOR);
 
     leftMotor.follow(middleMotor);
     rightMotor.follow(middleMotor);
@@ -46,8 +42,8 @@ public class RealElbow implements JointIO {
     leftMotor.burnFlash();
     rightMotor.burnFlash();
 
-    encoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
-    encoder.setDistancePerPulse(Elbow.CONVERSION);
+    encoder = new Encoder(ENCODER[0], ENCODER[1]);
+    encoder.setDistancePerPulse(CONVERSION);
     encoder.setReverseDirection(true);
 
     pid = pidConstants.createPIDController();
@@ -60,7 +56,7 @@ public class RealElbow implements JointIO {
   /** Elbow position relative to the chassis */
   @Log(name = "elbow position", methodName = "getRadians")
   public Rotation2d getRelativeAngle() {
-    return Rotation2d.fromRadians(encoder.getDistance() + Elbow.OFFSET);
+    return Rotation2d.fromRadians(encoder.getDistance() + OFFSET);
   }
 
   @Override
@@ -107,7 +103,7 @@ public class RealElbow implements JointIO {
   public boolean isFailing() {
     return encoder.getDistance() == 0 // no position reading
         && encoder.getRate() == 0 // no velocity reading
-        && encoder.getDistance() != Elbow.OFFSET // elbow is not going to 0
+        && encoder.getDistance() != OFFSET // elbow is not going to 0
         && middleMotor.getAppliedOutput() != 0; // elbow is trying to move
   }
 

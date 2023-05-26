@@ -42,8 +42,8 @@ public class MAXSwerveModule implements ModuleIO {
    * @param angularOffset offset from drivetrain
    */
   public MAXSwerveModule(int drivePort, int turnPort, double angularOffset) {
-    driveMotor = Driving.MOTOR.build(MotorType.kBrushless, drivePort);
-    turnMotor = Turning.MOTOR.build(MotorType.kBrushless, turnPort);
+    driveMotor = Driving.MOTOR_CFG.build(MotorType.kBrushless, drivePort);
+    turnMotor = Turning.MOTOR_CFG.build(MotorType.kBrushless, turnPort);
 
     driveEncoder = driveMotor.getEncoder();
     turningEncoder = turnMotor.getAbsoluteEncoder(Type.kDutyCycle);
