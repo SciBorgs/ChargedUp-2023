@@ -59,15 +59,15 @@ public class MAXSwerveModule implements ModuleIO {
     setDrivePID(Driving.PID);
     setTurnPID(Turning.PID);
 
-    driveEncoder.setPositionConversionFactor(Driving.CONVERSION.factor());
-    driveEncoder.setVelocityConversionFactor(Driving.CONVERSION.factor() / 60.0);
-    turningEncoder.setPositionConversionFactor(Turning.CONVERSION.factor());
-    turningEncoder.setVelocityConversionFactor(Turning.CONVERSION.factor() / 60.0);
+    driveEncoder.setPositionConversionFactor(Driving.CONVERSION);
+    driveEncoder.setVelocityConversionFactor(Driving.CONVERSION / 60.0);
+    turningEncoder.setPositionConversionFactor(Turning.CONVERSION);
+    turningEncoder.setVelocityConversionFactor(Turning.CONVERSION / 60.0);
 
     // set up continuous input for turning
     turnFeedback.setPositionPIDWrappingEnabled(true);
     turnFeedback.setPositionPIDWrappingMinInput(0);
-    turnFeedback.setPositionPIDWrappingMaxInput(Turning.CONVERSION.factor());
+    turnFeedback.setPositionPIDWrappingMaxInput(Turning.CONVERSION);
 
     driveMotor.burnFlash();
     turnMotor.burnFlash();

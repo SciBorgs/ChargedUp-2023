@@ -11,8 +11,6 @@ import edu.wpi.first.math.util.Units;
 import java.awt.Color;
 import java.util.Map;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.sciborgs1155.lib.constants.Conversion;
-import org.sciborgs1155.lib.constants.Conversion.PulsesPerRev;
 import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
@@ -38,7 +36,6 @@ import org.sciborgs1155.robot.subsystems.arm.ArmState;
  * </ul>
  *
  * @see MotorConfig
- * @see Conversion
  * @see PIDConstants
  * @see Constraints
  */
@@ -52,7 +49,7 @@ public final class Constants {
 
   public static final double PERIOD = 0.02; // roborio tickrate (s)
   public static final double DEADBAND = 0.1;
-  public static final int THROUGHBORE_CPR = 8192;
+  public static final int THROUGHBORE_PPR = 2048;
 
   public static final RobotType ROBOT_TYPE = RobotType.CHASSIS;
 
@@ -115,21 +112,14 @@ public final class Constants {
       public static final MotorConfig MOTOR =
           MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withInvert(true);
 
-      public static final double GEARING = 53.125 / 1.0;
+      public static final double MOTOR_GEARING = 53.125 / 1.0;
       // Gearing for motor : angle (radians)
 
-      public static final Conversion CONVERSION_RELATIVE =
-          Conversion.base()
-              .withUnits(Conversion.Units.RADIANS)
-              .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
+      public static final double CONVERSION_RELATIVE = 2.0 * Math.PI * THROUGHBORE_PPR;
+      public static final double CONVERSION_ABS = -2.0 * Math.PI;
 
-      public static final Conversion CONVERSION_ABS =
-          Conversion.base().withUnits(Conversion.Units.RADIANS);
-
-      public static final PIDConstants PID_NEW =
-          new PIDConstants(5.5, 0, 0.1); // p: 6.1297, d: 0.8453
-      public static final PIDConstants PID_OLD =
-          new PIDConstants(5.5, 0, 0.1); // p: 6.1297, d: 0.8453
+      public static final PIDConstants PID_NEW = new PIDConstants(5.5, 0, 0.1);
+      public static final PIDConstants PID_OLD = new PIDConstants(5.5, 0, 0.1);
       public static final SystemConstants FF_NEW =
           new SystemConstants(0.34613, 0.25692, 0.78381, 0.090836);
       public static final SystemConstants FF_OLD = new SystemConstants(0.1542, 0.6, 0.91, 0.038046);
@@ -144,7 +134,7 @@ public final class Constants {
       public static final JointConfig CONFIG_OLD =
           new JointConfig(
               DCMotor.getNEO(1),
-              GEARING,
+              MOTOR_GEARING,
               Dimensions.CLAW_LENGTH_OLD,
               Dimensions.CLAW_MASS_OLD,
               MIN_ANGLE,
@@ -152,7 +142,7 @@ public final class Constants {
       public static final JointConfig CONFIG_NEW =
           new JointConfig(
               DCMotor.getNEO(1),
-              GEARING,
+              MOTOR_GEARING,
               Dimensions.CLAW_LENGTH,
               Dimensions.CLAW_MASS,
               MIN_ANGLE,
@@ -163,15 +153,10 @@ public final class Constants {
       public static final MotorConfig MOTOR =
           MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
 
-      public static final double GEARING = 63.75 / 1.0;
-      // Gearing for motor : angle (radians)
+      public static final double MOTOR_GEARING = 63.75 / 1.0;
 
-      public static final Conversion CONVERSION =
-          Conversion.base()
-              .multiplyGearing(12)
-              .divideGearing(72)
-              .withUnits(Conversion.Units.RADIANS)
-              .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
+      public static final double ENCODER_RATIO = 12.0 / 72.0;
+      public static final double CONVERSION = ENCODER_RATIO * 2 * Math.PI * THROUGHBORE_PPR;
 
       public static final PIDConstants PID_NEW = new PIDConstants(12, 0, 1.1); // d = 2.18954
       public static final PIDConstants PID_OLD = new PIDConstants(12, 0, 1.1); // d = 2.18954
@@ -188,7 +173,7 @@ public final class Constants {
       public static final JointConfig CONFIG =
           new JointConfig(
               DCMotor.getNEO(3),
-              GEARING,
+              MOTOR_GEARING,
               Dimensions.FOREARM_LENGTH,
               Dimensions.FOREARM_MASS,
               MIN_ANGLE,
@@ -204,17 +189,13 @@ public final class Constants {
     public static final MotorConfig MOTOR =
         MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(35);
 
-    public static final double GEARING = 30.0 / 1.0;
+    public static final double MOTOR_GEARING = 30.0 / 1.0;
     // Gearing for motor : height (meters)
 
-    public static final Conversion RELATIVE_CONVERSION =
-        Conversion.base()
-            .multiplyRadius(0.0181864)
-            .withUnits(Conversion.Units.RADIANS)
-            .withPulsesPerRev(PulsesPerRev.REV_THROUGHBORE);
-    // units field for sysid is 0.1143
-    public static final Conversion ABSOLUTE_CONVERSION =
-        RELATIVE_CONVERSION.withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
+    public static final double CIRCUMFERENCE = 2.0 * Math.PI * 0.0181864;
+    // Diameter of the sprocket in meters (2 * π * R)
+
+    public static final double CONVERSION_RELATIVE = CIRCUMFERENCE / THROUGHBORE_PPR;
 
     public static final PIDConstants PID = new PIDConstants(50, 0, 1);
     public static final SystemConstants FF = new SystemConstants(0.4, 0.069335, 33.25, 1.5514);
@@ -225,14 +206,14 @@ public final class Constants {
     public static final ElevatorConfig CONFIG =
         new ElevatorConfig(
             DCMotor.getNEO(3),
-            GEARING,
+            MOTOR_GEARING,
             Dimensions.CARRIAGE_MASS + Dimensions.FOREARM_MASS + Dimensions.CLAW_MASS,
-            RELATIVE_CONVERSION.gearing(),
+            MOTOR_GEARING,
             MIN_HEIGHT,
             MAX_HEIGHT);
 
     public static final int SAMPLE_SIZE_TAPS = 3;
-    public static final int CURRENT_THRESHOLD = 35; // TODO this might be too high/unreasonable
+    public static final int CURRENT_THRESHOLD = 35;
 
     public static final Constraints CONSTRAINTS = new Constraints(3, 3.35);
 
@@ -294,14 +275,12 @@ public final class Constants {
       public static final MotorConfig MOTOR =
           MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
 
-      public static final Conversion CONVERSION =
-          Conversion.base()
-              .multiplyRadius(0.0381)
-              .withUnits(Conversion.Units.RADIANS)
-              .divideGearing(45.0)
-              .divideGearing(22.0)
-              .multiplyGearing(15.0)
-              .multiplyGearing(14.0); // pinion teeth
+      public static final double CIRCUMFERENCE = 2.0 * Math.PI * 0.0381;
+      // Diameter of the wheel in meters (2 * π * R)
+
+      public static final double GEARING = 1.0 / 45.0 / 22.0 * 15.0 * 14.0;
+
+      public static final double CONVERSION = CIRCUMFERENCE * GEARING;
 
       public static final PIDConstants PID = new PIDConstants(0.11, 0, 0.06);
       public static final SystemConstants FF = new SystemConstants(0.3, 2.7, 0.25);
@@ -311,10 +290,9 @@ public final class Constants {
       public static final MotorConfig MOTOR =
           MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(20);
 
-      public static final Conversion CONVERSION =
-          Conversion.base()
-              .withUnits(Conversion.Units.RADIANS)
-              .withPulsesPerRev(PulsesPerRev.REV_INTEGRATED);
+      public static final double MOTOR_GEARING = 1.0 / 4.0 / 3.0;
+
+      public static final double CONVERSION = 2.0 * Math.PI;
 
       public static final boolean ENCODER_INVERTED = true;
 
@@ -381,12 +359,6 @@ public final class Constants {
   }
 
   public static final class Field {
-    // public static final Map<Integer, Translation2d> INTAKE_POINTS =
-    //     Map.ofEntries(
-    //         Map.entry(1, new Translation2d(5, 2)),
-    //         Map.entry(2, new Translation2d(5, 3)),
-    //         Map.entry(3, new Translation2d(5, 4)),
-    //         Map.entry(4, new Translation2d(5, 5)));
     public static final double FIELD_WIDTH_METERS = 8.02;
     public static final Map<Integer, Translation2d> SCORING_POINTS_CUBE =
         Map.ofEntries(

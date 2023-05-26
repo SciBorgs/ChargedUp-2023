@@ -47,7 +47,7 @@ public class RealElbow implements JointIO {
     rightMotor.burnFlash();
 
     encoder = new Encoder(ELBOW_ENCODER[0], ELBOW_ENCODER[1]);
-    encoder.setDistancePerPulse(Elbow.CONVERSION.factor());
+    encoder.setDistancePerPulse(Elbow.CONVERSION);
     encoder.setReverseDirection(true);
 
     pid = pidConstants.create();

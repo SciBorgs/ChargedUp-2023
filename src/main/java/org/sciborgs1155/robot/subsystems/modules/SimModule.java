@@ -16,9 +16,8 @@ import org.sciborgs1155.robot.Constants;
 /** Class to encapsulate a rev max swerve module */
 public class SimModule implements ModuleIO {
 
-  private final DCMotorSim drive = Driving.FF.sim(DCMotor.getNEO(1), Driving.CONVERSION.gearing());
-  private final DCMotorSim turn =
-      Turning.FF.sim(DCMotor.getNeo550(1), Turning.CONVERSION.gearing());
+  private final DCMotorSim drive = Driving.FF.sim(DCMotor.getNEO(1), Driving.GEARING);
+  private final DCMotorSim turn = Turning.FF.sim(DCMotor.getNeo550(1), Turning.MOTOR_GEARING);
 
   private final PIDController driveFeedback =
       new PIDController(Driving.PID.p(), Driving.PID.i(), Driving.PID.d());
@@ -31,7 +30,7 @@ public class SimModule implements ModuleIO {
   private SwerveModuleState setpoint = new SwerveModuleState();
 
   public SimModule() {
-    turnFeedback.enableContinuousInput(0, Turning.CONVERSION.factor());
+    turnFeedback.enableContinuousInput(0, Turning.CONVERSION);
   }
 
   @Override

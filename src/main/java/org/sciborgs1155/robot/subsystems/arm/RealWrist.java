@@ -40,8 +40,8 @@ public class RealWrist implements JointIO {
     ff = ffConstants.createArmFF();
 
     absolute.setPositionOffset(Wrist.ZERO_OFFSET);
-    absolute.setDistancePerRotation(-Wrist.CONVERSION_ABS.factor());
-    relative.setDistancePerPulse(Wrist.CONVERSION_RELATIVE.factor());
+    absolute.setDistancePerRotation(Wrist.CONVERSION_ABS);
+    relative.setDistancePerPulse(Wrist.CONVERSION_RELATIVE);
     relative.setReverseDirection(true);
 
     // set wrist duty cycle absolute encoder frame periods to be the same as our tickrate
