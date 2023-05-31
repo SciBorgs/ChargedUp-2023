@@ -32,7 +32,7 @@ public final class Ports {
   }
 
   public static final class Wrist {
-    public static final int MOTOR = 7;
+    public static final int MOTOR = 10;
 
     public static final int[] RELATIVE_ENCODER = {5, 6};
     public static final int ABS_ENCODER = 4;
@@ -47,7 +47,7 @@ public final class Ports {
   }
 
   public static final class Intake {
-    public static final int WHEEL_MOTOR = 10;
+    public static final int WHEEL_MOTOR = 7;
   }
 
   public static final class LED {

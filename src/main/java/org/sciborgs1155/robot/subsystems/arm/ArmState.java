@@ -54,7 +54,7 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
   public static final ArmState NEW_GROUND_CONE_INTAKE =
       ArmState.fromRelative(0.618, -0.714, -0.723);
 
-  public static final ArmState NEW_GROUND_CUBE_INTAKE = ArmState.fromRelative(0, 0, 0);
+  public static final ArmState NEW_GROUND_CUBE_INTAKE = NEW_GROUND_CONE_INTAKE;
 
   /** Represents the side of the robot the arm is on */
   public enum Side {
@@ -182,41 +182,8 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
     };
   }
 
-  /**
-   * Returns the corresponding arm state given a target Math can be found {@link
-   * https://robotacademy.net.au/lesson/inverse-kinematics-for-a-2-joint-robot-arm-using-geometry}
-   */
-  public static Optional<ArmState> fromIK(Translation2d target) {
-    // get initial wrist and elbow angles
-    double wristAngle =
-        -Math.acos(
-            (Math.pow(target.getY(), 2)
-                    + Math.pow(target.getX(), 2)
-                    - Math.pow(Dimensions.FOREARM_LENGTH, 2)
-                    - Math.pow(Dimensions.CLAW_LENGTH, 2))
-                / (2.0 * Dimensions.CLAW_LENGTH * Dimensions.FOREARM_LENGTH));
-    double elbowAngle =
-        Math.atan2(target.getY(), target.getX())
-            + Math.atan2(
-                Dimensions.CLAW_LENGTH * Math.sin(wristAngle),
-                Dimensions.FOREARM_LENGTH + Dimensions.CLAW_LENGTH * Math.cos(wristAngle));
-
-    // check for nan
-    if (elbowAngle != elbowAngle || wristAngle != wristAngle) {
-      return Optional.empty();
-    }
-
-    // add elevator height if necessary
-    double totalHeight =
-        Math.sin(elbowAngle) * Dimensions.FOREARM_LENGTH
-            + Math.sin(wristAngle) * Dimensions.CLAW_LENGTH;
-
-    double elevatorHeight = totalHeight < target.getY() ? target.getY() - totalHeight : 0;
-
-    return Optional.of(fromRelative(elevatorHeight, elbowAngle, wristAngle));
-  }
-
   public static Optional<ArmState> fromIK(Pose2d target) {
+
     double wristAngle = target.getRotation().getRadians();
 
     double elbowAngle =

@@ -43,8 +43,8 @@ public class RealWrist implements JointIO {
 
     pid.setTolerance(0.3);
 
-    // setpoint = new State(Math.PI, 0);
-    setpoint = new State(absolute.getDistance(), 0);
+    setpoint = new State(2, 0);
+    // setpoint = new State(absolute.getDistance(), 0);
   }
 
   @Override

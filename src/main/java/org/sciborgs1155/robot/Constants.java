@@ -109,12 +109,12 @@ public final class Constants {
 
   public static final class Wrist {
     public static final MotorConfig MOTOR_CFG =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withInvert(true);
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
 
     public static final double MOTOR_GEARING = 53.125 / 1.0;
     // Gearing for motor : angle (radians)
 
-    public static final double CONVERSION_RELATIVE = 2.0 * Math.PI * THROUGHBORE_PPR;
+    public static final double CONVERSION_RELATIVE = 2.0 * Math.PI / THROUGHBORE_PPR;
     public static final double CONVERSION_ABS = -2.0 * Math.PI;
 
     public static final PIDConstants PID_NEW = new PIDConstants(5.5, 0, 0.1);
@@ -155,7 +155,7 @@ public final class Constants {
     public static final double MOTOR_GEARING = 63.75 / 1.0;
 
     public static final double ENCODER_RATIO = 12.0 / 72.0;
-    public static final double CONVERSION = ENCODER_RATIO * 2 * Math.PI * THROUGHBORE_PPR;
+    public static final double CONVERSION = ENCODER_RATIO * 2 * Math.PI / THROUGHBORE_PPR;
 
     public static final PIDConstants PID_NEW = new PIDConstants(12, 0, 1.1); // d = 2.18954
     public static final PIDConstants PID_OLD = new PIDConstants(12, 0, 1.1); // d = 2.18954
@@ -224,13 +224,13 @@ public final class Constants {
     public static final MotorConfig MOTOR_CFG =
         MotorConfig.base()
             .withNeutralBehavior(NeutralBehavior.BRAKE)
-            .withCurrentLimit(20)
+            .withCurrentLimit(40)
             .withInvert(true);
 
     public static final double DEFAULT_SPEED = 0.05;
 
-    public static final double CONE_SPEED = 0.3;
-    public static final double CUBE_SPEED = -0.2;
+    public static final double CONE_SPEED = 0.6;
+    public static final double CUBE_SPEED = -0.4;
 
     public static final double THRESHOLD = 0.5;
   }

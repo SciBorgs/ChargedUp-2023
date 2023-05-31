@@ -31,11 +31,11 @@ public class Intake extends SubsystemBase implements Loggable, AutoCloseable {
   }
 
   public Command intake(GamePiece gamePiece) {
-    return set(gamePiece == GamePiece.CONE ? CONE_SPEED : CUBE_SPEED).withName("intake");
+    return set(gamePiece == GamePiece.CONE ? coneSpeed : cubeSpeed).withName("intaking");
   }
 
   public Command outtake(GamePiece gamePiece) {
-    return set(-1 * (gamePiece == GamePiece.CONE ? CONE_SPEED : CUBE_SPEED)).withName("outtake");
+    return set(-1 * (gamePiece == GamePiece.CONE ? coneSpeed : cubeSpeed)).withName("outtaking");
   }
 
   public Command stop() {
