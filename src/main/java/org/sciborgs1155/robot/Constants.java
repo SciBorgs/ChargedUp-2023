@@ -19,7 +19,6 @@ import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.subsystems.Arm.ElevatorConfig;
 import org.sciborgs1155.robot.subsystems.Arm.JointConfig;
-import org.sciborgs1155.robot.subsystems.arm.ArmState;
 
 /**
  * Constants is a globally accessible class for storing immutable values. Every value should be
@@ -299,51 +298,6 @@ public final class Constants {
       // system constants only used in simulation
       public static final BasicFFConstants FF = new BasicFFConstants(0, 0.25, 0.015);
     }
-  }
-
-  public static final class Positions {
-
-    // public static final ArmState INITIAL =
-    //     ArmState.fromRelative(Elevator.ZERO_OFFSET, Elbow.OFFSET, Math.PI);
-
-    public static final ArmState INITIAL =
-        ArmState.fromRelative(Elevator.ZERO_OFFSET, Elbow.OFFSET, 2.4);
-
-    public static final ArmState STOW = ArmState.fromRelative(0, 1.21834, Math.PI / 2.0);
-
-    // LOWEST COG
-    public static final ArmState SAFE =
-        ArmState.fromAbsolute(Elevator.ZERO_OFFSET, Elbow.OFFSET + 0.1, Math.PI / 2);
-
-    public static final ArmState PASS_OLD = ArmState.fromAbsolute(0, Math.PI / 2.0, Math.PI / 2.0);
-    public static final ArmState PASS_TO_BACK = ArmState.fromAbsolute(0.03, Math.PI / 2.0, Math.PI);
-    public static final ArmState PASS_TO_FRONT =
-        ArmState.fromAbsolute(0.05, Math.PI / 2.0, Math.PI / 4.0);
-
-    public static final ArmState FRONT_INTAKE = ArmState.fromAbsolute(0.454, -0.983, -0.055);
-
-    public static final ArmState GROUND_CONE_INTAKE = ArmState.fromRelative(0.618, -0.714, -0.723);
-    public static final ArmState BACK_INTAKE = STOW; // TODO
-
-    public static final ArmState FRONT_SINGLE_SUBSTATION_CONE =
-        ArmState.fromAbsolute(0.425006, 0.128855, -0.305);
-    public static final ArmState FRONT_SINGLE_SUBSTATION_CUBE =
-        ArmState.fromAbsolute(0.543571, -0.367516, 0.445646);
-    public static final ArmState BACK_DOUBLE_SUBSTATION = ArmState.fromAbsolute(0, 2.8, Math.PI);
-
-    public static final ArmState FRONT_MID_CONE =
-        ArmState.fromAbsolute(0.061612, 0.493303, 0.001378);
-
-    public static final ArmState BACK_MID_CONE = STOW; // TODO
-    public static final ArmState BACK_HIGH_CONE = ArmState.fromAbsolute(0.253, 3.072, 2.5);
-    // ele 0.2475
-    public static final ArmState FRONT_MID_CUBE =
-        ArmState.fromAbsolute(0.11362, 0.458149, 0.353288);
-    public static final ArmState FRONT_HIGH_CUBE =
-        ArmState.fromAbsolute(0.113502, 0.333258, 0.353208);
-
-    public static final ArmState BACK_MID_CUBE = FRONT_MID_CUBE; // TODO
-    public static final ArmState BACK_HIGH_CUBE = ArmState.fromAbsolute(0.245, 2.75, 3.17);
   }
 
   public static final class Auto {

@@ -3,20 +3,19 @@ package org.sciborgs1155.robot;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.CommandRobot;
-import org.sciborgs1155.lib.DeferredCommand;
-import org.sciborgs1155.robot.Constants.Positions;
 import org.sciborgs1155.robot.Ports.OI;
-import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Scoring;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.subsystems.LED;
+import org.sciborgs1155.robot.subsystems.arm.ArmState;
 import org.sciborgs1155.robot.subsystems.arm.ArmState.GamePiece;
 import org.sciborgs1155.robot.subsystems.arm.ArmState.Level;
 import org.sciborgs1155.robot.subsystems.arm.ArmState.Side;
@@ -45,7 +44,7 @@ public class Robot extends CommandRobot implements Loggable {
 
   // COMMANDS
   @Log private final Scoring scoring = new Scoring(led);
-  @Log private final Autos autos = new Autos(drive, arm, intake);
+  // @Log private final Autos autos = new Autos(drive, arm, intake);
 
   /** The robot contains subsystems, OI devices, and commands. */
   public Robot() {
@@ -109,13 +108,13 @@ public class Robot extends CommandRobot implements Loggable {
     operator.povUp().onTrue(arm.goTo(() -> scoring.state(Level.HIGH)));
     operator.povRight().onTrue(arm.goTo(() -> scoring.state(Level.MID)));
     operator.povDown().onTrue(arm.goTo(() -> scoring.state(Level.LOW)));
-    operator.povLeft().onTrue(arm.goTo(Positions.STOW));
+    operator.povLeft().onTrue(arm.goTo(ArmState.STOW));
 
     operator.leftTrigger().onTrue(arm.goTo(() -> scoring.state(Level.SINGLE_SUBSTATION)));
     operator.rightTrigger().onTrue(arm.goTo(() -> scoring.state(Level.DOUBLE_SUBSTATION)));
 
-    operator.rightStick().onTrue(arm.goTo(Positions.SAFE));
-    operator.leftStick().onTrue(arm.goTo(Positions.SAFE));
+    operator.rightStick().onTrue(arm.goTo(ArmState.OLD_SAFE));
+    operator.leftStick().onTrue(arm.goTo(ArmState.OLD_SAFE));
 
     // INTAKING
     operator.leftBumper().whileTrue(intake.intake(scoring.gamePiece()));
@@ -133,8 +132,9 @@ public class Robot extends CommandRobot implements Loggable {
 
   /** The commamnd to be ran in autonomous */
   public Command getAutonomousCommand() {
-    return new DeferredCommand(autos::get, drive, arm)
-        .until(() -> !DriverStation.isAutonomous())
-        .withName("auto");
+    // return new DeferredCommand(autos::get, drive, arm)
+    //     .until(() -> !DriverStation.isAutonomous())
+    //     .withName("auto");
+    return Commands.none();
   }
 }

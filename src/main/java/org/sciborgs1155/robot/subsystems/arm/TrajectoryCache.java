@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.sciborgs1155.lib.Trajectory;
-import org.sciborgs1155.robot.Constants.Positions;
 
 public class TrajectoryCache {
 
@@ -86,21 +85,20 @@ public class TrajectoryCache {
     List<CachedTrajectory> generatedTrajectories = new ArrayList<CachedTrajectory>();
     var presets =
         List.of(
-            Positions.INITIAL,
-            Positions.STOW,
-            Positions.FRONT_INTAKE,
-            Positions.BACK_INTAKE,
-            Positions.FRONT_SINGLE_SUBSTATION_CONE,
-            Positions.FRONT_SINGLE_SUBSTATION_CUBE,
-            Positions.BACK_DOUBLE_SUBSTATION,
-            Positions.FRONT_MID_CONE,
-            Positions.BACK_MID_CONE,
-            Positions.BACK_HIGH_CONE,
-            Positions.FRONT_MID_CUBE,
-            Positions.FRONT_HIGH_CUBE,
-            Positions.BACK_MID_CUBE,
-            Positions.BACK_HIGH_CUBE,
-            Positions.SAFE);
+            ArmState.OLD_INITIAL,
+            ArmState.STOW,
+            ArmState.OLD_FRONT_INTAKE,
+            ArmState.OLD_FRONT_SINGLE_SUBSTATION_CONE,
+            ArmState.OLD_FRONT_SINGLE_SUBSTATION_CUBE,
+            ArmState.OLD_BACK_DOUBLE_SUBSTATION,
+            ArmState.OLD_FRONT_MID_CONE,
+            ArmState.OLD_BACK_MID_CONE,
+            ArmState.OLD_BACK_HIGH_CONE,
+            ArmState.OLD_FRONT_MID_CUBE,
+            ArmState.OLD_FRONT_HIGH_CUBE,
+            ArmState.OLD_BACK_MID_CUBE,
+            ArmState.OLD_BACK_HIGH_CUBE,
+            ArmState.OLD_SAFE);
 
     for (var initialPos : presets) {
       for (var finalPos : presets) {
