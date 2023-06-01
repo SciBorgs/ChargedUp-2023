@@ -17,7 +17,7 @@ import org.sciborgs1155.lib.constants.ElevatorFFConstants;
 import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
-import org.sciborgs1155.robot.subsystems.Arm.ElevatorConfig;
+import org.sciborgs1155.robot.subsystems.arm.ElevatorIO.ElevatorConfig;
 import org.sciborgs1155.robot.subsystems.arm.JointIO.JointConfig;
 
 /**

@@ -13,7 +13,7 @@ public class NoElevator implements ElevatorIO {
   }
 
   @Override
-  public State getState() {
+  public State getCurrentState() {
     return new State();
   }
 

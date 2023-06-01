@@ -5,7 +5,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import org.sciborgs1155.lib.BetterElevatorFeedforward;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.subsystems.Arm.ElevatorConfig;
 
 public class SimElevator implements ElevatorIO {
 
@@ -14,8 +13,8 @@ public class SimElevator implements ElevatorIO {
   private final PIDController pid;
   private final BetterElevatorFeedforward ff;
 
-  private State setpoint = new State();
-  private double voltage;
+  private State lastSetpoint = new State();
+  private double lastVoltage;
 
   public SimElevator(ElevatorConfig config) {
     sim =
@@ -38,30 +37,30 @@ public class SimElevator implements ElevatorIO {
   }
 
   @Override
-  public State getState() {
+  public State getCurrentState() {
     return new State(getHeight(), sim.getVelocityMetersPerSecond());
   }
 
   @Override
   public State getDesiredState() {
-    return setpoint;
+    return lastSetpoint;
   }
 
   @Override
   public void updateSetpoint(State setpoint) {
-    double ffVoltage = ff.calculate(this.setpoint.velocity, setpoint.velocity, Constants.PERIOD);
+    double ffVoltage = ff.calculate(lastSetpoint.velocity, setpoint.velocity, Constants.PERIOD);
     double pidVoltage = pid.calculate(getHeight(), setpoint.position);
 
-    voltage = ffVoltage + pidVoltage;
-    sim.setInputVoltage(voltage);
+    lastVoltage = ffVoltage + pidVoltage;
+    sim.setInputVoltage(lastVoltage);
     sim.update(Constants.PERIOD);
 
-    this.setpoint = setpoint;
+    lastSetpoint = setpoint;
   }
 
   @Override
   public void stopMoving() {
-    voltage = 0;
+    lastVoltage = 0;
     sim.setInputVoltage(0);
     sim.update(Constants.PERIOD);
   }
@@ -73,7 +72,7 @@ public class SimElevator implements ElevatorIO {
 
   @Override
   public double getVoltage() {
-    return voltage;
+    return lastVoltage;
   }
 
   @Override

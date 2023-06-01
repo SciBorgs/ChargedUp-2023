@@ -5,6 +5,7 @@ import static org.sciborgs1155.robot.Ports.Elbow.*;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
@@ -27,8 +28,8 @@ public class RealElbow implements JointIO {
   private final double minAngle;
   private final double maxAngle;
 
-  private State setpoint;
-  private double voltage;
+  private State lastSetpoint = new State();
+  private double lastVoltage;
 
   public RealElbow(JointConfig config) {
     middleMotor = MOTOR_CFG.build(MotorType.kBrushless, MIDDLE_MOTOR);
@@ -53,7 +54,7 @@ public class RealElbow implements JointIO {
     pid = config.pid().createPIDController();
     pid.setTolerance(0.3);
 
-    setpoint = new State(getRelativeAngle().getRadians(), 0);
+    lastSetpoint = new State(getRelativeAngle().getRadians(), 0);
   }
 
   /** Elbow position relative to the chassis */
@@ -69,28 +70,30 @@ public class RealElbow implements JointIO {
 
   @Override
   public void updateSetpoint(State setpoint) {
+    double clampedPosition = MathUtil.clamp(setpoint.position, minAngle, maxAngle);
+
     double feedforward =
         ff.calculate(
-            setpoint.position + getBaseAngle().getRadians(),
-            this.setpoint.velocity,
+            clampedPosition + getBaseAngle().getRadians(),
+            lastSetpoint.velocity,
             setpoint.velocity,
             Constants.PERIOD);
-    double feedback = pid.calculate(getRelativeAngle().getRadians(), setpoint.position);
+    double feedback = pid.calculate(getRelativeAngle().getRadians(), clampedPosition);
 
-    voltage = feedback + feedforward;
-    middleMotor.setVoltage(voltage);
+    lastVoltage = feedback + feedforward;
+    middleMotor.setVoltage(lastVoltage);
 
-    this.setpoint = setpoint;
+    lastSetpoint = setpoint;
   }
 
   @Override
   public void stopMoving() {
-    voltage = 0;
+    lastVoltage = 0;
     middleMotor.stopMotor();
   }
 
   public State getDesiredState() {
-    return setpoint;
+    return lastSetpoint;
   }
 
   @Override
@@ -113,7 +116,7 @@ public class RealElbow implements JointIO {
 
   @Override
   public double getVoltage() {
-    return voltage;
+    return lastVoltage;
   }
 
   @Override

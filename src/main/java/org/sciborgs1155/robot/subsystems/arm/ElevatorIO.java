@@ -28,7 +28,7 @@ public interface ElevatorIO extends Sendable, AutoCloseable {
   public double getHeight();
 
   /** Returns the current state (m, m/s) of the elevator. */
-  public State getState();
+  public State getCurrentState();
 
   /** Returns the desired state (m, m/s) of the elevator. */
   public State getDesiredState();
@@ -50,8 +50,8 @@ public interface ElevatorIO extends Sendable, AutoCloseable {
 
   @Override
   default void initSendable(SendableBuilder builder) {
-    builder.addDoubleProperty("position", () -> getState().position, null);
-    builder.addDoubleProperty("velocity", () -> getState().velocity, null);
+    builder.addDoubleProperty("position", () -> getCurrentState().position, null);
+    builder.addDoubleProperty("velocity", () -> getCurrentState().velocity, null);
     builder.addDoubleProperty("target position", () -> getDesiredState().position, null);
     builder.addDoubleProperty("target velocity", () -> getDesiredState().velocity, null);
     builder.addBooleanProperty("failing", this::isFailing, null);

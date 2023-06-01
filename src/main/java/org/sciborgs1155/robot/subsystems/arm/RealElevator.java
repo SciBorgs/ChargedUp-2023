@@ -5,13 +5,13 @@ import static org.sciborgs1155.robot.Ports.Elevator.*;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Encoder;
 import org.sciborgs1155.lib.BetterElevatorFeedforward;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.subsystems.Arm.ElevatorConfig;
 
 public class RealElevator implements ElevatorIO {
 
@@ -27,8 +27,8 @@ public class RealElevator implements ElevatorIO {
   private final double minHeight;
   private final double maxHeight;
 
-  private State setpoint;
-  private double voltage;
+  private State lastSetpoint = new State();
+  private double lastVoltage;
 
   public RealElevator(ElevatorConfig config) {
     lead = MOTOR_CFG.build(MotorType.kBrushless, RIGHT_MOTOR);
@@ -52,7 +52,7 @@ public class RealElevator implements ElevatorIO {
     ff = config.ff().createFeedforward();
     pid = config.pid().createPIDController();
 
-    setpoint = new State(getHeight(), 0);
+    lastSetpoint = new State(getHeight(), 0);
   }
 
   public double getHeight() {
@@ -60,29 +60,31 @@ public class RealElevator implements ElevatorIO {
   }
 
   @Override
-  public State getState() {
+  public State getCurrentState() {
     return new State(getHeight(), encoder.getRate());
   }
 
   @Override
   public State getDesiredState() {
-    return setpoint;
+    return lastSetpoint;
   }
 
   @Override
   public void updateSetpoint(State setpoint) {
-    double ffOutput = ff.calculate(this.setpoint.velocity, setpoint.velocity, Constants.PERIOD);
-    double fbOutput = pid.calculate(getHeight(), setpoint.position);
+    double clampedPosition = MathUtil.clamp(setpoint.position, minHeight, maxHeight);
 
-    voltage = ffOutput + fbOutput;
-    lead.setVoltage(voltage);
+    double ffOutput = ff.calculate(lastSetpoint.velocity, setpoint.velocity, Constants.PERIOD);
+    double fbOutput = pid.calculate(getHeight(), clampedPosition);
 
-    this.setpoint = setpoint;
+    lastVoltage = ffOutput + fbOutput;
+    lead.setVoltage(lastVoltage);
+
+    lastSetpoint = setpoint;
   }
 
   @Override
   public void stopMoving() {
-    voltage = 0;
+    lastVoltage = 0;
     lead.stopMotor();
   }
 
@@ -93,7 +95,7 @@ public class RealElevator implements ElevatorIO {
 
   @Override
   public double getVoltage() {
-    return voltage;
+    return lastVoltage;
   }
 
   @Override

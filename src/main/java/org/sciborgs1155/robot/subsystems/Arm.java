@@ -24,7 +24,9 @@ import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.subsystems.arm.ArmState;
 import org.sciborgs1155.robot.subsystems.arm.ArmState.Side;
 import org.sciborgs1155.robot.subsystems.arm.ElevatorIO;
+import org.sciborgs1155.robot.subsystems.arm.ElevatorIO.ElevatorConfig;
 import org.sciborgs1155.robot.subsystems.arm.JointIO;
+import org.sciborgs1155.robot.subsystems.arm.JointIO.JointConfig;
 import org.sciborgs1155.robot.subsystems.arm.NoElevator;
 import org.sciborgs1155.robot.subsystems.arm.NoJoint;
 import org.sciborgs1155.robot.subsystems.arm.RealElbow;
@@ -185,7 +187,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
                         new TrapezoidProfile(
                             Elevator.CONSTRAINTS,
                             new State(goal.get().elevatorHeight(), 0),
-                            elevator.getState()),
+                            elevator.getCurrentState()),
                         elevator::updateSetpoint),
                     new TrapezoidProfileCommand(
                         new TrapezoidProfile(
