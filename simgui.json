@@ -126,6 +126,9 @@
     "transitory": {
       "Shuffleboard": {
         "Arm": {
+          "elevator": {
+            "open": true
+          },
           "open": true
         },
         "Elevator": {
@@ -135,7 +138,6 @@
           }
         },
         "Robot": {
-          "open": true,
           "scoring": {
             "open": true
           }
@@ -155,8 +157,5 @@
         "open": true
       }
     }
-  },
-  "NetworkTables View": {
-    "visible": false
   }
 }

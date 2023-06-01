@@ -60,6 +60,8 @@ public final class Constants {
     public static final double BASE_HEIGHT = 0.5203698;
     // Distance from the ground to the lowest possible elbow position
 
+    public static final Translation2d BASE = new Translation2d(BASE_OFFSET, BASE_HEIGHT);
+
     public static final double FOREARM_LENGTH = 0.927;
     // Distance from elbow pivot to to wrist pivot
 
@@ -189,10 +191,10 @@ public final class Constants {
     public static final double MOTOR_GEARING = 30.0 / 1.0;
     // Gearing for motor : height (meters)
 
-    public static final double CIRCUMFERENCE = 2.0 * Math.PI * 0.0181864;
-    // Diameter of the sprocket in meters (2 * π * R)
+    public static final double SPROCKET_CIRCUMFERENCE = 2.0 * Math.PI * 0.0181864;
+    // Circumference of the sprocket in meters (2 * π * R)
 
-    public static final double CONVERSION_RELATIVE = CIRCUMFERENCE / THROUGHBORE_PPR;
+    public static final double CONVERSION_RELATIVE = SPROCKET_CIRCUMFERENCE / THROUGHBORE_PPR;
 
     public static final PIDConstants PID = new PIDConstants(50, 0, 1);
     public static final ElevatorFFConstants FF =
@@ -206,7 +208,7 @@ public final class Constants {
             DCMotor.getNEO(3),
             MOTOR_GEARING,
             Dimensions.CARRIAGE_MASS + Dimensions.FOREARM_MASS + Dimensions.CLAW_MASS,
-            MOTOR_GEARING,
+            SPROCKET_CIRCUMFERENCE,
             MIN_HEIGHT,
             MAX_HEIGHT);
 

@@ -1,9 +1,10 @@
 package org.sciborgs1155.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
@@ -135,6 +136,6 @@ public class Robot extends CommandRobot implements Loggable {
     // return new DeferredCommand(autos::get, drive, arm)
     //     .until(() -> !DriverStation.isAutonomous())
     //     .withName("auto");
-    return Commands.none();
+    return arm.goTo(ArmState.fromEndpoint(new Pose2d(0.5, 0.25, Rotation2d.fromDegrees(15))).get());
   }
 }
