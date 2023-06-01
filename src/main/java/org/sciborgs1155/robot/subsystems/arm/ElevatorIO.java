@@ -1,22 +1,51 @@
 package org.sciborgs1155.robot.subsystems.arm;
 
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import org.sciborgs1155.lib.constants.ElevatorFFConstants;
+import org.sciborgs1155.lib.constants.PIDConstants;
 
+/**
+ * Represents an elevator with closed loop control. Note that either {@link
+ * this#updateSetpoint(State)} or {@link this#stopMoving()} must be called periodically.
+ */
 public interface ElevatorIO extends Sendable, AutoCloseable {
+
+  /** A record to store configuration values for an elevator */
+  public static record ElevatorConfig(
+      ElevatorFFConstants ff,
+      PIDConstants pid,
+      DCMotor gearbox,
+      double gearing,
+      double mass,
+      double sprocketRadius,
+      double minHeight,
+      double maxHeight) {}
+
+  /** Returns the height of the elevator from the ground. */
   public double getHeight();
 
+  /** Returns the current state (m, m/s) of the elevator. */
   public State getState();
 
+  /** Returns the desired state (m, m/s) of the elevator. */
   public State getDesiredState();
 
+  /**
+   * Sets the setpoint to the specified state (m, m/s) of the elevator and updates the internal
+   * closed loop control.
+   */
   public void updateSetpoint(State setpoint);
 
+  /** Stops the elevator from moving by applying a voltage of 0. */
   public void stopMoving();
 
+  /** Returns if the elevator is inoperable. */
   public boolean isFailing();
 
+  /** Returns the last applied voltage. */
   public double getVoltage();
 
   @Override

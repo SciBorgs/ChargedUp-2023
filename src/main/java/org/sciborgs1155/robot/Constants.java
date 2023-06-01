@@ -18,7 +18,7 @@ import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.subsystems.Arm.ElevatorConfig;
-import org.sciborgs1155.robot.subsystems.Arm.JointConfig;
+import org.sciborgs1155.robot.subsystems.arm.JointIO.JointConfig;
 
 /**
  * Constants is a globally accessible class for storing immutable values. Every value should be
@@ -48,6 +48,7 @@ public final class Constants {
   }
 
   public static final double PERIOD = 0.02; // roborio tickrate (s)
+  public static final double SPARK_PERIOD = 0.001; // SparkMAX tickrate (s)
   public static final double DEADBAND = 0.1;
   public static final int THROUGHBORE_PPR = 2048;
 
@@ -134,6 +135,8 @@ public final class Constants {
 
     public static final JointConfig CONFIG_OLD =
         new JointConfig(
+            FF_OLD,
+            PID_OLD,
             DCMotor.getNEO(1),
             MOTOR_GEARING,
             Dimensions.CLAW_LENGTH_OLD,
@@ -142,6 +145,8 @@ public final class Constants {
             MAX_ANGLE);
     public static final JointConfig CONFIG_NEW =
         new JointConfig(
+            FF_NEW,
+            PID_NEW,
             DCMotor.getNEO(1),
             MOTOR_GEARING,
             Dimensions.CLAW_LENGTH,
@@ -170,12 +175,25 @@ public final class Constants {
     public static final double MAX_ANGLE = 3.0 * Math.PI / 2.0;
     public static final double MIN_ANGLE = -Math.PI / 2.0;
 
-    public static final JointConfig CONFIG =
+    public static final JointConfig CONFIG_OLD =
         new JointConfig(
+            FF_OLD,
+            PID_OLD,
             DCMotor.getNEO(3),
             MOTOR_GEARING,
             Dimensions.FOREARM_LENGTH,
-            Dimensions.FOREARM_MASS,
+            Dimensions.FOREARM_MASS + Dimensions.CLAW_MASS_OLD,
+            MIN_ANGLE,
+            MAX_ANGLE);
+
+    public static final JointConfig CONFIG_NEW =
+        new JointConfig(
+            FF_NEW,
+            PID_NEW,
+            DCMotor.getNEO(3),
+            MOTOR_GEARING,
+            Dimensions.FOREARM_LENGTH,
+            Dimensions.FOREARM_MASS + Dimensions.CLAW_MASS,
             MIN_ANGLE,
             MAX_ANGLE);
 
@@ -205,6 +223,8 @@ public final class Constants {
 
     public static final ElevatorConfig CONFIG =
         new ElevatorConfig(
+            FF,
+            PID,
             DCMotor.getNEO(3),
             MOTOR_GEARING,
             Dimensions.CARRIAGE_MASS + Dimensions.FOREARM_MASS + Dimensions.CLAW_MASS,

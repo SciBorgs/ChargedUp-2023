@@ -12,11 +12,8 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Encoder;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.BetterArmFeedforward;
-import org.sciborgs1155.lib.constants.ArmFFConstants;
-import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.Constants;
 
-/** Add your docs here. */
 public class RealElbow implements JointIO {
   private final CANSparkMax middleMotor;
   private final CANSparkMax leftMotor;
@@ -24,13 +21,16 @@ public class RealElbow implements JointIO {
 
   private final Encoder encoder;
 
-  private final PIDController pid;
   private final BetterArmFeedforward ff;
+  private final PIDController pid;
+
+  private final double minAngle;
+  private final double maxAngle;
 
   private State setpoint;
   private double voltage;
 
-  public RealElbow(PIDConstants pidConstants, ArmFFConstants ffConstants) {
+  public RealElbow(JointConfig config) {
     middleMotor = MOTOR_CFG.build(MotorType.kBrushless, MIDDLE_MOTOR);
     leftMotor = MOTOR_CFG.build(MotorType.kBrushless, LEFT_MOTOR);
     rightMotor = MOTOR_CFG.build(MotorType.kBrushless, RIGHT_MOTOR);
@@ -46,8 +46,11 @@ public class RealElbow implements JointIO {
     encoder.setDistancePerPulse(CONVERSION);
     encoder.setReverseDirection(true);
 
-    pid = pidConstants.createPIDController();
-    ff = ffConstants.createFeedforward();
+    minAngle = config.minAngle();
+    maxAngle = config.maxAngle();
+
+    ff = config.ff().createFeedforward();
+    pid = config.pid().createPIDController();
     pid.setTolerance(0.3);
 
     setpoint = new State(getRelativeAngle().getRadians(), 0);
@@ -82,6 +85,7 @@ public class RealElbow implements JointIO {
 
   @Override
   public void stopMoving() {
+    voltage = 0;
     middleMotor.stopMotor();
   }
 

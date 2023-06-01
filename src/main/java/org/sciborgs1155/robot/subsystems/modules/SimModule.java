@@ -20,9 +20,9 @@ public class SimModule implements ModuleIO {
   private final DCMotorSim turn = Turning.FF.sim(DCMotor.getNeo550(1), Turning.MOTOR_GEARING);
 
   private final PIDController driveFeedback =
-      new PIDController(Driving.PID.p(), Driving.PID.i(), Driving.PID.d());
+      new PIDController(Driving.PID.p() * 115, Driving.PID.i(), Driving.PID.d() * 115.0 / 1000);
   private final PIDController turnFeedback =
-      new PIDController(Turning.PID.p(), Turning.PID.i(), Turning.PID.d());
+      new PIDController(Turning.PID.p() * 2, Turning.PID.i(), Turning.PID.d() * 2.0 / 1000);
 
   private final SimpleMotorFeedforward driveFeedforward =
       new SimpleMotorFeedforward(Driving.FF.s(), Driving.FF.v(), Driving.FF.a());
@@ -53,9 +53,10 @@ public class SimModule implements ModuleIO {
         SwerveModuleState.optimize(
             desiredState, Rotation2d.fromRadians(turn.getAngularPositionRad()));
 
+    final double driveFF = driveFeedforward.calculate(setpoint.speedMetersPerSecond);
+
     final double driveFB =
         driveFeedback.calculate(drive.getAngularVelocityRadPerSec(), setpoint.speedMetersPerSecond);
-    final double driveFF = driveFeedforward.calculate(setpoint.speedMetersPerSecond);
 
     final double turnFB =
         turnFeedback.calculate(turn.getAngularPositionRad(), setpoint.angle.getRadians());

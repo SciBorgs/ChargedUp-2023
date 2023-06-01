@@ -63,19 +63,21 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Log private double speedMultiplier = 1;
 
-  public Drive() {
+  public static Drive create() {
+    return Robot.isReal()
+        ? new Drive(
+            new MAXSwerveModule(FRONT_LEFT_DRIVE, FRONT_LEFT_TURNING, ANGULAR_OFFSETS[0]),
+            new MAXSwerveModule(FRONT_RIGHT_DRIVE, FRONT_RIGHT_TURNING, ANGULAR_OFFSETS[1]),
+            new MAXSwerveModule(REAR_LEFT_DRIVE, REAR_LEFT_TURNING, ANGULAR_OFFSETS[2]),
+            new MAXSwerveModule(REAR_RIGHT_DRIVE, REAR_RIGHT_TURNING, ANGULAR_OFFSETS[3]))
+        : new Drive(new SimModule(), new SimModule(), new SimModule(), new SimModule());
+  }
 
-    if (Robot.isReal()) {
-      frontLeft = new MAXSwerveModule(FRONT_LEFT_DRIVE, FRONT_LEFT_TURNING, ANGULAR_OFFSETS[0]);
-      frontRight = new MAXSwerveModule(FRONT_RIGHT_DRIVE, FRONT_RIGHT_TURNING, ANGULAR_OFFSETS[1]);
-      rearLeft = new MAXSwerveModule(REAR_LEFT_DRIVE, REAR_LEFT_TURNING, ANGULAR_OFFSETS[2]);
-      rearRight = new MAXSwerveModule(REAR_RIGHT_DRIVE, REAR_RIGHT_TURNING, ANGULAR_OFFSETS[3]);
-    } else {
-      frontLeft = new SimModule();
-      frontRight = new SimModule();
-      rearLeft = new SimModule();
-      rearRight = new SimModule();
-    }
+  public Drive(ModuleIO frontLeft, ModuleIO frontRight, ModuleIO rearLeft, ModuleIO rearRight) {
+    this.frontLeft = frontLeft;
+    this.frontRight = frontRight;
+    this.rearLeft = rearLeft;
+    this.rearRight = rearRight;
 
     modules = List.of(frontLeft, frontRight, rearLeft, rearRight);
     modules2d = new FieldObject2d[modules.size()];

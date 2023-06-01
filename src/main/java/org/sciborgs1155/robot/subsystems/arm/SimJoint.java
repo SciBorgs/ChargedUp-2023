@@ -5,10 +5,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import org.sciborgs1155.lib.BetterArmFeedforward;
-import org.sciborgs1155.lib.constants.ArmFFConstants;
-import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.subsystems.Arm.JointConfig;
+import org.sciborgs1155.robot.subsystems.arm.JointIO.JointConfig;
 
 /** A simulated {@link JointIO} using {@link SingleJointedArmSim} */
 public class SimJoint implements JointIO {
@@ -23,11 +21,7 @@ public class SimJoint implements JointIO {
 
   private double voltage;
 
-  public SimJoint(PIDConstants pid, ArmFFConstants ff, JointConfig config) {
-    this(pid, ff, config, true);
-  }
-
-  public SimJoint(PIDConstants pid, ArmFFConstants ff, JointConfig config, boolean gravity) {
+  public SimJoint(JointConfig config, boolean gravity) {
     sim =
         new SingleJointedArmSim(
             config.gearbox(),
@@ -38,8 +32,8 @@ public class SimJoint implements JointIO {
             config.maxAngle(),
             gravity);
 
-    this.pid = pid.createPIDController();
-    this.ff = ff.createFeedforward();
+    ff = config.ff().createFeedforward();
+    pid = config.pid().createPIDController();
   }
 
   @Override
@@ -71,6 +65,7 @@ public class SimJoint implements JointIO {
 
   @Override
   public void stopMoving() {
+    voltage = 0;
     sim.setInputVoltage(0);
     sim.update(Constants.PERIOD);
   }

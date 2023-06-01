@@ -10,6 +10,9 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import org.sciborgs1155.lib.CommandRobot;
+import org.sciborgs1155.robot.Constants.Elbow;
+import org.sciborgs1155.robot.Constants.Elevator;
+import org.sciborgs1155.robot.Constants.Wrist;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Scoring;
 import org.sciborgs1155.robot.subsystems.Arm;
@@ -34,8 +37,18 @@ public class Robot extends CommandRobot implements Loggable {
   private final VisionIO vision = new NoVision();
 
   // SUBSYSTEMS
-  @Log private final Drive drive = new Drive();
-  @Log private final Arm arm = new Arm();
+  @Log private final Drive drive = Drive.create();
+
+  @Log
+  private final Arm arm =
+      switch (Constants.ROBOT_TYPE) {
+        case CHASSIS -> Arm.createNone();
+        case WHIPLASH_CLAW -> Arm.createFromConfig(
+            Elevator.CONFIG, Elbow.CONFIG_OLD, Wrist.CONFIG_OLD);
+        case WHIPLASH_ROLLER -> Arm.createFromConfig(
+            Elevator.CONFIG, Elbow.CONFIG_NEW, Wrist.CONFIG_NEW);
+      };
+
   @Log private final Intake intake = new Intake();
   @Log private final LED led = new LED();
 

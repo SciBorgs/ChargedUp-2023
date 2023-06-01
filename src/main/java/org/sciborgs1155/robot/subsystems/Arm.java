@@ -1,7 +1,6 @@
 package org.sciborgs1155.robot.subsystems;
 
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -18,12 +17,12 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.lib.Trajectory;
-import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Elbow;
 import org.sciborgs1155.robot.Constants.Elevator;
 import org.sciborgs1155.robot.Constants.Wrist;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.subsystems.arm.ArmState;
+import org.sciborgs1155.robot.subsystems.arm.ArmState.Side;
 import org.sciborgs1155.robot.subsystems.arm.ElevatorIO;
 import org.sciborgs1155.robot.subsystems.arm.JointIO;
 import org.sciborgs1155.robot.subsystems.arm.NoElevator;
@@ -40,57 +39,20 @@ import org.sciborgs1155.robot.subsystems.arm.Visualizer;
 
 public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
-  public static record JointConfig(
-      DCMotor gearbox,
-      double gearing,
-      double length,
-      double mass,
-      double minAngle,
-      double maxAngle) {}
+  public static Arm createNone() {
+    return new Arm(new NoElevator(), new NoJoint(), new NoJoint());
+  }
 
-  public static record ElevatorConfig(
-      DCMotor gearbox,
-      double gearing,
-      double mass,
-      double sprocketRadius,
-      double minHeight,
-      double maxHeight) {}
+  public static Arm createFromConfig(
+      ElevatorConfig elevator, JointConfig elbow, JointConfig wrist) {
+    return Robot.isReal()
+        ? new Arm(new RealElevator(elevator), new RealElbow(elbow), new RealWrist(wrist))
+        : new Arm(new SimElevator(elevator), new SimJoint(elbow, true), new SimJoint(wrist, false));
+  }
 
-  @Log
-  private final ElevatorIO elevator =
-      switch (Constants.ROBOT_TYPE) {
-        case CHASSIS -> new NoElevator();
-        case WHIPLASH_CLAW -> Robot.isReal()
-            ? new RealElevator(Elevator.PID, Elevator.FF)
-            : new SimElevator(Elevator.PID, Elevator.FF, Elevator.CONFIG);
-        case WHIPLASH_ROLLER -> Robot.isReal()
-            ? new RealElevator(Elevator.PID, Elevator.FF)
-            : new SimElevator(Elevator.PID, Elevator.FF, Elevator.CONFIG);
-      };
-
-  @Log
-  private final JointIO elbow =
-      switch (Constants.ROBOT_TYPE) {
-        case CHASSIS -> new NoJoint();
-        case WHIPLASH_CLAW -> Robot.isReal()
-            ? new RealElbow(Elbow.PID_OLD, Elbow.FF_OLD)
-            : new SimJoint(Elbow.PID_OLD, Elbow.FF_OLD, Elbow.CONFIG);
-        case WHIPLASH_ROLLER -> Robot.isReal()
-            ? new RealElbow(Elbow.PID_NEW, Elbow.FF_NEW)
-            : new SimJoint(Elbow.PID_NEW, Elbow.FF_NEW, Elbow.CONFIG);
-      };
-
-  @Log
-  private final JointIO wrist =
-      switch (Constants.ROBOT_TYPE) {
-        case CHASSIS -> new NoJoint();
-        case WHIPLASH_CLAW -> Robot.isReal()
-            ? new RealWrist(Wrist.PID_OLD, Wrist.FF_OLD)
-            : new SimJoint(Wrist.PID_OLD, Wrist.FF_OLD, Wrist.CONFIG_OLD, true);
-        case WHIPLASH_ROLLER -> Robot.isReal()
-            ? new RealWrist(Wrist.PID_NEW, Wrist.FF_NEW)
-            : new SimJoint(Wrist.PID_NEW, Wrist.FF_NEW, Wrist.CONFIG_NEW, true);
-      };
+  @Log private final ElevatorIO elevator;
+  @Log private final JointIO elbow;
+  @Log private final JointIO wrist;
 
   private final Map<Integer, ArmTrajectory> trajectories = TrajectoryCache.loadTrajectories();
 
@@ -98,6 +60,12 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
   @Log private final Visualizer setpointVisualizer = new Visualizer(new Color8Bit(0, 0, 255));
 
   @Log private boolean allowPassOver;
+
+  public Arm(ElevatorIO elevator, JointIO elbow, JointIO wrist) {
+    this.elevator = elevator;
+    this.elbow = elbow;
+    this.wrist = wrist;
+  }
 
   /** Returns the current position of the placement mechanisms */
   public ArmState getState() {
@@ -258,6 +226,7 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
 
   @Override
   public void periodic() {
+    wrist.setBaseAngle(elbow.getRelativeAngle());
     positionVisualizer.setState(getState());
     setpointVisualizer.setState(getSetpoint());
     allowPassOver = !wrist.isFailing();

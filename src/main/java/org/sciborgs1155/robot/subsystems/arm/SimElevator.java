@@ -4,8 +4,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import org.sciborgs1155.lib.BetterElevatorFeedforward;
-import org.sciborgs1155.lib.constants.ElevatorFFConstants;
-import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.Arm.ElevatorConfig;
 
@@ -19,7 +17,7 @@ public class SimElevator implements ElevatorIO {
   private State setpoint = new State();
   private double voltage;
 
-  public SimElevator(PIDConstants pid, ElevatorFFConstants ff, ElevatorConfig config) {
+  public SimElevator(ElevatorConfig config) {
     sim =
         new ElevatorSim(
             config.gearbox(),
@@ -29,8 +27,9 @@ public class SimElevator implements ElevatorIO {
             config.minHeight(),
             config.maxHeight(),
             true);
-    this.pid = pid.createPIDController();
-    this.ff = ff.createFeedforward();
+
+    ff = config.ff().createFeedforward();
+    pid = config.pid().createPIDController();
   }
 
   @Override
@@ -62,6 +61,7 @@ public class SimElevator implements ElevatorIO {
 
   @Override
   public void stopMoving() {
+    voltage = 0;
     sim.setInputVoltage(0);
     sim.update(Constants.PERIOD);
   }

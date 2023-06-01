@@ -10,9 +10,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Encoder;
 import org.sciborgs1155.lib.BetterElevatorFeedforward;
-import org.sciborgs1155.lib.constants.ElevatorFFConstants;
-import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.subsystems.Arm.ElevatorConfig;
 
 public class RealElevator implements ElevatorIO {
 
@@ -22,13 +21,16 @@ public class RealElevator implements ElevatorIO {
 
   private final Encoder encoder;
 
-  private final PIDController pid;
   private final BetterElevatorFeedforward ff;
+  private final PIDController pid;
+
+  private final double minHeight;
+  private final double maxHeight;
 
   private State setpoint;
   private double voltage;
 
-  public RealElevator(PIDConstants pidConstants, ElevatorFFConstants ffConstants) {
+  public RealElevator(ElevatorConfig config) {
     lead = MOTOR_CFG.build(MotorType.kBrushless, RIGHT_MOTOR);
     left = MOTOR_CFG.build(MotorType.kBrushless, LEFT_MOTOR);
     right = MOTOR_CFG.build(MotorType.kBrushless, MIDDLE_MOTOR);
@@ -44,8 +46,11 @@ public class RealElevator implements ElevatorIO {
     encoder.setDistancePerPulse(CONVERSION_RELATIVE);
     encoder.setReverseDirection(true);
 
-    pid = pidConstants.createPIDController();
-    ff = ffConstants.createFeedforward();
+    minHeight = config.minHeight();
+    maxHeight = config.maxHeight();
+
+    ff = config.ff().createFeedforward();
+    pid = config.pid().createPIDController();
 
     setpoint = new State(getHeight(), 0);
   }
@@ -77,6 +82,7 @@ public class RealElevator implements ElevatorIO {
 
   @Override
   public void stopMoving() {
+    voltage = 0;
     lead.stopMotor();
   }
 

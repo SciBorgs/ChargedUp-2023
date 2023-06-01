@@ -12,27 +12,27 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import org.sciborgs1155.lib.BetterArmFeedforward;
-import org.sciborgs1155.lib.constants.ArmFFConstants;
-import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.subsystems.arm.JointIO.JointConfig;
 
-/** Add your docs here. */
 public class RealWrist implements JointIO {
-  private final CANSparkMax motor = MOTOR_CFG.build(MotorType.kBrushless, MOTOR);
-  private final DutyCycleEncoder absolute = new DutyCycleEncoder(ABS_ENCODER);
-  private final Encoder relative = new Encoder(RELATIVE_ENCODER[0], RELATIVE_ENCODER[1]);
 
-  private final PIDController pid;
+  private final CANSparkMax motor;
+  private final DutyCycleEncoder absolute;
+  private final Encoder relative;
+
   private final BetterArmFeedforward ff;
+  private final PIDController pid;
 
   private Rotation2d elbowAngle = new Rotation2d();
 
   private State setpoint;
   private double voltage;
 
-  public RealWrist(PIDConstants pidConstants, ArmFFConstants ffConstants) {
-    pid = pidConstants.createPIDController();
-    ff = ffConstants.createFeedforward();
+  public RealWrist(JointConfig config) {
+    motor = MOTOR_CFG.build(MotorType.kBrushless, MOTOR);
+    absolute = new DutyCycleEncoder(ABS_ENCODER);
+    relative = new Encoder(RELATIVE_ENCODER[0], RELATIVE_ENCODER[1]);
 
     absolute.setPositionOffset(ZERO_OFFSET);
     absolute.setDistancePerRotation(CONVERSION_ABS);
@@ -41,10 +41,12 @@ public class RealWrist implements JointIO {
 
     motor.burnFlash();
 
+    ff = config.ff().createFeedforward();
+    pid = config.pid().createPIDController();
+
     pid.setTolerance(0.3);
 
     setpoint = new State(2, 0);
-    // setpoint = new State(absolute.getDistance(), 0);
   }
 
   @Override
@@ -80,6 +82,7 @@ public class RealWrist implements JointIO {
 
   @Override
   public void stopMoving() {
+    voltage = 0;
     motor.stopMotor();
   }
 
