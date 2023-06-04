@@ -79,32 +79,16 @@ public class ArmState implements Sendable {
     this.wristAngle = wristAngle;
   }
 
-  public void setElevatorHeight(double elevatorHeight) {
-    this.elevatorHeight = elevatorHeight;
-  }
-
   public double elevatorHeight() {
     return elevatorHeight;
-  }
-
-  public void setElbowAngle(double elbowAngleRads) {
-    this.elbowAngle = Rotation2d.fromRadians(elbowAngleRads);
   }
 
   public Rotation2d elbowAngle() {
     return elbowAngle;
   }
 
-  public void setWristAngle(double wristAngleRads) {
-    this.wristAngle = Rotation2d.fromRadians(wristAngleRads);
-  }
-
   public Rotation2d wristAngle() {
     return wristAngle;
-  }
-
-  public double getEndHeight() {
-    return getEndpoint().getY();
   }
 
   public void setEndpointHeight(double height) {
@@ -113,18 +97,10 @@ public class ArmState implements Sendable {
             new Pose2d(getEndpoint().getX(), height, getEndpoint().getRotation())));
   }
 
-  public double getEndReach() {
-    return getEndpoint().getX();
-  }
-
   public void setEndpointReach(double reach) {
     replaceIfPresent(
         ArmState.fromEndpoint(
             new Pose2d(reach, getEndpoint().getY(), getEndpoint().getRotation())));
-  }
-
-  public double getEndRads() {
-    return getEndpoint().getRotation().getRadians();
   }
 
   public void setEndpointRads(double rads) {
@@ -143,14 +119,16 @@ public class ArmState implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.addDoubleProperty("final height", this::getEndHeight, this::setEndpointHeight);
-    builder.addDoubleProperty("final reach", this::getEndReach, this::setEndpointReach);
-    builder.addDoubleProperty("final angle (rads)", this::getEndRads, this::setEndpointRads);
-    builder.addDoubleProperty("elevator height", this::elevatorHeight, this::setElevatorHeight);
+    builder.addDoubleProperty("final height", () -> getEndpoint().getY(), this::setEndpointHeight);
+    builder.addDoubleProperty("final reach", () -> getEndpoint().getX(), this::setEndpointReach);
     builder.addDoubleProperty(
-        "elbow angle (rads)", () -> elbowAngle().getRadians(), this::setElbowAngle);
-    builder.addDoubleProperty(
-        "wrist angle (rads)", () -> wristAngle().getRadians(), this::setWristAngle);
+        "final angle (rads)",
+        () -> getEndpoint().getRotation().getRadians(),
+        this::setEndpointRads);
+    // TODO delete body below this
+    builder.addDoubleProperty("elevator height", this::elevatorHeight, (r) -> {});
+    builder.addDoubleProperty("elbow angle (rads)", () -> elbowAngle().getRadians(), (r) -> {});
+    builder.addDoubleProperty("wrist angle (rads)", () -> wristAngle().getRadians(), (r) -> {});
   }
   ;
 
