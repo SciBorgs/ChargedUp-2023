@@ -10,7 +10,10 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Encoder;
+import java.util.List;
 import org.sciborgs1155.lib.BetterElevatorFeedforward;
+import org.sciborgs1155.lib.failure.FaultBuilder;
+import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
 
 public class RealElevator implements ElevatorIO {
@@ -89,13 +92,17 @@ public class RealElevator implements ElevatorIO {
   }
 
   @Override
-  public boolean isFailing() {
-    return false;
+  public double getVoltage() {
+    return lastVoltage;
   }
 
   @Override
-  public double getVoltage() {
-    return lastVoltage;
+  public List<HardwareFault> getFaults() {
+    var builder = new FaultBuilder();
+    builder.add("lead spark", lead);
+    builder.add("left spark", left);
+    builder.add("right spark", right);
+    return builder.faults();
   }
 
   @Override

@@ -7,12 +7,13 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import org.sciborgs1155.lib.constants.ArmFFConstants;
 import org.sciborgs1155.lib.constants.PIDConstants;
+import org.sciborgs1155.lib.failure.Fallible;
 
 /**
  * Represents a joint with closed loop control. Note that either {@link this#updateSetpoint(State)}
  * or {@link this#stopMoving()} must be called periodically.
  */
-public interface JointIO extends Sendable, AutoCloseable {
+public interface JointIO extends Sendable, Fallible, AutoCloseable {
 
   /** A record to store configuration values for a joint */
   public static record JointConfig(

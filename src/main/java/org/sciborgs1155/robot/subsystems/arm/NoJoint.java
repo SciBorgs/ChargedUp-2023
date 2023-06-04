@@ -2,6 +2,8 @@ package org.sciborgs1155.robot.subsystems.arm;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import java.util.List;
+import org.sciborgs1155.lib.failure.HardwareFault;
 
 public class NoJoint implements JointIO {
 
@@ -38,8 +40,8 @@ public class NoJoint implements JointIO {
   }
 
   @Override
-  public boolean isFailing() {
-    return false;
+  public List<HardwareFault> getFaults() {
+    return List.of();
   }
 
   @Override

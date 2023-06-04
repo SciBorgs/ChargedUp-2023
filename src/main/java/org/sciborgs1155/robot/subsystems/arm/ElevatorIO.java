@@ -6,12 +6,13 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import org.sciborgs1155.lib.constants.ElevatorFFConstants;
 import org.sciborgs1155.lib.constants.PIDConstants;
+import org.sciborgs1155.lib.failure.Fallible;
 
 /**
  * Represents an elevator with closed loop control. Note that either {@link
  * this#updateSetpoint(State)} or {@link this#stopMoving()} must be called periodically.
  */
-public interface ElevatorIO extends Sendable, AutoCloseable {
+public interface ElevatorIO extends Sendable, Fallible, AutoCloseable {
 
   /** A record to store configuration values for an elevator */
   public static record ElevatorConfig(
@@ -41,9 +42,6 @@ public interface ElevatorIO extends Sendable, AutoCloseable {
 
   /** Stops the elevator from moving by applying a voltage of 0. */
   public void stopMoving();
-
-  /** Returns if the elevator is inoperable. */
-  public boolean isFailing();
 
   /** Returns the last applied voltage. */
   public double getVoltage();

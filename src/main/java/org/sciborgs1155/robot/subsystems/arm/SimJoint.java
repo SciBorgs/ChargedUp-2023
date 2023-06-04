@@ -4,7 +4,9 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import java.util.List;
 import org.sciborgs1155.lib.BetterArmFeedforward;
+import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
 
 /** A simulated {@link JointIO} using {@link SingleJointedArmSim} */
@@ -84,13 +86,13 @@ public class SimJoint implements JointIO {
   }
 
   @Override
-  public boolean isFailing() {
-    return false;
+  public double getVoltage() {
+    return lastVoltage;
   }
 
   @Override
-  public double getVoltage() {
-    return lastVoltage;
+  public List<HardwareFault> getFaults() {
+    return List.of();
   }
 
   @Override

@@ -12,7 +12,10 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
+import java.util.List;
 import org.sciborgs1155.lib.BetterArmFeedforward;
+import org.sciborgs1155.lib.failure.FaultBuilder;
+import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
 
 public class RealWrist implements JointIO {
@@ -104,16 +107,16 @@ public class RealWrist implements JointIO {
   }
 
   @Override
-  public boolean isFailing() {
-    return absolute.isConnected();
-    // relative.getDistance() == 0
-    //     && relative.getVelocity() == 0
-    //     && relative.position() != 0;
+  public double getVoltage() {
+    return lastVoltage;
   }
 
   @Override
-  public double getVoltage() {
-    return lastVoltage;
+  public List<HardwareFault> getFaults() {
+    var builder = new FaultBuilder();
+    builder.add("spark", motor);
+    builder.add("abs encoder", absolute);
+    return builder.faults();
   }
 
   @Override

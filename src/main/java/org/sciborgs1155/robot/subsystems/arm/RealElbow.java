@@ -12,7 +12,10 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Encoder;
 import io.github.oblarg.oblog.annotations.Log;
+import java.util.List;
 import org.sciborgs1155.lib.BetterArmFeedforward;
+import org.sciborgs1155.lib.failure.FaultBuilder;
+import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
 
 public class RealElbow implements JointIO {
@@ -107,16 +110,23 @@ public class RealElbow implements JointIO {
   }
 
   @Override
-  public boolean isFailing() {
-    return encoder.getDistance() == 0 // no position reading
-        && encoder.getRate() == 0 // no velocity reading
-        && encoder.getDistance() != OFFSET // elbow is not going to 0
-        && middleMotor.getAppliedOutput() != 0; // elbow is trying to move
+  public double getVoltage() {
+    return lastVoltage;
   }
 
   @Override
-  public double getVoltage() {
-    return lastVoltage;
+  public List<HardwareFault> getFaults() {
+    var builder = new FaultBuilder();
+    builder.add("left spark", leftMotor);
+    builder.add("middle spark", middleMotor);
+    builder.add("right spark", rightMotor);
+    builder.add(
+        "cursed encoder",
+        encoder.getDistance() == 0 // no position reading
+            && encoder.getRate() == 0 // no velocity reading
+            && encoder.getDistance() != OFFSET // elbow is not going to 0
+            && middleMotor.getAppliedOutput() != 0); // elbow is trying to move;
+    return builder.faults();
   }
 
   @Override

@@ -1,6 +1,8 @@
 package org.sciborgs1155.robot.subsystems.arm;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import java.util.List;
+import org.sciborgs1155.lib.failure.HardwareFault;
 
 public class NoElevator implements ElevatorIO {
 
@@ -29,12 +31,12 @@ public class NoElevator implements ElevatorIO {
   public void stopMoving() {}
 
   @Override
-  public boolean isFailing() {
-    return false;
+  public double getVoltage() {
+    return 0;
   }
 
   @Override
-  public double getVoltage() {
-    return 0;
+  public List<HardwareFault> getFaults() {
+    return List.of();
   }
 }

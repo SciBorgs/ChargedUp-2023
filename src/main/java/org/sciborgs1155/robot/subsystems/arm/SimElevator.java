@@ -3,7 +3,9 @@ package org.sciborgs1155.robot.subsystems.arm;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import java.util.List;
 import org.sciborgs1155.lib.BetterElevatorFeedforward;
+import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
 
 public class SimElevator implements ElevatorIO {
@@ -66,13 +68,13 @@ public class SimElevator implements ElevatorIO {
   }
 
   @Override
-  public boolean isFailing() {
-    return false;
+  public double getVoltage() {
+    return lastVoltage;
   }
 
   @Override
-  public double getVoltage() {
-    return lastVoltage;
+  public List<HardwareFault> getFaults() {
+    return List.of();
   }
 
   @Override
