@@ -3,6 +3,10 @@ package org.sciborgs1155.robot.subsystems.arm;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import io.github.oblarg.oblog.annotations.Log;
+
 import java.util.Optional;
 import java.util.function.DoubleUnaryOperator;
 import org.sciborgs1155.robot.Constants;
@@ -12,7 +16,7 @@ import org.sciborgs1155.robot.Constants.Elevator;
 import org.sciborgs1155.robot.Constants.RobotType;
 
 /** ArmState class to store relative angles for the arm. */
-public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d wristAngle) {
+public class ArmState implements Sendable {
 
   public static final ArmState OLD_INITIAL =
       ArmState.fromRelative(Elevator.ZERO_OFFSET, Elbow.OFFSET, Math.PI);
@@ -22,9 +26,15 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
 
   public static final ArmState STOW = ArmState.fromRelative(0, 1.21834, Math.PI / 2.0);
 
+  @Log
+  public static final ArmState NEW_STOW = ArmState.fromRelative(0, 0, 0);
+
   // LOWEST COG
   public static final ArmState OLD_SAFE =
       ArmState.fromAbsolute(Elevator.ZERO_OFFSET, Elbow.OFFSET + 0.1, Math.PI / 2);
+
+  @Log
+  public static final ArmState NEW_SAFE = ArmState.fromAbsolute(Elevator.ZERO_OFFSET, Elbow.OFFSET + 0.1, Math.PI / 2);
 
   public static final ArmState PASS_TO_BACK = ArmState.fromAbsolute(0.03, Math.PI / 2.0, Math.PI);
   public static final ArmState PASS_TO_FRONT =
@@ -49,13 +59,86 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
   public static final ArmState OLD_FRONT_HIGH_CUBE =
       ArmState.fromAbsolute(0.113502, 0.333258, 0.353208);
 
+  @Log
+  public static final ArmState NEW_FRONT_MID_CUBE =
+      ArmState.fromAbsolute(0, 0, 0);
+  @Log
+  public static final ArmState NEW_FRONT_HIGH_CUBE = ArmState.fromAbsolute(0, 0, 0);
+
+
   public static final ArmState OLD_BACK_MID_CUBE = OLD_FRONT_MID_CUBE; // TODO
   public static final ArmState OLD_BACK_HIGH_CUBE = ArmState.fromAbsolute(0.245, 2.75, 3.17);
 
   public static final ArmState NEW_GROUND_CONE_INTAKE =
       ArmState.fromRelative(0.618, -0.714, -0.723);
 
-  public static final ArmState NEW_GROUND_CUBE_INTAKE = NEW_GROUND_CONE_INTAKE;
+  public static final ArmState NEW_GROUND_CUBE_INTAKE = ArmState.fromRelative(0, 0, 0);
+
+  private double elevatorHeight;
+  private Rotation2d elbowAngle;
+  private Rotation2d wristAngle;
+
+  public ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d wristAngle) {
+    this.elevatorHeight = elevatorHeight;
+    this.elbowAngle = elbowAngle;
+    this.wristAngle = wristAngle;
+  }
+
+  public void setElevatorHeight(double elevatorHeight) {
+    this.elevatorHeight = elevatorHeight;
+  }
+
+  public double getElevatorHeight() { return elevatorHeight; }
+
+  public void setElbowAngle(double elbowAngleRads) {
+    this.elbowAngle = Rotation2d.fromRadians(elbowAngleRads);
+  }
+
+  public Rotation2d getElbowAngle() { return elbowAngle; }
+
+  public void setWristAngle(double wristAngleRads) {
+    this.wristAngle = Rotation2d.fromRadians(wristAngleRads);
+  }
+
+  public Rotation2d getWristAngle() { return wristAngle; }
+
+  public double getEndHeight() { return getEndpoint().getY(); }
+
+  public void setEndpointHeight(double height) {
+    Optional<ArmState> newState = ArmState.fromEndpoint(new Pose2d(getEndpoint().getX(), height, getEndpoint().getRotation()));
+    replaceIfPresent(newState);
+  }
+
+  public double getEndReach() { return getEndpoint().getX(); }
+
+  public void setEndpointReach(double reach) {
+    Optional<ArmState> newState = ArmState.fromEndpoint(new Pose2d(reach, getEndpoint().getY(), getEndpoint().getRotation()));
+    replaceIfPresent(newState);
+  }
+
+  public double getEndRads() { return getEndpoint().getRotation().getRadians(); }
+
+  public void setEndpointRads(double rads) {
+    replaceIfPresent(ArmState.fromEndpoint(new Pose2d(getEndpoint().getX(), getEndpoint().getY(), Rotation2d.fromRadians(rads))));
+  }
+
+  private void replaceIfPresent(Optional<ArmState> newState) {
+    if (newState.isPresent()) {
+      this.elbowAngle = newState.get().getElbowAngle();
+      this.elevatorHeight = newState.get().getElevatorHeight();
+      this.wristAngle = newState.get().getWristAngle();
+    }
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.addDoubleProperty("final height", this::getEndHeight, this::setEndpointHeight);
+    builder.addDoubleProperty("final reach", this::getEndReach, this::setEndpointReach);
+    builder.addDoubleProperty("final angle (rads)", this::getEndRads, this::setEndpointRads);
+    builder.addDoubleProperty("elevator height", this::getElevatorHeight, this::setElevatorHeight);
+    builder.addDoubleProperty("elbow angle (rads)", () -> getElbowAngle().getRadians(), this::setElbowAngle);
+    builder.addDoubleProperty("wrist angle (rads)", () -> getWristAngle().getRadians(), this::setWristAngle);
+  };
 
   /** Represents the side of the robot the arm is on */
   public enum Side {
