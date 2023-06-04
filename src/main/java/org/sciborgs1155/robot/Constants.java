@@ -246,21 +246,21 @@ public final class Constants {
     public static final MotorConfig MOTOR_CFG =
         MotorConfig.base()
             .withNeutralBehavior(NeutralBehavior.BRAKE)
-            .withCurrentLimit(40)
+            .withCurrentLimit(45)
             .withInvert(true);
 
     public static final double DEFAULT_SPEED = 0.05;
 
-    public static final double CONE_SPEED = 0.6;
+    public static final double CONE_SPEED = 0.8;
     public static final double CUBE_SPEED = -0.4;
 
     public static final double THRESHOLD = 0.5;
   }
 
   public static final class Drive {
-    public static final double MAX_SPEED = 4.8; // m / s
-    public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
-    public static final double MAX_ACCEL = 8; // m / s^2
+    public static final double MAX_SPEED = 4.8 / 3.0; // m / s
+    public static final double MAX_ANGULAR_SPEED = Math.PI; // rad / s
+    public static final double MAX_ACCEL = 6.5; // m / s^2
 
     public static final double TRACK_WIDTH = 0.5715;
     // Distance between centers of right and left wheels on robot

@@ -124,7 +124,7 @@ public class RealElbow implements JointIO {
         "elbow encoder",
         encoder.getDistance() == 0 // no position reading
             && encoder.getRate() == 0 // no velocity reading
-            && encoder.getDistance() != OFFSET // elbow is not going to 0
+            && lastSetpoint.position != OFFSET // elbow is not going to 0
             && middleMotor.getAppliedOutput() != 0); // elbow is trying to move;
     return builder.faults();
   }

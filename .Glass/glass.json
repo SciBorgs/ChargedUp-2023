@@ -9,9 +9,6 @@
           "elbow feedback": {
             "open": true
           },
-          "elevator": {
-            "open": true
-          },
           "open": true,
           "wrist": {
             "open": true
@@ -110,6 +107,11 @@
     },
     "windows": {
       "/Shuffleboard/Arm/positionVisualizer": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Arm/setpointVisualizer": {
         "window": {
           "visible": true
         }
@@ -420,7 +422,7 @@
               "autoFit": true
             }
           ],
-          "height": 2,
+          "height": 202,
           "series": [
             {
               "color": [
@@ -448,7 +450,7 @@
               "autoFit": true
             }
           ],
-          "height": 2,
+          "height": 202,
           "series": [
             {
               "color": [

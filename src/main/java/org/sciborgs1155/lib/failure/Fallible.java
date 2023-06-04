@@ -11,6 +11,7 @@ public interface Fallible {
   public default boolean isFailing() {
     for (HardwareFault fault : getFaults()) {
       if (!fault.isWarning()) {
+        System.out.println("fault: " + fault.description());
         return true;
       }
     }
@@ -22,6 +23,6 @@ public interface Fallible {
   }
 
   public default void onFailing(Command command) {
-    getTrigger().onTrue(command);
+    getTrigger().debounce(0.5).onTrue(command);
   }
 }
