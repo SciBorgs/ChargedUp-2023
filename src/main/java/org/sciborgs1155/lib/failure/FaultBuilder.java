@@ -1,8 +1,6 @@
 package org.sciborgs1155.lib.failure;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.FaultID;
-import com.revrobotics.REVLibError;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,15 +27,15 @@ public class FaultBuilder {
   }
 
   public void add(String label, CANSparkMax sparkMax) {
-    REVLibError err = sparkMax.getLastError();
-    if (err != REVLibError.kOk) {
-      faults.add(new HardwareFault(String.format("[%s]: Error: %s", label, err.name())));
-    }
-    for (FaultID id : FaultID.values()) {
-      if (sparkMax.getFault(id)) {
-        faults.add(new HardwareFault(String.format("[%s]: Fault: %s", label, id.name()), true));
-      }
-    }
+    // REVLibError err = sparkMax.getLastError();
+    // if (err != REVLibError.kOk) {
+    //   faults.add(new HardwareFault(String.format("[%s]: Error: %s", label, err.name())));
+    // }
+    // for (FaultID id : FaultID.values()) {
+    //   if (sparkMax.getFault(id)) {
+    //     faults.add(new HardwareFault(String.format("[%s]: Fault: %s", label, id.name()), true));
+    //   }
+    // }
   }
 
   public void add(String label, DutyCycleEncoder encoder) {

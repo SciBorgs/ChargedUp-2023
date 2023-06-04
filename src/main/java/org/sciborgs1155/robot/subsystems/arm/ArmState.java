@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import io.github.oblarg.oblog.annotations.Log;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Optional;
 import java.util.function.DoubleUnaryOperator;
 import org.sciborgs1155.robot.Constants;
@@ -25,13 +25,12 @@ public class ArmState implements Sendable {
 
   public static final ArmState STOW = ArmState.fromRelative(0, 1.21834, Math.PI / 2.0);
 
-  @Log public static final ArmState NEW_STOW = ArmState.fromRelative(0, 0, 0);
+  public static final ArmState NEW_STOW = ArmState.fromRelative(0, 0, 0);
 
   // LOWEST COG
   public static final ArmState OLD_SAFE =
       ArmState.fromAbsolute(Elevator.ZERO_OFFSET, Elbow.OFFSET + 0.1, Math.PI / 2);
 
-  @Log
   public static final ArmState NEW_SAFE =
       ArmState.fromAbsolute(Elevator.ZERO_OFFSET, Elbow.OFFSET + 0.1, Math.PI / 2);
 
@@ -58,8 +57,8 @@ public class ArmState implements Sendable {
   public static final ArmState OLD_FRONT_HIGH_CUBE =
       ArmState.fromAbsolute(0.113502, 0.333258, 0.353208);
 
-  @Log public static final ArmState NEW_FRONT_MID_CUBE = ArmState.fromAbsolute(0, 0, 0);
-  @Log public static final ArmState NEW_FRONT_HIGH_CUBE = ArmState.fromAbsolute(0, 0, 0);
+  public static final ArmState NEW_FRONT_MID_CUBE = ArmState.fromAbsolute(0, 0, 0);
+  public static final ArmState NEW_FRONT_HIGH_CUBE = ArmState.fromAbsolute(0, 0, 0);
 
   public static final ArmState OLD_BACK_MID_CUBE = OLD_FRONT_MID_CUBE; // TODO
   public static final ArmState OLD_BACK_HIGH_CUBE = ArmState.fromAbsolute(0.245, 2.75, 3.17);
@@ -77,6 +76,7 @@ public class ArmState implements Sendable {
     this.elevatorHeight = elevatorHeight;
     this.elbowAngle = elbowAngle;
     this.wristAngle = wristAngle;
+    SmartDashboard.putData(this);
   }
 
   public double elevatorHeight() {

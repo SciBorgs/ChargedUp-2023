@@ -102,6 +102,12 @@ public class RealElevator implements ElevatorIO {
     builder.add("elevator lead spark", lead);
     builder.add("elevator left spark", left);
     builder.add("elevator right spark", right);
+    builder.add(
+        "elbow encoder",
+        encoder.getDistance() == 0 // no position reading
+            && encoder.getRate() == 0 // no velocity reading
+            && lastSetpoint.position != ZERO_OFFSET // elbow is not going to 0
+            && lead.getAppliedOutput() != 0); // elbow is trying to move;
     return builder.faults();
   }
 

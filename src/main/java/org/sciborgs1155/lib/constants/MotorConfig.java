@@ -56,7 +56,8 @@ public record MotorConfig(
    */
   public CANSparkMax build(MotorType motorType, int id) {
     var motor = new CANSparkMax(id, motorType);
-    motor.restoreFactoryDefaults();
+    // motor.restoreFactoryDefaults();
+    // Timer.delay(0.05); TODO
     motor.setInverted(inverted);
     motor.setIdleMode(neutralBehavior.getREV());
     motor.setOpenLoopRampRate(openLoopRampRate);

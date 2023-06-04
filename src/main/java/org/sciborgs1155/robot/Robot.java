@@ -116,6 +116,8 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
 
     driver.rightBumper().onTrue(drive.setSpeedMultiplier(0.3)).onFalse(drive.setSpeedMultiplier(1));
 
+    // babies are meant to be droped - siggy 2023
+
     // STATE SWITCHING
     operator.b().onTrue(scoring.setSide(Side.FRONT));
     operator.x().onTrue(scoring.setSide(Side.BACK));
@@ -139,9 +141,11 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
     operator.rightBumper().whileTrue(intake.outtake(scoring.gamePiece()));
 
     // FAILURE MODES
+    // arm.onFailing(Commands.either(arm.kill(), Commands.none(), () -> Timer.getFPGATimestamp() >
+    // 1));
     arm.onFailing(arm.kill());
-    intake.onFailing(Commands.print("intake broken"));
-    drive.onFailing(Commands.print("drive broken"));
+    intake.onFailing(Commands.print("intake faults" + intake.getFaults().toString()));
+    drive.onFailing(Commands.print("drive faults" + drive.getFaults().toString()));
   }
 
   @Override

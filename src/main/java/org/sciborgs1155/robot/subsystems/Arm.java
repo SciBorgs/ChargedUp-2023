@@ -72,6 +72,7 @@ public class Arm extends SubsystemBase implements Fallible, Loggable, AutoClosea
   }
 
   /** Returns the current position of the placement mechanisms */
+  @Log(name = "current state")
   public ArmState getState() {
     return new ArmState(elevator.getHeight(), elbow.getRelativeAngle(), wrist.getRelativeAngle());
   }
