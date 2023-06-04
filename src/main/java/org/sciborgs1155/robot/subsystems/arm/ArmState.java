@@ -126,9 +126,9 @@ public class ArmState implements Sendable {
         () -> getEndpoint().getRotation().getRadians(),
         this::setEndpointRads);
     // TODO delete body below this
-    builder.addDoubleProperty("elevator height", this::elevatorHeight, (r) -> {});
-    builder.addDoubleProperty("elbow angle (rads)", () -> elbowAngle().getRadians(), (r) -> {});
-    builder.addDoubleProperty("wrist angle (rads)", () -> wristAngle().getRadians(), (r) -> {});
+    builder.addDoubleProperty("elevator height", this::elevatorHeight, null);
+    builder.addDoubleProperty("elbow angle (rads)", () -> elbowAngle().getRadians(), null);
+    builder.addDoubleProperty("wrist angle (rads)", () -> wristAngle().getRadians(), null);
   }
   ;
 
