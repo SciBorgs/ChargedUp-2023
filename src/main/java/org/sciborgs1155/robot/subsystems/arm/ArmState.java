@@ -83,7 +83,7 @@ public class ArmState implements Sendable {
     this.elevatorHeight = elevatorHeight;
   }
 
-  public double getElevatorHeight() {
+  public double elevatorHeight() {
     return elevatorHeight;
   }
 
@@ -91,7 +91,7 @@ public class ArmState implements Sendable {
     this.elbowAngle = Rotation2d.fromRadians(elbowAngleRads);
   }
 
-  public Rotation2d getElbowAngle() {
+  public Rotation2d elbowAngle() {
     return elbowAngle;
   }
 
@@ -99,7 +99,7 @@ public class ArmState implements Sendable {
     this.wristAngle = Rotation2d.fromRadians(wristAngleRads);
   }
 
-  public Rotation2d getWristAngle() {
+  public Rotation2d wristAngle() {
     return wristAngle;
   }
 
@@ -135,9 +135,9 @@ public class ArmState implements Sendable {
 
   private void replaceIfPresent(Optional<ArmState> newState) {
     if (newState.isPresent()) {
-      this.elbowAngle = newState.get().getElbowAngle();
-      this.elevatorHeight = newState.get().getElevatorHeight();
-      this.wristAngle = newState.get().getWristAngle();
+      this.elbowAngle = newState.get().elbowAngle();
+      this.elevatorHeight = newState.get().elevatorHeight();
+      this.wristAngle = newState.get().wristAngle();
     }
   }
 
@@ -146,11 +146,11 @@ public class ArmState implements Sendable {
     builder.addDoubleProperty("final height", this::getEndHeight, this::setEndpointHeight);
     builder.addDoubleProperty("final reach", this::getEndReach, this::setEndpointReach);
     builder.addDoubleProperty("final angle (rads)", this::getEndRads, this::setEndpointRads);
-    builder.addDoubleProperty("elevator height", this::getElevatorHeight, this::setElevatorHeight);
+    builder.addDoubleProperty("elevator height", this::elevatorHeight, this::setElevatorHeight);
     builder.addDoubleProperty(
-        "elbow angle (rads)", () -> getElbowAngle().getRadians(), this::setElbowAngle);
+        "elbow angle (rads)", () -> elbowAngle().getRadians(), this::setElbowAngle);
     builder.addDoubleProperty(
-        "wrist angle (rads)", () -> getWristAngle().getRadians(), this::setWristAngle);
+        "wrist angle (rads)", () -> wristAngle().getRadians(), this::setWristAngle);
   }
   ;
 
