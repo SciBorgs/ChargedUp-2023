@@ -4,11 +4,11 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.FaultID;
 import com.revrobotics.REVLibError;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class FaultBuilder {
-  private final List<HardwareFault> faults = new ArrayList<>();
+  private final List<HardwareFault> faults = new LinkedList<>();
 
   public List<HardwareFault> faults() {
     return faults;

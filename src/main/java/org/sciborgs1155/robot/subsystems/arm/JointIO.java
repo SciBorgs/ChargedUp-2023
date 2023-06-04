@@ -59,9 +59,6 @@ public interface JointIO extends Sendable, Fallible, AutoCloseable {
    */
   public Rotation2d getBaseAngle();
 
-  /** Returns if the joint is inoperable. */
-  public boolean isFailing();
-
   /** Returns the last applied voltage. */
   public double getVoltage();
 

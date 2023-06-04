@@ -128,8 +128,7 @@
         "Arm": {
           "elevator": {
             "open": true
-          },
-          "open": true
+          }
         },
         "Elevator": {
           "open": true,
@@ -138,6 +137,7 @@
           }
         },
         "Robot": {
+          "open": true,
           "scoring": {
             "open": true
           }
@@ -153,6 +153,12 @@
           "scoring": {
             "open": true
           }
+        },
+        "open": true
+      },
+      "SmartDashboard": {
+        "faults": {
+          "open": true
         },
         "open": true
       }

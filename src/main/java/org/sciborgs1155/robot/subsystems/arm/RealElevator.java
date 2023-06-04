@@ -99,9 +99,9 @@ public class RealElevator implements ElevatorIO {
   @Override
   public List<HardwareFault> getFaults() {
     var builder = new FaultBuilder();
-    builder.add("lead spark", lead);
-    builder.add("left spark", left);
-    builder.add("right spark", right);
+    builder.add("elevator lead spark", lead);
+    builder.add("elevator left spark", left);
+    builder.add("elevator right spark", right);
     return builder.faults();
   }
 

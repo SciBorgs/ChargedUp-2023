@@ -13,7 +13,10 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import java.util.List;
 import org.sciborgs1155.lib.constants.PIDConstants;
+import org.sciborgs1155.lib.failure.FaultBuilder;
+import org.sciborgs1155.lib.failure.HardwareFault;
 
 /** Class to encapsulate a rev max swerve module */
 public class MAXSwerveModule implements ModuleIO {
@@ -30,6 +33,7 @@ public class MAXSwerveModule implements ModuleIO {
   private final SimpleMotorFeedforward driveFeedforward =
       new SimpleMotorFeedforward(Driving.FF.s(), Driving.FF.v(), Driving.FF.a());
 
+  private final String name;
   private final Rotation2d angularOffset;
 
   private SwerveModuleState setpoint = new SwerveModuleState();
@@ -41,7 +45,9 @@ public class MAXSwerveModule implements ModuleIO {
    * @param turnPort turning motor port
    * @param angularOffset offset from drivetrain
    */
-  public MAXSwerveModule(int drivePort, int turnPort, double angularOffset) {
+  public MAXSwerveModule(String name, int drivePort, int turnPort, double angularOffset) {
+    this.name = name;
+
     driveMotor = Driving.MOTOR_CFG.build(MotorType.kBrushless, drivePort);
     turnMotor = Turning.MOTOR_CFG.build(MotorType.kBrushless, turnPort);
 
@@ -132,6 +138,14 @@ public class MAXSwerveModule implements ModuleIO {
     driveFeedback.setP(constants.p());
     driveFeedback.setI(constants.i());
     driveFeedback.setD(constants.d());
+  }
+
+  @Override
+  public List<HardwareFault> getFaults() {
+    var builder = new FaultBuilder();
+    builder.add(name + " drive", driveMotor);
+    builder.add(name + " turn", turnMotor);
+    return builder.faults();
   }
 
   @Override

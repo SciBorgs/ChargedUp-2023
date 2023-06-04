@@ -5,9 +5,10 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import org.sciborgs1155.lib.constants.PIDConstants;
+import org.sciborgs1155.lib.failure.Fallible;
 
 /** Generalized SwerveModule with closed loop control */
-public interface ModuleIO extends Sendable, AutoCloseable {
+public interface ModuleIO extends Fallible, Sendable, AutoCloseable {
   /** Returns the current state of the module. */
   public SwerveModuleState getState();
 

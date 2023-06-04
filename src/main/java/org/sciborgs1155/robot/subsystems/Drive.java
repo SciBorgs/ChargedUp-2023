@@ -31,13 +31,16 @@ import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import org.photonvision.EstimatedRobotPose;
+import org.sciborgs1155.lib.failure.Fallible;
+import org.sciborgs1155.lib.failure.FaultBuilder;
+import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.subsystems.modules.MAXSwerveModule;
 import org.sciborgs1155.robot.subsystems.modules.ModuleIO;
 import org.sciborgs1155.robot.subsystems.modules.SimModule;
 
-public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
+public class Drive extends SubsystemBase implements Fallible, Loggable, AutoCloseable {
 
   @Log private final ModuleIO frontLeft;
   @Log private final ModuleIO frontRight;
@@ -66,10 +69,14 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
   public static Drive create() {
     return Robot.isReal()
         ? new Drive(
-            new MAXSwerveModule(FRONT_LEFT_DRIVE, FRONT_LEFT_TURNING, ANGULAR_OFFSETS[0]),
-            new MAXSwerveModule(FRONT_RIGHT_DRIVE, FRONT_RIGHT_TURNING, ANGULAR_OFFSETS[1]),
-            new MAXSwerveModule(REAR_LEFT_DRIVE, REAR_LEFT_TURNING, ANGULAR_OFFSETS[2]),
-            new MAXSwerveModule(REAR_RIGHT_DRIVE, REAR_RIGHT_TURNING, ANGULAR_OFFSETS[3]))
+            new MAXSwerveModule(
+                MODULE_NAMES[0], FRONT_LEFT_DRIVE, FRONT_LEFT_TURNING, ANGULAR_OFFSETS[0]),
+            new MAXSwerveModule(
+                MODULE_NAMES[1], FRONT_RIGHT_DRIVE, FRONT_RIGHT_TURNING, ANGULAR_OFFSETS[1]),
+            new MAXSwerveModule(
+                MODULE_NAMES[2], REAR_LEFT_DRIVE, REAR_LEFT_TURNING, ANGULAR_OFFSETS[2]),
+            new MAXSwerveModule(
+                MODULE_NAMES[3], REAR_RIGHT_DRIVE, REAR_RIGHT_TURNING, ANGULAR_OFFSETS[3]))
         : new Drive(new SimModule(), new SimModule(), new SimModule(), new SimModule());
   }
 
@@ -302,6 +309,15 @@ public class Drive extends SubsystemBase implements Loggable, AutoCloseable {
   /** Creates and follows trajectory for swerve from current pose to desiredPose */
   public Command driveToPose(Pose2d desiredPose, boolean useAllianceColor) {
     return driveToPose(getPose(), desiredPose, useAllianceColor);
+  }
+
+  @Override
+  public List<HardwareFault> getFaults() {
+    var builder = new FaultBuilder();
+    for (var module : modules) {
+      builder.add(module.getFaults());
+    }
+    return builder.faults();
   }
 
   public void close() throws Exception {

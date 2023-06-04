@@ -114,8 +114,8 @@ public class RealWrist implements JointIO {
   @Override
   public List<HardwareFault> getFaults() {
     var builder = new FaultBuilder();
-    builder.add("spark", motor);
-    builder.add("abs encoder", absolute);
+    builder.add("wrist spark", motor);
+    builder.add("wrist encoder", absolute);
     return builder.faults();
   }
 

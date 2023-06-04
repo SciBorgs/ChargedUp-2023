@@ -117,11 +117,11 @@ public class RealElbow implements JointIO {
   @Override
   public List<HardwareFault> getFaults() {
     var builder = new FaultBuilder();
-    builder.add("left spark", leftMotor);
-    builder.add("middle spark", middleMotor);
-    builder.add("right spark", rightMotor);
+    builder.add("elbow left spark", leftMotor);
+    builder.add("elbow middle spark", middleMotor);
+    builder.add("elbow right spark", rightMotor);
     builder.add(
-        "cursed encoder",
+        "elbow encoder",
         encoder.getDistance() == 0 // no position reading
             && encoder.getRate() == 0 // no velocity reading
             && encoder.getDistance() != OFFSET // elbow is not going to 0

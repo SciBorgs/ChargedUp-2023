@@ -1,6 +1,5 @@
 package org.sciborgs1155.robot.subsystems;
 
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -9,14 +8,17 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.lib.Trajectory;
+import org.sciborgs1155.lib.failure.Fallible;
+import org.sciborgs1155.lib.failure.FaultBuilder;
+import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants.Elbow;
 import org.sciborgs1155.robot.Constants.Elevator;
 import org.sciborgs1155.robot.Constants.Wrist;
@@ -39,7 +41,7 @@ import org.sciborgs1155.robot.subsystems.arm.TrajectoryCache.ArmTrajectory;
 import org.sciborgs1155.robot.subsystems.arm.TrajectoryCache.Parameters;
 import org.sciborgs1155.robot.subsystems.arm.Visualizer;
 
-public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
+public class Arm extends SubsystemBase implements Fallible, Loggable, AutoCloseable {
 
   public static Arm createNone() {
     return new Arm(new NoElevator(), new NoJoint(), new NoJoint());
@@ -80,21 +82,6 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
         elevator.getDesiredState().position,
         elbow.getDesiredState().position,
         wrist.getDesiredState().position);
-  }
-
-  /**
-   * @see RealElbow#isFailing()
-   */
-  public Trigger elbowFailing() {
-    return new Trigger(elbow::isFailing).debounce(Elbow.FAILING_DEBOUNCE_TIME, DebounceType.kBoth);
-  }
-
-  /**
-   * @see RealElevator#isFailing()
-   */
-  public Trigger elevatorFailing() {
-    return new Trigger(elevator::isFailing)
-        .debounce(Elevator.FAILING_DEBOUNCE_TIME, DebounceType.kBoth);
   }
 
   /**
@@ -224,6 +211,15 @@ public class Arm extends SubsystemBase implements Loggable, AutoCloseable {
         .alongWith(Commands.print("arm is fucked"))
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         .withName("killed");
+  }
+
+  @Override
+  public List<HardwareFault> getFaults() {
+    var builder = new FaultBuilder();
+    builder.add(elevator.getFaults());
+    builder.add(elbow.getFaults());
+    builder.add(wrist.getFaults());
+    return builder.faults();
   }
 
   @Override

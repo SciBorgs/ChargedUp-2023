@@ -11,9 +11,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
+import java.util.List;
+import org.sciborgs1155.lib.failure.Fallible;
+import org.sciborgs1155.lib.failure.FaultBuilder;
+import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.subsystems.arm.ArmState.GamePiece;
 
-public class Intake extends SubsystemBase implements Loggable, AutoCloseable {
+public class Intake extends SubsystemBase implements Fallible, Loggable, AutoCloseable {
 
   @Log(name = "applied output", methodName = "getAppliedOutput")
   @Log(name = "current", methodName = "getOutputCurrent")
@@ -44,6 +48,13 @@ public class Intake extends SubsystemBase implements Loggable, AutoCloseable {
 
   public boolean isHoldingItem() {
     return wheels.getOutputCurrent() > THRESHOLD;
+  }
+
+  @Override
+  public List<HardwareFault> getFaults() {
+    var builder = new FaultBuilder();
+    builder.add("intake spark", wheels);
+    return builder.faults();
   }
 
   @Override

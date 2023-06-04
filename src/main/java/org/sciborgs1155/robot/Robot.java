@@ -1,15 +1,18 @@
 package org.sciborgs1155.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
+import java.util.List;
 import org.sciborgs1155.lib.CommandRobot;
+import org.sciborgs1155.lib.failure.Fallible;
+import org.sciborgs1155.lib.failure.FaultBuilder;
+import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants.Elbow;
 import org.sciborgs1155.robot.Constants.Elevator;
 import org.sciborgs1155.robot.Constants.Wrist;
@@ -32,7 +35,7 @@ import org.sciborgs1155.robot.vision.VisionIO;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-public class Robot extends CommandRobot implements Loggable {
+public class Robot extends CommandRobot implements Fallible, Loggable {
 
   private final VisionIO vision = new NoVision();
 
@@ -80,8 +83,9 @@ public class Robot extends CommandRobot implements Loggable {
     DataLogManager.start();
 
     addPeriodic(Logger::updateEntries, Constants.PERIOD);
-
     addPeriodic(() -> drive.updateEstimates(vision.getPoseEstimates(drive.getPose())), 0.5);
+    // addPeriodic(() -> getFaults().forEach(fault -> SmartDashboard.putData("faults/", fault)),
+    // Constants.PERIOD);
 
     autonomous().onTrue(getAutonomousCommand());
 
@@ -135,8 +139,18 @@ public class Robot extends CommandRobot implements Loggable {
     operator.rightBumper().whileTrue(intake.outtake(scoring.gamePiece()));
 
     // FAILURE MODES
-    arm.elbowFailing().onTrue(arm.kill());
-    arm.elevatorFailing().onTrue(arm.kill());
+    arm.onFailing(arm.kill());
+    intake.onFailing(Commands.print("intake broken"));
+    drive.onFailing(Commands.print("drive broken"));
+  }
+
+  @Override
+  public List<HardwareFault> getFaults() {
+    var builder = new FaultBuilder();
+    builder.add(drive.getFaults());
+    builder.add(arm.getFaults());
+    builder.add(intake.getFaults());
+    return builder.faults();
   }
 
   /** The command to run when the robot is enabled */
@@ -146,9 +160,9 @@ public class Robot extends CommandRobot implements Loggable {
 
   /** The commamnd to be ran in autonomous */
   public Command getAutonomousCommand() {
-    // return new DeferredCommand(autos::get, drive, arm)
+    // return new DeferredCommand(Auto::get, drive, arm)
     //     .until(() -> !DriverStation.isAutonomous())
     //     .withName("auto");
-    return arm.goTo(ArmState.fromEndpoint(new Pose2d(0.5, 0.25, Rotation2d.fromDegrees(15))).get());
+    return Commands.none();
   }
 }
