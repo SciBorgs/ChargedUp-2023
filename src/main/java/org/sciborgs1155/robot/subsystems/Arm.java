@@ -216,11 +216,11 @@ public class Arm extends SubsystemBase implements Fallible, Loggable, AutoClosea
 
   @Override
   public List<HardwareFault> getFaults() {
-    var builder = new FaultBuilder();
-    builder.add(elevator.getFaults());
-    builder.add(elbow.getFaults());
-    builder.add(wrist.getFaults());
-    return builder.faults();
+    return FaultBuilder.create()
+        .register(elevator.getFaults())
+        .register(elbow.getFaults())
+        .register(wrist.getFaults())
+        .build();
   }
 
   @Override

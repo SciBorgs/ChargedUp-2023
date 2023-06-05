@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import java.util.List;
+import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
@@ -74,6 +75,9 @@ public class MAXSwerveModule implements ModuleIO {
     turnFeedback.setPositionPIDWrappingEnabled(true);
     turnFeedback.setPositionPIDWrappingMinInput(0);
     turnFeedback.setPositionPIDWrappingMaxInput(Turning.CONVERSION);
+
+    MotorConfig.disableFrames(driveMotor, 4, 5, 6);
+    MotorConfig.disableFrames(turnMotor, 4, 6);
 
     driveMotor.burnFlash();
     turnMotor.burnFlash();
@@ -142,10 +146,10 @@ public class MAXSwerveModule implements ModuleIO {
 
   @Override
   public List<HardwareFault> getFaults() {
-    var builder = new FaultBuilder();
-    builder.add(name + " drive", driveMotor);
-    builder.add(name + " turn", turnMotor);
-    return builder.faults();
+    return FaultBuilder.create()
+        .register(name + " drive", driveMotor)
+        .register(name + " turn", turnMotor)
+        .build();
   }
 
   @Override

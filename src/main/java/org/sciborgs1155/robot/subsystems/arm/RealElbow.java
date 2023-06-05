@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import org.sciborgs1155.lib.BetterArmFeedforward;
+import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
@@ -38,6 +39,10 @@ public class RealElbow implements JointIO {
     middleMotor = MOTOR_CFG.build(MotorType.kBrushless, MIDDLE_MOTOR);
     leftMotor = MOTOR_CFG.build(MotorType.kBrushless, LEFT_MOTOR);
     rightMotor = MOTOR_CFG.build(MotorType.kBrushless, RIGHT_MOTOR);
+
+    MotorConfig.disableFrames(middleMotor, 4, 5, 6);
+    MotorConfig.disableFrames(leftMotor, 1, 2, 3, 4, 5, 6);
+    MotorConfig.disableFrames(rightMotor, 1, 2, 3, 4, 5, 6);
 
     leftMotor.follow(middleMotor);
     rightMotor.follow(middleMotor);
@@ -116,17 +121,17 @@ public class RealElbow implements JointIO {
 
   @Override
   public List<HardwareFault> getFaults() {
-    var builder = new FaultBuilder();
-    builder.add("elbow left spark", leftMotor);
-    builder.add("elbow middle spark", middleMotor);
-    builder.add("elbow right spark", rightMotor);
-    builder.add(
-        "elbow encoder",
-        encoder.getDistance() == 0 // no position reading
-            && encoder.getRate() == 0 // no velocity reading
-            && lastSetpoint.position != OFFSET // elbow is not going to 0
-            && middleMotor.getAppliedOutput() != 0); // elbow is trying to move;
-    return builder.faults();
+    return FaultBuilder.create()
+        .register("elbow left spark", leftMotor)
+        .register("elbow middle spark", middleMotor)
+        .register("elbow right spark", rightMotor)
+        .register(
+            "elbow encoder",
+            encoder.getDistance() == 0 // no position reading
+                && encoder.getRate() == 0 // no velocity reading
+                && lastSetpoint.position != OFFSET // elbow is not going to 0
+                && middleMotor.getAppliedOutput() != 0) // elbow is trying to move;
+        .build();
   }
 
   @Override

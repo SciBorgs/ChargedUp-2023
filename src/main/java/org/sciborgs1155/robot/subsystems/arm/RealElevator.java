@@ -12,6 +12,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Encoder;
 import java.util.List;
 import org.sciborgs1155.lib.BetterElevatorFeedforward;
+import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
@@ -40,6 +41,10 @@ public class RealElevator implements ElevatorIO {
 
     left.follow(lead);
     right.follow(lead);
+
+    MotorConfig.disableFrames(lead, 4, 5, 6);
+    MotorConfig.disableFrames(left, 1, 2, 3, 4, 5, 6);
+    MotorConfig.disableFrames(right, 1, 2, 3, 4, 5, 6);
 
     lead.burnFlash();
     left.burnFlash();
@@ -98,17 +103,17 @@ public class RealElevator implements ElevatorIO {
 
   @Override
   public List<HardwareFault> getFaults() {
-    var builder = new FaultBuilder();
-    builder.add("elevator lead spark", lead);
-    builder.add("elevator left spark", left);
-    builder.add("elevator right spark", right);
-    builder.add(
-        "elbow encoder",
-        encoder.getDistance() == 0 // no position reading
-            && encoder.getRate() == 0 // no velocity reading
-            && lastSetpoint.position != ZERO_OFFSET // elbow is not going to 0
-            && lead.getAppliedOutput() != 0); // elbow is trying to move;
-    return builder.faults();
+    return FaultBuilder.create()
+        .register("elevator lead spark", lead)
+        .register("elevator left spark", left)
+        .register("elevator right spark", right)
+        .register(
+            "elbow encoder",
+            encoder.getDistance() == 0 // no position reading
+                && encoder.getRate() == 0 // no velocity reading
+                && lastSetpoint.position != ZERO_OFFSET // elbow is not going to 0
+                && lead.getAppliedOutput() != 0) // elbow is trying to move;
+        .build();
   }
 
   @Override

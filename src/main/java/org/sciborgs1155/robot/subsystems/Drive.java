@@ -315,9 +315,9 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
   public List<HardwareFault> getFaults() {
     var builder = new FaultBuilder();
     for (var module : modules) {
-      builder.add(module.getFaults());
+      builder.register(module.getFaults());
     }
-    return builder.faults();
+    return builder.build();
   }
 
   public void close() throws Exception {

@@ -141,8 +141,6 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
     operator.rightBumper().whileTrue(intake.outtake(scoring.gamePiece()));
 
     // FAILURE MODES
-    // arm.onFailing(Commands.either(arm.kill(), Commands.none(), () -> Timer.getFPGATimestamp() >
-    // 1));
     arm.onFailing(arm.kill());
     intake.onFailing(Commands.print("intake faults" + intake.getFaults().toString()));
     drive.onFailing(Commands.print("drive faults" + drive.getFaults().toString()));
@@ -150,11 +148,11 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
 
   @Override
   public List<HardwareFault> getFaults() {
-    var builder = new FaultBuilder();
-    builder.add(drive.getFaults());
-    builder.add(arm.getFaults());
-    builder.add(intake.getFaults());
-    return builder.faults();
+    return FaultBuilder.create()
+        .register(drive.getFaults())
+        .register(arm.getFaults())
+        .register(intake.getFaults())
+        .build();
   }
 
   /** The command to run when the robot is enabled */

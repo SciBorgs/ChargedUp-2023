@@ -52,9 +52,7 @@ public class Intake extends SubsystemBase implements Fallible, Loggable, AutoClo
 
   @Override
   public List<HardwareFault> getFaults() {
-    var builder = new FaultBuilder();
-    builder.add("intake spark", wheels);
-    return builder.faults();
+    return FaultBuilder.create().register("intake spark", wheels).build();
   }
 
   @Override

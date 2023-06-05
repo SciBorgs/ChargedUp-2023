@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import java.util.List;
 import org.sciborgs1155.lib.BetterArmFeedforward;
+import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
@@ -44,6 +45,8 @@ public class RealWrist implements JointIO {
     absolute.setDistancePerRotation(CONVERSION_ABS);
     relative.setDistancePerPulse(CONVERSION_RELATIVE);
     relative.setReverseDirection(true);
+
+    MotorConfig.disableFrames(motor, 4, 5, 6);
 
     motor.burnFlash();
 
@@ -113,10 +116,10 @@ public class RealWrist implements JointIO {
 
   @Override
   public List<HardwareFault> getFaults() {
-    var builder = new FaultBuilder();
-    builder.add("wrist spark", motor);
-    builder.add("wrist encoder", absolute);
-    return builder.faults();
+    return FaultBuilder.create()
+        .register("wrist spark", motor)
+        .register("wrist encoder", absolute)
+        .build();
   }
 
   @Override
