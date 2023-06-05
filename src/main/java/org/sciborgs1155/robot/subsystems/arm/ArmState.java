@@ -1,21 +1,23 @@
 package org.sciborgs1155.robot.subsystems.arm;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Optional;
 import java.util.function.DoubleUnaryOperator;
+
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Elbow;
 import org.sciborgs1155.robot.Constants.Elevator;
 import org.sciborgs1155.robot.Constants.RobotType;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+
 /** ArmState class to store relative angles for the arm. */
-public class ArmState implements Sendable {
+public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d wristAngle) implements Sendable {
 
   public static final ArmState OLD_INITIAL =
       ArmState.fromRelative(Elevator.ZERO_OFFSET, Elbow.OFFSET, Math.PI);
@@ -68,17 +70,6 @@ public class ArmState implements Sendable {
 
   public static final ArmState NEW_GROUND_CUBE_INTAKE = ArmState.fromRelative(0, 0, 0);
 
-  private double elevatorHeight;
-  private Rotation2d elbowAngle;
-  private Rotation2d wristAngle;
-
-  public ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d wristAngle) {
-    this.elevatorHeight = elevatorHeight;
-    this.elbowAngle = elbowAngle;
-    this.wristAngle = wristAngle;
-    SmartDashboard.putData(this);
-  }
-
   public double elevatorHeight() {
     return elevatorHeight;
   }
@@ -91,46 +82,34 @@ public class ArmState implements Sendable {
     return wristAngle;
   }
 
-  public void setEndpointHeight(double height) {
-    replaceIfPresent(
-        ArmState.fromEndpoint(
-            new Pose2d(getEndpoint().getX(), height, getEndpoint().getRotation())));
-  }
+  // public void setEndpointHeight(double height) {
+  //   replaceIfPresent(
+  //       ArmState.fromEndpoint(
+  //           new Pose2d(getEndpoint().getX(), height, getEndpoint().getRotation())));
+  // }
 
-  public void setEndpointReach(double reach) {
-    replaceIfPresent(
-        ArmState.fromEndpoint(
-            new Pose2d(reach, getEndpoint().getY(), getEndpoint().getRotation())));
-  }
+  // public void setEndpointReach(double reach) {
+  //   replaceIfPresent(
+  //       ArmState.fromEndpoint(
+  //           new Pose2d(reach, getEndpoint().getY(), getEndpoint().getRotation())));
+  // }
 
-  public void setEndpointRads(double rads) {
-    replaceIfPresent(
-        ArmState.fromEndpoint(
-            new Pose2d(getEndpoint().getX(), getEndpoint().getY(), Rotation2d.fromRadians(rads))));
-  }
-
-  private void replaceIfPresent(Optional<ArmState> newState) {
-    if (newState.isPresent()) {
-      this.elbowAngle = newState.get().elbowAngle();
-      this.elevatorHeight = newState.get().elevatorHeight();
-      this.wristAngle = newState.get().wristAngle();
-    }
-  }
+  // public void setEndpointRads(double rads) {
+  //   replaceIfPresent(
+  //       ArmState.fromEndpoint(
+  //           new Pose2d(getEndpoint().getX(), getEndpoint().getY(), Rotation2d.fromRadians(rads))));
+  // }
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.addDoubleProperty("final height", () -> getEndpoint().getY(), this::setEndpointHeight);
-    builder.addDoubleProperty("final reach", () -> getEndpoint().getX(), this::setEndpointReach);
+    builder.addDoubleProperty("final height", () -> getEndpoint().getY(), null);
+    builder.addDoubleProperty("final reach", () -> getEndpoint().getX(), null);
     builder.addDoubleProperty(
         "final angle (rads)",
         () -> getEndpoint().getRotation().getRadians(),
-        this::setEndpointRads);
-    // TODO delete body below this
-    builder.addDoubleProperty("elevator height", this::elevatorHeight, null);
-    builder.addDoubleProperty("elbow angle (rads)", () -> elbowAngle().getRadians(), null);
-    builder.addDoubleProperty("wrist angle (rads)", () -> wristAngle().getRadians(), null);
+        null);
   }
-  ;
+
 
   /** Represents the side of the robot the arm is on */
   public enum Side {
@@ -305,5 +284,10 @@ public class ArmState implements Sendable {
             .plus(new Translation2d(0, elevatorHeight))
             .plus(new Translation2d(Dimensions.FOREARM_LENGTH, elbowAngle)),
         elbowAngle.plus(wristAngle));
+  }
+
+  public static ArmState nextState(ArmState state, Transform2d change) {
+    Optional<ArmState> newState = fromEndpoint(state.getEndpoint().plus(change));
+    return newState.isPresent() ? newState.get() : state;
   }
 }
