@@ -24,6 +24,8 @@ import org.sciborgs1155.robot.Constants.Elevator;
 import org.sciborgs1155.robot.Constants.Wrist;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.subsystems.arm.ArmState;
+import org.sciborgs1155.robot.subsystems.arm.ArmState.GamePiece;
+import org.sciborgs1155.robot.subsystems.arm.ArmState.Goal;
 import org.sciborgs1155.robot.subsystems.arm.ElevatorIO;
 import org.sciborgs1155.robot.subsystems.arm.ElevatorIO.ElevatorConfig;
 import org.sciborgs1155.robot.subsystems.arm.JointIO;
@@ -95,6 +97,22 @@ public class Arm extends SubsystemBase implements Fallible, Loggable, AutoClosea
    */
   public Optional<ArmTrajectory> findTrajectory(ArmState goal) {
     return Optional.ofNullable(trajectories.get(new Parameters(getSetpoint(), goal).hashCode()));
+  }
+
+  /**
+   * Goes to a {@link ArmState} in the most optimal way, this is a safe command.
+   *
+   * <p>Uses {@link #followTrajectory(ArmTrajectory)} based on {@link #findTrajectory(ArmState)} if
+   * a valid state is cached for the inputted parameters. Otherwise, falls back on {@link
+   * #safeFollowProfile(ArmState)} for on the fly movements.
+   *
+   * @param goal The goal state.
+   * @param gamePiece The selected game piece.
+   * @return A command that goes to the goal safely using either custom trajectory following or
+   *     trapezoid profiling.
+   */
+  public CommandBase goTo(Goal goal, GamePiece gamePiece) {
+    return goTo(ArmState.fromGoal(goal, gamePiece));
   }
 
   /**

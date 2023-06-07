@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.subsystems;
 
 import static org.sciborgs1155.robot.Constants.Drive.*;
 import static org.sciborgs1155.robot.Ports.Drive.*;
+import static org.sciborgs1155.robot.util.PathFlipper.*;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.PathPlanner;
@@ -31,6 +32,7 @@ import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import org.photonvision.EstimatedRobotPose;
+import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.lib.failure.Fallible;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
@@ -252,7 +254,7 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
    *     following
    * @return The command that follows the trajectory
    */
-  public Command follow(PathPlannerTrajectory trajectory, boolean useAllianceColor) {
+  public Command follow(PathPlannerTrajectory trajectory) {
     return new PPSwerveControllerCommand(
             trajectory,
             this::getPose,
@@ -261,24 +263,20 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
             new PIDController(TRANSLATION.p(), TRANSLATION.i(), TRANSLATION.d()),
             new PIDController(ROTATION.p(), ROTATION.i(), ROTATION.d()),
             this::setModuleStates,
-            useAllianceColor)
+            false)
         .andThen(stop());
   }
 
   /** Follows the specified path planner path given a path name */
-  public Command follow(String pathName, boolean resetPosition, boolean useAllianceColor) {
+  public Command follow(String pathName, boolean resetPosition) {
     PathPlannerTrajectory loadedPath = PathPlanner.loadPath(pathName, CONSTRAINTS);
-    return (resetPosition ? pathOdometryReset(loadedPath, useAllianceColor) : Commands.none())
-        .andThen(follow(loadedPath, useAllianceColor));
+    return (resetPosition ? pathOdometryReset(loadedPath) : Commands.none())
+        .andThen(follow(loadedPath));
   }
 
   /** Resets odometry to first pose in path, using ppl to reflects if using alliance color */
-  public Command pathOdometryReset(PathPlannerTrajectory trajectory, boolean useAllianceColor) {
-    var initialState =
-        useAllianceColor
-            ? PathPlannerTrajectory.transformStateForAlliance(
-                trajectory.getInitialState(), DriverStation.getAlliance())
-            : trajectory.getInitialState();
+  public Command pathOdometryReset(PathPlannerTrajectory trajectory) {
+    var initialState = trajectory.getInitialState();
     Pose2d initialPose =
         new Pose2d(initialState.poseMeters.getTranslation(), initialState.holonomicRotation);
     return Commands.runOnce(() -> resetOdometry(initialPose), this);
@@ -297,18 +295,27 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
   }
 
   /** Creates and follows trajectroy for swerve from startPose to desiredPose */
-  public Command driveToPose(Pose2d startPose, Pose2d desiredPose, boolean useAllianceColor) {
+  public Command driveToPose(Pose2d startPose, Pose2d desiredPose) {
     Rotation2d heading = desiredPose.minus(startPose).getTranslation().getAngle();
     PathPoint start = new PathPoint(startPose.getTranslation(), heading, startPose.getRotation());
     PathPoint goal =
         new PathPoint(desiredPose.getTranslation(), heading, desiredPose.getRotation());
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(CONSTRAINTS, start, goal);
-    return follow(trajectory, useAllianceColor);
+    return follow(trajectory);
   }
 
   /** Creates and follows trajectory for swerve from current pose to desiredPose */
-  public Command driveToPose(Pose2d desiredPose, boolean useAllianceColor) {
-    return driveToPose(getPose(), desiredPose, useAllianceColor);
+  public Command driveToPose(Pose2d desiredPose) {
+    return new DeferredCommand(() -> driveToPose(getPose(), desiredPose), this);
+  }
+
+  public static List<PathPlannerTrajectory> loadPath(String pathName) {
+    return PathPlanner.loadPathGroup(pathName, CONSTRAINTS);
+  }
+
+  public Command followPath(PathPlannerTrajectory path, boolean resetOdometry) {
+    var newPath = pathForAlliance(path, DriverStation.getAlliance());
+    return (resetOdometry ? pathOdometryReset(newPath) : Commands.none()).andThen(follow(newPath));
   }
 
   @Override

@@ -17,41 +17,40 @@ import org.sciborgs1155.robot.Constants.RobotType;
 public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d wristAngle) {
 
   // ARM STATES
-  public static final ArmState PASS_TO_BACK = fromAbsolute(0.03, Math.PI / 2.0, Math.PI);
-  public static final ArmState PASS_TO_FRONT = fromAbsolute(0.05, Math.PI / 2.0, Math.PI / 4.0);
+  static final ArmState PASS_TO_BACK = fromAbsolute(0.03, Math.PI / 2.0, Math.PI);
+  static final ArmState PASS_TO_FRONT = fromAbsolute(0.05, Math.PI / 2.0, Math.PI / 4.0);
 
   // OLD ARM SPECIFIC STATES
-  public static final ArmState OLD_INITIAL =
-      fromRelative(Elevator.ZERO_OFFSET, Elbow.OFFSET, Math.PI);
-  public static final ArmState OLD_STOW = fromRelative(0, 1.218, Math.PI / 2.0);
-  public static final ArmState OLD_SAFE =
+  static final ArmState OLD_INITIAL = fromRelative(Elevator.ZERO_OFFSET, Elbow.OFFSET, Math.PI);
+  static final ArmState OLD_STOW = fromRelative(0, 1.218, Math.PI / 2.0);
+  static final ArmState OLD_SAFE =
       fromAbsolute(Elevator.ZERO_OFFSET, Elbow.OFFSET + 0.1, Math.PI / 2);
 
-  public static final ArmState OLD_GROUND_INTAKE = fromAbsolute(0.454, -0.983, -0.055);
-  public static final ArmState OLD_SINGLESUB_CONE = fromAbsolute(0.425, 0.129, -0.305);
-  public static final ArmState OLD_SINGLESUB_CUBE = fromAbsolute(0.544, -0.368, 0.446);
-  public static final ArmState OLD_DOUBLESUB = fromAbsolute(0, 2.8, Math.PI);
+  static final ArmState OLD_GROUND_INTAKE = fromAbsolute(0.454, -0.983, -0.055);
+  static final ArmState OLD_SINGLESUB_CONE = fromAbsolute(0.425, 0.129, -0.305);
+  static final ArmState OLD_SINGLESUB_CUBE = fromAbsolute(0.544, -0.368, 0.446);
+  static final ArmState OLD_DOUBLESUB = fromAbsolute(0, 2.8, Math.PI);
 
-  public static final ArmState OLD_MID_CONE = fromAbsolute(0.062, 0.493, 0.001);
-  public static final ArmState OLD_MID_CUBE = fromAbsolute(0.114, 0.458, 0.353);
-  public static final ArmState OLD_HIGH_CONE = fromAbsolute(0.253, 3.072, 2.5);
-  public static final ArmState OLD_HIGH_CUBE = fromAbsolute(0.114, 0.333, 0.353);
+  static final ArmState OLD_MID_CONE = fromAbsolute(0.062, 0.493, 0.001);
+  static final ArmState OLD_MID_CUBE = fromAbsolute(0.114, 0.458, 0.353);
+  static final ArmState OLD_HIGH_CONE = fromAbsolute(0.253, 3.072, 2.5);
+  static final ArmState OLD_HIGH_CUBE = fromAbsolute(0.114, 0.333, 0.353);
 
   // NEW ARM SPECIFIC STATES
-  public static final ArmState NEW_INITIAL = fromRelative(Elevator.ZERO_OFFSET, Elbow.OFFSET, 2.4);
-  public static final ArmState NEW_STOW = OLD_STOW;
+  static final ArmState NEW_INITIAL = fromRelative(Elevator.ZERO_OFFSET, Elbow.OFFSET, 2.4);
+  static final ArmState NEW_STOW = OLD_STOW;
 
-  public static final ArmState NEW_GROUND_CONE = fromRelative(0.618, -0.714, -0.723);
-  public static final ArmState NEW_GROUND_CUBE = fromRelative(0, 0, 0);
-  public static final ArmState NEW_SINGLESUB_CONE = OLD_SINGLESUB_CONE;
-  public static final ArmState NEW_SINGLESUB_CUBE = OLD_SINGLESUB_CUBE;
-  public static final ArmState NEW_DOUBLESUB_CONE = NEW_STOW;
-  public static final ArmState NEW_DOUBLESUB_CUBE = NEW_STOW;
+  static final ArmState NEW_GROUND_CONE = fromRelative(0.618, -0.714, -0.723);
+  static final ArmState NEW_GROUND_CUBE = fromRelative(0, 0, 0);
+  static final ArmState NEW_SINGLESUB_CONE = OLD_SINGLESUB_CONE;
+  static final ArmState NEW_SINGLESUB_CUBE = OLD_SINGLESUB_CUBE;
+  static final ArmState NEW_DOUBLESUB_CONE = NEW_STOW;
+  static final ArmState NEW_DOUBLESUB_CUBE = NEW_STOW;
 
-  public static final ArmState NEW_MID_CONE = NEW_STOW;
-  public static final ArmState NEW_MID_CUBE = NEW_STOW;
-  public static final ArmState NEW_HIGH_CONE = NEW_STOW;
-  public static final ArmState NEW_HIGH_CUBE = NEW_STOW;
+  static final ArmState NEW_MID_CONE = NEW_STOW;
+  static final ArmState NEW_MID_CUBE = NEW_STOW;
+  static final ArmState NEW_HIGH_CONE = NEW_STOW;
+  static final ArmState NEW_HIGH_CUBE = NEW_STOW;
 
   public static final List<ArmState> PRESETS =
       List.of(
@@ -112,7 +111,6 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
     LOW,
     SINGLE_SUBSTATION,
     DOUBLE_SUBSTATION,
-    STOW;
   }
 
   /**
@@ -175,6 +173,14 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
         : fromGoalOld(height, gamePiece);
   }
 
+  public static ArmState initial() {
+    return Constants.ROBOT_TYPE == RobotType.WHIPLASH_ROLLER ? NEW_STOW : OLD_STOW;
+  }
+
+  public static ArmState stow() {
+    return Constants.ROBOT_TYPE == RobotType.WHIPLASH_ROLLER ? NEW_INITIAL : OLD_INITIAL;
+  }
+
   /** Returns a PlacementState from scoring parameters based on new arm design */
   public static ArmState fromGoalNew(Goal height, GamePiece gamePiece) {
     return switch (height) {
@@ -198,7 +204,6 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
         case CONE -> NEW_DOUBLESUB_CONE;
         case CUBE -> NEW_DOUBLESUB_CUBE;
       };
-      case STOW -> NEW_STOW;
     };
   }
 
@@ -219,7 +224,6 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
         case CUBE -> OLD_SINGLESUB_CUBE;
       };
       case DOUBLE_SUBSTATION -> OLD_DOUBLESUB;
-      case STOW -> OLD_STOW;
     };
   }
 

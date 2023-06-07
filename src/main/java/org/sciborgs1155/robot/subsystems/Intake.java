@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot.subsystems;
 
+import static org.sciborgs1155.robot.Constants.Auto.*;
 import static org.sciborgs1155.robot.Constants.Intake.*;
 import static org.sciborgs1155.robot.Ports.Intake.*;
 
@@ -40,6 +41,15 @@ public class Intake extends SubsystemBase implements Fallible, Loggable, AutoClo
 
   public Command outtake(GamePiece gamePiece) {
     return set(-1 * (gamePiece == GamePiece.CONE ? coneSpeed : cubeSpeed)).withName("outtaking");
+  }
+
+  public Command outtakeWithTimeout(GamePiece gamePiece) {
+    return outtake(gamePiece)
+        .withTimeout(
+            switch (gamePiece) {
+              case CONE -> CONE_OUTTAKE_TIME;
+              case CUBE -> CUBE_OUTTAKE_TIME;
+            });
   }
 
   public Command stop() {

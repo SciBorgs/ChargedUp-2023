@@ -3,14 +3,12 @@ package org.sciborgs1155.robot;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
-import java.util.function.Function;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.failure.Fallible;
 import org.sciborgs1155.lib.failure.FaultBuilder;
@@ -19,6 +17,7 @@ import org.sciborgs1155.robot.Constants.Elbow;
 import org.sciborgs1155.robot.Constants.Elevator;
 import org.sciborgs1155.robot.Constants.Wrist;
 import org.sciborgs1155.robot.Ports.OI;
+import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
@@ -62,7 +61,8 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
   // COMMANDS
   @Log(name = "Game Piece", methodName = "name")
   private GamePiece gamePiece = GamePiece.CONE;
-  // @Log private final Autos autos = new Autos(drive, arm, intake);
+
+  @Log private final Autos autos = new Autos(drive, arm, intake);
 
   /** The robot contains subsystems, OI devices, and commands. */
   public Robot() {
@@ -109,8 +109,6 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
   /** Configures trigger -> command bindings */
   private void configureBindings() {
 
-    Function<Goal, CommandBase> goal = x -> arm.goTo(ArmState.fromGoal(x, gamePiece));
-
     // DRIVER INPUT
     driver.b().onTrue(drive.zeroHeading());
 
@@ -123,16 +121,13 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
     operator.a().onTrue(Commands.runOnce(() -> gamePiece = GamePiece.CUBE));
 
     // SCORING
-    operator.povUp().onTrue(goal.apply((Goal.HIGH)));
-    operator.povRight().onTrue(goal.apply((Goal.MID)));
-    operator.povDown().onTrue(goal.apply((Goal.LOW)));
-    operator.povLeft().onTrue(goal.apply((Goal.STOW)));
+    operator.povUp().onTrue(arm.goTo(Goal.HIGH, gamePiece));
+    operator.povRight().onTrue(arm.goTo(Goal.MID, gamePiece));
+    operator.povDown().onTrue(arm.goTo(Goal.LOW, gamePiece));
+    operator.povLeft().onTrue(arm.goTo(ArmState.stow()));
 
-    operator.leftTrigger().onTrue(goal.apply((Goal.SINGLE_SUBSTATION)));
-    operator.rightTrigger().onTrue(goal.apply((Goal.DOUBLE_SUBSTATION)));
-
-    operator.rightStick().onTrue(arm.goTo(ArmState.OLD_SAFE));
-    operator.leftStick().onTrue(arm.goTo(ArmState.OLD_SAFE));
+    operator.leftTrigger().onTrue(arm.goTo(Goal.SINGLE_SUBSTATION, gamePiece));
+    operator.rightTrigger().onTrue(arm.goTo(Goal.DOUBLE_SUBSTATION, gamePiece));
 
     // INTAKING
     operator.leftBumper().whileTrue(intake.intake(gamePiece));
