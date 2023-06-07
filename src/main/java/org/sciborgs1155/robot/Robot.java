@@ -130,8 +130,8 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
     operator.rightTrigger().onTrue(arm.goTo(Goal.DOUBLE_SUBSTATION, () -> gamePiece));
 
     // INTAKING
-    operator.leftBumper().whileTrue(intake.intake(gamePiece));
-    operator.rightBumper().whileTrue(intake.outtake(gamePiece));
+    operator.leftBumper().whileTrue(intake.intake(() -> gamePiece));
+    operator.rightBumper().whileTrue(intake.outtake(() -> gamePiece));
 
     // FAILURE MODES
     arm.onFailing(arm.kill());

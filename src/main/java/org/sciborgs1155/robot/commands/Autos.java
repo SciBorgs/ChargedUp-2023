@@ -244,7 +244,7 @@ public final class Autos implements Sendable {
   }
 
   private CommandBase score(Goal goal, GamePiece gamePiece) {
-    return arm.goTo(goal, () -> gamePiece).withTimeout(5).andThen(intake.outtake(gamePiece));
+    return arm.goTo(goal, () -> gamePiece).withTimeout(5).andThen(intake.outtake(() -> gamePiece));
   }
 
   /** no PPL */
@@ -296,7 +296,7 @@ public final class Autos implements Sendable {
     return Commands.sequence(
         staticOdometryReset(GamePiece.CONE, Side.FRONT, FLAT),
         arm.goTo(Goal.LOW, () -> GamePiece.CUBE),
-        intake.outtake(GamePiece.CUBE),
+        intake.outtake(() -> GamePiece.CUBE),
         drive.followPath(Paths.LEAVE_FLAT_BACKWARDS.get(0), false));
   }
 

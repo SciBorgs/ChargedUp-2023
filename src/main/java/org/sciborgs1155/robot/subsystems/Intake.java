@@ -4,8 +4,6 @@ import static org.sciborgs1155.robot.Constants.Auto.*;
 import static org.sciborgs1155.robot.Constants.Intake.*;
 import static org.sciborgs1155.robot.Ports.Intake.*;
 
-import java.util.function.Supplier;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
@@ -15,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
+import java.util.function.Supplier;
 import org.sciborgs1155.lib.failure.Fallible;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
@@ -42,7 +41,8 @@ public class Intake extends SubsystemBase implements Fallible, Loggable, AutoClo
   }
 
   public Command outtake(Supplier<GamePiece> gamePiece) {
-    return set(-1 * (gamePiece.get() == GamePiece.CONE ? coneSpeed : cubeSpeed)).withName("outtaking");
+    return set(-1 * (gamePiece.get() == GamePiece.CONE ? coneSpeed : cubeSpeed))
+        .withName("outtaking");
   }
 
   public Command outtakeWithTimeout(Supplier<GamePiece> gamePiece) {
