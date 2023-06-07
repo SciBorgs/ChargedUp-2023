@@ -16,10 +16,7 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "backHighCube",
-          "outtakeCube"
-        ],
+        "names": [],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
@@ -48,12 +45,5 @@
       }
     }
   ],
-  "markers": [
-    {
-      "position": 0.13487215909090913,
-      "names": [
-        "balanceState"
-      ]
-    }
-  ]
+  "markers": []
 }

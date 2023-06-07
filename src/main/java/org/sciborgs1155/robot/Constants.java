@@ -337,6 +337,7 @@ public final class Constants {
     //         Map.entry(3, new Translation2d(5, 4)),
     //         Map.entry(4, new Translation2d(5, 5)));
     public static final double FIELD_WIDTH_METERS = 8.02;
+    public static final double FIELD_LENGTH_METERS = 16.54;
     public static final Map<Integer, Translation2d> SCORING_POINTS_CUBE =
         Map.ofEntries(
             Map.entry(1, new Translation2d(1.83, 4.42)),

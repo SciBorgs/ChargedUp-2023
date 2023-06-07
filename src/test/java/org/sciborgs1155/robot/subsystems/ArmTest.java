@@ -65,7 +65,7 @@ public class ArmTest {
   @MethodSource("factory")
   void goTo(double elbowSetpoint, double wristSetpoint) {
     // check that wrist is not limp
-    assertTrue(arm.allowPassOver(), "wrist is");
+    assertTrue(arm.allowPassOver(), "wrist is limp");
 
     // set setpoints
     run(
@@ -88,11 +88,16 @@ public class ArmTest {
         Arguments.of(Elbow.MAX_ANGLE, Wrist.MAX_ANGLE));
   }
 
+  @Test
   void safety() {
-    arm.setStopped(true);
-    double elbowPos = arm.getElbowPosition().getRadians();
-    arm.setSetpoints(Rotation2d.fromRadians(0.4), Rotation2d.fromRadians(0.8));
-    fastForward();
-    assertEquals(elbowPos, arm.getElbowPosition().getRadians(), 1.5e-1);
+    run(arm.setStopped(true));
+    assert arm.allowPassOver();
+    run(arm.setSetpoints(Rotation2d.fromRadians(0.4), Rotation2d.fromRadians(0.2)));
+    fastForward(600);
+    assertEquals(Elbow.MIN_ANGLE, arm.getElbowPosition().getRadians(), ELBOW_DELTA);
+    assertNotEquals(
+        arm.getWristSetpoint().position(),
+        arm.getRelativeWristPosition().getRadians(),
+        WRIST_DELTA);
   }
 }
