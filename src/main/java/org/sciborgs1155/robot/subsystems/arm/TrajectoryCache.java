@@ -83,25 +83,9 @@ public class TrajectoryCache {
     // Generate trajectories between stored presets
 
     List<CachedTrajectory> generatedTrajectories = new ArrayList<CachedTrajectory>();
-    var presets =
-        List.of(
-            ArmState.OLD_INITIAL,
-            ArmState.STOW,
-            ArmState.OLD_FRONT_INTAKE,
-            ArmState.OLD_FRONT_SINGLE_SUBSTATION_CONE,
-            ArmState.OLD_FRONT_SINGLE_SUBSTATION_CUBE,
-            ArmState.OLD_BACK_DOUBLE_SUBSTATION,
-            ArmState.OLD_FRONT_MID_CONE,
-            ArmState.OLD_BACK_MID_CONE,
-            ArmState.OLD_BACK_HIGH_CONE,
-            ArmState.OLD_FRONT_MID_CUBE,
-            ArmState.OLD_FRONT_HIGH_CUBE,
-            ArmState.OLD_BACK_MID_CUBE,
-            ArmState.OLD_BACK_HIGH_CUBE,
-            ArmState.OLD_SAFE);
 
-    for (var initialPos : presets) {
-      for (var finalPos : presets) {
+    for (var initialPos : ArmState.PRESETS) {
+      for (var finalPos : ArmState.PRESETS) {
         if (!initialPos.equals(finalPos)) {
           System.out.println("Adding initial: " + initialPos + " final: " + finalPos);
           generatedTrajectories.add(

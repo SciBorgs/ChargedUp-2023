@@ -209,7 +209,10 @@ public final class Constants {
     public static final double MOTOR_GEARING = 30.0 / 1.0;
     // Gearing for motor : height (meters)
 
-    public static final double SPROCKET_CIRCUMFERENCE = 2.0 * Math.PI * 0.0181864;
+    public static final double SPROCKET_RADIUS = 0.0181864;
+    // Radius of the sprocket in meters
+
+    public static final double SPROCKET_CIRCUMFERENCE = 2.0 * Math.PI * SPROCKET_RADIUS;
     // Circumference of the sprocket in meters (2 * π * R)
 
     public static final double CONVERSION_RELATIVE = SPROCKET_CIRCUMFERENCE / THROUGHBORE_PPR;
@@ -228,7 +231,7 @@ public final class Constants {
             DCMotor.getNEO(3),
             MOTOR_GEARING,
             Dimensions.CARRIAGE_MASS + Dimensions.FOREARM_MASS + Dimensions.CLAW_MASS,
-            SPROCKET_CIRCUMFERENCE,
+            SPROCKET_RADIUS,
             MIN_HEIGHT,
             MAX_HEIGHT);
 

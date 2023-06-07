@@ -12,7 +12,7 @@ public class NoVision implements VisionIO {
 
   @Override
   public PhotonTrackedTarget getBestTarget() {
-    return null; // TODO funny
+    return new PhotonTrackedTarget();
   }
 
   @Override

@@ -74,7 +74,7 @@ public class SimElevator implements ElevatorIO {
 
   @Override
   public List<HardwareFault> getFaults() {
-    return List.of(new HardwareFault("test"));
+    return List.of();
   }
 
   @Override

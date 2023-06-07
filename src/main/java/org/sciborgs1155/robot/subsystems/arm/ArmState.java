@@ -1,142 +1,118 @@
 package org.sciborgs1155.robot.subsystems.arm;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.DoubleUnaryOperator;
-
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.Elbow;
 import org.sciborgs1155.robot.Constants.Elevator;
 import org.sciborgs1155.robot.Constants.RobotType;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-
 /** ArmState class to store relative angles for the arm. */
-public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d wristAngle) implements Sendable {
+public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d wristAngle) {
 
+  // ARM STATES
+  public static final ArmState PASS_TO_BACK = fromAbsolute(0.03, Math.PI / 2.0, Math.PI);
+  public static final ArmState PASS_TO_FRONT = fromAbsolute(0.05, Math.PI / 2.0, Math.PI / 4.0);
+
+  // OLD ARM SPECIFIC STATES
   public static final ArmState OLD_INITIAL =
-      ArmState.fromRelative(Elevator.ZERO_OFFSET, Elbow.OFFSET, Math.PI);
-
-  public static final ArmState NEW_INITIAL =
-      ArmState.fromRelative(Elevator.ZERO_OFFSET, Elbow.OFFSET, 2.4);
-
-  public static final ArmState STOW = ArmState.fromRelative(0, 1.21834, Math.PI / 2.0);
-
-  public static final ArmState NEW_STOW = ArmState.fromRelative(0, 0, 0);
-
-  // LOWEST COG
+      fromRelative(Elevator.ZERO_OFFSET, Elbow.OFFSET, Math.PI);
+  public static final ArmState OLD_STOW = fromRelative(0, 1.218, Math.PI / 2.0);
   public static final ArmState OLD_SAFE =
-      ArmState.fromAbsolute(Elevator.ZERO_OFFSET, Elbow.OFFSET + 0.1, Math.PI / 2);
+      fromAbsolute(Elevator.ZERO_OFFSET, Elbow.OFFSET + 0.1, Math.PI / 2);
 
-  public static final ArmState NEW_SAFE =
-      ArmState.fromAbsolute(Elevator.ZERO_OFFSET, Elbow.OFFSET + 0.1, Math.PI / 2);
+  public static final ArmState OLD_GROUND_INTAKE = fromAbsolute(0.454, -0.983, -0.055);
+  public static final ArmState OLD_SINGLESUB_CONE = fromAbsolute(0.425, 0.129, -0.305);
+  public static final ArmState OLD_SINGLESUB_CUBE = fromAbsolute(0.544, -0.368, 0.446);
+  public static final ArmState OLD_DOUBLESUB = fromAbsolute(0, 2.8, Math.PI);
 
-  public static final ArmState PASS_TO_BACK = ArmState.fromAbsolute(0.03, Math.PI / 2.0, Math.PI);
-  public static final ArmState PASS_TO_FRONT =
-      ArmState.fromAbsolute(0.05, Math.PI / 2.0, Math.PI / 4.0);
+  public static final ArmState OLD_MID_CONE = fromAbsolute(0.062, 0.493, 0.001);
+  public static final ArmState OLD_MID_CUBE = fromAbsolute(0.114, 0.458, 0.353);
+  public static final ArmState OLD_HIGH_CONE = fromAbsolute(0.253, 3.072, 2.5);
+  public static final ArmState OLD_HIGH_CUBE = fromAbsolute(0.114, 0.333, 0.353);
 
-  public static final ArmState OLD_FRONT_INTAKE = ArmState.fromAbsolute(0.454, -0.983, -0.055);
+  // NEW ARM SPECIFIC STATES
+  public static final ArmState NEW_INITIAL = fromRelative(Elevator.ZERO_OFFSET, Elbow.OFFSET, 2.4);
+  public static final ArmState NEW_STOW = OLD_STOW;
 
-  public static final ArmState OLD_FRONT_SINGLE_SUBSTATION_CONE =
-      ArmState.fromAbsolute(0.425006, 0.128855, -0.305);
-  public static final ArmState OLD_FRONT_SINGLE_SUBSTATION_CUBE =
-      ArmState.fromAbsolute(0.543571, -0.367516, 0.445646);
-  public static final ArmState OLD_BACK_DOUBLE_SUBSTATION = ArmState.fromAbsolute(0, 2.8, Math.PI);
+  public static final ArmState NEW_GROUND_CONE = fromRelative(0.618, -0.714, -0.723);
+  public static final ArmState NEW_GROUND_CUBE = fromRelative(0, 0, 0);
+  public static final ArmState NEW_SINGLESUB_CONE = OLD_SINGLESUB_CONE;
+  public static final ArmState NEW_SINGLESUB_CUBE = OLD_SINGLESUB_CUBE;
+  public static final ArmState NEW_DOUBLESUB_CONE = NEW_STOW;
+  public static final ArmState NEW_DOUBLESUB_CUBE = NEW_STOW;
 
-  public static final ArmState OLD_FRONT_MID_CONE =
-      ArmState.fromAbsolute(0.061612, 0.493303, 0.001378);
+  public static final ArmState NEW_MID_CONE = NEW_STOW;
+  public static final ArmState NEW_MID_CUBE = NEW_STOW;
+  public static final ArmState NEW_HIGH_CONE = NEW_STOW;
+  public static final ArmState NEW_HIGH_CUBE = NEW_STOW;
 
-  public static final ArmState OLD_BACK_MID_CONE = STOW; // TODO
-  public static final ArmState OLD_BACK_HIGH_CONE = ArmState.fromAbsolute(0.253, 3.072, 2.5);
-  // ele 0.2475
-  public static final ArmState OLD_FRONT_MID_CUBE =
-      ArmState.fromAbsolute(0.11362, 0.458149, 0.353288);
-  public static final ArmState OLD_FRONT_HIGH_CUBE =
-      ArmState.fromAbsolute(0.113502, 0.333258, 0.353208);
-
-  public static final ArmState NEW_FRONT_MID_CUBE = ArmState.fromAbsolute(0, 0, 0);
-  public static final ArmState NEW_FRONT_HIGH_CUBE = ArmState.fromAbsolute(0, 0, 0);
-
-  public static final ArmState OLD_BACK_MID_CUBE = OLD_FRONT_MID_CUBE; // TODO
-  public static final ArmState OLD_BACK_HIGH_CUBE = ArmState.fromAbsolute(0.245, 2.75, 3.17);
-
-  public static final ArmState NEW_GROUND_CONE_INTAKE =
-      ArmState.fromRelative(0.618, -0.714, -0.723);
-
-  public static final ArmState NEW_GROUND_CUBE_INTAKE = ArmState.fromRelative(0, 0, 0);
-
-  public double elevatorHeight() {
-    return elevatorHeight;
-  }
-
-  public Rotation2d elbowAngle() {
-    return elbowAngle;
-  }
-
-  public Rotation2d wristAngle() {
-    return wristAngle;
-  }
-
-  // public void setEndpointHeight(double height) {
-  //   replaceIfPresent(
-  //       ArmState.fromEndpoint(
-  //           new Pose2d(getEndpoint().getX(), height, getEndpoint().getRotation())));
-  // }
-
-  // public void setEndpointReach(double reach) {
-  //   replaceIfPresent(
-  //       ArmState.fromEndpoint(
-  //           new Pose2d(reach, getEndpoint().getY(), getEndpoint().getRotation())));
-  // }
-
-  // public void setEndpointRads(double rads) {
-  //   replaceIfPresent(
-  //       ArmState.fromEndpoint(
-  //           new Pose2d(getEndpoint().getX(), getEndpoint().getY(), Rotation2d.fromRadians(rads))));
-  // }
-
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.addDoubleProperty("final height", () -> getEndpoint().getY(), null);
-    builder.addDoubleProperty("final reach", () -> getEndpoint().getX(), null);
-    builder.addDoubleProperty(
-        "final angle (rads)",
-        () -> getEndpoint().getRotation().getRadians(),
-        null);
-  }
-
+  public static final List<ArmState> PRESETS =
+      List.of(
+          PASS_TO_BACK,
+          PASS_TO_FRONT,
+          OLD_INITIAL,
+          OLD_STOW,
+          OLD_SAFE,
+          OLD_GROUND_INTAKE,
+          OLD_SINGLESUB_CONE,
+          OLD_SINGLESUB_CUBE,
+          OLD_DOUBLESUB,
+          OLD_MID_CONE,
+          OLD_MID_CUBE,
+          OLD_HIGH_CONE,
+          OLD_HIGH_CUBE,
+          NEW_INITIAL,
+          NEW_STOW,
+          NEW_GROUND_CONE,
+          NEW_GROUND_CUBE,
+          NEW_SINGLESUB_CONE,
+          NEW_SINGLESUB_CUBE,
+          NEW_DOUBLESUB_CONE,
+          NEW_DOUBLESUB_CUBE,
+          NEW_MID_CONE,
+          NEW_MID_CUBE,
+          NEW_HIGH_CONE,
+          NEW_HIGH_CUBE);
 
   /** Represents the side of the robot the arm is on */
-  public enum Side {
-    FRONT,
-    BACK;
+  public static enum Side {
+    FRONT(0),
+    BACK(Math.PI);
 
-    public double rads() {
-      if (this == BACK) {
-        return Math.PI;
-      }
-      return 0;
+    public final double angle;
+
+    private Side(double angle) {
+      this.angle = angle;
     }
   }
 
+  /** Represents the if the robot arm is facing up or down */
+  public static enum End {
+    TOP,
+    BOTTOM,
+  }
+
   /** Represents the game piece the robot is holding */
-  public enum GamePiece {
+  public static enum GamePiece {
     CONE,
-    CUBE;
+    CUBE,
   }
 
   /** Represents the part of the game the robot is interacting with */
-  public enum Level {
+  public static enum Goal {
     HIGH,
     MID,
     LOW,
     SINGLE_SUBSTATION,
     DOUBLE_SUBSTATION,
+    STOW;
   }
 
   /**
@@ -171,9 +147,14 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
     };
   }
 
-  /** The side of the robot the arm is on */
+  /** The side of the robot the arm is on (front vs back) */
   public Side side() {
     return elbowAngle.getCos() > 0 ? Side.FRONT : Side.BACK;
+  }
+
+  /** The end of the robot the arm is on (top vs bottom) */
+  public End end() {
+    return elbowAngle.getSin() > 0 ? End.TOP : End.BOTTOM;
   }
 
   /**
@@ -188,53 +169,71 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
   }
 
   /** Returns a PlacementState from scoring parameters */
-  public static ArmState fromOperator(Level height, GamePiece gamePiece, Side side) {
+  public static ArmState fromGoal(Goal height, GamePiece gamePiece) {
     return Constants.ROBOT_TYPE == RobotType.WHIPLASH_ROLLER
-        ? fromOperatorNew(height, gamePiece, side)
-        : fromOperatorOld(height, gamePiece, side);
+        ? fromGoalNew(height, gamePiece)
+        : fromGoalOld(height, gamePiece);
   }
 
   /** Returns a PlacementState from scoring parameters based on new arm design */
-  public static ArmState fromOperatorNew(Level height, GamePiece gamePiece, Side side) {
+  public static ArmState fromGoalNew(Goal height, GamePiece gamePiece) {
     return switch (height) {
       case LOW -> switch (gamePiece) {
-        case CONE -> NEW_GROUND_CONE_INTAKE;
-        case CUBE -> NEW_GROUND_CUBE_INTAKE;
+        case CONE -> NEW_GROUND_CONE;
+        case CUBE -> NEW_GROUND_CUBE;
       };
       case MID -> switch (gamePiece) {
-        case CONE -> side == Side.FRONT ? OLD_FRONT_MID_CONE : OLD_BACK_MID_CONE;
-        case CUBE -> side == Side.FRONT ? OLD_FRONT_MID_CUBE : OLD_BACK_MID_CUBE;
+        case CONE -> NEW_MID_CONE;
+        case CUBE -> NEW_MID_CUBE;
       };
       case HIGH -> switch (gamePiece) {
-        case CONE -> OLD_BACK_HIGH_CONE;
-        case CUBE -> side == Side.FRONT ? OLD_FRONT_HIGH_CUBE : OLD_BACK_HIGH_CUBE;
+        case CONE -> NEW_HIGH_CONE;
+        case CUBE -> NEW_HIGH_CUBE;
       };
       case SINGLE_SUBSTATION -> switch (gamePiece) {
-        case CONE -> OLD_FRONT_SINGLE_SUBSTATION_CONE;
-        case CUBE -> OLD_FRONT_SINGLE_SUBSTATION_CUBE;
+        case CONE -> NEW_SINGLESUB_CONE;
+        case CUBE -> NEW_SINGLESUB_CUBE;
       };
-      case DOUBLE_SUBSTATION -> OLD_BACK_DOUBLE_SUBSTATION;
+      case DOUBLE_SUBSTATION -> switch (gamePiece) {
+        case CONE -> NEW_DOUBLESUB_CONE;
+        case CUBE -> NEW_DOUBLESUB_CUBE;
+      };
+      case STOW -> NEW_STOW;
     };
   }
 
   /** Returns a PlacementState from scoring parameters based on old arm design */
-  public static ArmState fromOperatorOld(Level height, GamePiece gamePiece, Side side) {
+  public static ArmState fromGoalOld(Goal height, GamePiece gamePiece) {
     return switch (height) {
-      case LOW -> OLD_FRONT_INTAKE;
+      case LOW -> OLD_GROUND_INTAKE;
       case MID -> switch (gamePiece) {
-        case CONE -> side == Side.FRONT ? OLD_FRONT_MID_CONE : OLD_BACK_MID_CONE;
-        case CUBE -> side == Side.FRONT ? OLD_FRONT_MID_CUBE : OLD_BACK_MID_CUBE;
+        case CONE -> OLD_MID_CONE;
+        case CUBE -> OLD_MID_CUBE;
       };
       case HIGH -> switch (gamePiece) {
-        case CONE -> OLD_BACK_HIGH_CONE;
-        case CUBE -> side == Side.FRONT ? OLD_FRONT_HIGH_CUBE : OLD_BACK_HIGH_CUBE;
+        case CONE -> OLD_HIGH_CONE;
+        case CUBE -> OLD_HIGH_CUBE;
       };
       case SINGLE_SUBSTATION -> switch (gamePiece) {
-        case CONE -> OLD_FRONT_SINGLE_SUBSTATION_CONE;
-        case CUBE -> OLD_FRONT_SINGLE_SUBSTATION_CUBE;
+        case CONE -> OLD_SINGLESUB_CONE;
+        case CUBE -> OLD_SINGLESUB_CUBE;
       };
-      case DOUBLE_SUBSTATION -> OLD_BACK_DOUBLE_SUBSTATION;
+      case DOUBLE_SUBSTATION -> OLD_DOUBLESUB;
+      case STOW -> OLD_STOW;
     };
+  }
+
+  /**
+   * Creates a new ArmState based on the provided pose for the endpoint using inverse kinematics.
+   *
+   * @param x The horizontal translation of the endpoint, in meters.
+   * @param y The vertical translation of the endpoint, in meters.
+   * @param theta The absolute angle of the endpoint from the horizontal, in radians.
+   * @return An optional, either containing the computed ArmState or None if such a state is
+   *     impossible.
+   */
+  public static Optional<ArmState> fromEndpoint(double x, double y, double theta) {
+    return fromEndpoint(new Pose2d(new Translation2d(x, y), Rotation2d.fromRadians(theta)));
   }
 
   /**
@@ -243,7 +242,7 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
    * @param endpoint A Pose2d, where translation represents the coordinates of the wrist joint and
    *     rotation represents the rotation of the wrist.
    * @return An optional, either containing the computed ArmState or None if such a state is
-   *     impossible,
+   *     impossible.
    */
   public static Optional<ArmState> fromEndpoint(Pose2d endpoint) {
     // find coordinate of wrist (end of forearm) relative to the elevator on top of our chassis

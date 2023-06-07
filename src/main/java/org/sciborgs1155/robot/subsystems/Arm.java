@@ -24,7 +24,6 @@ import org.sciborgs1155.robot.Constants.Elevator;
 import org.sciborgs1155.robot.Constants.Wrist;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.subsystems.arm.ArmState;
-import org.sciborgs1155.robot.subsystems.arm.ArmState.Side;
 import org.sciborgs1155.robot.subsystems.arm.ElevatorIO;
 import org.sciborgs1155.robot.subsystems.arm.ElevatorIO.ElevatorConfig;
 import org.sciborgs1155.robot.subsystems.arm.JointIO;
@@ -63,7 +62,9 @@ public class Arm extends SubsystemBase implements Fallible, Loggable, AutoClosea
   @Log private final Visualizer positionVisualizer = new Visualizer(new Color8Bit(255, 0, 0));
   @Log private final Visualizer setpointVisualizer = new Visualizer(new Color8Bit(0, 0, 255));
 
-  @Log private boolean allowPassOver;
+  // this is to make the emperical collection of arm states easier
+  @Log(name = "copy state")
+  String copyState = "";
 
   public Arm(ElevatorIO elevator, JointIO elbow, JointIO wrist) {
     this.elevator = elevator;
@@ -72,7 +73,6 @@ public class Arm extends SubsystemBase implements Fallible, Loggable, AutoClosea
   }
 
   /** Returns the current position of the placement mechanisms */
-  @Log(name = "current state")
   public ArmState getState() {
     return new ArmState(elevator.getHeight(), elbow.getRelativeAngle(), wrist.getRelativeAngle());
   }
@@ -126,33 +126,43 @@ public class Arm extends SubsystemBase implements Fallible, Loggable, AutoClosea
   public CommandBase goTo(Supplier<ArmState> goal) {
     return new DeferredCommand(
         () ->
-            Commands.either(
-                findTrajectory(goal.get())
-                    .map(this::followTrajectory)
-                    .orElse(safeFollowProfile(goal)),
-                Commands.none(),
-                () -> allowPassOver || goal.get().side() == getState().side()),
+            findTrajectory(goal.get()).map(this::followTrajectory).orElse(safeFollowProfile(goal)),
         this);
   }
 
   /**
-   * A (mostly) safe version of {@link #followProfile(ArmState)} that uses {@link #passOver(Side)}
-   * to reach the other side without height violations or destruction.
+   * A (mostly) safe version of {@link #followProfile(ArmState)} that uses {@link ArmState#side()}
+   * and {@link ArmState#end()} to reach the other side without height violations or destruction.
    *
    * <p>This is implemented by going to a safe intermediate goal if the side of the arm will change,
-   * which is slow, and does not prevent circumstances where the arm hits the ground.
+   * which is slow, and mostly prevents circumstances where the arm hits the ground.
    *
    * @param goal The goal goal.
    * @return A safe following command that will run to a safe goal and then until all mechanisms are
    *     at their goal.
    */
   private CommandBase safeFollowProfile(Supplier<ArmState> goal) {
-    return Commands.either(
+    var toSide =
+        Commands.either(
             followProfile(() -> ArmState.passOverToSide(goal.get().side())),
             Commands.none(),
-            () -> goal.get().side() != getState().side())
+            () -> goal.get().side() != getState().side());
+
+    var toOrientation =
+        Commands.either(
+            followProfile(
+                () ->
+                    ArmState.fromRelative(
+                        getState().elevatorHeight(),
+                        goal.get().side().angle,
+                        getState().wristAngle().getRadians())),
+            Commands.none(),
+            () -> getState().end() != goal.get().end());
+
+    return toSide
+        .andThen(toOrientation)
         .andThen(followProfile(goal))
-        .withName("safe follow profile");
+        .withName("safe following profile");
   }
 
   /** Sets the position setpoints for the elbow and wrist, in radians */
@@ -225,10 +235,15 @@ public class Arm extends SubsystemBase implements Fallible, Loggable, AutoClosea
 
   @Override
   public void periodic() {
+    var endpoint = getState().getEndpoint();
+    copyState =
+        String.format(
+            "fromEndpoint(%.3f, %.3f, %.3f)",
+            endpoint.getX(), endpoint.getY(), endpoint.getRotation().getRadians());
+
     wrist.setBaseAngle(elbow.getRelativeAngle());
     positionVisualizer.setState(getState());
     setpointVisualizer.setState(getSetpoint());
-    allowPassOver = !wrist.isFailing();
   }
 
   @Override

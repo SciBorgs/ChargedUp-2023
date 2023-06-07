@@ -3,12 +3,14 @@ package org.sciborgs1155.robot;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
+import java.util.function.Function;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.failure.Fallible;
 import org.sciborgs1155.lib.failure.FaultBuilder;
@@ -17,15 +19,13 @@ import org.sciborgs1155.robot.Constants.Elbow;
 import org.sciborgs1155.robot.Constants.Elevator;
 import org.sciborgs1155.robot.Constants.Wrist;
 import org.sciborgs1155.robot.Ports.OI;
-import org.sciborgs1155.robot.commands.Scoring;
 import org.sciborgs1155.robot.subsystems.Arm;
 import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.subsystems.LED;
 import org.sciborgs1155.robot.subsystems.arm.ArmState;
 import org.sciborgs1155.robot.subsystems.arm.ArmState.GamePiece;
-import org.sciborgs1155.robot.subsystems.arm.ArmState.Level;
-import org.sciborgs1155.robot.subsystems.arm.ArmState.Side;
+import org.sciborgs1155.robot.subsystems.arm.ArmState.Goal;
 import org.sciborgs1155.robot.vision.NoVision;
 import org.sciborgs1155.robot.vision.VisionIO;
 
@@ -60,7 +60,8 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
   private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
 
   // COMMANDS
-  @Log private final Scoring scoring = new Scoring(led);
+  @Log(name = "Game Piece", methodName = "name")
+  private GamePiece gamePiece = GamePiece.CONE;
   // @Log private final Autos autos = new Autos(drive, arm, intake);
 
   /** The robot contains subsystems, OI devices, and commands. */
@@ -84,8 +85,6 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
 
     addPeriodic(Logger::updateEntries, Constants.PERIOD);
     addPeriodic(() -> drive.updateEstimates(vision.getPoseEstimates(drive.getPose())), 0.5);
-    // addPeriodic(() -> getFaults().forEach(fault -> SmartDashboard.putData("faults/", fault)),
-    // Constants.PERIOD);
 
     autonomous().onTrue(getAutonomousCommand());
 
@@ -109,6 +108,9 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
 
   /** Configures trigger -> command bindings */
   private void configureBindings() {
+
+    Function<Goal, CommandBase> goal = x -> arm.goTo(ArmState.fromGoal(x, gamePiece));
+
     // DRIVER INPUT
     driver.b().onTrue(drive.zeroHeading());
 
@@ -116,29 +118,25 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
 
     driver.rightBumper().onTrue(drive.setSpeedMultiplier(0.3)).onFalse(drive.setSpeedMultiplier(1));
 
-    // babies are meant to be droped - siggy 2023
-
     // STATE SWITCHING
-    operator.b().onTrue(scoring.setSide(Side.FRONT));
-    operator.x().onTrue(scoring.setSide(Side.BACK));
-    operator.a().onTrue(scoring.setGamePiece(GamePiece.CUBE));
-    operator.y().onTrue(scoring.setGamePiece(GamePiece.CONE));
+    operator.b().onTrue(Commands.runOnce(() -> gamePiece = GamePiece.CONE));
+    operator.a().onTrue(Commands.runOnce(() -> gamePiece = GamePiece.CUBE));
 
     // SCORING
-    operator.povUp().onTrue(arm.goTo(() -> scoring.state(Level.HIGH)));
-    operator.povRight().onTrue(arm.goTo(() -> scoring.state(Level.MID)));
-    operator.povDown().onTrue(arm.goTo(() -> scoring.state(Level.LOW)));
-    operator.povLeft().onTrue(arm.goTo(ArmState.STOW));
+    operator.povUp().onTrue(goal.apply((Goal.HIGH)));
+    operator.povRight().onTrue(goal.apply((Goal.MID)));
+    operator.povDown().onTrue(goal.apply((Goal.LOW)));
+    operator.povLeft().onTrue(goal.apply((Goal.STOW)));
 
-    operator.leftTrigger().onTrue(arm.goTo(() -> scoring.state(Level.SINGLE_SUBSTATION)));
-    operator.rightTrigger().onTrue(arm.goTo(() -> scoring.state(Level.DOUBLE_SUBSTATION)));
+    operator.leftTrigger().onTrue(goal.apply((Goal.SINGLE_SUBSTATION)));
+    operator.rightTrigger().onTrue(goal.apply((Goal.DOUBLE_SUBSTATION)));
 
     operator.rightStick().onTrue(arm.goTo(ArmState.OLD_SAFE));
     operator.leftStick().onTrue(arm.goTo(ArmState.OLD_SAFE));
 
     // INTAKING
-    operator.leftBumper().whileTrue(intake.intake(scoring.gamePiece()));
-    operator.rightBumper().whileTrue(intake.outtake(scoring.gamePiece()));
+    operator.leftBumper().whileTrue(intake.intake(gamePiece));
+    operator.rightBumper().whileTrue(intake.outtake(gamePiece));
 
     // FAILURE MODES
     arm.onFailing(arm.kill());
