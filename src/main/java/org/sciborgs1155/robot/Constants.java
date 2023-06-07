@@ -204,7 +204,7 @@ public final class Constants {
 
   public static final class Elevator {
     public static final MotorConfig MOTOR_CFG =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(35);
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.COAST).withCurrentLimit(35);
 
     public static final double MOTOR_GEARING = 30.0 / 1.0;
     // Gearing for motor : height (meters)
@@ -261,8 +261,8 @@ public final class Constants {
   }
 
   public static final class Drive {
-    public static final double MAX_SPEED = 4.8 / 3.0; // m / s
-    public static final double MAX_ANGULAR_SPEED = Math.PI; // rad / s
+    public static final double MAX_SPEED = 4.8; // m / s
+    public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
     public static final double MAX_ACCEL = 6.5; // m / s^2
 
     public static final double TRACK_WIDTH = 0.5715;

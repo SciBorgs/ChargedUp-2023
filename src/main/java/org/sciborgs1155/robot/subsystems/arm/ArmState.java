@@ -38,18 +38,18 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
 
   // NEW ARM SPECIFIC STATES
   static final ArmState NEW_INITIAL = fromRelative(Elevator.ZERO_OFFSET, Elbow.OFFSET, 2.4);
-  static final ArmState NEW_STOW = OLD_STOW;
+  static final ArmState NEW_STOW = fromEndpoint(0.169, 0.250, 1.214).get();
 
   static final ArmState NEW_GROUND_CONE = fromRelative(0.618, -0.714, -0.723);
-  static final ArmState NEW_GROUND_CUBE = fromRelative(0, 0, 0);
+  static final ArmState NEW_GROUND_CUBE = fromEndpoint(0.331, 0.225, -0.253).get();
   static final ArmState NEW_SINGLESUB_CONE = OLD_SINGLESUB_CONE;
   static final ArmState NEW_SINGLESUB_CUBE = OLD_SINGLESUB_CUBE;
   static final ArmState NEW_DOUBLESUB_CONE = NEW_STOW;
   static final ArmState NEW_DOUBLESUB_CUBE = NEW_STOW;
 
-  static final ArmState NEW_MID_CONE = NEW_STOW;
+  static final ArmState NEW_MID_CONE = fromEndpoint(0.773, 1.208, -1.294).get();
   static final ArmState NEW_MID_CUBE = NEW_STOW;
-  static final ArmState NEW_HIGH_CONE = NEW_STOW;
+  static final ArmState NEW_HIGH_CONE = fromEndpoint(-1.037, 1.063, 2.970).get();
   static final ArmState NEW_HIGH_CUBE = NEW_STOW;
 
   public static final List<ArmState> PRESETS =
