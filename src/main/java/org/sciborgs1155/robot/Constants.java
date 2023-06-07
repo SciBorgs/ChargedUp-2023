@@ -204,7 +204,7 @@ public final class Constants {
 
   public static final class Elevator {
     public static final MotorConfig MOTOR_CFG =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.COAST).withCurrentLimit(35);
+        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(35);
 
     public static final double MOTOR_GEARING = 30.0 / 1.0;
     // Gearing for motor : height (meters)
@@ -249,12 +249,12 @@ public final class Constants {
     public static final MotorConfig MOTOR_CFG =
         MotorConfig.base()
             .withNeutralBehavior(NeutralBehavior.BRAKE)
-            .withCurrentLimit(45)
+            .withCurrentLimit(50)
             .withInvert(true);
 
     public static final double DEFAULT_SPEED = 0.05;
 
-    public static final double CONE_SPEED = 0.8;
+    public static final double CONE_SPEED = 1;
     public static final double CUBE_SPEED = -0.4;
 
     public static final double THRESHOLD = 0.5;

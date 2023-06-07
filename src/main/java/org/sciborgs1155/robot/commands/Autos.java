@@ -194,8 +194,8 @@ public final class Autos implements Sendable {
   }
 
   private Command frontMovingIntake(GamePiece gamePiece) {
-    return arm.goTo(Goal.LOW, gamePiece)
-        .andThen(intake.intake(gamePiece).withTimeout(MOVING_INTAKE_TIME));
+    return arm.goTo(Goal.LOW, () -> gamePiece)
+        .andThen(intake.intake(() -> gamePiece).withTimeout(MOVING_INTAKE_TIME));
   }
 
   /** back cone, cube intake, back cube */
@@ -244,7 +244,7 @@ public final class Autos implements Sendable {
   }
 
   private CommandBase score(Goal goal, GamePiece gamePiece) {
-    return arm.goTo(goal, gamePiece).withTimeout(5).andThen(intake.outtake(gamePiece));
+    return arm.goTo(goal, () -> gamePiece).withTimeout(5).andThen(intake.outtake(gamePiece));
   }
 
   /** no PPL */
@@ -295,7 +295,7 @@ public final class Autos implements Sendable {
   private Command lowCubeLeave() {
     return Commands.sequence(
         staticOdometryReset(GamePiece.CONE, Side.FRONT, FLAT),
-        arm.goTo(Goal.LOW, GamePiece.CUBE),
+        arm.goTo(Goal.LOW, () -> GamePiece.CUBE),
         intake.outtake(GamePiece.CUBE),
         drive.followPath(Paths.LEAVE_FLAT_BACKWARDS.get(0), false));
   }

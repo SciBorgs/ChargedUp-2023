@@ -111,8 +111,8 @@ public class Arm extends SubsystemBase implements Fallible, Loggable, AutoClosea
    * @return A command that goes to the goal safely using either custom trajectory following or
    *     trapezoid profiling.
    */
-  public CommandBase goTo(Goal goal, GamePiece gamePiece) {
-    return goTo(ArmState.fromGoal(goal, gamePiece));
+  public CommandBase goTo(Goal goal, Supplier<GamePiece> gamePiece) {
+    return goTo(() -> ArmState.fromGoal(goal, gamePiece.get()));
   }
 
   /**
@@ -173,7 +173,7 @@ public class Arm extends SubsystemBase implements Fallible, Loggable, AutoClosea
                     ArmState.fromRelative(
                         getState().elevatorHeight(),
                         goal.get().side().angle,
-                        getState().wristAngle().getRadians())),
+                        goal.get().wristAngle().getRadians())),
             Commands.none(),
             () -> getState().end() != goal.get().end());
 

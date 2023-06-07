@@ -121,13 +121,13 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
     operator.a().onTrue(Commands.runOnce(() -> gamePiece = GamePiece.CUBE));
 
     // SCORING
-    operator.povUp().onTrue(arm.goTo(Goal.HIGH, gamePiece));
-    operator.povRight().onTrue(arm.goTo(Goal.MID, gamePiece));
-    operator.povDown().onTrue(arm.goTo(Goal.LOW, gamePiece));
+    operator.povUp().onTrue(arm.goTo(Goal.HIGH, () -> gamePiece));
+    operator.povRight().onTrue(arm.goTo(Goal.MID, () -> gamePiece));
+    operator.povDown().onTrue(arm.goTo(Goal.LOW, () -> gamePiece));
     operator.povLeft().onTrue(arm.goTo(ArmState.stow()));
 
-    operator.leftTrigger().onTrue(arm.goTo(Goal.SINGLE_SUBSTATION, gamePiece));
-    operator.rightTrigger().onTrue(arm.goTo(Goal.DOUBLE_SUBSTATION, gamePiece));
+    operator.leftTrigger().onTrue(arm.goTo(Goal.SINGLE_SUBSTATION, () -> gamePiece));
+    operator.rightTrigger().onTrue(arm.goTo(Goal.DOUBLE_SUBSTATION, () -> gamePiece));
 
     // INTAKING
     operator.leftBumper().whileTrue(intake.intake(gamePiece));

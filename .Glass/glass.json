@@ -47,6 +47,7 @@
           }
         },
         "Robot": {
+          "open": true,
           "scoring": {
             "open": true
           }
@@ -59,6 +60,9 @@
             "open": true
           }
         },
+        "open": true
+      },
+      "SmartDashboard": {
         "open": true
       },
       "photonvision": {
