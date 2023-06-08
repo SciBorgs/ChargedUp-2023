@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.subsystems;
+package org.sciborgs1155.robot.subsystems.arm;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
@@ -23,24 +23,12 @@ import org.sciborgs1155.robot.Constants.Elbow;
 import org.sciborgs1155.robot.Constants.Elevator;
 import org.sciborgs1155.robot.Constants.Wrist;
 import org.sciborgs1155.robot.Robot;
-import org.sciborgs1155.robot.subsystems.arm.ArmState;
 import org.sciborgs1155.robot.subsystems.arm.ArmState.GamePiece;
 import org.sciborgs1155.robot.subsystems.arm.ArmState.Goal;
-import org.sciborgs1155.robot.subsystems.arm.ElevatorIO;
 import org.sciborgs1155.robot.subsystems.arm.ElevatorIO.ElevatorConfig;
-import org.sciborgs1155.robot.subsystems.arm.JointIO;
 import org.sciborgs1155.robot.subsystems.arm.JointIO.JointConfig;
-import org.sciborgs1155.robot.subsystems.arm.NoElevator;
-import org.sciborgs1155.robot.subsystems.arm.NoJoint;
-import org.sciborgs1155.robot.subsystems.arm.RealElbow;
-import org.sciborgs1155.robot.subsystems.arm.RealElevator;
-import org.sciborgs1155.robot.subsystems.arm.RealWrist;
-import org.sciborgs1155.robot.subsystems.arm.SimElevator;
-import org.sciborgs1155.robot.subsystems.arm.SimJoint;
-import org.sciborgs1155.robot.subsystems.arm.TrajectoryCache;
 import org.sciborgs1155.robot.subsystems.arm.TrajectoryCache.ArmTrajectory;
 import org.sciborgs1155.robot.subsystems.arm.TrajectoryCache.Parameters;
-import org.sciborgs1155.robot.subsystems.arm.Visualizer;
 
 public class Arm extends SubsystemBase implements Fallible, Loggable, AutoCloseable {
 

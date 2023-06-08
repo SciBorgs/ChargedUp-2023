@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.subsystems.modules;
+package org.sciborgs1155.robot.subsystems.drive;
 
 import static org.sciborgs1155.robot.Constants.SwerveModule.*;
 

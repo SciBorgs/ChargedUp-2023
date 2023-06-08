@@ -20,10 +20,10 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.List;
 import java.util.function.Supplier;
-import org.sciborgs1155.robot.subsystems.Arm;
-import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
+import org.sciborgs1155.robot.subsystems.arm.Arm;
 import org.sciborgs1155.robot.subsystems.arm.ArmState;
+import org.sciborgs1155.robot.subsystems.drive.Drive;
 
 public final class Autos implements Sendable {
 

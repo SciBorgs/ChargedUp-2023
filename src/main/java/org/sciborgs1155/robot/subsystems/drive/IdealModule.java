@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.subsystems.modules;
+package org.sciborgs1155.robot.subsystems.drive;
 
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;

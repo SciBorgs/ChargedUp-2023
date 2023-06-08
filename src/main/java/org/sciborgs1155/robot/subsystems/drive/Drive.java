@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.subsystems;
+package org.sciborgs1155.robot.subsystems.drive;
 
 import static org.sciborgs1155.robot.Constants.Drive.*;
 import static org.sciborgs1155.robot.Ports.Drive.*;
@@ -38,9 +38,6 @@ import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
-import org.sciborgs1155.robot.subsystems.modules.MAXSwerveModule;
-import org.sciborgs1155.robot.subsystems.modules.ModuleIO;
-import org.sciborgs1155.robot.subsystems.modules.SimModule;
 
 public class Drive extends SubsystemBase implements Fallible, Loggable, AutoCloseable {
 
