@@ -132,6 +132,9 @@
           "open": true,
           "position": {
             "open": true
+          },
+          "wrist": {
+            "open": true
           }
         },
         "Elevator": {
@@ -142,6 +145,9 @@
         },
         "Robot": {
           "arm": {
+            "open": true
+          },
+          "autos": {
             "open": true
           },
           "open": true,

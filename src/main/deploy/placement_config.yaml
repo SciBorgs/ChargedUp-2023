@@ -17,7 +17,7 @@ solver:
   maxAccelerationElbow: 3.4
   maxAccelerationWrist: 2.9
   maxAccelerationLift: 3.35
-  maxJerk: 800
+  maxJerk: 1000
 
 lift:
   mass: 6.80389
@@ -92,7 +92,7 @@ constraints:
     point: end
     args: [
       -0.3, 0,
-      0.3, 0.25
+      0.3, 0.32
     ]
   elevator:
     type: rectangle

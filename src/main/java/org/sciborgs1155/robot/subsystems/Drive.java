@@ -24,7 +24,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
@@ -133,7 +133,7 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
   }
 
   /** Drives the robot based on a {@link DoubleSupplier} for x y and omega velocities */
-  public Command drive(DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier vOmega) {
+  public CommandBase drive(DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier vOmega) {
     return run(
         () ->
             drive(
@@ -192,7 +192,7 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
   }
 
   /** Zeroes the heading of the robot. */
-  public Command zeroHeading() {
+  public CommandBase zeroHeading() {
     return runOnce(imu::reset);
   }
 
@@ -239,22 +239,32 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
                 * Constants.PERIOD);
   }
 
+  /** Stops drivetrain */
+  public CommandBase stop() {
+    return runOnce(() -> drive(new ChassisSpeeds()));
+  }
+
+  /** Sets the drivetrain to an "X" configuration, preventing movement */
+  public CommandBase lock() {
+    var front = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
+    var back = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
+    return run(() -> setModuleStates(new SwerveModuleState[] {front, back, back, front}));
+  }
+
   /** Sets a new speed multiplier for the robot, this affects max cartesian and angular speeds */
-  public Command setSpeedMultiplier(double multiplier) {
+  public CommandBase setSpeedMultiplier(double multiplier) {
     return runOnce(() -> speedMultiplier = multiplier);
   }
 
   /**
-   * Follows a path on the field.
+   * Follows a simple {@link PathPlannerTrajectory} on the field.
    *
-   * @param trajectory The pathplanner trajectory the robot will follow
-   * @param resetPosition Whether the robot should set its odometry to the initial pose of the
-   *     trajectory
-   * @param useAllianceColor Whether the robot should take into account alliance color before
-   *     following
-   * @return The command that follows the trajectory
+   * <p>For safer use, see {@link this#followPath(PathPlannerTrajectory, boolean)}.
+   *
+   * @param trajectory The trajectory to follow.
+   * @return The command that follows the trajectory.
    */
-  public Command follow(PathPlannerTrajectory trajectory) {
+  public CommandBase follow(PathPlannerTrajectory trajectory) {
     return new PPSwerveControllerCommand(
             trajectory,
             this::getPose,
@@ -267,35 +277,25 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
         .andThen(stop());
   }
 
-  /** Follows the specified path planner path given a path name */
-  public Command follow(String pathName, boolean resetPosition) {
-    PathPlannerTrajectory loadedPath = PathPlanner.loadPath(pathName, CONSTRAINTS);
-    return (resetPosition ? pathOdometryReset(loadedPath) : Commands.none())
-        .andThen(follow(loadedPath));
+  /**
+   * Follows the specified trajectory using {@link this#follow(PathPlannerTrajectory)} and resets if
+   * specified
+   */
+  public CommandBase followPath(PathPlannerTrajectory path, boolean resetOdometry) {
+    var newPath = pathForAlliance(path, DriverStation.getAlliance());
+    return (resetOdometry ? pathOdometryReset(newPath) : Commands.none()).andThen(follow(newPath));
   }
 
   /** Resets odometry to first pose in path, using ppl to reflects if using alliance color */
-  public Command pathOdometryReset(PathPlannerTrajectory trajectory) {
+  public CommandBase pathOdometryReset(PathPlannerTrajectory trajectory) {
     var initialState = trajectory.getInitialState();
     Pose2d initialPose =
         new Pose2d(initialState.poseMeters.getTranslation(), initialState.holonomicRotation);
     return Commands.runOnce(() -> resetOdometry(initialPose), this);
   }
 
-  /** Stops drivetrain */
-  public Command stop() {
-    return runOnce(() -> drive(new ChassisSpeeds()));
-  }
-
-  /** Sets the drivetrain to an "X" configuration, preventing movement */
-  public Command lock() {
-    var front = new SwerveModuleState(0, Rotation2d.fromDegrees(45));
-    var back = new SwerveModuleState(0, Rotation2d.fromDegrees(-45));
-    return run(() -> setModuleStates(new SwerveModuleState[] {front, back, back, front}));
-  }
-
   /** Creates and follows trajectroy for swerve from startPose to desiredPose */
-  public Command driveToPose(Pose2d startPose, Pose2d desiredPose) {
+  public CommandBase driveToPose(Pose2d startPose, Pose2d desiredPose) {
     Rotation2d heading = desiredPose.minus(startPose).getTranslation().getAngle();
     PathPoint start = new PathPoint(startPose.getTranslation(), heading, startPose.getRotation());
     PathPoint goal =
@@ -305,17 +305,8 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
   }
 
   /** Creates and follows trajectory for swerve from current pose to desiredPose */
-  public Command driveToPose(Pose2d desiredPose) {
+  public CommandBase driveToPose(Pose2d desiredPose) {
     return new DeferredCommand(() -> driveToPose(getPose(), desiredPose), this);
-  }
-
-  public static List<PathPlannerTrajectory> loadPath(String pathName) {
-    return PathPlanner.loadPathGroup(pathName, CONSTRAINTS);
-  }
-
-  public Command followPath(PathPlannerTrajectory path, boolean resetOdometry) {
-    var newPath = pathForAlliance(path, DriverStation.getAlliance());
-    return (resetOdometry ? pathOdometryReset(newPath) : Commands.none()).andThen(follow(newPath));
   }
 
   @Override

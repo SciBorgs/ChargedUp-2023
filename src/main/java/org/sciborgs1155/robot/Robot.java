@@ -10,6 +10,7 @@ import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import org.sciborgs1155.lib.CommandRobot;
+import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.lib.failure.Fallible;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
@@ -155,9 +156,8 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
 
   /** The commamnd to be ran in autonomous */
   public Command getAutonomousCommand() {
-    // return new DeferredCommand(Auto::get, drive, arm)
-    //     .until(() -> !DriverStation.isAutonomous())
-    //     .withName("auto");
-    return Commands.none();
+    return new DeferredCommand(autos::get, drive, arm)
+        .until(() -> !DriverStation.isAutonomous())
+        .withName("auto");
   }
 }

@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.sciborgs1155.lib.Trajectory;
+import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.Constants.RobotType;
 
 public class TrajectoryCache {
 
@@ -84,8 +86,14 @@ public class TrajectoryCache {
 
     List<CachedTrajectory> generatedTrajectories = new ArrayList<CachedTrajectory>();
 
-    for (var initialPos : ArmState.PRESETS) {
-      for (var finalPos : ArmState.PRESETS) {
+    // Only use necessary presets for the current model of robot
+    var presets =
+        Constants.ROBOT_TYPE == RobotType.WHIPLASH_CLAW
+            ? ArmState.OLD_PRESETS
+            : ArmState.NEW_PRESETS;
+
+    for (var initialPos : presets) {
+      for (var finalPos : presets) {
         if (!initialPos.equals(finalPos)) {
           System.out.println("Adding initial: " + initialPos + " final: " + finalPos);
           generatedTrajectories.add(

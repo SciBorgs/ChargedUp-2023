@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot.subsystems.arm;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -52,7 +53,7 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
   static final ArmState NEW_HIGH_CONE = fromEndpoint(-1.037, 1.063, 2.970).get();
   static final ArmState NEW_HIGH_CUBE = fromEndpoint(-1.028, 1.082, -1.975).get();
 
-  public static final List<ArmState> PRESETS =
+  static final List<ArmState> OLD_PRESETS =
       List.of(
           PASS_TO_BACK,
           PASS_TO_FRONT,
@@ -66,7 +67,11 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
           OLD_MID_CONE,
           OLD_MID_CUBE,
           OLD_HIGH_CONE,
-          OLD_HIGH_CUBE,
+          OLD_HIGH_CUBE);
+  static final List<ArmState> NEW_PRESETS =
+      List.of(
+          PASS_TO_BACK,
+          PASS_TO_FRONT,
           NEW_INITIAL,
           NEW_STOW,
           NEW_GROUND_CONE,
@@ -114,23 +119,22 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
   }
 
   /**
-   * Returns a new {@link ArmState} from angles in radians, with the wrist state relative to the
-   * chassis
+   * Returns a new {@link ArmState} from angles in radians, normalized from -pi to pi, with the
+   * wrist state relative to the chassis
    */
   public static ArmState fromAbsolute(double elevatorHeight, double elbowAngle, double wristAngle) {
-    return new ArmState(
-        elevatorHeight,
-        Rotation2d.fromRadians(elbowAngle),
-        Rotation2d.fromRadians(wristAngle - elbowAngle));
+    return fromRelative(elevatorHeight, elbowAngle, wristAngle - elbowAngle);
   }
 
   /**
-   * Returns a new {@link ArmState} from angles in radians, with the wrist state relative to the
-   * forearm
+   * Returns a new {@link ArmState} from angles in radians, normalized from -pi to pi, with the
+   * wrist state relative to the forearm
    */
   public static ArmState fromRelative(double elevatorHeight, double elbowAngle, double wristAngle) {
     return new ArmState(
-        elevatorHeight, Rotation2d.fromRadians(elbowAngle), Rotation2d.fromRadians(wristAngle));
+        elevatorHeight,
+        Rotation2d.fromRadians(MathUtil.angleModulus(elbowAngle)),
+        Rotation2d.fromRadians(MathUtil.angleModulus(wristAngle)));
   }
 
   /** Creates a PlacementState from an absolute 3d array */

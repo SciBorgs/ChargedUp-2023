@@ -50,7 +50,7 @@ if __name__ == "__main__":
     
     # Generate all trajectories
     fail_count = 0
-    results = multiprocessing.Pool().map(
+    results = multiprocessing.Pool(multiprocessing.cpu_count() // 3).map(
         calculate_func,
         cache_data["trajectories"],
     )
