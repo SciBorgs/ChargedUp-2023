@@ -31,7 +31,7 @@ public class RealElevator implements ElevatorIO {
   private final double minHeight;
   private final double maxHeight;
 
-  private State lastSetpoint = new State();
+  private State lastSetpoint;
   private double lastVoltage;
 
   public RealElevator(ElevatorConfig config) {

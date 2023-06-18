@@ -32,7 +32,7 @@ public class RealElbow implements JointIO {
   private final double minAngle;
   private final double maxAngle;
 
-  private State lastSetpoint = new State();
+  private State lastSetpoint;
   private double lastVoltage;
 
   public RealElbow(JointConfig config) {

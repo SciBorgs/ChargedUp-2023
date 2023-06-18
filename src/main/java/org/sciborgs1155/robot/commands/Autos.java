@@ -359,7 +359,6 @@ public final class Autos implements Sendable {
   }
 
   public Command get() {
-    // return arm.setSetpoints(ArmState::initial).andThen(autoChooser.getSelected().get());
-    return autoChooser.getSelected().get();
+    return arm.setSetpoints(ArmState::initial).andThen(autoChooser.getSelected().get());
   }
 }

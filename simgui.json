@@ -108,11 +108,6 @@
         "window": {
           "visible": true
         }
-      },
-      "/Shuffleboard/Robot/position": {
-        "window": {
-          "visible": true
-        }
       }
     }
   },
@@ -127,6 +122,9 @@
       "Shuffleboard": {
         "Arm": {
           "current state": {
+            "open": true
+          },
+          "elbow": {
             "open": true
           },
           "open": true,

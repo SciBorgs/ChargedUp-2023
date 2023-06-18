@@ -40,7 +40,10 @@ public class Arm extends SubsystemBase implements Fallible, Loggable, AutoClosea
       ElevatorConfig elevator, JointConfig elbow, JointConfig wrist) {
     return Robot.isReal()
         ? new Arm(new RealElevator(elevator), new RealElbow(elbow), new RealWrist(wrist))
-        : new Arm(new SimElevator(elevator), new SimJoint(elbow, true), new SimJoint(wrist, false));
+        : new Arm(
+            new SimElevator(elevator, ArmState.initial().elevatorHeight()),
+            new SimJoint(elbow, ArmState.initial().elbowAngle(), true),
+            new SimJoint(wrist, ArmState.initial().wristAngle(), false));
   }
 
   @Log private final ElevatorIO elevator;

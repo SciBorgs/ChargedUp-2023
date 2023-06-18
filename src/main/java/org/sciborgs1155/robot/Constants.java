@@ -126,7 +126,7 @@ public final class Constants {
         new ArmFFConstants(0.34613, 0.25692, 0.78381, 0.090836);
     public static final ArmFFConstants FF_OLD = new ArmFFConstants(0.1542, 0.6, 0.91, 0.038046);
 
-    public static final Constraints CONSTRAINTS = new Constraints(2.45, 2.9);
+    public static final Constraints CONSTRAINTS = new Constraints(2.45, 3.6);
 
     public static final double MAX_ANGLE = Math.PI;
     public static final double MIN_ANGLE = -Math.PI;

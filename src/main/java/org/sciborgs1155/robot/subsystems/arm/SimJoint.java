@@ -1,5 +1,7 @@
 package org.sciborgs1155.robot.subsystems.arm;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
@@ -21,7 +23,7 @@ public class SimJoint implements JointIO {
   private State lastSetpoint = new State();
   private double lastVoltage;
 
-  public SimJoint(JointConfig config, boolean gravity) {
+  public SimJoint(JointConfig config, Rotation2d startingAngle, boolean gravity) {
     sim =
         new SingleJointedArmSim(
             config.gearbox(),
@@ -30,7 +32,10 @@ public class SimJoint implements JointIO {
             config.length(),
             config.minAngle(),
             config.maxAngle(),
-            gravity);
+            gravity,
+            VecBuilder.fill(0.005));
+
+    sim.setState(VecBuilder.fill(startingAngle.getRadians(), 0));
 
     ff = config.ff().createFeedforward();
     pid = config.pid().createPIDController();
@@ -57,7 +62,7 @@ public class SimJoint implements JointIO {
     double pidVoltage = pid.calculate(getRelativeAngle().getRadians(), setpoint.position);
 
     lastVoltage = ffVoltage + pidVoltage;
-    sim.setInputVoltage(lastVoltage);
+    sim.setInputVoltage(MathUtil.clamp(lastVoltage, -12, 12));
     sim.update(Constants.PERIOD);
 
     lastSetpoint = setpoint;

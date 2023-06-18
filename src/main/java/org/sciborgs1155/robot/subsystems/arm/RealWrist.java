@@ -33,7 +33,7 @@ public class RealWrist implements JointIO {
 
   private Rotation2d elbowAngle = new Rotation2d();
 
-  private State lastSetpoint = new State();
+  private State lastSetpoint;
   private double lastVoltage;
 
   public RealWrist(JointConfig config) {

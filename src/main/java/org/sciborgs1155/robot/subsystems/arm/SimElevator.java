@@ -1,5 +1,7 @@
 package org.sciborgs1155.robot.subsystems.arm;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -18,7 +20,7 @@ public class SimElevator implements ElevatorIO {
   private State lastSetpoint = new State();
   private double lastVoltage;
 
-  public SimElevator(ElevatorConfig config) {
+  public SimElevator(ElevatorConfig config, double startingHeight) {
     sim =
         new ElevatorSim(
             config.gearbox(),
@@ -27,7 +29,10 @@ public class SimElevator implements ElevatorIO {
             config.sprocketRadius(),
             config.minHeight(),
             config.maxHeight(),
-            true);
+            true,
+            VecBuilder.fill(0.005));
+
+    sim.setState(VecBuilder.fill(startingHeight, 0));
 
     ff = config.ff().createFeedforward();
     pid = config.pid().createPIDController();
@@ -54,7 +59,7 @@ public class SimElevator implements ElevatorIO {
     double pidVoltage = pid.calculate(getHeight(), setpoint.position);
 
     lastVoltage = ffVoltage + pidVoltage;
-    sim.setInputVoltage(lastVoltage);
+    sim.setInputVoltage(MathUtil.clamp(lastVoltage, -12, 12));
     sim.update(Constants.PERIOD);
 
     lastSetpoint = setpoint;
