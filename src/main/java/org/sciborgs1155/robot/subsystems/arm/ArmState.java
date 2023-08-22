@@ -5,8 +5,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.DoubleUnaryOperator;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
@@ -53,8 +53,8 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
   static final ArmState NEW_HIGH_CONE = fromEndpoint(-1.037, 1.063, 2.970).get();
   static final ArmState NEW_HIGH_CUBE = fromEndpoint(-1.028, 1.082, -1.975).get();
 
-  static final List<ArmState> OLD_PRESETS =
-      List.of(
+  static final Set<ArmState> OLD_PRESETS =
+      Set.of(
           PASS_TO_BACK,
           PASS_TO_FRONT,
           OLD_INITIAL,
@@ -68,8 +68,8 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
           OLD_MID_CUBE,
           OLD_HIGH_CONE,
           OLD_HIGH_CUBE);
-  static final List<ArmState> NEW_PRESETS =
-      List.of(
+  static final Set<ArmState> NEW_PRESETS =
+      Set.of(
           PASS_TO_BACK,
           PASS_TO_FRONT,
           NEW_INITIAL,
@@ -78,8 +78,8 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
           NEW_GROUND_CUBE,
           NEW_SINGLESUB_CONE,
           NEW_SINGLESUB_CUBE,
-          NEW_DOUBLESUB_CONE,
-          NEW_DOUBLESUB_CUBE,
+          // NEW_DOUBLESUB_CONE,
+          // NEW_DOUBLESUB_CUBE,
           NEW_MID_CONE,
           NEW_MID_CUBE,
           NEW_HIGH_CONE,

@@ -134,8 +134,17 @@ public class Arm extends SubsystemBase implements Fallible, Loggable, AutoClosea
    */
   public CommandBase goTo(Supplier<ArmState> goal) {
     return new DeferredCommand(
-        () ->
-            findTrajectory(goal.get()).map(this::followTrajectory).orElse(safeFollowProfile(goal)),
+        () -> {
+          var trajectory = findTrajectory(goal.get());
+          return trajectory
+              .map(this::followTrajectory)
+              .orElse(safeFollowProfile(goal))
+              .alongWith(
+                  Commands.print(
+                      String.format(
+                          "Arm goTo Command:\nStart: %s\nGoal: %s\nFound trajectory: %b\n",
+                          getSetpoint(), goal.get(), trajectory.isPresent())));
+        },
         this);
   }
 

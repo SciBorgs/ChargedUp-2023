@@ -255,7 +255,9 @@ public final class Autos implements Sendable {
   }
 
   private CommandBase score(Goal goal, GamePiece gamePiece) {
-    return arm.goTo(goal, () -> gamePiece).withTimeout(5).andThen(intake.outtake(() -> gamePiece));
+    return arm.goTo(goal, () -> gamePiece)
+        .withTimeout(5)
+        .andThen(intake.outtakeWithTimeout(() -> gamePiece));
   }
 
   private CommandBase scoreThenBalance(GamePiece gamePiece) {
