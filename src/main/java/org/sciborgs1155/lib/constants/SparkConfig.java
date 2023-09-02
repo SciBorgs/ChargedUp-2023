@@ -2,19 +2,25 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package org.sciborgs1155.lib.constants;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 /** Add your docs here. */
 public class SparkConfig {
-  private final CANSparkMax motor;
+  private NeutralBehavior neutralBehavior;
+  private boolean inverted = false;
 
-  public SparkConfig(int port, MotorType motorType) {
-    motor = new CANSparkMax(port, motorType);
-    motor.restoreFactoryDefaults();
-  }
+  private SensorType sensor = SensorType.MISSING;
+  private PIDConstants pid = new PIDConstants(0, 0, 0);
+  private CANSparkMax lead = null;
+
+  private int currentLimit = 80;
+  private int openLoopRampRate = 0;
 
   public enum NeutralBehavior {
     COAST(true),
@@ -36,33 +42,59 @@ public class SparkConfig {
     INTEGRATED;
   }
 
-  // TODO: Work out specific logic for sensors
   public void setInverted(boolean inverted) {
-    motor.setInverted(inverted);
+    this.inverted = inverted;
   }
 
   public void setNeutralBehavior(NeutralBehavior neutralBehavior) {
-    motor.setIdleMode(neutralBehavior.getREV());
+    this.neutralBehavior = neutralBehavior;
   }
 
-  public void setSensor(SensorType sensor) {}
+  public void setSensor(SensorType sensor) {
+    this.sensor = sensor;
+  }
 
-  public void setPID(PIDConstants pid) {}
+  public void setPID(PIDConstants pid) {
+    this.pid = pid;
+  }
 
   public void setCurrentLimit(int currentLimit) {
-    motor.setSmartCurrentLimit(currentLimit);
+    this.currentLimit = currentLimit;
   }
 
-  public void setOpenLoopRampRate(double openLoopRampRate) {
-    motor.setOpenLoopRampRate(openLoopRampRate);
+  public void setOpenLoopRampRate(int openLoopRampRate) {
+    this.openLoopRampRate = openLoopRampRate;
   }
 
   public void follow(CANSparkMax lead) {
-    motor.follow(lead);
+    this.lead = lead;
   }
 
-  /** Creates a CANSparkMax based on configured values */
-  public CANSparkMax build() {
-    return motor;
+  public boolean isInverted() {
+    return inverted;
+  }
+
+  public NeutralBehavior getNeutralBehavior() {
+    return neutralBehavior;
+  }
+
+  public SensorType getSensor() {
+    return sensor;
+  }
+
+  public PIDConstants getPID() {
+    return pid;
+  }
+
+  public int getCurrentLimit() {
+    return currentLimit;
+  }
+
+  public int getOpenLoopRampRate() {
+    return openLoopRampRate;
+  }
+
+  public CANSparkMax getLead() {
+    return lead;
   }
 }

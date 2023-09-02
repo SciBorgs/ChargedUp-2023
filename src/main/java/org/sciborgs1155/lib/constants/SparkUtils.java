@@ -11,8 +11,19 @@ import java.util.function.Consumer;
 /** Add your docs here. */
 public class SparkUtils {
   public static CANSparkMax create(int port, MotorType type, Consumer<SparkConfig> configuration) {
-    var config = new SparkConfig(port, type);
-    configuration.accept(config);
-    return config.build();
+    CANSparkMax spark = new CANSparkMax(port, type);
+    var profile = new SparkConfig();
+    configuration.accept(profile);
+
+    spark.setIdleMode(profile.getNeutralBehavior().getREV());
+    spark.setInverted(profile.isInverted());
+    spark.setSmartCurrentLimit(profile.getCurrentLimit());
+    spark.setOpenLoopRampRate(profile.getOpenLoopRampRate());
+
+    if (profile.getLead() != null) {
+      spark.follow(profile.getLead());
+    }
+
+    return spark;
   }
 }
