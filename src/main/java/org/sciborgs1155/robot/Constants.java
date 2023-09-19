@@ -249,12 +249,12 @@ public final class Constants {
     public static final MotorConfig MOTOR_CFG =
         MotorConfig.base()
             .withNeutralBehavior(NeutralBehavior.BRAKE)
-            .withCurrentLimit(50)
+            .withCurrentLimit(40)
             .withInvert(true);
 
     public static final double DEFAULT_SPEED = 0.05;
 
-    public static final double CONE_SPEED = 1;
+    public static final double CONE_SPEED = 0.85;
     public static final double CUBE_SPEED = -0.4;
 
     public static final double THRESHOLD = 0.5;
