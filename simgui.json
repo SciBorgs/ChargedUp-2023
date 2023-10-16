@@ -29,6 +29,8 @@
       "/LiveWindow/Ungrouped/Pigeon IMU [42]": "Gyro",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/Shuffleboard/Arm/elbow feedback": "PIDController",
+      "/Shuffleboard/Arm/positionVisualizer": "Mechanism2d",
+      "/Shuffleboard/Arm/setpointVisualizer": "Mechanism2d",
       "/Shuffleboard/Arm/wrist feedback": "PIDController",
       "/Shuffleboard/Autos/Drive/field2d": "Field2d",
       "/Shuffleboard/Autos/Drive/imu": "Gyro",
@@ -64,8 +66,35 @@
       "/SmartDashboard/frontPhotonVision Sim Field": "Field2d"
     },
     "windows": {
+      "/Shuffleboard/Arm/positionVisualizer": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Arm/setpointVisualizer": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Shuffleboard/Drive/field2d": {
         "image": "./field/2023-field.png",
+        "module-0": {
+          "arrowSize": 22,
+          "selectable": false,
+          "style": "Line"
+        },
+        "module-1": {
+          "arrowSize": 22,
+          "style": "Line"
+        },
+        "module-2": {
+          "arrowSize": 22,
+          "style": "Line"
+        },
+        "module-3": {
+          "arrowSize": 22,
+          "style": "Line"
+        },
         "window": {
           "visible": true
         }
@@ -76,11 +105,6 @@
         }
       },
       "/Shuffleboard/Robot/autos": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/Shuffleboard/Robot/position": {
         "window": {
           "visible": true
         }
@@ -97,7 +121,19 @@
     "transitory": {
       "Shuffleboard": {
         "Arm": {
-          "open": true
+          "current state": {
+            "open": true
+          },
+          "elbow": {
+            "open": true
+          },
+          "open": true,
+          "position": {
+            "open": true
+          },
+          "wrist": {
+            "open": true
+          }
         },
         "Elevator": {
           "open": true,
@@ -106,6 +142,12 @@
           }
         },
         "Robot": {
+          "arm": {
+            "open": true
+          },
+          "autos": {
+            "open": true
+          },
           "open": true,
           "scoring": {
             "open": true
@@ -124,10 +166,19 @@
           }
         },
         "open": true
+      },
+      "SmartDashboard": {
+        "arm": {
+          "open": true,
+          "state": {
+            "open": true
+          }
+        },
+        "faults": {
+          "open": true
+        },
+        "open": true
       }
     }
-  },
-  "NetworkTables View": {
-    "visible": false
   }
 }

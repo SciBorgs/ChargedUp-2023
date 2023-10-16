@@ -2,6 +2,7 @@ package org.sciborgs1155.lib.constants;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
 /**
  * MotorConfig is a builder class for standardizing vendor motor controllers.
@@ -28,7 +29,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 public record MotorConfig(
     boolean inverted, NeutralBehavior neutralBehavior, double openLoopRampRate, int currentLimit) {
 
-  public enum NeutralBehavior {
+  public static enum NeutralBehavior {
     COAST(true),
     BRAKE(false);
 
@@ -40,6 +41,12 @@ public record MotorConfig(
 
     public CANSparkMax.IdleMode getREV() {
       return coast ? CANSparkMax.IdleMode.kCoast : CANSparkMax.IdleMode.kBrake;
+    }
+  }
+
+  public static void disableFrames(CANSparkMax sparkMax, int... frames) {
+    for (int frame : frames) {
+      sparkMax.setPeriodicFramePeriod(PeriodicFrame.fromId(frame), 65535);
     }
   }
 
@@ -57,6 +64,7 @@ public record MotorConfig(
   public CANSparkMax build(MotorType motorType, int id) {
     var motor = new CANSparkMax(id, motorType);
     motor.restoreFactoryDefaults();
+    motor.setCANTimeout(50); // ?
     motor.setInverted(inverted);
     motor.setIdleMode(neutralBehavior.getREV());
     motor.setOpenLoopRampRate(openLoopRampRate);

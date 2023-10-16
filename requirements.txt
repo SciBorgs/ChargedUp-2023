@@ -1,4 +1,4 @@
-casadi==3.5.5
+casadi>=3.5.5
 pyntcore==2023.*
 PyYAML==6.*
 matplotlib>=3.7.1

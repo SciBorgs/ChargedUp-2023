@@ -8,8 +8,6 @@ public final class Ports {
     public static final int LEFT_STICK = 2;
     public static final int RIGHT_STICK = 3;
   }
-  // angy
-  // angery
 
   public static final class Drive {
     public static final int FRONT_LEFT_DRIVE = 1;
@@ -25,14 +23,19 @@ public final class Ports {
     public static final int PIGEON = 42;
   }
 
-  public static final class Arm {
-    public static final int LEFT_ELBOW_MOTOR = 14;
-    public static final int MIDDLE_ELBOW_MOTOR = 16;
-    public static final int RIGHT_ELBOW_MOTOR = 15;
+  public static final class Elbow {
+    public static final int LEFT_MOTOR = 14;
+    public static final int MIDDLE_MOTOR = 16;
+    public static final int RIGHT_MOTOR = 15;
 
-    public static final int[] ELBOW_ENCODER = {9, 8};
+    public static final int[] ENCODER = {2, 3};
+  }
 
-    public static final int WRIST_MOTOR = 7;
+  public static final class Wrist {
+    public static final int MOTOR = 10;
+
+    public static final int[] RELATIVE_ENCODER = {5, 6};
+    public static final int ABS_ENCODER = 4;
   }
 
   public static final class Elevator {
@@ -40,18 +43,14 @@ public final class Ports {
     public static final int RIGHT_MOTOR = 24;
     public static final int MIDDLE_MOTOR = 25;
 
-    public static final int[] ENCODER = {6, 7};
-
-    public static final int LIMIT_SWITCH = 9;
+    public static final int[] ENCODER = {0, 1};
   }
 
   public static final class Intake {
-    public static final int WHEEL_MOTOR = 10;
+    public static final int WHEEL_MOTOR = 7;
   }
 
-  public static final class Led {
-    public static final int led1 = 9;
-    // on the robot before putting it on chassis the port # was 7
-    public static final int led2 = 8;
+  public static final class LED {
+    public static final int STRIP = 9;
   }
 }

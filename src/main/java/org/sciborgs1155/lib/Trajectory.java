@@ -1,7 +1,7 @@
 package org.sciborgs1155.lib;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.List;
@@ -12,12 +12,6 @@ public class Trajectory {
 
   private final List<Double> states;
   private final double totalTime;
-
-  public record State(double position, double velocity, double acceleration) {
-    public TrapezoidProfile.State trapezoidState() {
-      return new TrapezoidProfile.State(position, velocity);
-    }
-  }
 
   /**
    * Constructs a trajectory from a vector of states.
@@ -66,17 +60,8 @@ public class Trajectory {
     double position = MathUtil.interpolate(states.get(prev), states.get(next), (time % dt) / dt);
     double velocity = (states.get(next) - states.get(prev)) / dt;
 
-    double acceleration;
-    if ((time % dt) / dt < 0.5) {
-      var prevVelocity = (states.get(prev) - states.get(secondPrev)) / dt;
-      acceleration = (velocity - prevVelocity) / dt;
-    } else {
-      var nextVelocity = (states.get(secondNext) - states.get(next)) / dt;
-      acceleration = (nextVelocity - velocity) / dt;
-    }
-
     // return state vector
-    return new State(position, velocity, acceleration);
+    return new State(position, velocity);
   }
 
   /** Returns a command to follow the trajectory using {@link TrajectoryCommand} */

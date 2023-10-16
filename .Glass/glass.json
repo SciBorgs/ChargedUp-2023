@@ -9,15 +9,15 @@
           "elbow feedback": {
             "open": true
           },
+          "elevator": {
+            "open": true
+          },
+          "open": true,
           "wrist feedback": {
             "open": true
           }
         },
         "Drive": {
-          "open": true,
-          "rearLeft": {
-            "open": true
-          },
           "rearRight": {
             "open": true
           }
@@ -46,6 +46,12 @@
             "open": true
           }
         },
+        "Robot": {
+          "open": true,
+          "scoring": {
+            "open": true
+          }
+        },
         "RobotContainer": {
           "drive": {
             "open": true
@@ -56,6 +62,9 @@
         },
         "open": true
       },
+      "SmartDashboard": {
+        "open": true
+      },
       "photonvision": {
         "Microsoft_LifeCam_HD-3000 (1)": {
           "open": true
@@ -64,7 +73,12 @@
     },
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Arm/elbow": "PIDController",
       "/Shuffleboard/Arm/elbow feedback": "PIDController",
+      "/Shuffleboard/Arm/elevator": "PIDController",
+      "/Shuffleboard/Arm/positionVisualizer": "Mechanism2d",
+      "/Shuffleboard/Arm/setpointVisualizer": "Mechanism2d",
+      "/Shuffleboard/Arm/wrist": "PIDController",
       "/Shuffleboard/Arm/wrist feedback": "PIDController",
       "/Shuffleboard/Autos/Drive/field2d": "Field2d",
       "/Shuffleboard/Autos/Drive/imu": "Gyro",
@@ -76,6 +90,11 @@
       "/Shuffleboard/Drivetrain/field2d": "Field2d",
       "/Shuffleboard/Drivetrain/gyro": "Gyro",
       "/Shuffleboard/Elevator/pid": "PIDController",
+      "/Shuffleboard/Robot/arm": "Subsystem",
+      "/Shuffleboard/Robot/autos": "String Chooser",
+      "/Shuffleboard/Robot/drive": "Subsystem",
+      "/Shuffleboard/Robot/intake": "Subsystem",
+      "/Shuffleboard/Robot/led": "Subsystem",
       "/Shuffleboard/RobotContainer/arm": "Subsystem",
       "/Shuffleboard/RobotContainer/auto path chooser": "String Chooser",
       "/Shuffleboard/RobotContainer/autos": "String Chooser",
@@ -91,12 +110,12 @@
       "/SmartDashboard/frontPhotonVision Sim Field": "Field2d"
     },
     "windows": {
-      "/Shuffleboard/RobotContainer/position": {
+      "/Shuffleboard/Arm/positionVisualizer": {
         "window": {
           "visible": true
         }
       },
-      "/Shuffleboard/RobotContainer/setpoint": {
+      "/Shuffleboard/Arm/setpointVisualizer": {
         "window": {
           "visible": true
         }
@@ -104,7 +123,7 @@
     }
   },
   "NetworkTables Settings": {
-    "mode": "Client (NT3)",
+    "mode": "Client (NT4)",
     "serverTeam": "1155"
   },
   "Plots": {
@@ -222,7 +241,7 @@
               "autoFit": true
             }
           ],
-          "height": 275,
+          "height": 0,
           "series": [
             {
               "color": [
@@ -407,7 +426,7 @@
               "autoFit": true
             }
           ],
-          "height": 292,
+          "height": 202,
           "series": [
             {
               "color": [
@@ -435,7 +454,7 @@
               "autoFit": true
             }
           ],
-          "height": 292,
+          "height": 202,
           "series": [
             {
               "color": [

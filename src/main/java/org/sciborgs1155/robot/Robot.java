@@ -2,31 +2,32 @@ package org.sciborgs1155.robot;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
+import java.util.List;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.DeferredCommand;
-import org.sciborgs1155.robot.Constants.Drive.SpeedMultiplier;
-import org.sciborgs1155.robot.Constants.Positions;
+import org.sciborgs1155.lib.failure.Fallible;
+import org.sciborgs1155.lib.failure.FaultBuilder;
+import org.sciborgs1155.lib.failure.HardwareFault;
+import org.sciborgs1155.robot.Constants.Elbow;
+import org.sciborgs1155.robot.Constants.Elevator;
+import org.sciborgs1155.robot.Constants.Wrist;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
-import org.sciborgs1155.robot.commands.Placement;
-import org.sciborgs1155.robot.commands.Scoring;
-import org.sciborgs1155.robot.subsystems.Arm;
-import org.sciborgs1155.robot.subsystems.Drive;
-import org.sciborgs1155.robot.subsystems.Elevator;
 import org.sciborgs1155.robot.subsystems.Intake;
 import org.sciborgs1155.robot.subsystems.LED;
-import org.sciborgs1155.robot.util.Vision;
-import org.sciborgs1155.robot.util.Vision.Mode;
-import org.sciborgs1155.robot.util.Visualizer;
-import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;
-import org.sciborgs1155.robot.util.placement.PlacementState.Level;
-import org.sciborgs1155.robot.util.placement.PlacementState.Side;
+import org.sciborgs1155.robot.subsystems.arm.Arm;
+import org.sciborgs1155.robot.subsystems.arm.ArmState;
+import org.sciborgs1155.robot.subsystems.arm.ArmState.GamePiece;
+import org.sciborgs1155.robot.subsystems.arm.ArmState.Goal;
+import org.sciborgs1155.robot.subsystems.drive.Drive;
+import org.sciborgs1155.robot.vision.NoVision;
+import org.sciborgs1155.robot.vision.VisionIO;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -34,16 +35,23 @@ import org.sciborgs1155.robot.util.placement.PlacementState.Side;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-public class Robot extends CommandRobot implements Loggable {
+public class Robot extends CommandRobot implements Fallible, Loggable {
 
-  private final Vision vision = new Vision(Mode.NONE);
-  @Log private final Visualizer position = new Visualizer(new Color8Bit(255, 0, 0));
-  @Log private final Visualizer setpoint = new Visualizer(new Color8Bit(0, 0, 255));
+  private final VisionIO vision = new NoVision();
 
   // SUBSYSTEMS
-  @Log private final Drive drive = new Drive(vision);
-  @Log private final Elevator elevator = new Elevator(position, setpoint);
-  @Log private final Arm arm = new Arm(position, setpoint);
+  @Log private final Drive drive = Drive.create();
+
+  @Log
+  private final Arm arm =
+      switch (Constants.ROBOT_TYPE) {
+        case CHASSIS -> Arm.createNone();
+        case WHIPLASH_CLAW -> Arm.createFromConfig(
+            Elevator.CONFIG, Elbow.CONFIG_OLD, Wrist.CONFIG_OLD);
+        case WHIPLASH_ROLLER -> Arm.createFromConfig(
+            Elevator.CONFIG, Elbow.CONFIG_NEW, Wrist.CONFIG_NEW);
+      };
+
   @Log private final Intake intake = new Intake();
   @Log private final LED led = new LED();
 
@@ -52,9 +60,10 @@ public class Robot extends CommandRobot implements Loggable {
   private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
 
   // COMMANDS
-  private final Placement placement = new Placement(arm, elevator);
-  @Log private final Scoring scoring = new Scoring(led);
-  @Log private final Autos autos = new Autos(drive, placement, intake);
+  @Log(name = "Game Piece", methodName = "name")
+  private GamePiece gamePiece = GamePiece.CONE;
+
+  @Log private final Autos autos = new Autos(drive, arm, intake);
 
   /** The robot contains subsystems, OI devices, and commands. */
   public Robot() {
@@ -76,6 +85,7 @@ public class Robot extends CommandRobot implements Loggable {
     DataLogManager.start();
 
     addPeriodic(Logger::updateEntries, Constants.PERIOD);
+    addPeriodic(() -> drive.updateEstimates(vision.getPoseEstimates(drive.getPose())), 0.5);
 
     autonomous().onTrue(getAutonomousCommand());
 
@@ -92,59 +102,61 @@ public class Robot extends CommandRobot implements Loggable {
             .drive(() -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX())
             .withName("teleop driving"));
 
-    intake.setDefaultCommand(intake.set(Constants.Intake.DEFAULT_SPEED).withName("passive intake"));
+    arm.setDefaultCommand(arm.setSetpoints(arm::getSetpoint).repeatedly().withName("holding"));
+
+    // intake.setDefaultCommand(intake.intake(scoring.gamePiece()).withName("passive intake"));
   }
 
   /** Configures trigger -> command bindings */
   private void configureBindings() {
+
     // DRIVER INPUT
     driver.b().onTrue(drive.zeroHeading());
 
-    driver
-        .leftBumper()
-        .onTrue(drive.setSpeedMultiplier(SpeedMultiplier.SLOW))
-        .onFalse(drive.setSpeedMultiplier(SpeedMultiplier.NORMAL));
+    driver.leftBumper().onTrue(drive.setSpeedMultiplier(0.3)).onFalse(drive.setSpeedMultiplier(1));
 
-    driver
-        .rightBumper()
-        .onTrue(drive.setSpeedMultiplier(SpeedMultiplier.SLOW))
-        .onFalse(drive.setSpeedMultiplier(SpeedMultiplier.NORMAL));
+    driver.rightBumper().onTrue(drive.setSpeedMultiplier(0.3)).onFalse(drive.setSpeedMultiplier(1));
 
     // STATE SWITCHING
-    operator.b().onTrue(scoring.setSide(Side.FRONT));
-    operator.x().onTrue(scoring.setSide(Side.BACK));
-    operator.a().onTrue(scoring.setGamePiece(GamePiece.CUBE));
-    operator.y().onTrue(scoring.setGamePiece(GamePiece.CONE));
+    operator.b().onTrue(Commands.runOnce(() -> gamePiece = GamePiece.CONE));
+    operator.a().onTrue(Commands.runOnce(() -> gamePiece = GamePiece.CUBE));
 
     // SCORING
-    operator.povUp().onTrue(placement.goTo(() -> scoring.state(Level.HIGH)));
-    operator.povRight().onTrue(placement.goTo(() -> scoring.state(Level.MID)));
-    operator.povDown().onTrue(placement.goTo(() -> scoring.state(Level.LOW)));
-    operator.povLeft().onTrue(placement.goTo(Positions.STOW));
+    operator.povUp().onTrue(arm.goTo(Goal.HIGH, () -> gamePiece));
+    operator.povRight().onTrue(arm.goTo(Goal.MID, () -> gamePiece));
+    operator.povDown().onTrue(arm.goTo(Goal.LOW, () -> gamePiece));
+    operator.povLeft().onTrue(arm.goTo(ArmState.stow()));
 
-    operator.leftTrigger().onTrue(placement.goTo(() -> scoring.state(Level.SINGLE_SUBSTATION)));
-    operator.rightTrigger().onTrue(placement.goTo(() -> scoring.state(Level.DOUBLE_SUBSTATION)));
-
-    operator.rightStick().onTrue(placement.goTo(Positions.SAFE));
-    operator.leftStick().onTrue(placement.goTo(Positions.SAFE));
+    operator.leftTrigger().onTrue(arm.goTo(Goal.SINGLE_SUBSTATION, () -> gamePiece));
+    operator.rightTrigger().onTrue(arm.goTo(Goal.DOUBLE_SUBSTATION, () -> gamePiece));
 
     // INTAKING
-    operator.leftBumper().onTrue(intake.intake()).onFalse(intake.stop());
-    operator.rightBumper().onTrue(intake.outtake()).onFalse(intake.stop());
+    operator.leftBumper().whileTrue(intake.intake(() -> gamePiece));
+    operator.rightBumper().whileTrue(intake.outtake(() -> gamePiece));
 
     // FAILURE MODES
-    arm.onElbowFailing().onTrue(placement.setStopped(true));
-    elevator.onFailing().onTrue(placement.setStopped(true));
+    arm.onFailing(arm.kill());
+    intake.onFailing(Commands.print("intake faults" + intake.getFaults().toString()));
+    drive.onFailing(Commands.print("drive faults" + drive.getFaults().toString()));
+  }
+
+  @Override
+  public List<HardwareFault> getFaults() {
+    return FaultBuilder.create()
+        .register(drive.getFaults())
+        .register(arm.getFaults())
+        .register(intake.getFaults())
+        .build();
   }
 
   /** The command to run when the robot is enabled */
   public Command getEnableCommand() {
-    return new DeferredCommand(() -> placement.setSetpoint(placement.state()), arm, elevator);
+    return arm.setSetpoints(arm::getState);
   }
 
   /** The commamnd to be ran in autonomous */
   public Command getAutonomousCommand() {
-    return new DeferredCommand(autos::get, drive, arm, elevator)
+    return new DeferredCommand(autos::get, drive, arm)
         .until(() -> !DriverStation.isAutonomous())
         .withName("auto");
   }

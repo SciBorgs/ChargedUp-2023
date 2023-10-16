@@ -1,13 +1,11 @@
 package org.sciborgs1155.robot.commands;
 
 import static org.sciborgs1155.robot.Constants.Auto.*;
+import static org.sciborgs1155.robot.Constants.Drive.CONSTRAINTS;
 import static org.sciborgs1155.robot.Constants.Field.*;
-import static org.sciborgs1155.robot.Constants.Positions.*;
-import static org.sciborgs1155.robot.commands.Autos.StartingPos.*;
-import static org.sciborgs1155.robot.subsystems.Drive.loadPath;
-import static org.sciborgs1155.robot.util.placement.PlacementState.GamePiece.*;
-import static org.sciborgs1155.robot.util.placement.PlacementState.Side.*;
+import static org.sciborgs1155.robot.subsystems.arm.ArmState.*;
 
+import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -18,58 +16,71 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.List;
 import java.util.function.Supplier;
-import org.sciborgs1155.robot.subsystems.Drive;
 import org.sciborgs1155.robot.subsystems.Intake;
-import org.sciborgs1155.robot.util.placement.PlacementState.GamePiece;
-import org.sciborgs1155.robot.util.placement.PlacementState.Side;
+import org.sciborgs1155.robot.subsystems.arm.Arm;
+import org.sciborgs1155.robot.subsystems.arm.ArmState;
+import org.sciborgs1155.robot.subsystems.drive.Drive;
 
 public final class Autos implements Sendable {
 
-  public enum StartingPos {
+  public static enum StartingPos {
     BUMP,
     FLAT,
-    CENTER
+    CENTER,
   }
 
   public static final class Paths {
-    public static final List<PathPlannerTrajectory> TWO_GAMEPIECE_BUMP = loadPath("cone cube b");
-    public static final List<PathPlannerTrajectory> TWO_GAMEPIECE_FLAT = loadPath("cone cube f");
+    public static final List<PathPlannerTrajectory> TWO_GAMEPIECE_BUMP =
+        PathPlanner.loadPathGroup("cone cube b", CONSTRAINTS);
+    public static final List<PathPlannerTrajectory> TWO_GAMEPIECE_FLAT =
+        PathPlanner.loadPathGroup("cone cube f", CONSTRAINTS);
 
-    public static final List<PathPlannerTrajectory> CONE_LEAVE_BUMP = loadPath("cone leaveComm b");
-    public static final List<PathPlannerTrajectory> CONE_LEAVE_FLAT = loadPath("cone leaveComm f");
+    public static final List<PathPlannerTrajectory> CONE_LEAVE_BUMP =
+        PathPlanner.loadPathGroup("cone leaveComm b", CONSTRAINTS);
+    public static final List<PathPlannerTrajectory> CONE_LEAVE_FLAT =
+        PathPlanner.loadPathGroup("cone leaveComm f", CONSTRAINTS);
 
-    public static final List<PathPlannerTrajectory> CUBE_LEAVE_BUMP = loadPath("cube leaveComm b");
-    public static final List<PathPlannerTrajectory> CUBE_LEAVE_FLAT = loadPath("cube leaveComm f");
+    public static final List<PathPlannerTrajectory> CUBE_LEAVE_BUMP =
+        PathPlanner.loadPathGroup("cube leaveComm b", CONSTRAINTS);
+    public static final List<PathPlannerTrajectory> CUBE_LEAVE_FLAT =
+        PathPlanner.loadPathGroup("cube leaveComm f", CONSTRAINTS);
 
-    public static final List<PathPlannerTrajectory> CUBE_INTAKE_FLAT = loadPath("cube intake f");
+    public static final List<PathPlannerTrajectory> CUBE_INTAKE_FLAT =
+        PathPlanner.loadPathGroup("cube intake f", CONSTRAINTS);
 
-    public static final List<PathPlannerTrajectory> LEAVE_BUMP = loadPath("leaveComm b");
-    public static final List<PathPlannerTrajectory> LEAVE_FLAT = loadPath("leaveComm f");
+    public static final List<PathPlannerTrajectory> LEAVE_BUMP =
+        PathPlanner.loadPathGroup("leaveComm b", CONSTRAINTS);
+    public static final List<PathPlannerTrajectory> LEAVE_FLAT =
+        PathPlanner.loadPathGroup("leaveComm f", CONSTRAINTS);
 
     public static final List<PathPlannerTrajectory> LEAVE_FLAT_BACKWARDS =
-        loadPath("leaveComm f backwards");
+        PathPlanner.loadPathGroup("leaveComm f backwards", CONSTRAINTS);
 
-    public static final List<PathPlannerTrajectory> ONE_METER_TEST = loadPath("one meter");
+    public static final List<PathPlannerTrajectory> ONE_METER_TEST =
+        PathPlanner.loadPathGroup("one meter", CONSTRAINTS);
 
-    public static final List<PathPlannerTrajectory> BALANCE = loadPath("balance");
+    public static final List<PathPlannerTrajectory> BALANCE =
+        PathPlanner.loadPathGroup("balance", CONSTRAINTS);
   }
 
   private final Drive drive;
-  private final Placement placement;
+  private final Arm arm;
   private final Intake intake;
 
   private final SendableChooser<Supplier<Command>> autoChooser;
 
-  public Autos(Drive drive, Placement placement, Intake intake) {
+  public Autos(Drive drive, Arm arm, Intake intake) {
     this.drive = drive;
+    this.arm = arm;
     this.intake = intake;
-    this.placement = placement;
 
     autoChooser = new SendableChooser<Supplier<Command>>();
     configureMainAutos();
+    configureExtraAutos();
   }
 
   private void configureMainAutos() {
@@ -78,21 +89,21 @@ public final class Autos implements Sendable {
      * orientation: away from grid
      * starting position: cone scoring, flat side
      */
-    autoChooser.addOption("2 gamepiece (flat)", () -> twoGamepiece(FLAT));
+    autoChooser.addOption("2 gamepiece (flat)", () -> twoGamepiece(StartingPos.FLAT));
 
     /* cube balance setup instructions:
      * gamepiece: cube
      * orientation: away from grid
      * starting location: cube scoring, center
      */
-    autoChooser.addOption("cube, balance", this::cubeBalance);
+    autoChooser.addOption("cube, balance", () -> scoreThenBalance(GamePiece.CUBE));
 
     /* cube intake setup instructions:
      * gamepiece: cube
      * orientation: away from grid
      * starting location: cube scoring, flat side
      */
-    autoChooser.addOption("cube, intake (flat)", this::cubeIntake);
+    autoChooser.addOption("cube, intake (flat)", this::cubeScoreIntake);
 
     // backups
 
@@ -101,14 +112,16 @@ public final class Autos implements Sendable {
      * orientation: away from grid
      * starting location: cube scoring (preferably flat)
      */
-    autoChooser.setDefaultOption("cube score (no drive)", () -> justScore(CUBE, FLAT));
+    autoChooser.setDefaultOption(
+        "cube score (no drive)", () -> justScore(GamePiece.CUBE, Side.FRONT, StartingPos.FLAT));
     /* cone score setup instructions:
      * gamepiece: cone
      * orientation: away from grid
      * set starting pos: no
      * starting location: cone scoring (preferably flat)
      */
-    autoChooser.addOption("cone score (no drive)", () -> justScore(CONE, FLAT));
+    autoChooser.addOption(
+        "cone score (no drive)", () -> justScore(GamePiece.CONE, Side.BACK, StartingPos.FLAT));
 
     // ultimate backup
     autoChooser.addOption("none", Commands::none);
@@ -120,14 +133,14 @@ public final class Autos implements Sendable {
      * orientation: away from grid
      * starting location: in front of charge station, preferably cube scoring
      */
-    autoChooser.addOption("balance", this::justBalance);
+    autoChooser.addOption("balance", this::driveThenBalance);
 
     /* cone balance setup instructions:
      * gamepiece: cone
      * orientation: away from grid
      * starting location: cone scoring, off-center (preferably left of center)
      */
-    autoChooser.addOption("cone, balance", this::coneBalance);
+    autoChooser.addOption("cone, balance", () -> scoreThenBalance(GamePiece.CONE));
 
     // simple scoring
 
@@ -136,28 +149,32 @@ public final class Autos implements Sendable {
      * orientation: away from grid
      * starting location: cone scoring, flat side
      */
-    autoChooser.addOption("cone, leave (flat)", () -> coneLeave(FLAT));
+    autoChooser.addOption(
+        "cone, leave (flat)", () -> scoreThenLeave(GamePiece.CONE, StartingPos.FLAT));
 
     /* cone leave setup instructions:
      * gamepiece: cone
      * orientation: away from grid
      * starting location: cone scoring, bump side
      */
-    autoChooser.addOption("cone, leave (bump)", () -> coneLeave(BUMP));
+    autoChooser.addOption(
+        "cone, leave (bump)", () -> scoreThenLeave(GamePiece.CONE, StartingPos.BUMP));
 
     /* cube leave setup instructions:
      * gamepiece: cube
      * orientation: away from grid
      * starting location: cube scoring, flat side
      */
-    autoChooser.addOption("cube, leave (flat)", () -> cubeLeave(FLAT));
+    autoChooser.addOption(
+        "cube, leave (flat)", () -> scoreThenLeave(GamePiece.CUBE, StartingPos.FLAT));
 
     /* cube leave setup instructions:
      * gamepiece: cube
      * orientation: away from grid
      * starting location: cube scoring, bump side
      */
-    autoChooser.addOption("cube, leave (bump)", () -> cubeLeave(BUMP));
+    autoChooser.addOption(
+        "cube, leave (bump)", () -> scoreThenLeave(GamePiece.CUBE, StartingPos.BUMP));
 
     // backups
 
@@ -167,7 +184,7 @@ public final class Autos implements Sendable {
      * set starting pos: yes
      * starting location: against grid, to one side (it should have a clear path straight forward)
      */
-    autoChooser.addOption("flat leave (no arm)", () -> leave(FLAT));
+    autoChooser.addOption("flat leave (no arm)", () -> leave(StartingPos.FLAT));
 
     /* leave setup instructions:
      * gamepiece: none
@@ -175,7 +192,7 @@ public final class Autos implements Sendable {
      * set starting pos: yes
      * starting location: against grid, to one side (it should have a clear path straight forward)
      */
-    autoChooser.addOption("bump leave (no arm)", () -> leave(BUMP));
+    autoChooser.addOption("bump leave (no arm)", () -> leave(StartingPos.BUMP));
 
     autoChooser.addOption("low cube, leave (flat)", this::lowCubeLeave);
   }
@@ -183,7 +200,7 @@ public final class Autos implements Sendable {
   private void configureTestAutos() {
     autoChooser.addOption(
         "one meter test", () -> drive.followPath(Paths.ONE_METER_TEST.get(0), true));
-    autoChooser.addOption("2 gamepeice (bump)", () -> twoGamepiece(BUMP));
+    autoChooser.addOption("2 gamepeice (bump)", () -> twoGamepiece(StartingPos.BUMP));
   }
 
   private void configureAllAutos() {
@@ -192,19 +209,13 @@ public final class Autos implements Sendable {
     configureTestAutos();
   }
 
-  private Command frontMovingIntake() {
-    return Commands.sequence(
-        placement.goTo(FRONT_INTAKE),
-        intake.intake().withTimeout(MOVING_INTAKE_TIME),
-        intake.stop());
-  }
-
-  private Command initialIntake() {
-    return Commands.sequence(intake.intake().withTimeout(INITIAL_INTAKE_TIME), intake.stop());
+  private CommandBase frontMovingIntake(GamePiece gamePiece) {
+    return arm.goTo(Goal.LOW, () -> gamePiece)
+        .andThen(intake.intake(() -> gamePiece).withTimeout(MOVING_INTAKE_TIME));
   }
 
   /** back cone, cube intake, back cube */
-  public Command twoGamepiece(StartingPos startingPos) {
+  public CommandBase twoGamepiece(StartingPos startingPos) {
     var pathGroup =
         switch (startingPos) {
           case BUMP -> Paths.TWO_GAMEPIECE_BUMP;
@@ -212,22 +223,17 @@ public final class Autos implements Sendable {
           case CENTER -> Paths.TWO_GAMEPIECE_FLAT;
         };
     return Commands.sequence(
-        staticOdometryReset(CONE, Rotation2d.fromRadians(0), startingPos),
-        highConeScore(true),
+        staticOdometryReset(GamePiece.CONE, Rotation2d.fromRadians(0), startingPos),
+        score(Goal.HIGH, GamePiece.CONE),
         Commands.parallel(
             Commands.sequence(Commands.waitSeconds(0.5), drive.followPath(pathGroup.get(0), false)),
-            frontMovingIntake()),
-        Commands.parallel(drive.followPath(pathGroup.get(1), false), placement.goTo(STOW)),
-        backHighCubeScore(),
-        placement.goTo(SAFE));
+            frontMovingIntake(GamePiece.CUBE)),
+        Commands.parallel(drive.followPath(pathGroup.get(1), false), arm.goTo(ArmState::stow)),
+        score(Goal.HIGH, GamePiece.CUBE),
+        arm.goTo(ArmState::stow));
   }
 
-  private Command justBalance() {
-    return Commands.sequence(
-        staticOdometryReset(CUBE, Rotation2d.fromRadians(0), CENTER), fullBalance());
-  }
-
-  public Command balance() {
+  public CommandBase balance() {
     var controller = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
     controller.setTolerance(PITCH_TOLERANCE);
     controller.setSetpoint(0);
@@ -239,96 +245,61 @@ public final class Autos implements Sendable {
         .andThen(drive.lock());
   }
 
-  private Command fullBalance() {
+  private CommandBase driveThenBalance() {
     return Commands.sequence(
         drive.followPath(Paths.BALANCE.get(0), true).withTimeout(4), balance(), drive.lock());
   }
 
-  private Command justScore(GamePiece gamePiece, StartingPos startingPos) {
+  public CommandBase justScore(GamePiece gamePiece, Side side, StartingPos startingPos) {
+    return staticOdometryReset(gamePiece, side, startingPos).andThen(score(Goal.HIGH, gamePiece));
+  }
+
+  private CommandBase score(Goal goal, GamePiece gamePiece) {
+    return arm.goTo(goal, () -> gamePiece)
+        .withTimeout(5)
+        .andThen(intake.outtakeWithTimeout(() -> gamePiece));
+  }
+
+  private CommandBase scoreThenBalance(GamePiece gamePiece) {
     return Commands.sequence(
-        staticOdometryReset(gamePiece, Rotation2d.fromDegrees(0), startingPos),
-        switch (gamePiece) {
-          case CONE -> highConeScore(true);
-          case CUBE -> backHighCubeScore();
-        });
+        score(Goal.HIGH, gamePiece), arm.goTo(ArmState::stow).withTimeout(3.5), driveThenBalance());
   }
 
-  private Command backHighCubeScore() {
-    return Commands.sequence(placement.goTo(BACK_HIGH_CUBE).withTimeout(5), intake.outtake(CUBE));
-  }
-
-  private Command highConeScore(boolean preloaded) {
-    return Commands.sequence(
-        preloaded ? initialIntake() : Commands.none(),
-        placement.goTo(BACK_HIGH_CONE).withTimeout(5),
-        intake.outtake(CONE));
-  }
-
-  /** no PPL */
-  private Command cubeBalance() {
-    return Commands.sequence(
-        staticOdometryReset(CUBE, BACK, CENTER),
-        backHighCubeScore(),
-        placement.goTo(SAFE).withTimeout(3.5),
-        fullBalance());
-  }
-
-  /** no PPL */
-  private Command coneBalance() {
-    return Commands.sequence(
-        staticOdometryReset(CONE, BACK, CENTER),
-        highConeScore(true),
-        placement.goTo(SAFE).withTimeout(3.5),
-        fullBalance());
-  }
-
-  private Command coneLeave(StartingPos startingPos) {
+  public CommandBase scoreThenLeave(GamePiece gamePiece, StartingPos startingPos) {
     var pathGroup =
         switch (startingPos) {
-          case BUMP -> Paths.CONE_LEAVE_BUMP;
-          case FLAT -> Paths.CONE_LEAVE_FLAT;
-          case CENTER -> Paths.CONE_LEAVE_FLAT;
+          case BUMP -> gamePiece == GamePiece.CONE ? Paths.CONE_LEAVE_BUMP : Paths.CUBE_LEAVE_BUMP;
+          case FLAT -> gamePiece == GamePiece.CONE ? Paths.CONE_LEAVE_FLAT : Paths.CUBE_LEAVE_FLAT;
+          case CENTER -> gamePiece == GamePiece.CONE
+              ? Paths.CONE_LEAVE_FLAT
+              : Paths.CUBE_LEAVE_FLAT;
         };
     return Commands.sequence(
-        staticOdometryReset(CONE, BACK, startingPos),
-        highConeScore(true),
-        Commands.parallel(drive.followPath(pathGroup.get(0), false), placement.goTo(SAFE)));
+        staticOdometryReset(GamePiece.CONE, Side.BACK, startingPos),
+        score(Goal.HIGH, gamePiece)
+            .andThen(drive.followPath(pathGroup.get(0), true).alongWith(arm.goTo(ArmState::stow))));
   }
 
-  private Command cubeLeave(StartingPos startingPos) {
-    var pathGroup =
-        switch (startingPos) {
-          case BUMP -> Paths.CUBE_LEAVE_BUMP;
-          case FLAT -> Paths.CUBE_LEAVE_FLAT;
-          case CENTER -> Paths.CONE_LEAVE_FLAT;
-        };
+  private CommandBase cubeScoreIntake() {
     return Commands.sequence(
-        staticOdometryReset(CUBE, BACK, startingPos),
-        backHighCubeScore(),
-        Commands.parallel(drive.followPath(pathGroup.get(0), false), placement.goTo(SAFE)));
-  }
-
-  private Command cubeIntake() {
-    return Commands.sequence(
-        staticOdometryReset(CUBE, BACK, FLAT),
-        backHighCubeScore(),
+        staticOdometryReset(GamePiece.CUBE, Side.BACK, StartingPos.FLAT),
+        score(Goal.HIGH, GamePiece.CUBE),
         Commands.parallel(
             Commands.sequence(
                 Commands.waitSeconds(0.5), drive.followPath(Paths.CUBE_INTAKE_FLAT.get(0), false)),
-            frontMovingIntake()),
-        initialIntake());
+            frontMovingIntake(GamePiece.CUBE)));
   }
 
-  private Command lowCubeLeave() {
+  private CommandBase lowCubeLeave() {
     return Commands.sequence(
-        staticOdometryReset(CONE, FRONT, FLAT),
-        placement.goTo(FRONT_INTAKE),
-        intake.outtake(CUBE),
+        staticOdometryReset(GamePiece.CONE, Side.FRONT, StartingPos.FLAT),
+        arm.goTo(Goal.LOW, () -> GamePiece.CUBE),
+        intake.outtake(() -> GamePiece.CUBE),
         drive.followPath(Paths.LEAVE_FLAT_BACKWARDS.get(0), false));
   }
 
   /** backup: no arm */
-  private Command leave(StartingPos startingPos) {
+  private CommandBase leave(StartingPos startingPos) {
     return drive.followPath(
         (switch (startingPos) {
               case BUMP -> Paths.LEAVE_BUMP;
@@ -339,14 +310,14 @@ public final class Autos implements Sendable {
         true);
   }
 
-  private Command staticOdometryReset(
+  private CommandBase staticOdometryReset(
       GamePiece gamePiece, Side scoringSide, StartingPos startingPos) {
     return staticOdometryReset(
-        gamePiece, Rotation2d.fromRadians(Math.PI - scoringSide.rads()), startingPos);
+        gamePiece, Rotation2d.fromRadians(Math.PI - scoringSide.angle), startingPos);
   }
 
   /** resets odometry where feild is static (doesn't depend on alliance) */
-  private Command staticOdometryReset(
+  private CommandBase staticOdometryReset(
       GamePiece gamePiece, Rotation2d rotation, StartingPos startingPos) {
     return Commands.runOnce(
         () ->
@@ -390,6 +361,6 @@ public final class Autos implements Sendable {
   }
 
   public Command get() {
-    return placement.setSetpoint(INITIAL).andThen(autoChooser.getSelected().get());
+    return arm.setSetpoints(ArmState::initial).andThen(autoChooser.getSelected().get());
   }
 }
