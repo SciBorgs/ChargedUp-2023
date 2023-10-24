@@ -87,7 +87,7 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
     addPeriodic(Logger::updateEntries, Constants.PERIOD);
     addPeriodic(() -> drive.updateEstimates(vision.getPoseEstimates(drive.getPose())), 0.5);
 
-    autonomous().onTrue(getAutonomousCommand());
+    // autonomous().onTrue(getAutonomousCommand());
 
     teleop().onTrue(getEnableCommand());
   }

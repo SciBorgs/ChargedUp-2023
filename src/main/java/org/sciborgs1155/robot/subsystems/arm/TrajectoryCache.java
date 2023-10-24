@@ -120,7 +120,7 @@ public class TrajectoryCache {
     ProcessBuilder pythonBuilder;
     String pythonPath;
     if (System.getProperty("os.name").startsWith("Windows")) {
-      pythonPath = "./venv/Scripts/python";
+      pythonPath = "python";
     } else {
       pythonPath = "./venv/bin/python";
     }
