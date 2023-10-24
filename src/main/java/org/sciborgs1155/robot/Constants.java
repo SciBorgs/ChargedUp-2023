@@ -267,19 +267,15 @@ public final class Constants {
   }
 
   public static final class Intake {
-    public static final Consumer<CANSparkMax> MOTOR_CFG =
-        spark -> {
-          spark.restoreFactoryDefaults();
-          spark.setCANTimeout(50);
-          spark.setInverted(true);
-          spark.setIdleMode(IdleMode.kBrake);
-          spark.setOpenLoopRampRate(0);
-          spark.setSmartCurrentLimit(50);
-        };
+    public static final MotorConfig MOTOR_CFG =
+        MotorConfig.base()
+            .withNeutralBehavior(NeutralBehavior.BRAKE)
+            .withCurrentLimit(40)
+            .withInvert(true);
 
     public static final double DEFAULT_SPEED = 0.05;
 
-    public static final double CONE_SPEED = 1;
+    public static final double CONE_SPEED = 0.85;
     public static final double CUBE_SPEED = -0.4;
 
     public static final double THRESHOLD = 0.5;

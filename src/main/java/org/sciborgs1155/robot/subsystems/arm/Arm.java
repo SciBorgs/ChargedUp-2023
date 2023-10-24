@@ -57,7 +57,7 @@ public class Arm extends SubsystemBase implements Fallible, Loggable, AutoClosea
 
   // this is to make the emperical collection of arm states easier
   @Log(name = "copy state")
-  String copyState = "";
+  private String copyState = "";
 
   public Arm(ElevatorIO elevator, JointIO elbow, JointIO wrist) {
     this.elevator = elevator;
@@ -253,11 +253,12 @@ public class Arm extends SubsystemBase implements Fallible, Loggable, AutoClosea
 
   @Override
   public void periodic() {
-    var endpoint = getState().getEndpoint();
     copyState =
         String.format(
-            "fromEndpoint(%.3f, %.3f, %.3f)",
-            endpoint.getX(), endpoint.getY(), endpoint.getRotation().getRadians());
+            "fromRelative(%.3f, %.3f, %.3f)",
+            getState().elevatorHeight(),
+            getState().elbowAngle().getRadians(),
+            getState().wristAngle().getRadians());
 
     wrist.setBaseAngle(elbow.getRelativeAngle());
     positionVisualizer.setState(getState());

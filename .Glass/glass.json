@@ -9,10 +9,10 @@
           "elbow feedback": {
             "open": true
           },
-          "open": true,
-          "wrist": {
+          "elevator": {
             "open": true
           },
+          "open": true,
           "wrist feedback": {
             "open": true
           }
@@ -123,7 +123,7 @@
     }
   },
   "NetworkTables Settings": {
-    "mode": "Client (NT3)",
+    "mode": "Client (NT4)",
     "serverTeam": "1155"
   },
   "Plots": {
