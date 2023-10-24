@@ -5,6 +5,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+
+import java.text.DecimalFormat;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.DoubleUnaryOperator;
@@ -140,6 +142,16 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
   /** Creates a PlacementState from an absolute 3d array */
   public static ArmState fromArray(double[] state) {
     return fromAbsolute(state[0], state[1], state[2]);
+  }
+
+  private static double round(double value) {
+    return (double) Math.round(value * 1000000d) / 1000000d;
+  }
+
+  public ArmState {
+    elevatorHeight = round(elevatorHeight);
+    elbowAngle = Rotation2d.fromRadians(round(elbowAngle.getRadians()));
+    wristAngle = Rotation2d.fromRadians(round(wristAngle.getRadians()));
   }
 
   /** Returns an array representation of the absolute state */
