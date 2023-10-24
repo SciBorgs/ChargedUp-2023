@@ -217,7 +217,7 @@ public final class Constants {
 
     public static final double CONVERSION_RELATIVE = SPROCKET_CIRCUMFERENCE / THROUGHBORE_PPR;
 
-    public static final PIDConstants PID = new PIDConstants(50, 0, 1);
+    public static final PIDConstants PID = new PIDConstants(55, 0, 0.5);
     public static final ElevatorFFConstants FF =
         new ElevatorFFConstants(0.4, 0.069335, 33.25, 1.5514);
 
@@ -255,7 +255,7 @@ public final class Constants {
     public static final double DEFAULT_SPEED = 0.05;
 
     public static final double CONE_SPEED = 0.85;
-    public static final double CUBE_SPEED = -0.4;
+    public static final double CUBE_SPEED = -0.25;
 
     public static final double THRESHOLD = 0.5;
   }
