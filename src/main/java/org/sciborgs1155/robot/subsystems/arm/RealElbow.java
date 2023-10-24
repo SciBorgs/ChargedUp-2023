@@ -1,6 +1,5 @@
 package org.sciborgs1155.robot.subsystems.arm;
 
-import static org.sciborgs1155.robot.Constants.Elbow.*;
 import static org.sciborgs1155.robot.Ports.Elbow.*;
 
 import com.revrobotics.CANSparkMax;
@@ -17,7 +16,7 @@ import org.sciborgs1155.lib.BetterArmFeedforward;
 import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
-import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.subsystems.arm.ArmConstants.Elbow;
 
 public class RealElbow implements JointIO {
   private final CANSparkMax middleMotor;
@@ -36,9 +35,9 @@ public class RealElbow implements JointIO {
   private double lastVoltage;
 
   public RealElbow(JointConfig config) {
-    middleMotor = MOTOR_CFG.build(MotorType.kBrushless, MIDDLE_MOTOR);
-    leftMotor = MOTOR_CFG.build(MotorType.kBrushless, LEFT_MOTOR);
-    rightMotor = MOTOR_CFG.build(MotorType.kBrushless, RIGHT_MOTOR);
+    middleMotor = Elbow.MOTOR_CFG.build(null, MIDDLE_MOTOR);
+    leftMotor = Elbow.MOTOR_CFG.build(MotorType.kBrushless, LEFT_MOTOR);
+    rightMotor = Elbow.MOTOR_CFG.build(MotorType.kBrushless, RIGHT_MOTOR);
 
     MotorConfig.disableFrames(middleMotor, 4, 5, 6);
     MotorConfig.disableFrames(leftMotor, 1, 2, 3, 4, 5, 6);
@@ -52,7 +51,7 @@ public class RealElbow implements JointIO {
     rightMotor.burnFlash();
 
     encoder = new Encoder(ENCODER[0], ENCODER[1]);
-    encoder.setDistancePerPulse(CONVERSION);
+    encoder.setDistancePerPulse(Elbow.CONVERSION);
     encoder.setReverseDirection(true);
 
     minAngle = config.minAngle();
@@ -68,7 +67,7 @@ public class RealElbow implements JointIO {
   /** Elbow position relative to the chassis */
   @Log(name = "elbow position", methodName = "getRadians")
   public Rotation2d getRelativeAngle() {
-    return Rotation2d.fromRadians(encoder.getDistance() + OFFSET);
+    return Rotation2d.fromRadians(encoder.getDistance() + Elbow.OFFSET);
   }
 
   @Override
@@ -85,7 +84,7 @@ public class RealElbow implements JointIO {
             clampedPosition + getBaseAngle().getRadians(),
             lastSetpoint.velocity,
             setpoint.velocity,
-            Constants.PERIOD);
+            ArmConstants.PERIOD);
     double feedback = pid.calculate(getRelativeAngle().getRadians(), clampedPosition);
 
     lastVoltage = feedback + feedforward;
@@ -129,7 +128,7 @@ public class RealElbow implements JointIO {
             "elbow encoder",
             encoder.getDistance() == 0 // no position reading
                 && encoder.getRate() == 0 // no velocity reading
-                && lastSetpoint.position != OFFSET // elbow is not going to 0
+                && lastSetpoint.position != Elbow.OFFSET // elbow is not going to 0
                 && middleMotor.getAppliedOutput() != 0) // elbow is trying to move;
         .build();
   }

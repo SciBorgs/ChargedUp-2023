@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import org.sciborgs1155.robot.Constants.Dimensions;
-import org.sciborgs1155.robot.Constants.Elevator;
+import org.sciborgs1155.robot.subsystems.arm.ArmConstants.Elevator;
 
 /** Visualization class specific for our charged up bot */
 public class Visualizer implements Sendable {

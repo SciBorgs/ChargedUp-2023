@@ -1,6 +1,5 @@
 package org.sciborgs1155.robot.subsystems.arm;
 
-import static org.sciborgs1155.robot.Constants.Elevator.*;
 import static org.sciborgs1155.robot.Ports.Elevator.*;
 
 import com.revrobotics.CANSparkMax;
@@ -15,7 +14,7 @@ import org.sciborgs1155.lib.BetterElevatorFeedforward;
 import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
-import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.subsystems.arm.ArmConstants.Elevator;
 
 public class RealElevator implements ElevatorIO {
 
@@ -35,9 +34,9 @@ public class RealElevator implements ElevatorIO {
   private double lastVoltage;
 
   public RealElevator(ElevatorConfig config) {
-    lead = MOTOR_CFG.build(MotorType.kBrushless, RIGHT_MOTOR);
-    left = MOTOR_CFG.build(MotorType.kBrushless, LEFT_MOTOR);
-    right = MOTOR_CFG.build(MotorType.kBrushless, MIDDLE_MOTOR);
+    lead = Elevator.MOTOR_CFG.build(MotorType.kBrushless, RIGHT_MOTOR);
+    left = Elevator.MOTOR_CFG.build(MotorType.kBrushless, LEFT_MOTOR);
+    right = Elevator.MOTOR_CFG.build(MotorType.kBrushless, MIDDLE_MOTOR);
 
     left.follow(lead);
     right.follow(lead);
@@ -51,7 +50,7 @@ public class RealElevator implements ElevatorIO {
     right.burnFlash();
 
     encoder = new Encoder(ENCODER[0], ENCODER[1]);
-    encoder.setDistancePerPulse(CONVERSION_RELATIVE);
+    encoder.setDistancePerPulse(Elevator.CONVERSION_RELATIVE);
     encoder.setReverseDirection(true);
 
     minHeight = config.minHeight();
@@ -64,7 +63,7 @@ public class RealElevator implements ElevatorIO {
   }
 
   public double getHeight() {
-    return encoder.getDistance() + ZERO_OFFSET;
+    return encoder.getDistance() + Elevator.ZERO_OFFSET;
   }
 
   @Override
@@ -81,7 +80,7 @@ public class RealElevator implements ElevatorIO {
   public void updateSetpoint(State setpoint) {
     double clampedPosition = MathUtil.clamp(setpoint.position, minHeight, maxHeight);
 
-    double ffOutput = ff.calculate(lastSetpoint.velocity, setpoint.velocity, Constants.PERIOD);
+    double ffOutput = ff.calculate(lastSetpoint.velocity, setpoint.velocity, ArmConstants.PERIOD);
     double fbOutput = pid.calculate(getHeight(), clampedPosition);
 
     lastVoltage = ffOutput + fbOutput;
@@ -111,7 +110,7 @@ public class RealElevator implements ElevatorIO {
             "elbow encoder",
             encoder.getDistance() == 0 // no position reading
                 && encoder.getRate() == 0 // no velocity reading
-                && lastSetpoint.position != ZERO_OFFSET // elbow is not going to 0
+                && lastSetpoint.position != Elevator.ZERO_OFFSET // elbow is not going to 0
                 && lead.getAppliedOutput() != 0) // elbow is trying to move;
         .build();
   }

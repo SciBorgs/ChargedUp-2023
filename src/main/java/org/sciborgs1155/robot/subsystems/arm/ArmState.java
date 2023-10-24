@@ -10,8 +10,8 @@ import java.util.Set;
 import java.util.function.DoubleUnaryOperator;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
-import org.sciborgs1155.robot.Constants.Elbow;
-import org.sciborgs1155.robot.Constants.Elevator;
+import org.sciborgs1155.robot.subsystems.arm.ArmConstants.Elbow;
+import org.sciborgs1155.robot.subsystems.arm.ArmConstants.Elevator;
 import org.sciborgs1155.robot.Constants.RobotType;
 
 /** ArmState class to store relative angles for the arm. */
