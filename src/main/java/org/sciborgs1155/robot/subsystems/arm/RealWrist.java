@@ -17,7 +17,7 @@ import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.subsystems.arm.ArmConstants.Wrist;  
+import org.sciborgs1155.robot.subsystems.arm.ArmConstants.Wrist;
 
 public class RealWrist implements JointIO {
 
