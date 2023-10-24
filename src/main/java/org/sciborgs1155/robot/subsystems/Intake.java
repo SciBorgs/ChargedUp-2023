@@ -5,6 +5,7 @@ import static org.sciborgs1155.robot.Constants.Intake.*;
 import static org.sciborgs1155.robot.Ports.Intake.*;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
@@ -14,6 +15,7 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import java.util.function.Supplier;
+import org.sciborgs1155.lib.constants.SparkUtils;
 import org.sciborgs1155.lib.failure.Fallible;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
@@ -23,7 +25,18 @@ public class Intake extends SubsystemBase implements Fallible, Loggable, AutoClo
 
   @Log(name = "applied output", methodName = "getAppliedOutput")
   @Log(name = "current", methodName = "getOutputCurrent")
-  private final CANSparkMax wheels = MOTOR_CFG.build(MotorType.kBrushless, WHEEL_MOTOR);
+  private final CANSparkMax wheels =
+      SparkUtils.create(
+          WHEEL_MOTOR,
+          MotorType.kBrushless,
+          spark -> {
+            spark.restoreFactoryDefaults();
+            spark.setCANTimeout(50);
+            spark.setIdleMode(IdleMode.kBrake);
+            spark.setSmartCurrentLimit(40);
+            spark.setInverted(true);
+            spark.setOpenLoopRampRate(0);
+          });
 
   @Log(name = "velocity", methodName = "getVelocity")
   private final RelativeEncoder encoder = wheels.getEncoder();

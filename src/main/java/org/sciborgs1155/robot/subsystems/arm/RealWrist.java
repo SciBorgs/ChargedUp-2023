@@ -4,6 +4,7 @@ import static org.sciborgs1155.robot.Constants.Wrist.*;
 import static org.sciborgs1155.robot.Ports.Wrist.*;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -14,7 +15,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import java.util.List;
 import org.sciborgs1155.lib.BetterArmFeedforward;
-import org.sciborgs1155.lib.constants.MotorConfig;
+import org.sciborgs1155.lib.constants.SparkUtils;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
@@ -37,7 +38,17 @@ public class RealWrist implements JointIO {
   private double lastVoltage;
 
   public RealWrist(JointConfig config) {
-    motor = MOTOR_CFG.build(MotorType.kBrushless, MOTOR);
+    motor =
+        SparkUtils.create(
+            MOTOR,
+            MotorType.kBrushless,
+            spark -> {
+              spark.restoreFactoryDefaults();
+              spark.setCANTimeout(50);
+              spark.setIdleMode(IdleMode.kBrake);
+              spark.setOpenLoopRampRate(0);
+              spark.setSmartCurrentLimit(80);
+            });
     absolute = new DutyCycleEncoder(ABS_ENCODER);
     relative = new Encoder(RELATIVE_ENCODER[0], RELATIVE_ENCODER[1]);
 
@@ -46,9 +57,7 @@ public class RealWrist implements JointIO {
     relative.setDistancePerPulse(CONVERSION_RELATIVE);
     relative.setReverseDirection(true);
 
-    MotorConfig.disableFrames(motor, 4, 5, 6);
-
-    motor.burnFlash();
+    SparkUtils.disableFrames(motor, 4, 5, 6);
 
     ff = config.ff().createFeedforward();
     pid = config.pid().createPIDController();

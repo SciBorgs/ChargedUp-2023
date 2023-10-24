@@ -4,6 +4,7 @@ import static org.sciborgs1155.robot.Constants.Elbow.*;
 import static org.sciborgs1155.robot.Ports.Elbow.*;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -14,7 +15,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import org.sciborgs1155.lib.BetterArmFeedforward;
-import org.sciborgs1155.lib.constants.MotorConfig;
+import org.sciborgs1155.lib.constants.SparkUtils;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
@@ -36,20 +37,45 @@ public class RealElbow implements JointIO {
   private double lastVoltage;
 
   public RealElbow(JointConfig config) {
-    middleMotor = MOTOR_CFG.build(MotorType.kBrushless, MIDDLE_MOTOR);
-    leftMotor = MOTOR_CFG.build(MotorType.kBrushless, LEFT_MOTOR);
-    rightMotor = MOTOR_CFG.build(MotorType.kBrushless, RIGHT_MOTOR);
+    middleMotor =
+        SparkUtils.create(
+            MIDDLE_MOTOR,
+            MotorType.kBrushless,
+            spark -> {
+              spark.restoreFactoryDefaults();
+              spark.setCANTimeout(50);
+              spark.setIdleMode(IdleMode.kBrake);
+              spark.setOpenLoopRampRate(0);
+              spark.setSmartCurrentLimit(50);
+            });
+    leftMotor =
+        SparkUtils.create(
+            LEFT_MOTOR,
+            MotorType.kBrushless,
+            spark -> {
+              spark.restoreFactoryDefaults();
+              spark.setCANTimeout(50);
+              spark.setIdleMode(IdleMode.kBrake);
+              spark.setOpenLoopRampRate(0);
+              spark.setSmartCurrentLimit(50);
+              spark.follow(middleMotor);
+            });
+    rightMotor =
+        SparkUtils.create(
+            RIGHT_MOTOR,
+            MotorType.kBrushless,
+            spark -> {
+              spark.restoreFactoryDefaults();
+              spark.setCANTimeout(50);
+              spark.setIdleMode(IdleMode.kBrake);
+              spark.setOpenLoopRampRate(0);
+              spark.setSmartCurrentLimit(50);
+              spark.follow(middleMotor);
+            });
 
-    MotorConfig.disableFrames(middleMotor, 4, 5, 6);
-    MotorConfig.disableFrames(leftMotor, 1, 2, 3, 4, 5, 6);
-    MotorConfig.disableFrames(rightMotor, 1, 2, 3, 4, 5, 6);
-
-    leftMotor.follow(middleMotor);
-    rightMotor.follow(middleMotor);
-
-    middleMotor.burnFlash();
-    leftMotor.burnFlash();
-    rightMotor.burnFlash();
+    SparkUtils.disableFrames(middleMotor, 4, 5, 6);
+    SparkUtils.disableFrames(leftMotor, 1, 2, 3, 4, 5, 6);
+    SparkUtils.disableFrames(rightMotor, 1, 2, 3, 4, 5, 6);
 
     encoder = new Encoder(ENCODER[0], ENCODER[1]);
     encoder.setDistancePerPulse(CONVERSION);

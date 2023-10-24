@@ -14,8 +14,6 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.constants.ArmFFConstants;
 import org.sciborgs1155.lib.constants.BasicFFConstants;
 import org.sciborgs1155.lib.constants.ElevatorFFConstants;
-import org.sciborgs1155.lib.constants.MotorConfig;
-import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.subsystems.arm.ElevatorIO.ElevatorConfig;
 import org.sciborgs1155.robot.subsystems.arm.JointIO.JointConfig;
@@ -111,8 +109,6 @@ public final class Constants {
   }
 
   public static final class Wrist {
-    public static final MotorConfig MOTOR_CFG =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
 
     public static final double MOTOR_GEARING = 53.125 / 1.0;
     // Gearing for motor : angle (radians)
@@ -156,9 +152,6 @@ public final class Constants {
   }
 
   public static final class Elbow {
-    public static final MotorConfig MOTOR_CFG =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
-
     public static final double MOTOR_GEARING = 63.75 / 1.0;
 
     public static final double ENCODER_RATIO = 12.0 / 72.0;
@@ -203,8 +196,6 @@ public final class Constants {
   }
 
   public static final class Elevator {
-    public static final MotorConfig MOTOR_CFG =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(35);
 
     public static final double MOTOR_GEARING = 30.0 / 1.0;
     // Gearing for motor : height (meters)
@@ -246,12 +237,6 @@ public final class Constants {
   }
 
   public static final class Intake {
-    public static final MotorConfig MOTOR_CFG =
-        MotorConfig.base()
-            .withNeutralBehavior(NeutralBehavior.BRAKE)
-            .withCurrentLimit(40)
-            .withInvert(true);
-
     public static final double DEFAULT_SPEED = 0.05;
 
     public static final double CONE_SPEED = 0.85;
@@ -299,8 +284,6 @@ public final class Constants {
 
   public static final class SwerveModule {
     public static final class Driving {
-      public static final MotorConfig MOTOR_CFG =
-          MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
 
       public static final double CIRCUMFERENCE = 2.0 * Math.PI * 0.0381;
       // Diameter of the wheel in meters (2 * π * R)
@@ -314,8 +297,6 @@ public final class Constants {
     }
 
     public static final class Turning {
-      public static final MotorConfig MOTOR_CFG =
-          MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(20);
 
       public static final double MOTOR_GEARING = 1.0 / 4.0 / 3.0;
 
