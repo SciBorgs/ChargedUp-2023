@@ -4,6 +4,7 @@ import static org.sciborgs1155.robot.Constants.Elevator.*;
 import static org.sciborgs1155.robot.Ports.Elevator.*;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -12,7 +13,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Encoder;
 import java.util.List;
 import org.sciborgs1155.lib.BetterElevatorFeedforward;
-import org.sciborgs1155.lib.constants.MotorConfig;
+import org.sciborgs1155.lib.SparkUtils;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
@@ -35,20 +36,35 @@ public class RealElevator implements ElevatorIO {
   private double lastVoltage;
 
   public RealElevator(ElevatorConfig config) {
-    lead = MOTOR_CFG.build(MotorType.kBrushless, RIGHT_MOTOR);
-    left = MOTOR_CFG.build(MotorType.kBrushless, LEFT_MOTOR);
-    right = MOTOR_CFG.build(MotorType.kBrushless, MIDDLE_MOTOR);
+    lead = SparkUtils.create(RIGHT_MOTOR, MotorType.kBrushless, MOTOR_CFG);
+    left =
+        SparkUtils.create(
+            LEFT_MOTOR,
+            MotorType.kBrushless,
+            spark -> {
+              spark.restoreFactoryDefaults();
+              spark.setCANTimeout(50);
+              spark.setIdleMode(IdleMode.kBrake);
+              spark.setOpenLoopRampRate(0);
+              spark.setSmartCurrentLimit(35);
+              spark.follow(lead);
+            });
+    right =
+        SparkUtils.create(
+            MIDDLE_MOTOR,
+            MotorType.kBrushless,
+            spark -> {
+              spark.restoreFactoryDefaults();
+              spark.setCANTimeout(50);
+              spark.setIdleMode(IdleMode.kBrake);
+              spark.setOpenLoopRampRate(0);
+              spark.setSmartCurrentLimit(35);
+              spark.follow(lead);
+            });
 
-    left.follow(lead);
-    right.follow(lead);
-
-    MotorConfig.disableFrames(lead, 4, 5, 6);
-    MotorConfig.disableFrames(left, 1, 2, 3, 4, 5, 6);
-    MotorConfig.disableFrames(right, 1, 2, 3, 4, 5, 6);
-
-    lead.burnFlash();
-    left.burnFlash();
-    right.burnFlash();
+    SparkUtils.disableFrames(lead, 4, 5, 6);
+    SparkUtils.disableFrames(left, 1, 2, 3, 4, 5, 6);
+    SparkUtils.disableFrames(right, 1, 2, 3, 4, 5, 6);
 
     encoder = new Encoder(ENCODER[0], ENCODER[1]);
     encoder.setDistancePerPulse(CONVERSION_RELATIVE);

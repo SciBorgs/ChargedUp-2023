@@ -14,6 +14,7 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import java.util.function.Supplier;
+import org.sciborgs1155.lib.SparkUtils;
 import org.sciborgs1155.lib.failure.Fallible;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
@@ -23,7 +24,8 @@ public class Intake extends SubsystemBase implements Fallible, Loggable, AutoClo
 
   @Log(name = "applied output", methodName = "getAppliedOutput")
   @Log(name = "current", methodName = "getOutputCurrent")
-  private final CANSparkMax wheels = MOTOR_CFG.build(MotorType.kBrushless, WHEEL_MOTOR);
+  private final CANSparkMax wheels =
+      SparkUtils.create(WHEEL_MOTOR, MotorType.kBrushless, MOTOR_CFG);
 
   @Log(name = "velocity", methodName = "getVelocity")
   private final RelativeEncoder encoder = wheels.getEncoder();

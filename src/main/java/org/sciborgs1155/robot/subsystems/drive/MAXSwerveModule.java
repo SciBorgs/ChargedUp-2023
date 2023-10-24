@@ -1,6 +1,6 @@
 package org.sciborgs1155.robot.subsystems.drive;
 
-import static org.sciborgs1155.robot.Constants.SwerveModule.*;
+import static org.sciborgs1155.robot.subsystems.drive.DriveConstants.SwerveModule.*;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
@@ -14,8 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import java.util.List;
-import org.sciborgs1155.lib.constants.MotorConfig;
-import org.sciborgs1155.lib.constants.PIDConstants;
+import org.sciborgs1155.lib.SparkUtils;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
 
@@ -32,7 +31,7 @@ public class MAXSwerveModule implements ModuleIO {
   private final SparkMaxPIDController turnFeedback;
 
   private final SimpleMotorFeedforward driveFeedforward =
-      new SimpleMotorFeedforward(Driving.FF.s(), Driving.FF.v(), Driving.FF.a());
+      new SimpleMotorFeedforward(Driving.s, Driving.v, Driving.a);
 
   private final String name;
   private final Rotation2d angularOffset;
@@ -49,8 +48,8 @@ public class MAXSwerveModule implements ModuleIO {
   public MAXSwerveModule(String name, int drivePort, int turnPort, double angularOffset) {
     this.name = name;
 
-    driveMotor = Driving.MOTOR_CFG.build(MotorType.kBrushless, drivePort);
-    turnMotor = Turning.MOTOR_CFG.build(MotorType.kBrushless, turnPort);
+    driveMotor = SparkUtils.create(drivePort, MotorType.kBrushless, Driving.MOTOR_CFG);
+    turnMotor = SparkUtils.create(turnPort, MotorType.kBrushless, Turning.MOTOR_CFG);
 
     driveEncoder = driveMotor.getEncoder();
     turningEncoder = turnMotor.getAbsoluteEncoder(Type.kDutyCycle);
@@ -63,8 +62,8 @@ public class MAXSwerveModule implements ModuleIO {
 
     turningEncoder.setInverted(Turning.ENCODER_INVERTED);
 
-    setDrivePID(Driving.PID);
-    setTurnPID(Turning.PID);
+    setDrivePID(Driving.kP, Driving.kI, Driving.kD);
+    setTurnPID(Turning.kP, Turning.kI, Turning.kD);
 
     driveEncoder.setPositionConversionFactor(Driving.CONVERSION);
     driveEncoder.setVelocityConversionFactor(Driving.CONVERSION / 60.0);
@@ -76,11 +75,8 @@ public class MAXSwerveModule implements ModuleIO {
     turnFeedback.setPositionPIDWrappingMinInput(0);
     turnFeedback.setPositionPIDWrappingMaxInput(Turning.CONVERSION);
 
-    MotorConfig.disableFrames(driveMotor, 4, 5, 6);
-    MotorConfig.disableFrames(turnMotor, 4, 6);
-
-    driveMotor.burnFlash();
-    turnMotor.burnFlash();
+    SparkUtils.disableFrames(driveMotor, 4, 5, 6);
+    SparkUtils.disableFrames(turnMotor, 4, 6);
 
     driveEncoder.setPosition(0);
     this.angularOffset = Rotation2d.fromRadians(angularOffset);
@@ -131,17 +127,17 @@ public class MAXSwerveModule implements ModuleIO {
   }
 
   @Override
-  public void setTurnPID(PIDConstants constants) {
-    turnFeedback.setP(constants.p());
-    turnFeedback.setI(constants.i());
-    turnFeedback.setD(constants.d());
+  public void setTurnPID(double kP, double kI, double kD) {
+    turnFeedback.setP(kP);
+    turnFeedback.setI(kI);
+    turnFeedback.setD(kD);
   }
 
   @Override
-  public void setDrivePID(PIDConstants constants) {
-    driveFeedback.setP(constants.p());
-    driveFeedback.setI(constants.i());
-    driveFeedback.setD(constants.d());
+  public void setDrivePID(double kP, double kI, double kD) {
+    driveFeedback.setP(kP);
+    driveFeedback.setI(kI);
+    driveFeedback.setD(kD);
   }
 
   @Override

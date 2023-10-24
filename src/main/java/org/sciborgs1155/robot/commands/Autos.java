@@ -1,9 +1,9 @@
 package org.sciborgs1155.robot.commands;
 
 import static org.sciborgs1155.robot.Constants.Auto.*;
-import static org.sciborgs1155.robot.Constants.Drive.CONSTRAINTS;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.subsystems.arm.ArmState.*;
+import static org.sciborgs1155.robot.subsystems.drive.DriveConstants.CONSTRAINTS;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -234,7 +234,7 @@ public final class Autos implements Sendable {
   }
 
   public CommandBase balance() {
-    var controller = new PIDController(BALANCE.p(), BALANCE.i(), BALANCE.d());
+    var controller = new PIDController(BALANCE_kP, BALANCE_kI, BALANCE_kD);
     controller.setTolerance(PITCH_TOLERANCE);
     controller.setSetpoint(0);
 

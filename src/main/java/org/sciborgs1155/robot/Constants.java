@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot;
 
-import com.pathplanner.lib.PathConstraints;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -10,13 +11,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import java.awt.Color;
 import java.util.Map;
+import java.util.function.Consumer;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.sciborgs1155.lib.constants.ArmFFConstants;
-import org.sciborgs1155.lib.constants.BasicFFConstants;
-import org.sciborgs1155.lib.constants.ElevatorFFConstants;
-import org.sciborgs1155.lib.constants.MotorConfig;
-import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
-import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.subsystems.arm.ElevatorIO.ElevatorConfig;
 import org.sciborgs1155.robot.subsystems.arm.JointIO.JointConfig;
 
@@ -111,8 +107,14 @@ public final class Constants {
   }
 
   public static final class Wrist {
-    public static final MotorConfig MOTOR_CFG =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
+    public static final Consumer<CANSparkMax> MOTOR_CFG =
+        spark -> {
+          spark.restoreFactoryDefaults();
+          spark.setCANTimeout(50);
+          spark.setIdleMode(IdleMode.kBrake);
+          spark.setOpenLoopRampRate(0);
+          spark.setSmartCurrentLimit(80);
+        };
 
     public static final double MOTOR_GEARING = 53.125 / 1.0;
     // Gearing for motor : angle (radians)
@@ -156,14 +158,21 @@ public final class Constants {
   }
 
   public static final class Elbow {
-    public static final MotorConfig MOTOR_CFG =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
+    public static final Consumer<CANSparkMax> MOTOR_CFG =
+        spark -> {
+          spark.restoreFactoryDefaults();
+          spark.setCANTimeout(50);
+          spark.setIdleMode(IdleMode.kBrake);
+          spark.setOpenLoopRampRate(0);
+          spark.setSmartCurrentLimit(50);
+        };
 
     public static final double MOTOR_GEARING = 63.75 / 1.0;
 
     public static final double ENCODER_RATIO = 12.0 / 72.0;
     public static final double CONVERSION = ENCODER_RATIO * 2 * Math.PI / THROUGHBORE_PPR;
-
+    
+    // TODO refactor this zoo of constants
     public static final PIDConstants PID_NEW = new PIDConstants(12, 0, 1.1); // d = 2.18954
     public static final PIDConstants PID_OLD = new PIDConstants(12, 0, 1.1); // d = 2.18954
     public static final ArmFFConstants FF_NEW =
@@ -203,8 +212,14 @@ public final class Constants {
   }
 
   public static final class Elevator {
-    public static final MotorConfig MOTOR_CFG =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(35);
+    public static final Consumer<CANSparkMax> MOTOR_CFG =
+        spark -> {
+          spark.restoreFactoryDefaults();
+          spark.setCANTimeout(50);
+          spark.setIdleMode(IdleMode.kBrake);
+          spark.setOpenLoopRampRate(0);
+          spark.setSmartCurrentLimit(35);
+        };
 
     public static final double MOTOR_GEARING = 30.0 / 1.0;
     // Gearing for motor : height (meters)
@@ -217,9 +232,15 @@ public final class Constants {
 
     public static final double CONVERSION_RELATIVE = SPROCKET_CIRCUMFERENCE / THROUGHBORE_PPR;
 
-    public static final PIDConstants PID = new PIDConstants(50, 0, 1);
-    public static final ElevatorFFConstants FF =
-        new ElevatorFFConstants(0.4, 0.069335, 33.25, 1.5514);
+    public static final double kP = 50;
+    public static final double kI = 0;
+    public static final double kD = 1;
+
+    public static final double s = 0.4;
+    public static final double v = 0.069335;
+    public static final double g = 33.25;
+    public static final double a = 1.5514;
+    ;
 
     public static final double MIN_HEIGHT = 0;
     public static final double MAX_HEIGHT = 0.65;
@@ -246,11 +267,15 @@ public final class Constants {
   }
 
   public static final class Intake {
-    public static final MotorConfig MOTOR_CFG =
-        MotorConfig.base()
-            .withNeutralBehavior(NeutralBehavior.BRAKE)
-            .withCurrentLimit(50)
-            .withInvert(true);
+    public static final Consumer<CANSparkMax> MOTOR_CFG =
+        spark -> {
+          spark.restoreFactoryDefaults();
+          spark.setCANTimeout(50);
+          spark.setInverted(true);
+          spark.setIdleMode(IdleMode.kBrake);
+          spark.setOpenLoopRampRate(0);
+          spark.setSmartCurrentLimit(50);
+        };
 
     public static final double DEFAULT_SPEED = 0.05;
 
@@ -260,82 +285,15 @@ public final class Constants {
     public static final double THRESHOLD = 0.5;
   }
 
-  public static final class Drive {
-    public static final double MAX_SPEED = 4.8; // m / s
-    public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
-    public static final double MAX_ACCEL = 6.5; // m / s^2
-
-    public static final double TRACK_WIDTH = 0.5715;
-    // Distance between centers of right and left wheels on robot
-    public static final double WHEEL_BASE = 0.5715;
-    // Distance between front and back wheels on robot
-
-    public static final Translation2d[] MODULE_OFFSET = {
-      new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), // front left
-      new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), // front right
-      new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), // rear left
-      new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2) // rear right
-    };
-
-    public static final String[] MODULE_NAMES = {
-      "front left module", "front right module", "rear left moduke", "rear right module"
-    };
-
-    // angular offsets of the modules, since we use absolute encoders
-    // ignored (used as 0) in simulation because the simulated robot doesn't have offsets
-    public static final double[] ANGULAR_OFFSETS = {
-      -Math.PI / 2, // front left
-      0, // front right
-      Math.PI, // rear left
-      Math.PI / 2 // rear right
-    };
-
-    public static final PIDConstants TRANSLATION = new PIDConstants(0.6, 0, 0);
-    public static final PIDConstants ROTATION = new PIDConstants(0.4, 0, 0);
-
-    public static final PathConstraints CONSTRAINTS =
-        new PathConstraints(MAX_SPEED / 1.9, MAX_ACCEL / 1.4);
-  }
-
-  public static final class SwerveModule {
-    public static final class Driving {
-      public static final MotorConfig MOTOR_CFG =
-          MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
-
-      public static final double CIRCUMFERENCE = 2.0 * Math.PI * 0.0381;
-      // Diameter of the wheel in meters (2 * π * R)
-
-      public static final double GEARING = 1.0 / 45.0 / 22.0 * 15.0 * 14.0;
-
-      public static final double CONVERSION = CIRCUMFERENCE * GEARING;
-
-      public static final PIDConstants PID = new PIDConstants(0.11, 0, 0.06);
-      public static final BasicFFConstants FF = new BasicFFConstants(0.3, 2.7, 0.25);
-    }
-
-    public static final class Turning {
-      public static final MotorConfig MOTOR_CFG =
-          MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(20);
-
-      public static final double MOTOR_GEARING = 1.0 / 4.0 / 3.0;
-
-      public static final double CONVERSION = 2.0 * Math.PI;
-
-      public static final boolean ENCODER_INVERTED = true;
-
-      public static final PIDConstants PID = new PIDConstants(2, 0, 0.1);
-      // system constants only used in simulation
-      public static final BasicFFConstants FF = new BasicFFConstants(0, 0.25, 0.015);
-    }
-  }
-
   public static final class Auto {
     public static final double CUBE_OUTTAKE_TIME = 0.5; // seconds
     public static final double CONE_OUTTAKE_TIME = 3; // seconds
     public static final double INITIAL_INTAKE_TIME = 0.3; // seconds
     public static final double MOVING_INTAKE_TIME = 4; // seconds
 
-    public static final PIDConstants BALANCE = new PIDConstants(0.05, 0, 0);
+    public static final double BALANCE_kP = 0.05;
+    public static final double BALANCE_kI = 0;
+    public static final double BALANCE_kD = 0;
 
     public static final double PITCH_TOLERANCE = 12.5; // 12.5; // deg
   }

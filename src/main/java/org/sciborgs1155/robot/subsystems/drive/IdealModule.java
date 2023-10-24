@@ -3,7 +3,6 @@ package org.sciborgs1155.robot.subsystems.drive;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import java.util.List;
-import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
 
@@ -38,10 +37,10 @@ public class IdealModule implements ModuleIO {
   public void resetEncoders() {}
 
   @Override
-  public void setTurnPID(PIDConstants constants) {}
+  public void setTurnPID(double kP, double kI, double kD) {}
 
   @Override
-  public void setDrivePID(PIDConstants constants) {}
+  public void setDrivePID(double kP, double kI, double kD) {}
 
   @Override
   public void close() {}

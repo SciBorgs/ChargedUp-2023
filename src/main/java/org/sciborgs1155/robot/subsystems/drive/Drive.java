@@ -1,8 +1,8 @@
 package org.sciborgs1155.robot.subsystems.drive;
 
 import static org.sciborgs1155.lib.PathFlipper.*;
-import static org.sciborgs1155.robot.Constants.Drive.*;
 import static org.sciborgs1155.robot.Ports.Drive.*;
+import static org.sciborgs1155.robot.subsystems.drive.DriveConstants.*;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.PathPlanner;
@@ -38,6 +38,7 @@ import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
+import org.sciborgs1155.robot.subsystems.drive.DriveConstants.TRANSLATION;
 
 public class Drive extends SubsystemBase implements Fallible, Loggable, AutoCloseable {
 
@@ -266,9 +267,9 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
             trajectory,
             this::getPose,
             kinematics,
-            new PIDController(TRANSLATION.p(), TRANSLATION.i(), TRANSLATION.d()),
-            new PIDController(TRANSLATION.p(), TRANSLATION.i(), TRANSLATION.d()),
-            new PIDController(ROTATION.p(), ROTATION.i(), ROTATION.d()),
+            new PIDController(TRANSLATION.kP, TRANSLATION.kI, TRANSLATION.kD),
+            new PIDController(TRANSLATION.kP, TRANSLATION.kI, TRANSLATION.kD),
+            new PIDController(ROTATION.kP, ROTATION.kD, ROTATION.kD),
             this::setModuleStates,
             false)
         .andThen(stop());
