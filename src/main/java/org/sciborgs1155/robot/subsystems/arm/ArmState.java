@@ -42,11 +42,11 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
   static final ArmState NEW_STOW = fromEndpoint(0.425, 0.394, 1.147).get();
 
   static final ArmState NEW_GROUND_CONE = fromRelative(0.618, -0.714, -0.723);
-  static final ArmState NEW_GROUND_CUBE = fromEndpoint(0.331, 0.225, -0.253).get();
+  static final ArmState NEW_GROUND_CUBE = fromRelative(0.411, -1.029, 1.336);
   static final ArmState NEW_SINGLESUB_CONE = OLD_SINGLESUB_CONE;
   static final ArmState NEW_SINGLESUB_CUBE = OLD_SINGLESUB_CUBE;
-  static final ArmState NEW_DOUBLESUB_CONE = NEW_STOW;
-  static final ArmState NEW_DOUBLESUB_CUBE = NEW_STOW;
+  static final ArmState NEW_DOUBLESUB_CONE = fromRelative(0.040, 0.695, -1.378);
+  static final ArmState NEW_DOUBLESUB_CUBE = fromRelative(0.411, 0.081, 0.662);
 
   static final ArmState NEW_MID_CONE = fromRelative(0.466, 0.24, -1.54);
   static final ArmState NEW_MID_CUBE = fromRelative(0.541, -0.34, 0.85);
@@ -78,8 +78,8 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
           NEW_GROUND_CUBE,
           NEW_SINGLESUB_CONE,
           NEW_SINGLESUB_CUBE,
-          // NEW_DOUBLESUB_CONE,
-          // NEW_DOUBLESUB_CUBE,
+          NEW_DOUBLESUB_CONE,
+          NEW_DOUBLESUB_CUBE,
           NEW_MID_CONE,
           NEW_MID_CUBE,
           NEW_HIGH_CONE,
@@ -140,6 +140,17 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
   /** Creates a PlacementState from an absolute 3d array */
   public static ArmState fromArray(double[] state) {
     return fromAbsolute(state[0], state[1], state[2]);
+  }
+
+  /** Prevents floating point roundoff error */
+  private static double round(double value) {
+    return (double) Math.round(value * 1000000d) / 1000000d;
+  }
+
+  public ArmState {
+    elevatorHeight = round(elevatorHeight);
+    elbowAngle = Rotation2d.fromRadians(round(elbowAngle.getRadians()));
+    wristAngle = Rotation2d.fromRadians(round(wristAngle.getRadians()));
   }
 
   /** Returns an array representation of the absolute state */

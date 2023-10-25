@@ -16,6 +16,7 @@ import org.sciborgs1155.lib.BetterArmFeedforward;
 import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
+import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.arm.ArmConstants.Elbow;
 
 public class RealElbow implements JointIO {
@@ -84,7 +85,7 @@ public class RealElbow implements JointIO {
             clampedPosition + getBaseAngle().getRadians(),
             lastSetpoint.velocity,
             setpoint.velocity,
-            ArmConstants.PERIOD);
+            Constants.PERIOD);
     double feedback = pid.calculate(getRelativeAngle().getRadians(), clampedPosition);
 
     lastVoltage = feedback + feedforward;
