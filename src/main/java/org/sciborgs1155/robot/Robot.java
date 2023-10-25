@@ -25,7 +25,6 @@ import org.sciborgs1155.robot.arm.ArmState.Goal;
 import org.sciborgs1155.robot.auto.Autos;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.intake.Intake;
-import org.sciborgs1155.robot.intake.LED;
 import org.sciborgs1155.robot.vision.NoVision;
 import org.sciborgs1155.robot.vision.VisionIO;
 
@@ -53,7 +52,6 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
       };
 
   @Log private final Intake intake = new Intake();
-  @Log private final LED led = new LED();
 
   // INPUT DEVICES
   private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);

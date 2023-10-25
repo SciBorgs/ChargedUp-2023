@@ -1,7 +1,7 @@
 package org.sciborgs1155.robot.intake;
 
 import static org.sciborgs1155.robot.Constants.Auto.*;
-import static org.sciborgs1155.robot.Constants.Intake.*;
+import static org.sciborgs1155.robot.intake.IntakeConstants.*;
 import static org.sciborgs1155.robot.Ports.Intake.*;
 
 import com.revrobotics.CANSparkMax;

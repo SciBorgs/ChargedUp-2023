@@ -69,21 +69,6 @@ public final class Constants {
     // Mass of the claw alone
   }
 
-  public static final class Intake {
-    public static final MotorConfig MOTOR_CFG =
-        MotorConfig.base()
-            .withNeutralBehavior(NeutralBehavior.BRAKE)
-            .withCurrentLimit(40)
-            .withInvert(true);
-
-    public static final double DEFAULT_SPEED = 0.05;
-
-    public static final double CONE_SPEED = 0.85;
-    public static final double CUBE_SPEED = -0.25;
-
-    public static final double THRESHOLD = 0.5;
-  }
-
   public static final class Auto {
     public static final double CUBE_OUTTAKE_TIME = 0.5; // seconds
     public static final double CONE_OUTTAKE_TIME = 3; // seconds
