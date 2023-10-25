@@ -5,7 +5,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import java.awt.Color;
 import java.util.Map;
 import org.sciborgs1155.lib.constants.MotorConfig;
-import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
 
 /**
