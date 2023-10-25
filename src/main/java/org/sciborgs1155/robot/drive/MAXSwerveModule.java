@@ -1,6 +1,4 @@
-package org.sciborgs1155.robot.subsystems.drive;
-
-import static org.sciborgs1155.robot.Constants.SwerveModule.*;
+package org.sciborgs1155.robot.drive;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
@@ -18,6 +16,8 @@ import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
+import org.sciborgs1155.robot.drive.DriveConstants.SwerveModule.Driving;
+import org.sciborgs1155.robot.drive.DriveConstants.Turning;
 
 /** Class to encapsulate a rev max swerve module */
 public class MAXSwerveModule implements ModuleIO {

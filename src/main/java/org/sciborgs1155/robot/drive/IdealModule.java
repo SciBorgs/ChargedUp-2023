@@ -1,11 +1,10 @@
-package org.sciborgs1155.robot.subsystems.drive;
+package org.sciborgs1155.robot.drive;
 
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import java.util.List;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.failure.HardwareFault;
-import org.sciborgs1155.robot.Constants;
 
 /** Ideal swerve module, useful for debugging */
 public class IdealModule implements ModuleIO {
@@ -26,7 +25,7 @@ public class IdealModule implements ModuleIO {
   @Override
   public void setDesiredState(SwerveModuleState desiredState) {
     state = SwerveModuleState.optimize(desiredState, state.angle);
-    distance += state.speedMetersPerSecond * Constants.PERIOD;
+    distance += state.speedMetersPerSecond * DriveConstants.PERIOD;
   }
 
   @Override

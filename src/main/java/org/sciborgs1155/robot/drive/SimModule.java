@@ -1,6 +1,4 @@
-package org.sciborgs1155.robot.subsystems.drive;
-
-import static org.sciborgs1155.robot.Constants.SwerveModule.*;
+package org.sciborgs1155.robot.drive;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
@@ -13,7 +11,8 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import java.util.List;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.failure.HardwareFault;
-import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.drive.DriveConstants.SwerveModule.Driving;
+import org.sciborgs1155.robot.drive.DriveConstants.Turning;
 
 /** Class to encapsulate a rev max swerve module */
 public class SimModule implements ModuleIO {
@@ -64,9 +63,9 @@ public class SimModule implements ModuleIO {
         turnFeedback.calculate(turn.getAngularPositionRad(), setpoint.angle.getRadians());
 
     drive.setInputVoltage(driveFB + driveFF);
-    drive.update(Constants.PERIOD);
+    drive.update(DriveConstants.PERIOD);
     turn.setInputVoltage(turnFB);
-    turn.update(Constants.PERIOD);
+    turn.update(DriveConstants.PERIOD);
   }
 
   @Override

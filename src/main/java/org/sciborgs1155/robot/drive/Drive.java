@@ -1,8 +1,15 @@
-package org.sciborgs1155.robot.subsystems.drive;
+package org.sciborgs1155.robot.drive;
 
-import static org.sciborgs1155.lib.PathFlipper.*;
-import static org.sciborgs1155.robot.Constants.Drive.*;
-import static org.sciborgs1155.robot.Ports.Drive.*;
+import static org.sciborgs1155.lib.PathFlipper.pathForAlliance;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_LEFT_DRIVE;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_LEFT_TURNING;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_RIGHT_DRIVE;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_RIGHT_TURNING;
+import static org.sciborgs1155.robot.Ports.Drive.PIGEON;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_LEFT_DRIVE;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_LEFT_TURNING;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_RIGHT_DRIVE;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_RIGHT_TURNING;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.PathPlanner;
@@ -36,7 +43,6 @@ import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.lib.failure.Fallible;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
-import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
 
 public class Drive extends SubsystemBase implements Fallible, Loggable, AutoCloseable {
@@ -51,7 +57,8 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
   // this should be a generic IMU class, once WPILib implements it
   @Log private final WPI_PigeonIMU imu = new WPI_PigeonIMU(PIGEON);
 
-  public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
+  public final SwerveDriveKinematics kinematics =
+      new SwerveDriveKinematics(DriveConstants.Drive.MODULE_OFFSET);
 
   // Odometry and pose estimation
   private final SwerveDrivePoseEstimator odometry;
@@ -60,8 +67,8 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
   private final FieldObject2d[] modules2d;
 
   // Rate limiting
-  private final SlewRateLimiter xLimiter = new SlewRateLimiter(MAX_ACCEL);
-  private final SlewRateLimiter yLimiter = new SlewRateLimiter(MAX_ACCEL);
+  private final SlewRateLimiter xLimiter = new SlewRateLimiter(DriveConstants.Drive.MAX_ACCEL);
+  private final SlewRateLimiter yLimiter = new SlewRateLimiter(DriveConstants.Drive.MAX_ACCEL);
 
   @Log private double speedMultiplier = 1;
 
@@ -69,13 +76,25 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
     return Robot.isReal()
         ? new Drive(
             new MAXSwerveModule(
-                MODULE_NAMES[0], FRONT_LEFT_DRIVE, FRONT_LEFT_TURNING, ANGULAR_OFFSETS[0]),
+                DriveConstants.Drive.MODULE_NAMES[0],
+                FRONT_LEFT_DRIVE,
+                FRONT_LEFT_TURNING,
+                DriveConstants.Drive.ANGULAR_OFFSETS[0]),
             new MAXSwerveModule(
-                MODULE_NAMES[1], FRONT_RIGHT_DRIVE, FRONT_RIGHT_TURNING, ANGULAR_OFFSETS[1]),
+                DriveConstants.Drive.MODULE_NAMES[1],
+                FRONT_RIGHT_DRIVE,
+                FRONT_RIGHT_TURNING,
+                DriveConstants.Drive.ANGULAR_OFFSETS[1]),
             new MAXSwerveModule(
-                MODULE_NAMES[2], REAR_LEFT_DRIVE, REAR_LEFT_TURNING, ANGULAR_OFFSETS[2]),
+                DriveConstants.Drive.MODULE_NAMES[2],
+                REAR_LEFT_DRIVE,
+                REAR_LEFT_TURNING,
+                DriveConstants.Drive.ANGULAR_OFFSETS[2]),
             new MAXSwerveModule(
-                MODULE_NAMES[3], REAR_RIGHT_DRIVE, REAR_RIGHT_TURNING, ANGULAR_OFFSETS[3]))
+                DriveConstants.Drive.MODULE_NAMES[3],
+                REAR_RIGHT_DRIVE,
+                REAR_RIGHT_TURNING,
+                DriveConstants.Drive.ANGULAR_OFFSETS[3]))
         : new Drive(new SimModule(), new SimModule(), new SimModule(), new SimModule());
   }
 
@@ -125,7 +144,7 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
 
   /** Deadbands and squares inputs */
   private static double scale(double input) {
-    input = MathUtil.applyDeadband(input, Constants.DEADBAND);
+    input = MathUtil.applyDeadband(input, DriveConstants.DEADBAND);
     return Math.copySign(input * input, input);
   }
 
@@ -135,9 +154,13 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
         () ->
             drive(
                 ChassisSpeeds.fromFieldRelativeSpeeds(
-                    xLimiter.calculate(scale(vx.getAsDouble()) * MAX_SPEED * speedMultiplier),
-                    yLimiter.calculate(scale(vy.getAsDouble()) * MAX_SPEED * speedMultiplier),
-                    scale(vOmega.getAsDouble()) * MAX_ANGULAR_SPEED * speedMultiplier,
+                    xLimiter.calculate(
+                        scale(vx.getAsDouble()) * DriveConstants.Drive.MAX_SPEED * speedMultiplier),
+                    yLimiter.calculate(
+                        scale(vy.getAsDouble()) * DriveConstants.Drive.MAX_SPEED * speedMultiplier),
+                    scale(vOmega.getAsDouble())
+                        * DriveConstants.Drive.MAX_ANGULAR_SPEED
+                        * speedMultiplier,
                     getHeading())));
   }
 
@@ -151,17 +174,17 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
   public void drive(ChassisSpeeds speeds) {
     var target =
         new Pose2d(
-            speeds.vxMetersPerSecond * Constants.PERIOD,
-            speeds.vyMetersPerSecond * Constants.PERIOD,
-            Rotation2d.fromRadians(speeds.omegaRadiansPerSecond * Constants.PERIOD));
+            speeds.vxMetersPerSecond * DriveConstants.PERIOD,
+            speeds.vyMetersPerSecond * DriveConstants.PERIOD,
+            Rotation2d.fromRadians(speeds.omegaRadiansPerSecond * DriveConstants.PERIOD));
 
     var twist = new Pose2d().log(target);
 
     speeds =
         new ChassisSpeeds(
-            twist.dx / Constants.PERIOD,
-            twist.dy / Constants.PERIOD,
-            twist.dtheta / Constants.PERIOD);
+            twist.dx / DriveConstants.PERIOD,
+            twist.dy / DriveConstants.PERIOD,
+            twist.dtheta / DriveConstants.PERIOD);
 
     setModuleStates(kinematics.toSwerveModuleStates(speeds));
   }
@@ -176,7 +199,7 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
       throw new IllegalArgumentException("desiredStates must have the same length as modules");
     }
 
-    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, MAX_SPEED);
+    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.Drive.MAX_SPEED);
 
     for (int i = 0; i < modules.size(); i++) {
       modules.get(i).setDesiredState(desiredStates[i]);
@@ -222,7 +245,8 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
 
     for (int i = 0; i < modules2d.length; i++) {
       var module = modules.get(i);
-      var transform = new Transform2d(MODULE_OFFSET[i], module.getPosition().angle);
+      var transform =
+          new Transform2d(DriveConstants.Drive.MODULE_OFFSET[i], module.getPosition().angle);
       modules2d[i].setPose(getPose().transformBy(transform));
     }
   }
@@ -233,7 +257,7 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
         .addHeading(
             Units.radiansToDegrees(
                     kinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond)
-                * Constants.PERIOD);
+                * DriveConstants.PERIOD);
   }
 
   /** Stops drivetrain */
@@ -266,9 +290,18 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
             trajectory,
             this::getPose,
             kinematics,
-            new PIDController(TRANSLATION.p(), TRANSLATION.i(), TRANSLATION.d()),
-            new PIDController(TRANSLATION.p(), TRANSLATION.i(), TRANSLATION.d()),
-            new PIDController(ROTATION.p(), ROTATION.i(), ROTATION.d()),
+            new PIDController(
+                DriveConstants.Drive.TRANSLATION.p(),
+                DriveConstants.Drive.TRANSLATION.i(),
+                DriveConstants.Drive.TRANSLATION.d()),
+            new PIDController(
+                DriveConstants.Drive.TRANSLATION.p(),
+                DriveConstants.Drive.TRANSLATION.i(),
+                DriveConstants.Drive.TRANSLATION.d()),
+            new PIDController(
+                DriveConstants.Drive.ROTATION.p(),
+                DriveConstants.Drive.ROTATION.i(),
+                DriveConstants.Drive.ROTATION.d()),
             this::setModuleStates,
             false)
         .andThen(stop());
@@ -297,7 +330,8 @@ public class Drive extends SubsystemBase implements Fallible, Loggable, AutoClos
     PathPoint start = new PathPoint(startPose.getTranslation(), heading, startPose.getRotation());
     PathPoint goal =
         new PathPoint(desiredPose.getTranslation(), heading, desiredPose.getRotation());
-    PathPlannerTrajectory trajectory = PathPlanner.generatePath(CONSTRAINTS, start, goal);
+    PathPlannerTrajectory trajectory =
+        PathPlanner.generatePath(DriveConstants.Drive.CONSTRAINTS, start, goal);
     return follow(trajectory);
   }
 
