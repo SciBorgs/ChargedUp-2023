@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.subsystems.arm;
+package org.sciborgs1155.robot.arm;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -9,8 +9,8 @@ import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
-import org.sciborgs1155.robot.subsystems.arm.ElevatorIO.ElevatorConfig;
-import org.sciborgs1155.robot.subsystems.arm.JointIO.JointConfig;
+import org.sciborgs1155.robot.arm.ElevatorIO.ElevatorConfig;
+import org.sciborgs1155.robot.arm.JointIO.JointConfig;
 
 public class ArmConstants {
 

@@ -1,9 +1,9 @@
-package org.sciborgs1155.robot.commands;
+package org.sciborgs1155.robot.auto;
 
 import static org.sciborgs1155.robot.Constants.Auto.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
+import static org.sciborgs1155.robot.arm.ArmState.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
-import static org.sciborgs1155.robot.subsystems.arm.ArmState.*;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -20,10 +20,10 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.List;
 import java.util.function.Supplier;
+import org.sciborgs1155.robot.arm.Arm;
+import org.sciborgs1155.robot.arm.ArmState;
 import org.sciborgs1155.robot.drive.Drive;
-import org.sciborgs1155.robot.subsystems.Intake;
-import org.sciborgs1155.robot.subsystems.arm.Arm;
-import org.sciborgs1155.robot.subsystems.arm.ArmState;
+import org.sciborgs1155.robot.intake.Intake;
 
 public final class Autos implements Sendable {
 

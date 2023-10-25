@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.subsystems.arm;
+package org.sciborgs1155.robot.arm;
 
 import static org.sciborgs1155.robot.Ports.Elbow.*;
 
@@ -17,7 +17,7 @@ import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.subsystems.arm.ArmConstants.Elbow;
+import org.sciborgs1155.robot.arm.ArmConstants.Elbow;
 
 public class RealElbow implements JointIO {
   private final CANSparkMax middleMotor;

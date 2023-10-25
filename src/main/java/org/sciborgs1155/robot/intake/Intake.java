@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.subsystems;
+package org.sciborgs1155.robot.intake;
 
 import static org.sciborgs1155.robot.Constants.Auto.*;
 import static org.sciborgs1155.robot.Constants.Intake.*;
@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 import org.sciborgs1155.lib.failure.Fallible;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
-import org.sciborgs1155.robot.subsystems.arm.ArmState.GamePiece;
+import org.sciborgs1155.robot.arm.ArmState.GamePiece;
 
 public class Intake extends SubsystemBase implements Fallible, Loggable, AutoCloseable {
 

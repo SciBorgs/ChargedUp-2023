@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.subsystems.arm;
+package org.sciborgs1155.robot.arm;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -11,8 +11,8 @@ import java.util.function.DoubleUnaryOperator;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.Constants.RobotType;
-import org.sciborgs1155.robot.subsystems.arm.ArmConstants.Elbow;
-import org.sciborgs1155.robot.subsystems.arm.ArmConstants.Elevator;
+import org.sciborgs1155.robot.arm.ArmConstants.Elbow;
+import org.sciborgs1155.robot.arm.ArmConstants.Elevator;
 
 /** ArmState class to store relative angles for the arm. */
 public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d wristAngle) {
