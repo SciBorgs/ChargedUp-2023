@@ -17,7 +17,7 @@ import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.drive.DriveConstants.SwerveModule.Driving;
-import org.sciborgs1155.robot.drive.DriveConstants.Turning;
+import org.sciborgs1155.robot.drive.DriveConstants.SwerveModule.Turning;
 
 /** Class to encapsulate a rev max swerve module */
 public class MAXSwerveModule implements ModuleIO {

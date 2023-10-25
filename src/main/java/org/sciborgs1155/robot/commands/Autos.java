@@ -2,7 +2,7 @@ package org.sciborgs1155.robot.commands;
 
 import static org.sciborgs1155.robot.Constants.Auto.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
-import static org.sciborgs1155.robot.drive.DriveConstants.Drive.CONSTRAINTS;
+import static org.sciborgs1155.robot.drive.DriveConstants.*;
 import static org.sciborgs1155.robot.subsystems.arm.ArmState.*;
 
 import com.pathplanner.lib.PathPlanner;
