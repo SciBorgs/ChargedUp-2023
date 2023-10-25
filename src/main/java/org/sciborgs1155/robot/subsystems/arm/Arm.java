@@ -1,5 +1,7 @@
 package org.sciborgs1155.robot.subsystems.arm;
 
+import static org.sciborgs1155.robot.subsystems.arm.ArmConstants.*;
+
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -20,9 +22,6 @@ import org.sciborgs1155.lib.failure.Fallible;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Robot;
-import org.sciborgs1155.robot.subsystems.arm.ArmConstants.Elbow;
-import org.sciborgs1155.robot.subsystems.arm.ArmConstants.Elevator;
-import org.sciborgs1155.robot.subsystems.arm.ArmConstants.Wrist;
 import org.sciborgs1155.robot.subsystems.arm.ArmState.GamePiece;
 import org.sciborgs1155.robot.subsystems.arm.ArmState.Goal;
 import org.sciborgs1155.robot.subsystems.arm.ElevatorIO.ElevatorConfig;

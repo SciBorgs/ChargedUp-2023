@@ -14,6 +14,7 @@ import org.sciborgs1155.lib.BetterElevatorFeedforward;
 import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
+import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.subsystems.arm.ArmConstants.Elevator;
 
 public class RealElevator implements ElevatorIO {
@@ -80,7 +81,7 @@ public class RealElevator implements ElevatorIO {
   public void updateSetpoint(State setpoint) {
     double clampedPosition = MathUtil.clamp(setpoint.position, minHeight, maxHeight);
 
-    double ffOutput = ff.calculate(lastSetpoint.velocity, setpoint.velocity, ArmConstants.PERIOD);
+    double ffOutput = ff.calculate(lastSetpoint.velocity, setpoint.velocity, Constants.PERIOD);
     double fbOutput = pid.calculate(getHeight(), clampedPosition);
 
     lastVoltage = ffOutput + fbOutput;

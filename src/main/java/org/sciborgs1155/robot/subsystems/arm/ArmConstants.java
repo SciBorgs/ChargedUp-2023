@@ -7,14 +7,12 @@ import org.sciborgs1155.lib.constants.ElevatorFFConstants;
 import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
+import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
 import org.sciborgs1155.robot.subsystems.arm.ElevatorIO.ElevatorConfig;
 import org.sciborgs1155.robot.subsystems.arm.JointIO.JointConfig;
 
 public class ArmConstants {
-
-  public static final int THROUGHBORE_PPR = 2048;
-  public static final double PERIOD = 0.02; // roborio tickrate (s)
 
   public static final class Wrist {
     public static final MotorConfig MOTOR_CFG =
@@ -23,7 +21,7 @@ public class ArmConstants {
     public static final double MOTOR_GEARING = 53.125 / 1.0;
     // Gearing for motor : angle (radians)
 
-    public static final double CONVERSION_RELATIVE = 2.0 * Math.PI / THROUGHBORE_PPR;
+    public static final double CONVERSION_RELATIVE = 2.0 * Math.PI / Constants.THROUGHBORE_PPR;
     public static final double CONVERSION_ABS = -2.0 * Math.PI;
 
     public static final PIDConstants PID_NEW = new PIDConstants(5.5, 0, 0.1);
@@ -61,14 +59,14 @@ public class ArmConstants {
             MAX_ANGLE);
   }
 
-  public static class Elbow {
+  public static final class Elbow {
     public static final MotorConfig MOTOR_CFG =
         MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
 
     public static final double MOTOR_GEARING = 63.75 / 1.0;
 
     public static final double ENCODER_RATIO = 12.0 / 72.0;
-    public static final double CONVERSION = ENCODER_RATIO * 2 * Math.PI / THROUGHBORE_PPR;
+    public static final double CONVERSION = ENCODER_RATIO * 2 * Math.PI / Constants.THROUGHBORE_PPR;
 
     public static final PIDConstants PID_NEW = new PIDConstants(12, 0, 1.1); // d = 2.18954
     public static final PIDConstants PID_OLD = new PIDConstants(12, 0, 1.1); // d = 2.18954
@@ -121,9 +119,10 @@ public class ArmConstants {
     public static final double SPROCKET_CIRCUMFERENCE = 2.0 * Math.PI * SPROCKET_RADIUS;
     // Circumference of the sprocket in meters (2 * π * R)
 
-    public static final double CONVERSION_RELATIVE = SPROCKET_CIRCUMFERENCE / THROUGHBORE_PPR;
+    public static final double CONVERSION_RELATIVE =
+        SPROCKET_CIRCUMFERENCE / Constants.THROUGHBORE_PPR;
 
-    public static final PIDConstants PID = new PIDConstants(50, 0, 1);
+    public static final PIDConstants PID = new PIDConstants(55, 0, 0.5);
     public static final ElevatorFFConstants FF =
         new ElevatorFFConstants(0.4, 0.069335, 33.25, 1.5514);
 
