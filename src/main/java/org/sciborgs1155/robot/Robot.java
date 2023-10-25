@@ -87,7 +87,9 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
     addPeriodic(Logger::updateEntries, Constants.PERIOD);
     addPeriodic(() -> drive.updateEstimates(vision.getPoseEstimates(drive.getPose())), 0.5);
 
-    autonomous().onTrue(getAutonomousCommand());
+    addPeriodic(() -> getFaults().forEach(System.out::print), 1);
+
+    autonomous().whileTrue(getAutonomousCommand());
 
     teleop().onTrue(getEnableCommand());
   }
@@ -156,8 +158,6 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
 
   /** The commamnd to be ran in autonomous */
   public Command getAutonomousCommand() {
-    return new DeferredCommand(autos::get, drive, arm)
-        .until(() -> !DriverStation.isAutonomous())
-        .withName("auto");
+    return new DeferredCommand(autos::get, drive, arm).withName("auto");
   }
 }
