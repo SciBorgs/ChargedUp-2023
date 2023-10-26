@@ -4,7 +4,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import java.awt.Color;
 import java.util.Map;
-import org.sciborgs1155.lib.constants.MotorConfig;
 import org.sciborgs1155.lib.constants.PIDConstants;
 
 /**

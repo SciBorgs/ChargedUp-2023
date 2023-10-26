@@ -3,7 +3,7 @@ package org.sciborgs1155.robot.arm;
 import static org.sciborgs1155.robot.Ports.Elbow.*;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,16 +13,41 @@ import edu.wpi.first.wpilibj.Encoder;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import org.sciborgs1155.lib.BetterArmFeedforward;
-import org.sciborgs1155.lib.constants.MotorConfig;
+import org.sciborgs1155.lib.constants.SparkUtils;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.arm.ArmConstants.Elbow;
 
 public class RealElbow implements JointIO {
-  private final CANSparkMax middleMotor;
-  private final CANSparkMax leftMotor;
-  private final CANSparkMax rightMotor;
+  private final CANSparkMax middleMotor =
+      SparkUtils.create(
+          MIDDLE_MOTOR,
+          s -> {
+            s.setIdleMode(IdleMode.kBrake);
+            s.setOpenLoopRampRate(0);
+            s.setSmartCurrentLimit(50);
+          });
+
+  private final CANSparkMax leftMotor =
+      SparkUtils.create(
+          LEFT_MOTOR,
+          s -> {
+            s.setIdleMode(IdleMode.kBrake);
+            s.setOpenLoopRampRate(0);
+            s.setSmartCurrentLimit(50);
+            s.follow(middleMotor);
+          });
+
+  private final CANSparkMax rightMotor =
+      SparkUtils.create(
+          RIGHT_MOTOR,
+          s -> {
+            s.setIdleMode(IdleMode.kBrake);
+            s.setOpenLoopRampRate(0);
+            s.setSmartCurrentLimit(50);
+            s.follow(middleMotor);
+          });
 
   private final Encoder encoder;
 
@@ -36,20 +61,9 @@ public class RealElbow implements JointIO {
   private double lastVoltage;
 
   public RealElbow(JointConfig config) {
-    middleMotor = Elbow.MOTOR_CFG.build(null, MIDDLE_MOTOR);
-    leftMotor = Elbow.MOTOR_CFG.build(MotorType.kBrushless, LEFT_MOTOR);
-    rightMotor = Elbow.MOTOR_CFG.build(MotorType.kBrushless, RIGHT_MOTOR);
-
-    MotorConfig.disableFrames(middleMotor, 4, 5, 6);
-    MotorConfig.disableFrames(leftMotor, 1, 2, 3, 4, 5, 6);
-    MotorConfig.disableFrames(rightMotor, 1, 2, 3, 4, 5, 6);
-
-    leftMotor.follow(middleMotor);
-    rightMotor.follow(middleMotor);
-
-    middleMotor.burnFlash();
-    leftMotor.burnFlash();
-    rightMotor.burnFlash();
+    SparkUtils.disableFrames(middleMotor, 4, 5, 6);
+    SparkUtils.disableFrames(leftMotor, 1, 2, 3, 4, 5, 6);
+    SparkUtils.disableFrames(rightMotor, 1, 2, 3, 4, 5, 6);
 
     encoder = new Encoder(ENCODER[0], ENCODER[1]);
     encoder.setDistancePerPulse(Elbow.CONVERSION);

@@ -1,6 +1,5 @@
 package org.sciborgs1155.lib.constants;
 
-/** Add your docs here. */
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
@@ -17,12 +16,11 @@ public class SparkUtils {
    * Creates and configures a CANSparkMax.
    *
    * @param port
-   * @param type
    * @param config
    * @return The configured CANSparkMax
    */
-  public static CANSparkMax create(int port, MotorType type, Consumer<CANSparkMax> config) {
-    CANSparkMax spark = new CANSparkMax(port, type);
+  public static CANSparkMax create(int port, Consumer<CANSparkMax> config) {
+    CANSparkMax spark = new CANSparkMax(port, MotorType.kBrushless);
     spark.restoreFactoryDefaults();
     config.accept(spark);
     sparks.add(spark);
@@ -30,10 +28,8 @@ public class SparkUtils {
   }
 
   /**
-   * Burn to flash all motor configs at once, accounting for CAN bus delay. Use after fully
+   * Burn all motor configs to flash at the same time, accounting for CAN bus delay. Use after fully
    * configuring motors.
-   *
-   * @param sparks
    */
   public static void safeBurnFlash() {
     Timer.delay(0.2);
@@ -44,6 +40,12 @@ public class SparkUtils {
     Timer.delay(0.2);
   }
 
+  /**
+   * Disables a list of frames for a specific motor.
+   *
+   * @param spark
+   * @param frames
+   */
   public static void disableFrames(CANSparkMax spark, int... frames) {
     for (int frame : frames) {
       spark.setPeriodicFramePeriod(PeriodicFrame.fromId(frame), 65535);

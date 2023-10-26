@@ -3,7 +3,7 @@ package org.sciborgs1155.robot.arm;
 import static org.sciborgs1155.robot.Ports.Wrist.*;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import java.util.List;
 import org.sciborgs1155.lib.BetterArmFeedforward;
-import org.sciborgs1155.lib.constants.MotorConfig;
+import org.sciborgs1155.lib.constants.SparkUtils;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
@@ -21,7 +21,15 @@ import org.sciborgs1155.robot.arm.ArmConstants.Wrist;
 
 public class RealWrist implements JointIO {
 
-  private final CANSparkMax motor;
+  private final CANSparkMax motor =
+      SparkUtils.create(
+          MOTOR,
+          s -> {
+            s.setIdleMode(IdleMode.kBrake);
+            s.setOpenLoopRampRate(0);
+            s.setSmartCurrentLimit(80);
+          });
+
   private final DutyCycleEncoder absolute;
   private final Encoder relative;
 
@@ -37,7 +45,6 @@ public class RealWrist implements JointIO {
   private double lastVoltage;
 
   public RealWrist(JointConfig config) {
-    motor = Wrist.MOTOR_CFG.build(MotorType.kBrushless, MOTOR);
     absolute = new DutyCycleEncoder(ABS_ENCODER);
     relative = new Encoder(RELATIVE_ENCODER[0], RELATIVE_ENCODER[1]);
 
@@ -46,9 +53,7 @@ public class RealWrist implements JointIO {
     relative.setDistancePerPulse(Wrist.CONVERSION_RELATIVE);
     relative.setReverseDirection(true);
 
-    MotorConfig.disableFrames(motor, 4, 5, 6);
-
-    motor.burnFlash();
+    SparkUtils.disableFrames(motor, 4, 5, 6);
 
     ff = config.ff().createFeedforward();
     pid = config.pid().createPIDController();

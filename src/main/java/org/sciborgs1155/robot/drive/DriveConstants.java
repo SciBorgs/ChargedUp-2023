@@ -3,12 +3,9 @@ package org.sciborgs1155.robot.drive;
 import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.math.geometry.Translation2d;
 import org.sciborgs1155.lib.constants.BasicFFConstants;
-import org.sciborgs1155.lib.constants.MotorConfig;
-import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
 
 public final class DriveConstants {
-
   public static final double MAX_SPEED = 4.8; // m / s
   public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // rad / s
   public static final double MAX_ACCEL = 6.5; // m / s^2
@@ -46,9 +43,6 @@ public final class DriveConstants {
 
   public static final class SwerveModule {
     public static final class Driving {
-      public static final MotorConfig MOTOR_CFG =
-          MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
-
       public static final double CIRCUMFERENCE = 2.0 * Math.PI * 0.0381;
       // Diameter of the wheel in meters (2 * π * R)
 
@@ -61,9 +55,6 @@ public final class DriveConstants {
     }
 
     public static final class Turning {
-      public static final MotorConfig MOTOR_CFG =
-          MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(20);
-
       public static final double MOTOR_GEARING = 1.0 / 4.0 / 3.0;
 
       public static final double CONVERSION = 2.0 * Math.PI;

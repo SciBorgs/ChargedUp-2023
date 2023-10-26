@@ -4,8 +4,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import org.sciborgs1155.lib.constants.ArmFFConstants;
 import org.sciborgs1155.lib.constants.ElevatorFFConstants;
-import org.sciborgs1155.lib.constants.MotorConfig;
-import org.sciborgs1155.lib.constants.MotorConfig.NeutralBehavior;
 import org.sciborgs1155.lib.constants.PIDConstants;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
@@ -15,9 +13,6 @@ import org.sciborgs1155.robot.arm.JointIO.JointConfig;
 public class ArmConstants {
 
   public static final class Wrist {
-    public static final MotorConfig MOTOR_CFG =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE);
-
     public static final double MOTOR_GEARING = 53.125 / 1.0;
     // Gearing for motor : angle (radians)
 
@@ -60,9 +55,6 @@ public class ArmConstants {
   }
 
   public static final class Elbow {
-    public static final MotorConfig MOTOR_CFG =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(50);
-
     public static final double MOTOR_GEARING = 63.75 / 1.0;
 
     public static final double ENCODER_RATIO = 12.0 / 72.0;
@@ -107,9 +99,6 @@ public class ArmConstants {
   }
 
   public static final class Elevator {
-    public static final MotorConfig MOTOR_CFG =
-        MotorConfig.base().withNeutralBehavior(NeutralBehavior.BRAKE).withCurrentLimit(35);
-
     public static final double MOTOR_GEARING = 30.0 / 1.0;
     // Gearing for motor : height (meters)
 
