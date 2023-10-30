@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
@@ -87,7 +88,7 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
 
     addPeriodic(() -> getFaults().forEach(System.out::print), 1);
 
-    autonomous().whileTrue(getAutonomousCommand());
+    autonomous().whileTrue(new ProxyCommand(autos::get));
 
     teleop().onTrue(getEnableCommand());
   }
@@ -153,9 +154,3 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
   public Command getEnableCommand() {
     return arm.setSetpoints(arm::getState);
   }
-
-  /** The commamnd to be ran in autonomous */
-  public Command getAutonomousCommand() {
-    return new DeferredCommand(autos::get, drive, arm).withName("auto");
-  }
-}
