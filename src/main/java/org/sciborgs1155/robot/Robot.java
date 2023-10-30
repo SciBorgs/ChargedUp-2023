@@ -11,7 +11,6 @@ import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import org.sciborgs1155.lib.CommandRobot;
-import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.lib.failure.Fallible;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
@@ -154,3 +153,4 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
   public Command getEnableCommand() {
     return arm.setSetpoints(arm::getState);
   }
+}

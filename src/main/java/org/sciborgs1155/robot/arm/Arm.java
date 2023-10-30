@@ -4,6 +4,7 @@ import static org.sciborgs1155.robot.arm.ArmConstants.*;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -51,8 +52,9 @@ public class Arm extends SubsystemBase implements Fallible, Loggable, AutoClosea
 
   private final Map<Integer, ArmTrajectory> trajectories = TrajectoryCache.loadTrajectories();
 
-  @Log private final Visualizer positionVisualizer = new Visualizer(new Color8Bit(255, 0, 0));
-  @Log private final Visualizer setpointVisualizer = new Visualizer(new Color8Bit(0, 0, 255));
+  @Log Mechanism2d mech = new Mechanism2d(4, 2);
+  private final Visualizer positionVisualizer = new Visualizer(mech, new Color8Bit(255, 0, 0));
+  private final Visualizer setpointVisualizer = new Visualizer(mech, new Color8Bit(0, 0, 255));
 
   // this is to make the emperical collection of arm states easier
   @Log(name = "copy state")
@@ -236,7 +238,7 @@ public class Arm extends SubsystemBase implements Fallible, Loggable, AutoClosea
           elbow.stopMoving();
           wrist.stopMoving();
         })
-        .alongWith(Commands.print("arm is fucked"))
+        .alongWith(Commands.print("arm is dead"))
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         .withName("killed");
   }
