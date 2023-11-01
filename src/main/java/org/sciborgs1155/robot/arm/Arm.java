@@ -37,7 +37,9 @@ public class Arm extends SubsystemBase implements Fallible, Loggable, AutoClosea
     return new Arm(new NoElevator(), new NoJoint(), new NoJoint());
   }
 
-  /** Factory for an Arm with either real or simulated segments, depending on {@link Robot#isReal()} */
+  /**
+   * Factory for an Arm with either real or simulated segments, depending on {@link Robot#isReal()}
+   */
   public static Arm createFromConfig(
       ElevatorConfig elevator, JointConfig elbow, JointConfig wrist) {
     return Robot.isReal()

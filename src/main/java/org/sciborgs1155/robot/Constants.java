@@ -1,8 +1,6 @@
 package org.sciborgs1155.robot;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import java.awt.Color;
 import java.util.Map;
 import org.sciborgs1155.lib.constants.PIDConstants;
 
@@ -20,10 +18,6 @@ import org.sciborgs1155.lib.constants.PIDConstants;
  *   <li>time: seconds
  *   <li>angle: radians
  * </ul>
- *
- * @see MotorConfig
- * @see PIDConstants
- * @see Constraints
  */
 public final class Constants {
 
@@ -94,17 +88,5 @@ public final class Constants {
             Map.entry(4, new Translation2d(1.83, 2.17)),
             Map.entry(5, new Translation2d(1.83, 1.63)),
             Map.entry(6, new Translation2d(1.83, 0.51)));
-  }
-
-  public static final class LED {
-    public static final int buffer1Length = 60;
-
-    public static final int buffer2Length = 60;
-
-    // RGB COLORS
-    public static Color lightPurple = new Color(147, 112, 219);
-    public static Color yellow = new Color(237, 237, 12);
-    public static Color blue = new Color(0, 0, 228);
-    public static Color rainbow1stPixel = new Color(255, 0, 0);
   }
 }
