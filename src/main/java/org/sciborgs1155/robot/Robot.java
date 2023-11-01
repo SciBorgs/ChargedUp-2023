@@ -82,14 +82,20 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
 
     DataLogManager.start();
 
+    // Periodically updates oblog entries
     addPeriodic(Logger::updateEntries, Constants.PERIOD);
+
+    // Periodically updates pose estimate from vision data
     addPeriodic(() -> drive.updateEstimates(vision.getPoseEstimates(drive.getPose())), 0.5);
 
+    // Prints all current faults via Fallible
     addPeriodic(() -> getFaults().forEach(System.out::print), 1);
 
+    // Runs the selected auto for autonomous
     autonomous().whileTrue(new ProxyCommand(autos::get));
 
-    teleop().onTrue(getEnableCommand());
+    // Sets arm setpoint to current position when re-enabled
+    teleop().onTrue(arm.setSetpoints(arm::getState));
   }
 
   /**
@@ -103,8 +109,6 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
             .withName("teleop driving"));
 
     arm.setDefaultCommand(arm.setSetpoints(arm::getSetpoint).repeatedly().withName("holding"));
-
-    // intake.setDefaultCommand(intake.intake(scoring.gamePiece()).withName("passive intake"));
   }
 
   /** Configures trigger -> command bindings */
@@ -112,9 +116,7 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
 
     // DRIVER INPUT
     driver.b().onTrue(drive.zeroHeading());
-
     driver.leftBumper().onTrue(drive.setSpeedMultiplier(0.3)).onFalse(drive.setSpeedMultiplier(1));
-
     driver.rightBumper().onTrue(drive.setSpeedMultiplier(0.3)).onFalse(drive.setSpeedMultiplier(1));
 
     // STATE SWITCHING
@@ -147,10 +149,5 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
         .register(arm.getFaults())
         .register(intake.getFaults())
         .build();
-  }
-
-  /** The command to run when the robot is enabled */
-  public Command getEnableCommand() {
-    return arm.setSetpoints(arm::getState);
   }
 }

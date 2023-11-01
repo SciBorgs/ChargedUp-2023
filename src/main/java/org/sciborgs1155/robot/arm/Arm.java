@@ -32,10 +32,12 @@ import org.sciborgs1155.robot.arm.TrajectoryCache.Parameters;
 
 public class Arm extends SubsystemBase implements Fallible, Loggable, AutoCloseable {
 
+  /** Factory for an Arm with empty segments */
   public static Arm createNone() {
     return new Arm(new NoElevator(), new NoJoint(), new NoJoint());
   }
 
+  /** Factory for an Arm with either real or simulated segments, depending on {@link Robot#isReal()} */
   public static Arm createFromConfig(
       ElevatorConfig elevator, JointConfig elbow, JointConfig wrist) {
     return Robot.isReal()
@@ -46,11 +48,17 @@ public class Arm extends SubsystemBase implements Fallible, Loggable, AutoClosea
             new SimJoint(wrist, ArmState.initial().wristAngle(), false));
   }
 
+  // HARDWARE IO
+
   @Log private final ElevatorIO elevator;
   @Log private final JointIO elbow;
   @Log private final JointIO wrist;
 
+  // TRAJECTORY CACHE
+
   private final Map<Integer, ArmTrajectory> trajectories = TrajectoryCache.loadTrajectories();
+
+  // VISUALIZATION
 
   @Log Mechanism2d mech = new Mechanism2d(4, 2);
   private final Visualizer positionVisualizer = new Visualizer(mech, new Color8Bit(255, 0, 0));
