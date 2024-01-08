@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.subsystems.arm;
+package org.sciborgs1155.robot.arm;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.subsystems.arm;
+package org.sciborgs1155.robot.arm;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -10,9 +10,9 @@ import java.util.Set;
 import java.util.function.DoubleUnaryOperator;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Dimensions;
-import org.sciborgs1155.robot.Constants.Elbow;
-import org.sciborgs1155.robot.Constants.Elevator;
 import org.sciborgs1155.robot.Constants.RobotType;
+import org.sciborgs1155.robot.arm.ArmConstants.Elbow;
+import org.sciborgs1155.robot.arm.ArmConstants.Elevator;
 
 /** ArmState class to store relative angles for the arm. */
 public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d wristAngle) {
@@ -142,6 +142,7 @@ public record ArmState(double elevatorHeight, Rotation2d elbowAngle, Rotation2d 
     return fromAbsolute(state[0], state[1], state[2]);
   }
 
+  /** Prevents floating point roundoff error */
   private static double round(double value) {
     return (double) Math.round(value * 1000000d) / 1000000d;
   }

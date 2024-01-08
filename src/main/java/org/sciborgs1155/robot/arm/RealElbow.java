@@ -1,10 +1,9 @@
-package org.sciborgs1155.robot.subsystems.arm;
+package org.sciborgs1155.robot.arm;
 
-import static org.sciborgs1155.robot.Constants.Elbow.*;
 import static org.sciborgs1155.robot.Ports.Elbow.*;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,15 +13,41 @@ import edu.wpi.first.wpilibj.Encoder;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import org.sciborgs1155.lib.BetterArmFeedforward;
-import org.sciborgs1155.lib.constants.MotorConfig;
+import org.sciborgs1155.lib.constants.SparkUtils;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
 import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.arm.ArmConstants.Elbow;
 
 public class RealElbow implements JointIO {
-  private final CANSparkMax middleMotor;
-  private final CANSparkMax leftMotor;
-  private final CANSparkMax rightMotor;
+  private final CANSparkMax middleMotor =
+      SparkUtils.create(
+          MIDDLE_MOTOR,
+          s -> {
+            s.setIdleMode(IdleMode.kBrake);
+            s.setOpenLoopRampRate(0);
+            s.setSmartCurrentLimit(50);
+          });
+
+  private final CANSparkMax leftMotor =
+      SparkUtils.create(
+          LEFT_MOTOR,
+          s -> {
+            s.setIdleMode(IdleMode.kBrake);
+            s.setOpenLoopRampRate(0);
+            s.setSmartCurrentLimit(50);
+            s.follow(middleMotor);
+          });
+
+  private final CANSparkMax rightMotor =
+      SparkUtils.create(
+          RIGHT_MOTOR,
+          s -> {
+            s.setIdleMode(IdleMode.kBrake);
+            s.setOpenLoopRampRate(0);
+            s.setSmartCurrentLimit(50);
+            s.follow(middleMotor);
+          });
 
   private final Encoder encoder;
 
@@ -36,23 +61,12 @@ public class RealElbow implements JointIO {
   private double lastVoltage;
 
   public RealElbow(JointConfig config) {
-    middleMotor = MOTOR_CFG.build(MotorType.kBrushless, MIDDLE_MOTOR);
-    leftMotor = MOTOR_CFG.build(MotorType.kBrushless, LEFT_MOTOR);
-    rightMotor = MOTOR_CFG.build(MotorType.kBrushless, RIGHT_MOTOR);
-
-    MotorConfig.disableFrames(middleMotor, 4, 5, 6);
-    MotorConfig.disableFrames(leftMotor, 1, 2, 3, 4, 5, 6);
-    MotorConfig.disableFrames(rightMotor, 1, 2, 3, 4, 5, 6);
-
-    leftMotor.follow(middleMotor);
-    rightMotor.follow(middleMotor);
-
-    middleMotor.burnFlash();
-    leftMotor.burnFlash();
-    rightMotor.burnFlash();
+    SparkUtils.disableFrames(middleMotor, 4, 5, 6);
+    SparkUtils.disableFrames(leftMotor, 1, 2, 3, 4, 5, 6);
+    SparkUtils.disableFrames(rightMotor, 1, 2, 3, 4, 5, 6);
 
     encoder = new Encoder(ENCODER[0], ENCODER[1]);
-    encoder.setDistancePerPulse(CONVERSION);
+    encoder.setDistancePerPulse(Elbow.CONVERSION);
     encoder.setReverseDirection(true);
 
     minAngle = config.minAngle();
@@ -68,7 +82,7 @@ public class RealElbow implements JointIO {
   /** Elbow position relative to the chassis */
   @Log(name = "elbow position", methodName = "getRadians")
   public Rotation2d getRelativeAngle() {
-    return Rotation2d.fromRadians(encoder.getDistance() + OFFSET);
+    return Rotation2d.fromRadians(encoder.getDistance() + Elbow.OFFSET);
   }
 
   @Override
@@ -129,7 +143,7 @@ public class RealElbow implements JointIO {
             "elbow encoder",
             encoder.getDistance() == 0 // no position reading
                 && encoder.getRate() == 0 // no velocity reading
-                && lastSetpoint.position != OFFSET // elbow is not going to 0
+                && lastSetpoint.position != Elbow.OFFSET // elbow is not going to 0
                 && middleMotor.getAppliedOutput() != 0) // elbow is trying to move;
         .build();
   }

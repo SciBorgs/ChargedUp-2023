@@ -1,7 +1,10 @@
-package org.sciborgs1155.robot.subsystems.arm;
+package org.sciborgs1155.robot.arm;
+
+import static org.sciborgs1155.robot.arm.ArmConstants.*;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -19,23 +22,24 @@ import org.sciborgs1155.lib.Trajectory;
 import org.sciborgs1155.lib.failure.Fallible;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
-import org.sciborgs1155.robot.Constants.Elbow;
-import org.sciborgs1155.robot.Constants.Elevator;
-import org.sciborgs1155.robot.Constants.Wrist;
 import org.sciborgs1155.robot.Robot;
-import org.sciborgs1155.robot.subsystems.arm.ArmState.GamePiece;
-import org.sciborgs1155.robot.subsystems.arm.ArmState.Goal;
-import org.sciborgs1155.robot.subsystems.arm.ElevatorIO.ElevatorConfig;
-import org.sciborgs1155.robot.subsystems.arm.JointIO.JointConfig;
-import org.sciborgs1155.robot.subsystems.arm.TrajectoryCache.ArmTrajectory;
-import org.sciborgs1155.robot.subsystems.arm.TrajectoryCache.Parameters;
+import org.sciborgs1155.robot.arm.ArmState.GamePiece;
+import org.sciborgs1155.robot.arm.ArmState.Goal;
+import org.sciborgs1155.robot.arm.ElevatorIO.ElevatorConfig;
+import org.sciborgs1155.robot.arm.JointIO.JointConfig;
+import org.sciborgs1155.robot.arm.TrajectoryCache.ArmTrajectory;
+import org.sciborgs1155.robot.arm.TrajectoryCache.Parameters;
 
 public class Arm extends SubsystemBase implements Fallible, Loggable, AutoCloseable {
 
+  /** Factory for an Arm with empty segments */
   public static Arm createNone() {
     return new Arm(new NoElevator(), new NoJoint(), new NoJoint());
   }
 
+  /**
+   * Factory for an Arm with either real or simulated segments, depending on {@link Robot#isReal()}
+   */
   public static Arm createFromConfig(
       ElevatorConfig elevator, JointConfig elbow, JointConfig wrist) {
     return Robot.isReal()
@@ -46,14 +50,21 @@ public class Arm extends SubsystemBase implements Fallible, Loggable, AutoClosea
             new SimJoint(wrist, ArmState.initial().wristAngle(), false));
   }
 
+  // HARDWARE IO
+
   @Log private final ElevatorIO elevator;
   @Log private final JointIO elbow;
   @Log private final JointIO wrist;
 
+  // TRAJECTORY CACHE
+
   private final Map<Integer, ArmTrajectory> trajectories = TrajectoryCache.loadTrajectories();
 
-  @Log private final Visualizer positionVisualizer = new Visualizer(new Color8Bit(255, 0, 0));
-  @Log private final Visualizer setpointVisualizer = new Visualizer(new Color8Bit(0, 0, 255));
+  // VISUALIZATION
+
+  @Log Mechanism2d mech = new Mechanism2d(4, 2);
+  private final Visualizer positionVisualizer = new Visualizer(mech, new Color8Bit(255, 0, 0));
+  private final Visualizer setpointVisualizer = new Visualizer(mech, new Color8Bit(0, 0, 255));
 
   // this is to make the emperical collection of arm states easier
   @Log(name = "copy state")
@@ -237,7 +248,7 @@ public class Arm extends SubsystemBase implements Fallible, Loggable, AutoClosea
           elbow.stopMoving();
           wrist.stopMoving();
         })
-        .alongWith(Commands.print("arm is fucked"))
+        .alongWith(Commands.print("arm is dead"))
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         .withName("killed");
   }

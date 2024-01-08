@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.commands;
+package org.sciborgs1155.robot.auto;
 
 import static org.sciborgs1155.lib.PathFlipper.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
@@ -12,9 +12,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Collection;
 import java.util.List;
 import org.sciborgs1155.lib.DeferredCommand;
-import org.sciborgs1155.robot.subsystems.arm.ArmState.GamePiece;
-import org.sciborgs1155.robot.subsystems.arm.ArmState.Side;
-import org.sciborgs1155.robot.subsystems.drive.Drive;
+import org.sciborgs1155.robot.arm.ArmState.GamePiece;
+import org.sciborgs1155.robot.arm.ArmState.Side;
+import org.sciborgs1155.robot.drive.Drive;
 
 public class Alignment {
 

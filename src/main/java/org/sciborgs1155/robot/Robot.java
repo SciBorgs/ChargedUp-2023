@@ -2,30 +2,28 @@ package org.sciborgs1155.robot;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.Logger;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import org.sciborgs1155.lib.CommandRobot;
-import org.sciborgs1155.lib.DeferredCommand;
 import org.sciborgs1155.lib.failure.Fallible;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
-import org.sciborgs1155.robot.Constants.Elbow;
-import org.sciborgs1155.robot.Constants.Elevator;
-import org.sciborgs1155.robot.Constants.Wrist;
 import org.sciborgs1155.robot.Ports.OI;
-import org.sciborgs1155.robot.commands.Autos;
-import org.sciborgs1155.robot.subsystems.Intake;
-import org.sciborgs1155.robot.subsystems.LED;
-import org.sciborgs1155.robot.subsystems.arm.Arm;
-import org.sciborgs1155.robot.subsystems.arm.ArmState;
-import org.sciborgs1155.robot.subsystems.arm.ArmState.GamePiece;
-import org.sciborgs1155.robot.subsystems.arm.ArmState.Goal;
-import org.sciborgs1155.robot.subsystems.drive.Drive;
+import org.sciborgs1155.robot.arm.Arm;
+import org.sciborgs1155.robot.arm.ArmConstants.Elbow;
+import org.sciborgs1155.robot.arm.ArmConstants.Elevator;
+import org.sciborgs1155.robot.arm.ArmConstants.Wrist;
+import org.sciborgs1155.robot.arm.ArmState;
+import org.sciborgs1155.robot.arm.ArmState.GamePiece;
+import org.sciborgs1155.robot.arm.ArmState.Goal;
+import org.sciborgs1155.robot.auto.Autos;
+import org.sciborgs1155.robot.drive.Drive;
+import org.sciborgs1155.robot.intake.Intake;
 import org.sciborgs1155.robot.vision.NoVision;
 import org.sciborgs1155.robot.vision.VisionIO;
 
@@ -53,7 +51,6 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
       };
 
   @Log private final Intake intake = new Intake();
-  @Log private final LED led = new LED();
 
   // INPUT DEVICES
   private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
@@ -84,14 +81,20 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
 
     DataLogManager.start();
 
+    // Periodically updates oblog entries
     addPeriodic(Logger::updateEntries, Constants.PERIOD);
+
+    // Periodically updates pose estimate from vision data
     addPeriodic(() -> drive.updateEstimates(vision.getPoseEstimates(drive.getPose())), 0.5);
 
+    // Prints all current faults via Fallible
     addPeriodic(() -> getFaults().forEach(System.out::print), 1);
 
-    autonomous().whileTrue(getAutonomousCommand());
+    // Runs the selected auto for autonomous
+    autonomous().whileTrue(new ProxyCommand(autos::get));
 
-    teleop().onTrue(getEnableCommand());
+    // Sets arm setpoint to current position when re-enabled
+    teleop().onTrue(arm.setSetpoints(arm::getState));
   }
 
   /**
@@ -105,8 +108,6 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
             .withName("teleop driving"));
 
     arm.setDefaultCommand(arm.setSetpoints(arm::getSetpoint).repeatedly().withName("holding"));
-
-    // intake.setDefaultCommand(intake.intake(scoring.gamePiece()).withName("passive intake"));
   }
 
   /** Configures trigger -> command bindings */
@@ -114,9 +115,7 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
 
     // DRIVER INPUT
     driver.b().onTrue(drive.zeroHeading());
-
     driver.leftBumper().onTrue(drive.setSpeedMultiplier(0.3)).onFalse(drive.setSpeedMultiplier(1));
-
     driver.rightBumper().onTrue(drive.setSpeedMultiplier(0.3)).onFalse(drive.setSpeedMultiplier(1));
 
     // STATE SWITCHING
@@ -149,15 +148,5 @@ public class Robot extends CommandRobot implements Fallible, Loggable {
         .register(arm.getFaults())
         .register(intake.getFaults())
         .build();
-  }
-
-  /** The command to run when the robot is enabled */
-  public Command getEnableCommand() {
-    return arm.setSetpoints(arm::getState);
-  }
-
-  /** The commamnd to be ran in autonomous */
-  public Command getAutonomousCommand() {
-    return new DeferredCommand(autos::get, drive, arm).withName("auto");
   }
 }

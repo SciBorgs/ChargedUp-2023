@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.subsystems.arm;
+package org.sciborgs1155.robot.arm;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;

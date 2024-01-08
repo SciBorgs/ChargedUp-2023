@@ -1,11 +1,11 @@
-package org.sciborgs1155.robot.subsystems;
+package org.sciborgs1155.robot.intake;
 
 import static org.sciborgs1155.robot.Constants.Auto.*;
-import static org.sciborgs1155.robot.Constants.Intake.*;
 import static org.sciborgs1155.robot.Ports.Intake.*;
+import static org.sciborgs1155.robot.intake.IntakeConstants.*;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,16 +14,25 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import java.util.List;
 import java.util.function.Supplier;
+import org.sciborgs1155.lib.constants.SparkUtils;
 import org.sciborgs1155.lib.failure.Fallible;
 import org.sciborgs1155.lib.failure.FaultBuilder;
 import org.sciborgs1155.lib.failure.HardwareFault;
-import org.sciborgs1155.robot.subsystems.arm.ArmState.GamePiece;
+import org.sciborgs1155.robot.arm.ArmState.GamePiece;
 
 public class Intake extends SubsystemBase implements Fallible, Loggable, AutoCloseable {
 
   @Log(name = "applied output", methodName = "getAppliedOutput")
   @Log(name = "current", methodName = "getOutputCurrent")
-  private final CANSparkMax wheels = MOTOR_CFG.build(MotorType.kBrushless, WHEEL_MOTOR);
+  private final CANSparkMax wheels =
+      SparkUtils.create(
+          WHEEL_MOTOR,
+          s -> {
+            s.setIdleMode(IdleMode.kBrake);
+            s.setSmartCurrentLimit(40);
+            s.setOpenLoopRampRate(0);
+            s.setInverted(true);
+          });
 
   @Log(name = "velocity", methodName = "getVelocity")
   private final RelativeEncoder encoder = wheels.getEncoder();

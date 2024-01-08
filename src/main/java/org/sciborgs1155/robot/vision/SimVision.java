@@ -1,6 +1,6 @@
 package org.sciborgs1155.robot.vision;
 
-import static org.sciborgs1155.robot.Constants.Vision.*;
+import static org.sciborgs1155.robot.vision.VisionConstants.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import org.photonvision.EstimatedRobotPose;
